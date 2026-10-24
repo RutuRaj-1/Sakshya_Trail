@@ -176,3 +176,13 @@ export interface InstrumentSummary {
   released_count: number;
   total_deposit_value: string | number;
 }
+
+export interface DashboardSummary {
+  total_active_institutions: number;
+  total_inactive_institutions: number;
+  total_instruments: number;
+  total_deposit_value: string;
+  instruments_by_status: Record<string, number>;
+  instruments_by_trust_level: Record<string, number>;
+  instruments_approaching_maturity: number;
+}

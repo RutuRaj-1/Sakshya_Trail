@@ -9,6 +9,7 @@ import {
   Layers,
   FileCheck2,
   Users,
+  KeyRound,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/features/auth/AuthContext';
@@ -27,6 +28,7 @@ const baseNavItems: NavItem[] = [
   { name: 'Institutions', to: '/institutions', icon: Building2 },
   { name: 'User Admin', to: '/users', icon: Users, badge: 'Admin', adminOnly: true },
   { name: 'Audit History', to: '/audit', icon: History },
+  { name: 'Password Security', to: '/change-password', icon: KeyRound },
   { name: 'System Diagnostics', to: '/health', icon: Activity },
 ];
 

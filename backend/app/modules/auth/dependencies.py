@@ -39,16 +39,23 @@ def verify_csrf_origin(request: Request) -> None:
     if request.method in ("POST", "PUT", "PATCH", "DELETE"):
         origin = request.headers.get("origin")
         referer = request.headers.get("referer")
+        is_dev = settings.ENVIRONMENT == "development" or settings.DEBUG
 
-        # Allow requests if origin matches CORS whitelist
+        # Allow requests if origin matches CORS whitelist or is local dev host
         if origin:
-            if origin not in settings.CORS_ORIGINS:
-                # In development, also accept localhost variations
-                if not any(origin.startswith(o) for o in settings.CORS_ORIGINS):
-                    raise ForbiddenException("Cross-Origin request blocked by security policy")
+            if origin in settings.CORS_ORIGINS:
+                return
+            if is_dev and (origin.startswith("http://localhost:") or origin.startswith("http://127.0.0.1:")):
+                return
+            if any(origin.startswith(o) for o in settings.CORS_ORIGINS):
+                return
+            raise ForbiddenException("Cross-Origin request blocked by security policy")
         elif referer:
-            if not any(referer.startswith(o) for o in settings.CORS_ORIGINS):
-                raise ForbiddenException("Referer header origin mismatch")
+            if is_dev and (referer.startswith("http://localhost:") or referer.startswith("http://127.0.0.1:")):
+                return
+            if any(referer.startswith(o) for o in settings.CORS_ORIGINS):
+                return
+            raise ForbiddenException("Referer header origin mismatch")
 
 
 async def get_current_user(
@@ -89,12 +96,19 @@ async def get_current_active_user(
     return current_user
 
 
-def require_roles(*allowed_roles: str) -> Callable[[User], User]:
+def require_roles(*allowed_roles) -> Callable[[User], User]:
     """
     Centralized role-based access control dependency factory.
     Example: Depends(require_roles("SYSTEM_ADMIN", "SCRUTINY_OFFICER"))
+    or: Depends(require_roles(["SYSTEM_ADMIN", "SCRUTINY_OFFICER"]))
     """
-    role_set = set(allowed_roles)
+    roles = []
+    for r in allowed_roles:
+        if isinstance(r, (list, tuple, set)):
+            roles.extend(r)
+        else:
+            roles.append(r)
+    role_set = set(roles)
 
     def role_checker(current_user: User = Depends(get_current_active_user)) -> User:
         if current_user.role not in role_set:

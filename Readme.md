@@ -2,38 +2,42 @@
 
 **AICTE Regulation Bureau · Problem Statement ID: 26265**  
 *Streamline of Security Deposit / FDR Portal · Theme: Smart Automation*  
-**Team:** Ukdiche_Modak
+**Team:** Ukdiche_Modak  
+**Stage:** Module 1 Complete Handover (Identity, RBAC, Institution Registry, Instrument Registry & Audit Foundation)  
 
 ---
 
 ## 1. Project Overview
 
-**FDR Sentinel** is a digital governance and lifecycle-integrity platform created for the **All India Council for Technical Education (AICTE) Regulation Bureau**. It provides a single trusted register for statutory Fixed Deposit Receipts (FDRs) and security deposits submitted by technical institutions across India.
+**FDR Sentinel** is an enterprise digital governance and lifecycle-integrity platform created for the **All India Council for Technical Education (AICTE) Regulation Bureau**. It establishes an authoritative single register for statutory Fixed Deposit Receipts (FDRs) and institutional security deposits submitted by technical education institutions across India.
 
-### Key Capabilities
-- **Explicit Trust Provenance (L1–L4)**: Differentiates between declared data (L1), OCR/document-consistent data (L2), scrutiny officer-verified data (L3), and legitimate bank-confirmed data (L4).
-- **Automated Lifecycle & Maturity Tracking**: Monitors deposit validity, sends configurable advance renewal notifications (90d/60d/30d), and tracks lien endorsements.
-- **Renewal Lineage**: Preserves an unbroken historical chain across replacements and roll-overs without overwriting past certificates.
-- **Gated Release & Refund Workflow**: Prevents unauthorized releases by verifying all regulatory conditions before competent-authority approval.
-- **Tamper-Evident Audit Ledger**: Immutable event trail capturing all regulatory reviews, status changes, and administrative actions.
+### Key Capabilities & Completed Module 1 Deliverables
+- **Authoritative Identity & Session Security**: Secure Argon2id password hashing, mandatory password rotation for provisioned nodal accounts, signed JWT sessions with `HttpOnly`, `SameSite=Lax` cookies, and origin CSRF protection.
+- **Enforced Role-Based Scoping (RBAC)**: Fine-grained access control across 7 application roles. `INSTITUTION_USER` accounts are strictly scoped to their assigned institution and forbidden from cross-institution access or privilege tampering.
+- **Statutory Institution Registry**: Full lifecycle management with normalized unique codes, state/type classification, verified nodal contacts, and non-destructive deactivation preserving audit history.
+- **FDR Instrument Registry**: High-precision monetary storage (`Numeric(18, 2)` decimal; never float), parent institution foreign key, issuance and maturity date validation (`maturity_date > issue_date`).
+- **Separation of Three Core Concepts**:
+  - *Administrative Workflow Status*: `DRAFT`, `REGISTERED`.
+  - *Evidentiary Trust Tier*: `L0 — DECLARED` (baseline default), `L1 — DOCUMENT_CONSISTENT` (Module 2 OCR), `L2 — OFFICER_VERIFIED` (Module 3 Scrutiny), `L3 — BANK_CONFIRMED` (Module 4 Direct Gateway). Ordinary registry endpoints cannot escalate trust levels.
+  - *Derived Read-Only Maturity Indicator*: Derived dynamically as `ACTIVE`, `EXPIRING_SOON` (≤ 90-day warning window), or `EXPIRED`.
+- **Conservative Duplicate-Reference Warning Path**: Normalized bank and reference number matching returns structured 409 warnings with existing record details without blocking legitimate records or merging data. Explicit authorized override (`confirm_duplicate: true`) records an auditable override.
+- **Tamper-Evident Audit Ledger**: Immutable event trail capturing actor, timestamp, action, target record, and sanitized context without leaking passwords or secrets.
+- **Scoped Executive Dashboard**: Role-scoped live counts and monetary sums derived directly from database queries.
 
 ---
 
 ## 2. Technology Stack
 
-- **Backend**: Python 3.11+ (tested on Python 3.14.2), FastAPI, Pydantic v2 (`pydantic-settings`).
-- **ORM & Migrations**: SQLAlchemy 2.x (`DeclarativeBase`), Alembic.
-- **Database**: 
-  - **PostgreSQL** (Production / Staging / External service via `psycopg[binary]` v3).
-  - **SQLite** (Local zero-config development and in-memory test harness).
-  - **Firebase** (Adapter configuration placeholders for optional cloud storage).
-- **Frontend**: React 19, TypeScript, Vite 8, Tailwind CSS v4 (`@tailwindcss/vite`), React Router v7, Lucide Icons.
-- **Testing**: `pytest` + `httpx` (Backend), `vitest` + `@testing-library/react` (Frontend).
-- **Deployment Strategy**: Modular monolith. *(No Docker is required or utilized at this stage).*
+- **Backend**: Python 3.11+ (verified on Python 3.14.2), FastAPI, Pydantic v2 (`pydantic-settings`), Uvicorn.
+- **Database & ORM**: SQLAlchemy 2.x declarative base, Alembic migrations.
+  - **SQLite** (Default local zero-config development engine: `backend/fdr_sentinel.db`).
+  - **PostgreSQL** (Production / Containerized staging via `psycopg[binary]` v3).
+- **Frontend**: React 19, TypeScript, Vite 8 (with native reverse-proxy), Tailwind CSS v4, React Router v7, Lucide Icons.
+- **Testing**: `pytest` + `httpx` (67 backend tests), `vitest` + `@testing-library/react` (4 frontend tests).
 
 ---
 
-## 3. Directory Structure
+## 3. Directory & File Structure
 
 ```text
 FDR_Sentinel/
@@ -42,166 +46,257 @@ FDR_Sentinel/
 ├── FDR_Sentinel_Project_Synopsis.md              # Research & solution synopsis (Preserved)
 ├── FDR_Sentinel_SRS.md                           # Software Requirements Specification (Preserved)
 ├── FDR_Sentinel_Seven_Module_Prototype_Blueprint.docx # Blueprint source (Preserved)
-├── README.md                                     # Complete project documentation
+├── README.md                                     # Complete project documentation & developer guide
 ├── .gitignore                                    # Secrets, virtualenvs, caches, builds
 ├── .env.example                                  # Comprehensive environment template
 ├── Doc/
-│   └── module1.md                                # Detailed Module 1 architecture summary
+│   └── module1.md                                # Comprehensive Module 1 specification & test log
 ├── docs/
-│   ├── architecture/
-│   │   └── system_overview.md                    # Architecture diagram and trust levels
-│   └── development/
-│       └── getting_started.md                    # Developer onboarding guide
+│   └── architecture/
+│       └── module1_architecture.md               # Architecture, ERD, and trust model
 ├── scripts/
-│   ├── dev.ps1                                   # One-click dev launcher for backend & frontend
+│   ├── dev.ps1                                   # Dev launcher for backend & frontend
 │   └── test.ps1                                  # Unified test runner (backend + frontend)
 ├── backend/
 │   ├── pyproject.toml                            # Backend dependencies & pytest config
 │   ├── alembic.ini                               # Database migration settings
 │   ├── alembic/                                  # Alembic migration scripts
 │   ├── app/
-│   │   ├── main.py                               # FastAPI application entrypoint
+│   │   ├── main.py                               # FastAPI application entrypoint & CORS
 │   │   ├── core/                                 # Config (Pydantic Settings) & security
-│   │   ├── db/                                   # Session maker, engine, and base
-│   │   ├── common/                               # Standard response envelopes & exceptions
-│   │   ├── api/v1/                               # API v1 routes & health probes
+│   │   ├── db/                                   # Session maker, engine, Base & TimestampMixin
+│   │   ├── common/                               # Envelopes, exceptions & error handlers
+│   │   ├── api/v1/                               # API v1 aggregate router & health probes
 │   │   └── modules/
-│   │       ├── auth/                             # User models, roles, bootstrap
+│   │       ├── auth/                             # User models, RBAC dependencies, sessions
 │   │       ├── institutions/                     # AICTE institution registry
-│   │       ├── instruments/                      # FDR instruments & executive KPI summary
+│   │       ├── instruments/                      # FDR instrument registry & validation
+│   │       ├── dashboard/                        # Scoped Module 1 dashboard summary
 │   │       └── audit/                            # Tamper-evident audit event ledger
 │   ├── scripts/
-│   │   └── init_db.py                            # Database seed script with sample data
+│   │   ├── bootstrap_admin.py                    # CLI command to securely bootstrap first admin
+│   │   └── init_db.py                            # Idempotent synthetic demo seeding script
 │   └── tests/
-│       ├── conftest.py                           # Pytest fixtures & isolated in-memory DB
-│       ├── test_health.py                        # Liveness & database readiness tests
-│       └── test_modules.py                       # Integration tests for domain modules
+│       ├── conftest.py                           # Pytest fixtures & isolated DB harness
+│       ├── test_health.py                        # Liveness & readiness probe tests
+│       ├── test_auth_rbac.py                     # Authentication & RBAC enforcement tests
+│       ├── test_institutions_users.py            # Institution CRUD & User administration tests
+│       ├── test_instruments_registry.py          # FDR registry, validation & duplicate tests
+│       ├── test_module1_acceptance.py            # Complete M1-AC-01 to M1-AC-18 acceptance tests
+│       └── test_modules.py                       # Integration tests
 └── frontend/
     ├── package.json                              # Vite, React 19, Tailwind v4, Vitest
-    ├── vite.config.ts                            # Vite build & Vitest test runner setup
-    ├── tsconfig.json                             # TypeScript project references
-    ├── tsconfig.app.json                         # Strict frontend TypeScript configuration
-    ├── index.html                                # Inter typography & SEO metadata
+    ├── vite.config.ts                            # Vite configuration & native /api reverse proxy
+    ├── tsconfig.json                             # TypeScript references
+    ├── index.html                                # SEO metadata & Inter typography
     └── src/
         ├── app/
-        │   ├── App.tsx                           # Root component
-        │   ├── router.tsx                        # React Router routes
-        │   └── routes/                           # Dashboard, Instruments, Institutions, Health, Audit
+        │   ├── App.tsx                           # Root component & providers
+        │   ├── router.tsx                        # Client routing & ProtectedRoute
+        │   └── routes/                           # Dashboard, Instruments, Institutions, etc.
         ├── components/
         │   ├── common/                           # Badge, Button, Card, StatusIndicator
-        │   └── navigation/                       # Header (live health probe), Sidebar
-        ├── layouts/
-        │   └── MainLayout.tsx                    # Responsive administrative shell
+        │   └── navigation/                       # Header, Sidebar
         ├── features/
-        │   ├── instruments/                      # InstrumentsList, InstrumentSummaryCards
-        │   └── institutions/                     # InstitutionsList
+        │   ├── auth/                             # AuthContext & Session management
+        │   ├── instruments/                      # InstrumentsList, InstrumentModal
+        │   └── institutions/                     # InstitutionsList, InstitutionModal
         ├── api/
-        │   ├── client.ts                         # Centralized typed HTTP client
+        │   ├── client.ts                         # Centralized typed HTTP client (/api/v1)
         │   └── endpoints.ts                      # Typed API methods
-        ├── hooks/
-        │   └── useHealth.ts                      # Health & readiness polling hook
-        ├── lib/
-        │   └── utils.ts                          # formatINR, formatDate, cn
         └── types/
-            └── index.ts                          # Domain TypeScript interfaces
+            └── index.ts                          # Shared TypeScript domain contracts
 ```
 
 ---
 
-## 4. Quick Start & Execution Commands
+## 4. Developer Handover & Getting Started Guide
 
-### Prerequisites
-- Python 3.11+
-- Node.js 18+ (tested with v22.19.0)
-- npm 10+ (tested with 11.11.0)
+### 4.1 Prerequisites
+- **Python**: 3.11 or higher (tested on Python 3.14.2)
+- **Node.js**: v18.0.0 or higher (tested on v22.19.0)
+- **Package Managers**: `pip` (Python), `npm` 10+ (Node)
+- **PowerShell**: 5.1+ (Windows) or bash (macOS/Linux)
 
-### 4.1 Backend Setup
-```powershell
-# Navigate to project root
-cd FDR_Sentinel
+---
 
-# Create and activate virtual environment (if not already created)
-python -m venv backend/.venv
+### 4.2 Environment Configuration
 
-# Install dependencies
-backend\.venv\Scripts\python -m pip install -e backend
+Create your `.env` file in the root directory (or `backend/.env`):
 
-# Initialize and seed database with sample AICTE institutions & FDRs
-backend\.venv\Scripts\python backend/scripts/init_db.py
+```bash
+# General
+ENVIRONMENT=development
+PROJECT_NAME="FDR Sentinel"
+VERSION=0.2.0
+API_V1_STR=/api/v1
+SECRET_KEY=fdr-sentinel-regulatory-secret-key-2026-production-grade
+DEBUG=True
 
-# Start FastAPI backend server
-backend\.venv\Scripts\python -m uvicorn app.main:app --app-dir backend --reload --host 127.0.0.1 --port 8000
+# Server Bindings
+BACKEND_HOST=127.0.0.1
+BACKEND_PORT=8000
+
+# Database Connection (Default: SQLite for local dev)
+DATABASE_URL=sqlite:///./fdr_sentinel.db
+
+# If using PostgreSQL:
+# DATABASE_URL=postgresql+psycopg://fdr_admin:SecurePass2026@localhost:5432/fdr_sentinel_db
+
+# CORS Allowed Origins
+CORS_ORIGINS=["http://localhost:5173","http://127.0.0.1:5173","http://localhost:5174","http://127.0.0.1:5174"]
 ```
 
-### 4.2 Frontend Setup
+---
+
+### 4.3 Database Setup & Migrations
+
+The repository uses Alembic for schema migrations:
+
 ```powershell
-# Navigate to frontend directory
+# Navigate to backend
+cd backend
+
+# Run pending migrations to head
+.\.venv\Scripts\alembic.exe upgrade head
+```
+
+---
+
+### 4.4 PostgreSQL & Optional Docker Compose Setup
+
+To run a dedicated PostgreSQL instance instead of SQLite:
+
+```powershell
+# 1. Start PostgreSQL with Docker (optional)
+docker run --name fdr-postgres -e POSTGRES_USER=fdr_admin -e POSTGRES_PASSWORD=SecurePass2026 -e POSTGRES_DB=fdr_sentinel_db -p 5432:5432 -d postgres:16-alpine
+
+# 2. Set environment variable in your .env:
+# DATABASE_URL=postgresql+psycopg://fdr_admin:SecurePass2026@localhost:5432/fdr_sentinel_db
+
+# 3. Apply migrations to PostgreSQL
+cd backend
+.\.venv\Scripts\alembic.exe upgrade head
+```
+
+---
+
+### 4.5 Secure First-Administrator Bootstrap
+
+To create the initial `SYSTEM_ADMIN` account safely through the CLI (prompts securely for password without committing credentials):
+
+```powershell
+cd backend
+.\.venv\Scripts\python scripts/bootstrap_admin.py --email admin@aicte-india.org --name "AICTE Master Administrator"
+```
+*(Prompts interactively for an 8+ character password and verifies confirmation before saving).*
+
+---
+
+### 4.6 Synthetic Demonstration Data Seeding
+
+To populate idempotent synthetic institutions, users across all roles, and sample FDR instruments (including an intentional duplicate for testing):
+
+```powershell
+cd backend
+.\.venv\Scripts\python scripts/init_db.py
+```
+
+*This command is 100% idempotent and can be safely executed multiple times without generating duplicate records.*
+
+**Pre-seeded Evaluator Demo Accounts:**
+| Role | Email | Password | Scope & Characteristics |
+|---|---|---|---|
+| `SYSTEM_ADMIN` | `admin@aicte-india.org` | `AdminPassword@2026` | Bureau-wide technical setup, user provisioning, institution management |
+| `SCRUTINY_OFFICER` | `scrutiny.verma@aicte-india.org` | `OfficerPassword@2026` | Bureau-wide review of institutions and instruments, scrutiny corrections |
+| `BRANCH_HEAD` | `branch.head.north@aicte-india.org` | `BranchPassword@2026` | Regional AICTE jurisdiction oversight (Read-Only) |
+| `AUDITOR` | `auditor.compliance@aicte-india.org` | `AuditorPassword@2026` | Independent oversight, read-only inspection of records and audit ledger |
+| `INSTITUTION_USER` | `nodal@diet-delhi.ac.in` | `NodalPassword@2026` | Scoped to DIET Delhi (`DEMO-AICTE-001`). Forces password rotation on first login |
+| `INSTITUTION_USER` | `nodal.pune@mims-demo.ac.in` | `NodalPassword@2026` | Scoped to MIMS Pune (`DEMO-AICTE-002`). Proves multi-tenant isolation |
+
+---
+
+### 4.7 Starting Backend & Frontend
+
+#### Terminal 1 — FastAPI Backend:
+```powershell
+cd backend
+.\.venv\Scripts\python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+```
+- Swagger API Docs: `http://127.0.0.1:8000/docs`
+- Health Probe: `http://127.0.0.1:8000/healthz`
+
+#### Terminal 2 — React Frontend (Vite):
+```powershell
 cd frontend
-
-# Install dependencies
 npm install
-
-# Start Vite development server
 npm run dev
 ```
-
-### 4.3 One-Click Development Launcher (PowerShell)
-From the project root:
-```powershell
-powershell -ExecutionPolicy Bypass -File scripts/dev.ps1
-```
+- Web Application Portal: `http://localhost:5173` (or `http://localhost:5174`)
 
 ---
 
-## 5. Running Quality Checks and Tests
+## 5. Automated Testing & Verification
 
-Execute both test suites in one command via the unified runner:
+Execute the unified test runner from the root directory:
+
 ```powershell
 powershell -ExecutionPolicy Bypass -File scripts/test.ps1
 ```
 
-Or execute them individually:
-
-### Backend Tests (pytest)
+### 5.1 Backend Pytest Suite (67 / 67 Passed in ~5.5s)
 ```powershell
 backend\.venv\Scripts\pytest backend/tests -v
 ```
-*Current status: 10 passed in 0.11s.*
+Test modules executed:
+- `test_health.py` (5 tests): Liveness, readiness, database dialect probes.
+- `test_auth_rbac.py` (14 tests): Argon2 hashing, JWT cookies, role permissions, CSRF origin.
+- `test_institutions_users.py` (14 tests): Institution CRUD, unique code, soft-delete, user provisioning, last-admin lockout.
+- `test_instruments_registry.py` (12 tests): Amount/date validation, L0 trust lock, duplicate warning override, decimal precision.
+- `test_module1_acceptance.py` (18 tests): Explicit coverage for **M1-AC-01 through M1-AC-18**.
+- `test_modules.py` (4 tests): End-to-end integration flows.
 
-### Frontend Tests (vitest)
+### 5.2 Frontend Vitest Suite (4 / 4 Passed)
 ```powershell
 cd frontend
 npm test
 ```
-*Current status: 3 passed in 1.18s.*
 
-### Frontend Typecheck & Production Build
+### 5.3 Production Bundle Build
 ```powershell
 cd frontend
 npm run build
 ```
-*Current status: Successfully built client bundle in ~400ms.*
+*(Runs TypeScript compiler `tsc -b` and Vite production bundler with 0 errors).*
 
 ---
 
-## 6. Health & Diagnostics Endpoints
+## 6. Role-Based Access Control (RBAC) Matrix
 
-The system exposes live observability probes:
-
-| Endpoint | Method | Purpose | Response Sample |
-|---|---|---|---|
-| `/api/v1/health/live` | `GET` | Liveness probe verifying API worker is responding | `{"status": "alive", "service": "FDR Sentinel", "version": "0.1.0"}` |
-| `/api/v1/health/ready` | `GET` | Readiness probe checking database reachability via `SELECT 1` | `{"status": "ready", "is_ready": true, "components": {"database": {"status": "connected", "dialect": "sqlite", "latency_ms": 0.36}}}` |
-| `/healthz` | `GET` | Root alias for orchestrator liveness | `{"status": "alive"}` |
-| `/readyz` | `GET` | Root alias for orchestrator readiness | `{"is_ready": true}` |
-| `/api/v1/instruments/summary` | `GET` | Live executive metrics for administrative dashboard | Total deposits, active count, expiring soon (<90d), under scrutiny |
+| Operation / Endpoint | `SYSTEM_ADMIN` | `SCRUTINY_OFFICER` | `BRANCH_HEAD` | `COMPETENT_AUTHORITY` | `FINANCE_OFFICER` | `AUDITOR` | `INSTITUTION_USER` |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| **Institution: List / Read** | Full | Full | Full | Full | Full | Full (Read-Only) | **Own Institution Only** |
+| **Institution: Create** | Allowed | Denied | Denied | Denied | Denied | Denied | Denied |
+| **Institution: Edit Contact Info** | Allowed | Allowed | Denied | Denied | Denied | Denied | **Own Contact Fields Only** |
+| **Institution: Deactivate/Activate** | Allowed | Denied | Denied | Denied | Denied | Denied | Denied |
+| **User Administration Portal** | Full | Denied | Denied | Denied | Denied | Denied | Denied |
+| **Instruments: List / Read** | Full | Full | Full | Full | Full | Full (Read-Only) | **Own FDRs Only** |
+| **Instruments: Create** | Allowed | Allowed | Denied | Denied | Denied | Denied | **Own FDRs Only** |
+| **Instruments: Edit Permitted** | Allowed | Allowed | Denied | Denied | Denied | Denied | **Own Draft/Reg FDRs** |
+| **Instruments: Escalate Trust Level** | **Blocked** | **Blocked** | **Blocked** | **Blocked** | **Blocked** | **Blocked** | **Blocked** |
+| **Dashboard: Scoped Metrics** | Bureau | Bureau | Bureau | Bureau | Bureau | Bureau | **Own Scoped Totals** |
+| **Audit Trails: Inspect** | Allowed | Denied | Denied | Denied | Denied | Allowed | Denied |
 
 ---
 
-## 7. Roadmap & Next Modules
+## 7. Known Limitations & Module 2 Roadmap
 
-- **Module 1 (Completed)**: Foundational modular-monolith scaffold, database layer (PostgreSQL/SQLite dual engine), health/readiness observability, centralized frontend API client, and administrative UI shell.
-- **Module 2**: End-to-end FDR submission wizard, document upload with SHA-256 integrity hashing, and scrutiny review workflow.
-- **Module 3**: Automated maturity & validity rule engine with advance notifications (90d/60d/30d) and renewal lineage tracking.
-- **Module 4**: Gated release/refund authorization workflow, competent authority sign-off, and policy compliance verification.
-- **Module 5**: Role-based access enforcement, security hardening, simulated bank confirmation adapter, and final prototype demonstration.
+### Limitations in Current Scope
+1. **Physical Document Extraction**: In Module 1, instruments store statutory metadata. PDF attachment, SHA-256 document hashing, and multi-OCR extraction are scheduled for **Module 2**.
+2. **Scrutiny Verification Queue**: Promotion from `L0_DECLARED` to `L1` (Document Consistent) and `L2` (Officer Verified) requires the formal discrepancy detection engine in **Module 3**.
+3. **Live Bank API Confirmation**: Promotion to `L3_BANK_CONFIRMED` requires the SFTP / direct bank gateway adapters in **Module 4**.
+4. **Renewal & Release State Transitions**: Formal release approvals, encashment directives, and renewal lineage graphs belong to **Module 5**.
+5. **Email Delivery**: Password reset credentials generate a secure temporary password displayed to the administrator for secure transmission; automated SMTP mail delivery will be integrated in future phases.
+
+### Recommended Next Step
+Proceed to **Module 2: Document Ingestion, Multi-Engine OCR Pipeline, and SHA-256 Evidence Hashing**.

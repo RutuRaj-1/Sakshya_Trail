@@ -1,4 +1,5 @@
-import { ShieldCheck, Database, RefreshCw, LogOut } from 'lucide-react';
+import { ShieldCheck, Database, RefreshCw, LogOut, KeyRound } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useHealth } from '@/hooks/useHealth';
 import { useAuth } from '@/features/auth/AuthContext';
 import { StatusIndicator } from '@/components/common/StatusIndicator';
@@ -122,6 +123,15 @@ export const Header: React.FC = () => {
             >
               {getInitials(user.full_name)}
             </div>
+
+            <Link
+              to="/change-password"
+              className="p-1.5 text-slate-400 hover:text-sentinel-700 hover:bg-sentinel-50 rounded-lg transition-colors cursor-pointer"
+              title="Change account password"
+              aria-label="Change password"
+            >
+              <KeyRound className="w-4 h-4" />
+            </Link>
 
             <button
               onClick={() => logout()}

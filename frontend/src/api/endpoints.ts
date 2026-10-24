@@ -8,6 +8,7 @@ import type {
   Instrument,
   InstrumentListResponse,
   InstrumentSummary,
+  DashboardSummary,
   User,
   UserListResponse,
 } from '@/types';
@@ -131,4 +132,8 @@ export const instrumentsApi = {
   update: (id: string, data: Partial<Instrument> & { confirm_duplicate?: boolean }) =>
     apiClient.patch<Instrument>(`/instruments/${id}`, data),
   getSummary: () => apiClient.get<InstrumentSummary>('/instruments/summary'),
+};
+
+export const dashboardApi = {
+  getSummary: () => apiClient.get<DashboardSummary>('/dashboard/summary'),
 };
