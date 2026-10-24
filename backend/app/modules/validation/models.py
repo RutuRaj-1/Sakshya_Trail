@@ -241,9 +241,30 @@ class ValidationFinding(Base, TimestampMixin):
         nullable=True, index=True,
     )
 
+    # ---- Review assignment & observations ----
+    assigned_to_user_id: Mapped[Optional[str]] = mapped_column(
+        String(36), ForeignKey("users.id", ondelete="SET NULL"),
+        nullable=True, index=True,
+    )
+    assigned_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    review_notes_json: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
+    # ---- Optimistic concurrency control ----
+    concurrency_version: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
+
     # Relationships
     instrument: Mapped["Instrument"] = relationship("Instrument", foreign_keys=[instrument_id])
     document: Mapped[Optional["Document"]] = relationship("Document", foreign_keys=[document_id])
+
+    @property
+    def review_notes(self) -> List[Dict[str, Any]]:
+        """Parse review_notes_json as a list of dicts."""
+        if not self.review_notes_json:
+            return []
+        try:
+            return json.loads(self.review_notes_json)
+        except Exception:
+            return []
 
     __table_args__ = (
         Index("ix_vf_instrument_status", "instrument_id", "status"),

@@ -20,14 +20,16 @@ Safety constraints
 * Does NOT delete findings — only status transitions with audit trail.
 """
 import json
+import uuid
 from datetime import datetime, timezone
 from typing import List, Optional, Dict, Any
 
 from sqlalchemy.orm import Session
 from sqlalchemy import select, and_
 
+from app.modules.instruments.models import Instrument
 from app.modules.validation.models import ValidationFinding, ValidationRun
-from app.modules.validation.enums import FindingStatus, RuleOutcome
+from app.modules.validation.enums import FindingStatus, RuleOutcome, RuleSeverity
 from app.modules.validation.registry import RuleResult, compute_finding_fingerprint
 from app.modules.audit.service import log_audit_event
 
@@ -363,4 +365,449 @@ def get_validation_runs_for_instrument(
         ).all()
     )
     return runs, total
+
+
+# ---------------------------------------------------------------------------
+# Prompt 4: Workflow Operations, Concurrency, and Review Queue
+# ---------------------------------------------------------------------------
+
+def transition_finding_status(
+    db: Session,
+    finding: ValidationFinding,
+    target_status: str,
+    actor_user: Any,
+    reason: Optional[str] = None,
+    expected_concurrency_version: Optional[int] = None,
+) -> ValidationFinding:
+    """
+    Transition finding lifecycle status with strict transition rules, reason requirements,
+    role authorization, and optimistic concurrency protection.
+
+    Allowed transitions:
+      OPEN      -> IN_REVIEW, RESOLVED, DISMISSED
+      IN_REVIEW -> RESOLVED, DISMISSED
+    """
+    from app.common.exceptions import AppException, ForbiddenException, ConflictException
+    from app.core.security import ROLE_SCRUTINY_OFFICER, ROLE_BRANCH_HEAD, ROLE_SYSTEM_ADMIN
+
+    # 1. Role permission: Only officers and admins can change finding status
+    allowed_roles = (ROLE_SCRUTINY_OFFICER, ROLE_BRANCH_HEAD, ROLE_SYSTEM_ADMIN)
+    if actor_user.role not in allowed_roles:
+        raise ForbiddenException(
+            f"Role '{actor_user.role}' is not authorized to transition finding status. "
+            f"Requires one of: {', '.join(allowed_roles)}."
+        )
+
+    # 2. Scope check: verify institution matches if user is scoped
+    if actor_user.institution_id and actor_user.institution_id != finding.institution_id:
+        raise ForbiddenException("Cannot modify finding belonging to another institution.")
+
+    # 3. Optimistic concurrency check
+    if expected_concurrency_version is not None:
+        if finding.concurrency_version != expected_concurrency_version:
+            raise ConflictException(
+                "The finding has been modified by another concurrent review action. "
+                f"Expected version {expected_concurrency_version}, but current version is {finding.concurrency_version}. "
+                "Please reload and review latest state before retrying."
+            )
+
+    curr_status = finding.status
+    target_norm = target_status.strip().upper()
+
+    # 4. Enforce permitted transitions
+    valid_transitions = {
+        FindingStatus.OPEN.value: {
+            FindingStatus.IN_REVIEW.value,
+            FindingStatus.RESOLVED.value,
+            FindingStatus.DISMISSED.value,
+        },
+        FindingStatus.IN_REVIEW.value: {
+            FindingStatus.RESOLVED.value,
+            FindingStatus.DISMISSED.value,
+        },
+    }
+
+    allowed_targets = valid_transitions.get(curr_status, set())
+    if target_norm not in allowed_targets:
+        raise AppException(
+            f"Invalid transition from '{curr_status}' to '{target_norm}'. "
+            f"Allowed next states from '{curr_status}': {sorted(list(allowed_targets)) or 'None (terminal state)'}.",
+            status_code=400,
+            code="INVALID_FINDING_STATUS_TRANSITION",
+        )
+
+    # 5. Reason requirement: RESOLVED and DISMISSED strictly require a non-empty reason
+    if target_norm in (FindingStatus.RESOLVED.value, FindingStatus.DISMISSED.value):
+        if not reason or not reason.strip():
+            raise AppException(
+                f"A non-empty reason is mandatory when transitioning finding to '{target_norm}'.",
+                status_code=422,
+                code="REASON_REQUIRED",
+            )
+
+    now = _utc_now()
+    prior_status = finding.status
+    finding.status = target_norm
+    finding.last_evaluated_at = now
+    finding.concurrency_version += 1
+
+    # Update resolution / dismissal tracking fields
+    if target_norm in (FindingStatus.RESOLVED.value, FindingStatus.DISMISSED.value):
+        finding.resolved_at = now
+        finding.resolved_by_user_id = actor_user.id
+        finding.resolution_note = reason.strip() if reason else None
+
+    # Append to review_notes audit list
+    notes = finding.review_notes
+    notes.append({
+        "id": str(uuid.uuid4()),
+        "actor_id": actor_user.id,
+        "actor_email": actor_user.email,
+        "actor_role": actor_user.role,
+        "action": f"STATUS_TRANSITION_{prior_status}_TO_{target_norm}",
+        "reason": reason.strip() if reason else None,
+        "timestamp": now.isoformat(),
+    })
+    finding.review_notes_json = json.dumps(notes)
+
+    db.commit()
+    db.refresh(finding)
+
+    # Audit logging
+    log_audit_event(
+        db=db,
+        action=f"VALIDATION_FINDING_{target_norm}",
+        entity_type="validation_finding",
+        entity_id=finding.id,
+        actor_user_id=actor_user.id,
+        actor_email=actor_user.email,
+        actor_role=actor_user.role,
+        outcome="SUCCESS",
+        metadata={
+            "prior_status": prior_status,
+            "new_status": target_norm,
+            "reason": reason.strip() if reason else None,
+            "instrument_id": finding.instrument_id,
+            "concurrency_version": finding.concurrency_version,
+        },
+    )
+
+    return finding
+
+
+def assign_finding(
+    db: Session,
+    finding: ValidationFinding,
+    assigned_to_user_id: str,
+    actor_user: Any,
+) -> ValidationFinding:
+    """Assign or reassign a finding to an authorized officer."""
+    from app.common.exceptions import AppException, ForbiddenException, NotFoundException
+    from app.modules.auth.models import User
+    from app.core.security import ROLE_SCRUTINY_OFFICER, ROLE_BRANCH_HEAD, ROLE_SYSTEM_ADMIN
+
+    allowed_roles = (ROLE_SCRUTINY_OFFICER, ROLE_BRANCH_HEAD, ROLE_SYSTEM_ADMIN)
+    if actor_user.role not in allowed_roles:
+        raise ForbiddenException("Not authorized to assign findings.")
+
+    target_user = db.scalar(select(User).where(User.id == assigned_to_user_id))
+    if not target_user:
+        raise NotFoundException(f"User '{assigned_to_user_id}' not found.")
+
+    now = _utc_now()
+    finding.assigned_to_user_id = assigned_to_user_id
+    finding.assigned_at = now
+    finding.concurrency_version += 1
+
+    notes = finding.review_notes
+    notes.append({
+        "id": str(uuid.uuid4()),
+        "actor_id": actor_user.id,
+        "actor_email": actor_user.email,
+        "actor_role": actor_user.role,
+        "action": "ASSIGNED",
+        "assigned_to": target_user.email,
+        "timestamp": now.isoformat(),
+    })
+    finding.review_notes_json = json.dumps(notes)
+
+    db.commit()
+    db.refresh(finding)
+
+    log_audit_event(
+        db=db,
+        action="VALIDATION_FINDING_ASSIGNED",
+        entity_type="validation_finding",
+        entity_id=finding.id,
+        actor_user_id=actor_user.id,
+        actor_email=actor_user.email,
+        actor_role=actor_user.role,
+        outcome="SUCCESS",
+        metadata={
+            "assigned_to_user_id": assigned_to_user_id,
+            "assigned_to_email": target_user.email,
+            "instrument_id": finding.instrument_id,
+        },
+    )
+    return finding
+
+
+def add_finding_observation(
+    db: Session,
+    finding: ValidationFinding,
+    actor_user: Any,
+    observation_text: str,
+) -> ValidationFinding:
+    """Add a review observation note to a finding without altering its status."""
+    from app.common.exceptions import AppException, ForbiddenException
+
+    if not observation_text or not observation_text.strip():
+        raise AppException("Observation note cannot be blank.", status_code=422, code="BLANK_OBSERVATION")
+
+    now = _utc_now()
+    finding.concurrency_version += 1
+
+    notes = finding.review_notes
+    notes.append({
+        "id": str(uuid.uuid4()),
+        "actor_id": actor_user.id,
+        "actor_email": actor_user.email,
+        "actor_role": actor_user.role,
+        "action": "OBSERVATION",
+        "note": observation_text.strip(),
+        "timestamp": now.isoformat(),
+    })
+    finding.review_notes_json = json.dumps(notes)
+
+    db.commit()
+    db.refresh(finding)
+
+    log_audit_event(
+        db=db,
+        action="VALIDATION_FINDING_OBSERVATION_ADDED",
+        entity_type="validation_finding",
+        entity_id=finding.id,
+        actor_user_id=actor_user.id,
+        actor_email=actor_user.email,
+        actor_role=actor_user.role,
+        outcome="SUCCESS",
+        metadata={
+            "instrument_id": finding.instrument_id,
+            "observation_length": len(observation_text.strip()),
+        },
+    )
+    return finding
+
+
+def return_instrument_for_correction(
+    db: Session,
+    instrument_id: str,
+    actor_user: Any,
+    explanation: str,
+) -> Instrument:
+    """
+    Return an instrument to the submitting institution for correction.
+    Requires an explicit non-empty explanation and officer authorization.
+    """
+    from app.common.exceptions import AppException, ForbiddenException, NotFoundException
+    from app.modules.instruments.models import Instrument
+    from app.core.security import ROLE_SCRUTINY_OFFICER, ROLE_BRANCH_HEAD, ROLE_SYSTEM_ADMIN
+
+    allowed_roles = (ROLE_SCRUTINY_OFFICER, ROLE_BRANCH_HEAD, ROLE_SYSTEM_ADMIN)
+    if actor_user.role not in allowed_roles:
+        raise ForbiddenException("Only authorized officers can return a submission for correction.")
+
+    if not explanation or not explanation.strip():
+        raise AppException(
+            "An explicit explanation is required when returning an instrument for correction.",
+            status_code=422,
+            code="EXPLANATION_REQUIRED",
+        )
+
+    instrument = db.scalar(select(Instrument).where(Instrument.id == instrument_id))
+    if not instrument:
+        raise NotFoundException(f"Instrument '{instrument_id}' not found.")
+
+    instrument.status = "RETURNED_FOR_CORRECTION"
+    instrument.updated_by_user_id = actor_user.id
+    instrument.remarks = f"[Returned for correction by {actor_user.email}]: {explanation.strip()}"
+
+    db.commit()
+    db.refresh(instrument)
+
+    log_audit_event(
+        db=db,
+        action="INSTRUMENT_RETURNED_FOR_CORRECTION",
+        entity_type="Instrument",
+        entity_id=instrument.id,
+        actor_user_id=actor_user.id,
+        actor_email=actor_user.email,
+        actor_role=actor_user.role,
+        outcome="SUCCESS",
+        metadata={
+            "explanation": explanation.strip(),
+            "institution_id": instrument.institution_id,
+        },
+    )
+    return instrument
+
+
+def get_review_queue(
+    db: Session,
+    current_user: Any,
+    status_filter: Optional[List[str]] = None,
+    severity_filter: Optional[str] = None,
+    category_filter: Optional[str] = None,
+    rule_id_filter: Optional[str] = None,
+    instrument_id_filter: Optional[str] = None,
+    institution_id_filter: Optional[str] = None,
+    search: Optional[str] = None,
+    sort_by: str = "priority",  # 'priority', 'detected_at', 'severity', 'status'
+    sort_order: str = "desc",
+    skip: int = 0,
+    limit: int = 50,
+) -> Dict[str, Any]:
+    """
+    Query the discrepancy review queue with filtering, search, pagination,
+    role-based tenant scoping, and transparent priority score calculation.
+    """
+    from app.core.security import ROLE_INSTITUTION_USER
+    from app.modules.instruments.models import Instrument
+    from app.modules.institutions.models import Institution
+    from app.modules.documents.models import Document
+    from app.modules.validation.priority_score import calculate_review_priority_score
+
+    stmt = select(ValidationFinding).join(Instrument, ValidationFinding.instrument_id == Instrument.id)
+
+    # 1. Scope enforcement
+    if current_user.role == ROLE_INSTITUTION_USER:
+        if not current_user.institution_id:
+            return {"items": [], "total": 0, "skip": skip, "limit": limit}
+        stmt = stmt.where(ValidationFinding.institution_id == current_user.institution_id)
+        # Exclude internal-only cross-institution rules for standard institution users
+        stmt = stmt.where(ValidationFinding.rule_id != "VAL-DUP-002")
+    elif institution_id_filter:
+        stmt = stmt.where(ValidationFinding.institution_id == institution_id_filter)
+
+    if instrument_id_filter:
+        stmt = stmt.where(ValidationFinding.instrument_id == instrument_id_filter)
+    if status_filter:
+        stmt = stmt.where(ValidationFinding.status.in_(status_filter))
+    if severity_filter:
+        stmt = stmt.where(ValidationFinding.severity == severity_filter)
+    if category_filter:
+        stmt = stmt.where(ValidationFinding.category == category_filter)
+    if rule_id_filter:
+        stmt = stmt.where(ValidationFinding.rule_id == rule_id_filter)
+
+    # Text search
+    if search and search.strip():
+        term = f"%{search.strip().lower()}%"
+        stmt = stmt.where(
+            ValidationFinding.title.ilike(term)
+            | ValidationFinding.rule_id.ilike(term)
+            | Instrument.reference_number.ilike(term)
+            | Instrument.bank_name.ilike(term)
+        )
+
+    # Query all matching findings for accurate prioritization
+    all_matching = list(db.scalars(stmt).all())
+    total_count = len(all_matching)
+
+    # Pre-cache instruments and their open findings for fast score computation
+    inst_ids = {f.instrument_id for f in all_matching}
+    instruments_map = {
+        inst.id: inst for inst in db.scalars(select(Instrument).where(Instrument.id.in_(inst_ids))).all()
+    } if inst_ids else {}
+
+    # Check FDR copy presence for each instrument
+    fdr_copy_map = {}
+    if inst_ids:
+        docs = db.scalars(
+            select(Document).where(
+                Document.instrument_id.in_(inst_ids),
+                Document.category == "FDR_COPY",
+                Document.status == "ACTIVE",
+            )
+        ).all()
+        for d in docs:
+            fdr_copy_map[d.instrument_id] = True
+
+    # Compute priority scores and decorate findings
+    scored_items: List[Dict[str, Any]] = []
+    for f in all_matching:
+        inst = instruments_map.get(f.instrument_id)
+        has_fdr = fdr_copy_map.get(f.instrument_id, False)
+
+        # Related open findings for this instrument
+        inst_open_findings = [
+            other for other in all_matching
+            if other.instrument_id == f.instrument_id and other.status in (FindingStatus.OPEN.value, FindingStatus.IN_REVIEW.value)
+        ]
+
+        priority_res = calculate_review_priority_score(
+            instrument=inst,
+            open_findings=inst_open_findings,
+            has_fdr_copy=has_fdr,
+        )
+
+        item_dict = {
+            "id": f.id,
+            "instrument_id": f.instrument_id,
+            "institution_id": f.institution_id,
+            "rule_id": f.rule_id,
+            "rule_version": f.rule_version,
+            "rule_type": f.rule_type,
+            "category": f.category,
+            "severity": f.severity,
+            "status": f.status,
+            "title": f.title,
+            "explanation": f.explanation,
+            "observed_value": f.observed_value,
+            "expected_value": f.expected_value,
+            "evidence_refs": json.loads(f.evidence_refs_json) if f.evidence_refs_json else [],
+            "suggested_action": f.suggested_action,
+            "policy_version_ref": f.policy_version_ref,
+            "first_detected_at": f.first_detected_at.isoformat() if f.first_detected_at else None,
+            "last_evaluated_at": f.last_evaluated_at.isoformat() if f.last_evaluated_at else None,
+            "resolved_at": f.resolved_at.isoformat() if f.resolved_at else None,
+            "resolution_note": f.resolution_note,
+            "assigned_to_user_id": f.assigned_to_user_id,
+            "assigned_at": f.assigned_at.isoformat() if f.assigned_at else None,
+            "concurrency_version": f.concurrency_version,
+            "review_notes": f.review_notes,
+            "priority_score": priority_res.total_score,
+            "priority_score_details": priority_res.to_dict(),
+            "instrument_summary": {
+                "reference_number": inst.reference_number if inst else None,
+                "bank_name": inst.bank_name if inst else None,
+                "amount": str(inst.amount) if inst and inst.amount else None,
+                "status": inst.status if inst else None,
+                "trust_level": inst.trust_level if inst else None,
+                "maturity_date": inst.maturity_date.isoformat() if inst and inst.maturity_date else None,
+            } if inst else None,
+        }
+        scored_items.append(item_dict)
+
+    # Sorting
+    reverse = (sort_order.lower() == "desc")
+    if sort_by == "priority":
+        scored_items.sort(key=lambda x: x["priority_score"], reverse=reverse)
+    elif sort_by == "severity":
+        sev_rank = {RuleSeverity.CRITICAL.value: 4, RuleSeverity.HIGH.value: 3, RuleSeverity.MEDIUM.value: 2, RuleSeverity.LOW.value: 1, RuleSeverity.INFO.value: 0}
+        scored_items.sort(key=lambda x: sev_rank.get(x["severity"], 0), reverse=reverse)
+    elif sort_by == "status":
+        scored_items.sort(key=lambda x: x["status"], reverse=reverse)
+    else:  # detected_at
+        scored_items.sort(key=lambda x: x["first_detected_at"] or "", reverse=reverse)
+
+    paginated = scored_items[skip : skip + limit]
+
+    return {
+        "items": paginated,
+        "total": total_count,
+        "skip": skip,
+        "limit": limit,
+    }
+
 

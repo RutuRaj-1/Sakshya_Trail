@@ -186,3 +186,78 @@ export interface DashboardSummary {
   instruments_by_trust_level: Record<string, number>;
   instruments_approaching_maturity: number;
 }
+
+export interface PriorityScoreFactorContribution {
+  factor_name: string;
+  points: number;
+  max_points: number;
+  observed_value: any;
+  is_missing: boolean;
+  basis: string;
+}
+
+export interface PriorityScoreDetails {
+  total_score: number;
+  score_version: string;
+  is_prototype: boolean;
+  factor_breakdown: PriorityScoreFactorContribution[];
+  missing_fields: string[];
+  disclaimer: string;
+  summary_explanation: string;
+}
+
+export interface FindingReviewNote {
+  id: string;
+  actor_id: string;
+  actor_email: string;
+  actor_role: string;
+  action: string;
+  reason?: string | null;
+  note?: string | null;
+  assigned_to?: string | null;
+  timestamp: string;
+}
+
+export interface ValidationFindingItem {
+  id: string;
+  instrument_id: string;
+  institution_id: string;
+  rule_id: string;
+  rule_version: string;
+  rule_type: string;
+  category: string;
+  severity: 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW' | 'INFO';
+  status: 'OPEN' | 'IN_REVIEW' | 'RESOLVED' | 'DISMISSED' | 'SUPERSEDED';
+  title: string;
+  explanation?: string | null;
+  observed_value?: string | null;
+  expected_value?: string | null;
+  evidence_refs: string[];
+  suggested_action?: string | null;
+  policy_version_ref?: string | null;
+  first_detected_at?: string | null;
+  last_evaluated_at?: string | null;
+  resolved_at?: string | null;
+  resolution_note?: string | null;
+  assigned_to_user_id?: string | null;
+  assigned_at?: string | null;
+  concurrency_version: number;
+  review_notes: FindingReviewNote[];
+  priority_score: number;
+  priority_score_details: PriorityScoreDetails;
+  instrument_summary?: {
+    reference_number?: string | null;
+    bank_name?: string | null;
+    amount?: string | null;
+    status?: string | null;
+    trust_level?: string | null;
+    maturity_date?: string | null;
+  } | null;
+}
+
+export interface ReviewQueueListResponse {
+  items: ValidationFindingItem[];
+  total: number;
+  skip: number;
+  limit: number;
+}

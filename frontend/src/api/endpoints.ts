@@ -11,6 +11,8 @@ import type {
   DashboardSummary,
   User,
   UserListResponse,
+  ReviewQueueListResponse,
+  ValidationFindingItem,
 } from '@/types';
 
 export const healthApi = {
@@ -136,4 +138,63 @@ export const instrumentsApi = {
 
 export const dashboardApi = {
   getSummary: () => apiClient.get<DashboardSummary>('/dashboard/summary'),
+};
+
+export const findingsApi = {
+  getQueue: (params?: {
+    status?: string[];
+    severity?: string;
+    category?: string;
+    rule_id?: string;
+    instrument_id?: string;
+    institution_id?: string;
+    search?: string;
+    sort_by?: string;
+    sort_order?: string;
+    skip?: number;
+    limit?: number;
+  }) => {
+    const sp = new URLSearchParams();
+    if (params?.status && params.status.length > 0) {
+      params.status.forEach((st) => sp.append('status', st));
+    }
+    if (params?.severity) sp.append('severity', params.severity);
+    if (params?.category) sp.append('category', params.category);
+    if (params?.rule_id) sp.append('rule_id', params.rule_id);
+    if (params?.instrument_id) sp.append('instrument_id', params.instrument_id);
+    if (params?.institution_id) sp.append('institution_id', params.institution_id);
+    if (params?.search) sp.append('search', params.search);
+    if (params?.sort_by) sp.append('sort_by', params.sort_by);
+    if (params?.sort_order) sp.append('sort_order', params.sort_order);
+    if (params?.skip !== undefined) sp.append('skip', String(params.skip));
+    if (params?.limit !== undefined) sp.append('limit', String(params.limit));
+    const query = sp.toString() ? `?${sp.toString()}` : '';
+    return apiClient.get<ReviewQueueListResponse>(`/findings/queue${query}`);
+  },
+
+  get: (id: string) => apiClient.get<ValidationFindingItem>(`/findings/${id}`),
+
+  transitionStatus: (
+    id: string,
+    data: {
+      target_status: string;
+      reason?: string;
+      expected_concurrency_version?: number;
+    }
+  ) => apiClient.post<ValidationFindingItem>(`/findings/${id}/status`, data),
+
+  assign: (id: string, data: { assigned_to_user_id: string }) =>
+    apiClient.post<ValidationFindingItem>(`/findings/${id}/assign`, data),
+
+  addObservation: (id: string, data: { observation_text: string }) =>
+    apiClient.post<ValidationFindingItem>(`/findings/${id}/observations`, data),
+
+  reEvaluate: (id: string) =>
+    apiClient.post<ValidationFindingItem>(`/findings/${id}/re-evaluate`),
+
+  returnForCorrection: (instrument_id: string, data: { explanation: string }) =>
+    apiClient.post<{ status: string; instrument_id: string; remarks: string }>(
+      `/instruments/${instrument_id}/return-for-correction`,
+      data
+    ),
 };

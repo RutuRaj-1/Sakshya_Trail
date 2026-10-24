@@ -8,6 +8,7 @@ import { InstitutionDetailPage } from '@/app/routes/InstitutionDetailPage';
 import { UserAdminPage } from '@/app/routes/UserAdminPage';
 import { HealthPage } from '@/app/routes/HealthPage';
 import { AuditPage } from '@/app/routes/AuditPage';
+import { ReviewQueuePage } from '@/app/routes/ReviewQueuePage';
 import { LoginPage } from '@/app/routes/LoginPage';
 import { ChangePasswordPage } from '@/app/routes/ChangePasswordPage';
 import { ProtectedRoute } from '@/features/auth/ProtectedRoute';
@@ -52,6 +53,10 @@ export const router = createBrowserRouter([
       {
         path: 'institutions/:id',
         element: <InstitutionDetailPage />,
+      },
+      {
+        path: 'findings/queue',
+        element: <ReviewQueuePage />,
       },
       {
         path: 'users',

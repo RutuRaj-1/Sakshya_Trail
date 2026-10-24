@@ -10,6 +10,7 @@ import {
   FileCheck2,
   Users,
   KeyRound,
+  AlertTriangle,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/features/auth/AuthContext';
@@ -24,6 +25,7 @@ interface NavItem {
 
 const baseNavItems: NavItem[] = [
   { name: 'Dashboard', to: '/', icon: LayoutDashboard },
+  { name: 'Review Queue', to: '/findings/queue', icon: AlertTriangle, badge: 'Scrutiny' },
   { name: 'FDR Instruments', to: '/instruments', icon: FileSpreadsheet, badge: 'Core' },
   { name: 'Institutions', to: '/institutions', icon: Building2 },
   { name: 'User Admin', to: '/users', icon: Users, badge: 'Admin', adminOnly: true },

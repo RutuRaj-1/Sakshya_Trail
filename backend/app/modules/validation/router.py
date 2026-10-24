@@ -60,6 +60,11 @@ from app.modules.validation.finding_service import (
     dismiss_finding,
     re_evaluate_finding,
     get_validation_runs_for_instrument,
+    transition_finding_status,
+    assign_finding,
+    add_finding_observation,
+    return_instrument_for_correction,
+    get_review_queue,
 )
 from app.modules.validation.policy_service import (
     list_policy_configs,
@@ -77,6 +82,11 @@ from app.modules.validation.schemas import (
     RuleRegistryEntry,
     PolicyConfigResponse,
     PolicyConfigCreateRequest,
+    FindingStatusTransitionRequest,
+    FindingAssignRequest,
+    FindingObservationRequest,
+    ReturnForCorrectionRequest,
+    ReviewQueueListResponse,
 )
 
 # 1. Namespaced router (prefix: /validation)
@@ -301,6 +311,162 @@ def list_findings_direct(
     )
 
 
+# ---------------------------------------------------------------------------
+# Prompt 4: Review Queue & Discrepancy Operations
+# ---------------------------------------------------------------------------
+
+@instruments_validation_router.get(
+    "/findings/queue",
+    response_model=ReviewQueueListResponse,
+    summary="Discrepancy review queue with transparent priority scoring and tenant filtering",
+)
+def get_review_queue_endpoint(
+    status: Optional[List[str]] = Query(None, description="Filter by status (OPEN, IN_REVIEW, RESOLVED, DISMISSED)"),
+    severity: Optional[str] = Query(None, description="Filter by severity"),
+    category: Optional[str] = Query(None, description="Filter by category"),
+    rule_id: Optional[str] = Query(None, description="Filter by rule ID"),
+    instrument_id: Optional[str] = Query(None, description="Filter by instrument ID"),
+    institution_id: Optional[str] = Query(None, description="Filter by institution ID"),
+    search: Optional[str] = Query(None, description="Search across title, rule ID, reference number, bank name"),
+    sort_by: str = Query("priority", description="Sort field: priority, detected_at, severity, status"),
+    sort_order: str = Query("desc", description="asc or desc"),
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=100),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+):
+    return get_review_queue(
+        db=db,
+        current_user=current_user,
+        status_filter=status,
+        severity_filter=severity,
+        category_filter=category,
+        rule_id_filter=rule_id,
+        instrument_id_filter=instrument_id,
+        institution_id_filter=institution_id,
+        search=search,
+        sort_by=sort_by,
+        sort_order=sort_order,
+        skip=skip,
+        limit=limit,
+    )
+
+
+@instruments_validation_router.post(
+    "/findings/{finding_id}/status",
+    response_model=FindingResponse,
+    summary="Transition finding status (OPEN -> IN_REVIEW -> RESOLVED/DISMISSED)",
+)
+def transition_finding_status_endpoint(
+    finding_id: str,
+    payload: FindingStatusTransitionRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(
+        require_roles(ROLE_SYSTEM_ADMIN, ROLE_SCRUTINY_OFFICER, ROLE_BRANCH_HEAD)
+    ),
+):
+    finding = db.scalar(select(ValidationFinding).where(ValidationFinding.id == finding_id))
+    if not finding:
+        raise NotFoundException(f"Finding '{finding_id}' not found.")
+    
+    if current_user.institution_id and current_user.institution_id != finding.institution_id:
+        raise ForbiddenException("Cannot modify finding belonging to another institution.")
+
+    updated = transition_finding_status(
+        db=db,
+        finding=finding,
+        target_status=payload.target_status,
+        actor_user=current_user,
+        reason=payload.reason,
+        expected_concurrency_version=payload.expected_concurrency_version,
+    )
+    return FindingResponse.from_orm(updated)
+
+
+@instruments_validation_router.post(
+    "/findings/{finding_id}/assign",
+    response_model=FindingResponse,
+    summary="Assign or reassign a finding to an authorized officer",
+)
+def assign_finding_endpoint(
+    finding_id: str,
+    payload: FindingAssignRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(
+        require_roles(ROLE_SYSTEM_ADMIN, ROLE_SCRUTINY_OFFICER, ROLE_BRANCH_HEAD)
+    ),
+):
+    finding = db.scalar(select(ValidationFinding).where(ValidationFinding.id == finding_id))
+    if not finding:
+        raise NotFoundException(f"Finding '{finding_id}' not found.")
+    
+    if current_user.institution_id and current_user.institution_id != finding.institution_id:
+        raise ForbiddenException("Cannot modify finding belonging to another institution.")
+
+    updated = assign_finding(
+        db=db,
+        finding=finding,
+        assigned_to_user_id=payload.assigned_to_user_id,
+        actor_user=current_user,
+    )
+    return FindingResponse.from_orm(updated)
+
+
+@instruments_validation_router.post(
+    "/findings/{finding_id}/observations",
+    response_model=FindingResponse,
+    summary="Add an officer review observation note to a finding",
+)
+def add_finding_observation_endpoint(
+    finding_id: str,
+    payload: FindingObservationRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(
+        require_roles(ROLE_SYSTEM_ADMIN, ROLE_SCRUTINY_OFFICER, ROLE_BRANCH_HEAD)
+    ),
+):
+    finding = db.scalar(select(ValidationFinding).where(ValidationFinding.id == finding_id))
+    if not finding:
+        raise NotFoundException(f"Finding '{finding_id}' not found.")
+    
+    if current_user.institution_id and current_user.institution_id != finding.institution_id:
+        raise ForbiddenException("Cannot modify finding belonging to another institution.")
+
+    updated = add_finding_observation(
+        db=db,
+        finding=finding,
+        actor_user=current_user,
+        observation_text=payload.observation_text,
+    )
+    return FindingResponse.from_orm(updated)
+
+
+@instruments_validation_router.post(
+    "/instruments/{instrument_id}/return-for-correction",
+    summary="Return instrument to institution for correction with mandatory explanation",
+)
+def return_for_correction_endpoint(
+    instrument_id: str,
+    payload: ReturnForCorrectionRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(
+        require_roles(ROLE_SYSTEM_ADMIN, ROLE_SCRUTINY_OFFICER, ROLE_BRANCH_HEAD)
+    ),
+):
+    instrument = return_instrument_for_correction(
+        db=db,
+        instrument_id=instrument_id,
+        actor_user=current_user,
+        explanation=payload.explanation,
+    )
+    return {
+        "status": instrument.status,
+        "instrument_id": instrument.id,
+        "remarks": instrument.remarks,
+        "updated_at": instrument.updated_at.isoformat() if instrument.updated_at else None,
+    }
+
+
 @instruments_validation_router.get(
     "/findings/{finding_id}",
     response_model=FindingResponse,
@@ -515,3 +681,107 @@ def create_or_update_policy(
         effective_from=payload.effective_from,
     )
     return PolicyConfigResponse.model_validate(cfg)
+
+
+# ---------------------------------------------------------------------------
+# Namespaced Aliases (/validation/findings/queue, etc.)
+# ---------------------------------------------------------------------------
+
+@router.get(
+    "/findings/queue",
+    response_model=ReviewQueueListResponse,
+    summary="Discrepancy review queue (namespaced alias)",
+)
+def get_review_queue_compat(
+    status: Optional[List[str]] = Query(None),
+    severity: Optional[str] = Query(None),
+    category: Optional[str] = Query(None),
+    rule_id: Optional[str] = Query(None),
+    instrument_id: Optional[str] = Query(None),
+    institution_id: Optional[str] = Query(None),
+    search: Optional[str] = Query(None),
+    sort_by: str = Query("priority"),
+    sort_order: str = Query("desc"),
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=100),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+):
+    return get_review_queue_endpoint(
+        status=status,
+        severity=severity,
+        category=category,
+        rule_id=rule_id,
+        instrument_id=instrument_id,
+        institution_id=institution_id,
+        search=search,
+        sort_by=sort_by,
+        sort_order=sort_order,
+        skip=skip,
+        limit=limit,
+        db=db,
+        current_user=current_user,
+    )
+
+
+@router.post(
+    "/findings/{finding_id}/status",
+    response_model=FindingResponse,
+    summary="Transition finding status (namespaced alias)",
+)
+def transition_finding_status_compat(
+    finding_id: str,
+    payload: FindingStatusTransitionRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(
+        require_roles(ROLE_SYSTEM_ADMIN, ROLE_SCRUTINY_OFFICER, ROLE_BRANCH_HEAD)
+    ),
+):
+    return transition_finding_status_endpoint(finding_id, payload, db, current_user)
+
+
+@router.post(
+    "/findings/{finding_id}/assign",
+    response_model=FindingResponse,
+    summary="Assign finding (namespaced alias)",
+)
+def assign_finding_compat(
+    finding_id: str,
+    payload: FindingAssignRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(
+        require_roles(ROLE_SYSTEM_ADMIN, ROLE_SCRUTINY_OFFICER, ROLE_BRANCH_HEAD)
+    ),
+):
+    return assign_finding_endpoint(finding_id, payload, db, current_user)
+
+
+@router.post(
+    "/findings/{finding_id}/observations",
+    response_model=FindingResponse,
+    summary="Add observation note (namespaced alias)",
+)
+def add_finding_observation_compat(
+    finding_id: str,
+    payload: FindingObservationRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(
+        require_roles(ROLE_SYSTEM_ADMIN, ROLE_SCRUTINY_OFFICER, ROLE_BRANCH_HEAD)
+    ),
+):
+    return add_finding_observation_endpoint(finding_id, payload, db, current_user)
+
+
+@router.post(
+    "/instruments/{instrument_id}/return-for-correction",
+    summary="Return instrument for correction (namespaced alias)",
+)
+def return_for_correction_compat(
+    instrument_id: str,
+    payload: ReturnForCorrectionRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(
+        require_roles(ROLE_SYSTEM_ADMIN, ROLE_SCRUTINY_OFFICER, ROLE_BRANCH_HEAD)
+    ),
+):
+    return return_for_correction_endpoint(instrument_id, payload, db, current_user)

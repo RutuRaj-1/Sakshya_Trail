@@ -119,12 +119,16 @@ class FindingResponse(BaseModel):
     resolution_note: Optional[str] = None
     superseded_by_finding_id: Optional[str] = None
     validation_run_id: Optional[str] = None
+    assigned_to_user_id: Optional[str] = None
+    assigned_at: Optional[datetime] = None
+    concurrency_version: int = 1
+    review_notes: List[Dict[str, Any]] = Field(default_factory=list)
     created_at: datetime
     updated_at: datetime
 
     @classmethod
     def from_orm(cls, finding) -> "FindingResponse":
-        """Convert ORM object, parsing JSON evidence_refs."""
+        """Convert ORM object, parsing JSON evidence_refs and review_notes."""
         data = {
             "id": finding.id,
             "finding_fingerprint": finding.finding_fingerprint,
@@ -152,6 +156,10 @@ class FindingResponse(BaseModel):
             "resolution_note": finding.resolution_note,
             "superseded_by_finding_id": finding.superseded_by_finding_id,
             "validation_run_id": finding.validation_run_id,
+            "assigned_to_user_id": finding.assigned_to_user_id,
+            "assigned_at": finding.assigned_at,
+            "concurrency_version": getattr(finding, "concurrency_version", 1),
+            "review_notes": getattr(finding, "review_notes", []),
             "created_at": finding.created_at,
             "updated_at": finding.updated_at,
         }
@@ -172,6 +180,115 @@ class DismissFindingRequest(BaseModel):
         max_length=1000,
         description="Human-readable reason for dismissal. Must be at least 10 characters.",
     )
+
+
+# ---------------------------------------------------------------------------
+# Prompt 4: Discrepancy Review, Transitions, & Priority Queue Schemas
+# ---------------------------------------------------------------------------
+
+class FindingStatusTransitionRequest(BaseModel):
+    target_status: str = Field(
+        ...,
+        description="Target status: IN_REVIEW, RESOLVED, or DISMISSED.",
+    )
+    reason: Optional[str] = Field(
+        None,
+        description="Mandatory justification for RESOLVED and DISMISSED transitions. Must be non-empty.",
+    )
+    expected_concurrency_version: Optional[int] = Field(
+        None,
+        description="Optimistic concurrency control: expected concurrency_version of the finding.",
+    )
+
+
+class FindingAssignRequest(BaseModel):
+    assigned_to_user_id: str = Field(
+        ...,
+        description="UUID of the officer to assign this finding to.",
+    )
+
+
+class FindingObservationRequest(BaseModel):
+    observation_text: str = Field(
+        ...,
+        min_length=3,
+        max_length=2000,
+        description="Reviewer observation or note to attach to the finding.",
+    )
+
+
+class ReturnForCorrectionRequest(BaseModel):
+    explanation: str = Field(
+        ...,
+        min_length=10,
+        max_length=2000,
+        description="Required reason/explanation detailing why the submission is returned for correction.",
+    )
+
+
+class PriorityScoreFactorContributionResponse(BaseModel):
+    factor_name: str
+    points: float
+    max_points: float
+    observed_value: Any = None
+    is_missing: bool = False
+    basis: str
+
+
+class PriorityScoreDetailsResponse(BaseModel):
+    total_score: int
+    score_version: str
+    is_prototype: bool
+    factor_breakdown: List[PriorityScoreFactorContributionResponse]
+    missing_fields: List[str]
+    disclaimer: str
+    summary_explanation: str
+
+
+class InstrumentSummaryResponse(BaseModel):
+    reference_number: Optional[str] = None
+    bank_name: Optional[str] = None
+    amount: Optional[str] = None
+    status: Optional[str] = None
+    trust_level: Optional[str] = None
+    maturity_date: Optional[str] = None
+
+
+class ReviewQueueItemResponse(BaseModel):
+    id: str
+    instrument_id: str
+    institution_id: str
+    rule_id: str
+    rule_version: str
+    rule_type: str
+    category: str
+    severity: str
+    status: str
+    title: str
+    explanation: Optional[str] = None
+    observed_value: Optional[str] = None
+    expected_value: Optional[str] = None
+    evidence_refs: List[str] = Field(default_factory=list)
+    suggested_action: Optional[str] = None
+    policy_version_ref: Optional[str] = None
+    first_detected_at: Optional[str] = None
+    last_evaluated_at: Optional[str] = None
+    resolved_at: Optional[str] = None
+    resolution_note: Optional[str] = None
+    assigned_to_user_id: Optional[str] = None
+    assigned_at: Optional[str] = None
+    concurrency_version: int = 1
+    review_notes: List[Dict[str, Any]] = Field(default_factory=list)
+    priority_score: int
+    priority_score_details: PriorityScoreDetailsResponse
+    instrument_summary: Optional[InstrumentSummaryResponse] = None
+
+
+class ReviewQueueListResponse(BaseModel):
+    items: List[ReviewQueueItemResponse]
+    total: int
+    skip: int
+    limit: int
 
 
 # ---------------------------------------------------------------------------

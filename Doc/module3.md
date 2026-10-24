@@ -1,16 +1,16 @@
 # Module 3 — Validation, Discrepancy & Explainable Intelligence
 ## Implementation Summary
 
-> **Status:** ✅ Prompt 3: Evidence Reconciliation, Duplicate Detection & Explainable Advisory Indicators Implemented  
-> **Revision:** `dde1c7162b37` (Alembic head)  
-> **Tests:** 186 passed total across all modules (15 Prompt 3 tests + 25 Prompt 2 tests + 43 Prompt 1 tests + 103 prior modules) — **0 failures**  
+> **Status:** ✅ Prompt 4: Discrepancy Review, Reasoned Resolution, Return-for-Correction & Explainable Priority Queue Implemented  
+> **Revision:** `f4a9b2c8e1d7` (Alembic head)  
+> **Tests:** 203 passed total across all modules (17 Prompt 4 tests + 15 Prompt 3 tests + 25 Prompt 2 tests + 43 Prompt 1 tests + 103 prior modules) — **0 failures**  
 > **Date:** 2026-10-25
 
 ---
 
 ## 1. Scope & Ownership
 
-Module 3 implements the **rule-driven validation engine**, **cross-source evidence reconciliation**, **tenant-isolated duplicate detection**, **explainable finding persistence**, and **authorized policy configuration** infrastructure for the FDR Sentinel platform. It connects data from Module 1 (instruments, institutions, users) and Module 2 (documents, document versions, extracted OCR fields) without duplicating their ownership or overwriting authoritative records.
+Module 3 implements the **rule-driven validation engine**, **cross-source evidence reconciliation**, **tenant-isolated duplicate detection**, **explainable finding persistence**, **authorized policy configuration**, and **officer discrepancy review workflow** with a **transparent review-priority ordering queue** for the FDR Sentinel platform. It connects data from Module 1 (instruments, institutions, users) and Module 2 (documents, document versions, extracted OCR fields) without duplicating their ownership or overwriting authoritative records.
 
 ### What Module 3 owns
 | Concern | Owner | Status |
@@ -26,9 +26,15 @@ Module 3 implements the **rule-driven validation engine**, **cross-source eviden
 | Normalization utilities (reference, bank, depositor names) | Module 3 | Implemented (`normalization.py`) |
 | Finding persistence, idempotency & lifecycle | Module 3 | Implemented (OPEN, IN_REVIEW, RESOLVED, DISMISSED, SUPERSEDED) |
 | Finding deduplication & supersession linkages | Module 3 | Implemented (SHA-256 fingerprinting) |
+| Server-enforced status transitions with mandatory reasons | Module 3 | Implemented (`transition_finding_status`) |
+| Optimistic concurrency protection (`concurrency_version`) | Module 3 | Implemented (409 ConflictException on stale writes) |
+| Finding assignment & review observation notes | Module 3 | Implemented (`assign_finding`, `add_finding_observation`) |
+| Return for correction integration | Module 3 | Implemented (`return_instrument_for_correction`) |
+| Transparent review-priority scoring engine (0–100) | Module 3 | Implemented (`priority_score.py`) |
+| Discrepancy review queue & detail frontend | Module 3 | Implemented (`ReviewQueuePage.tsx`, `/findings/queue`) |
 | Policy configuration (versioned, authorized) | Module 3 | Implemented (`ValidationPolicyConfig`) |
 | Validation run log & run history | Module 3 | Implemented (`ValidationRun`) |
-| Versioned REST API endpoints | Module 3 | Implemented (`/api/v1/instruments/...`, `/api/v1/findings/...`) |
+| Versioned REST API endpoints | Module 3 | Implemented (`/api/v1/findings/...`, `/api/v1/instruments/...`) |
 | Post-save validation triggers | Module 3 | Triggered on instrument edit, document upload, extraction save |
 
 ### What Module 3 does NOT own
@@ -38,8 +44,86 @@ Module 3 implements the **rule-driven validation engine**, **cross-source eviden
 | Document completeness checklist engine | Module 2 | Module 3 integrates with checklist; reports UNABLE_TO_EVALUATE if absent |
 | Authoritative bank confirmation | Module 4 | Out of scope; machine extractions are suggestions, not bank confirmation |
 | FDR trust-level promotion (L0→L1→L2→L3) | Module 4 | Safety constraint: validation never modifies trust level |
-| Maturity scheduling and reminders | Module 5 | Future module |
 | Release / refund authorization | Module 6 | Future module |
+
+---
+
+## 7. Finding Lifecycle, Discrepancy Workflow & Concurrency
+
+### Allowed Status Transitions
+- `OPEN → IN_REVIEW`: Reviewer starts investigation.
+- `OPEN → RESOLVED`: Condition verified or corrected (mandatory non-empty reason required).
+- `OPEN → DISMISSED`: Finding dismissed with regulatory exemption or policy justification (mandatory non-empty reason required).
+- `IN_REVIEW → RESOLVED`: In-review finding successfully resolved (mandatory reason required).
+- `IN_REVIEW → DISMISSED`: In-review finding dismissed (mandatory reason required).
+- `OPEN / IN_REVIEW → SUPERSEDED`: Automatically applied when rule version or evidence inputs change and a new finding is created. Preserves prior finding link and review timeline.
+- Terminal states (`RESOLVED`, `DISMISSED`, `SUPERSEDED`) reject further manual status transitions.
+
+### Optimistic Concurrency Protection
+Every finding row maintains a `concurrency_version: int` column. Any transition or assignment can supply `expected_concurrency_version`. If a concurrent officer modifies the finding in the interim, the server rejects the update with `409 ConflictException`, requiring the client to refresh and review the latest state.
+
+### Reason-Required Decisions
+Resolving or dismissing a finding strictly requires a non-empty, non-whitespace reason (status code `422 REASON_REQUIRED`). All actions, actors, reasons, and timestamps append to `review_notes_json` and log to `audit_events`.
+
+### Return for Correction
+Authorized officers (`SCRUTINY_OFFICER`, `BRANCH_HEAD`, `SYSTEM_ADMIN`) can return an instrument for correction with an explicit explanation. The instrument status transitions to `RETURNED_FOR_CORRECTION` and remarks are recorded. Earlier document versions and findings are preserved without silent overwrite.
+
+---
+
+## 8. Transparent Review-Priority Score (USP)
+
+The platform includes a deterministic **0–100 review queue ordering score** (`calculate_review_priority_score`):
+- **Purpose:** Strictly for review queue ordering and prioritization; **NOT** an AI-predicted fraud probability, credit rating, or financial risk prediction.
+- **Factor Allocations:**
+  1. **Days to Maturity (Max 25 pts):** Closer maturity requires more urgent officer scrutiny (expired = 25 pts; <= 30 days = 22.5 pts; <= 90 days = 15 pts; <= 180 days = 7.5 pts).
+  2. **Highest Finding Severity (Max 30 pts):** Critical finding = 30 pts; High = 20 pts; Medium = 10 pts; Low/Info = 5 pts.
+  3. **Unresolved Discrepancies Count (Max 20 pts):** Scales with active open discrepancies (1 = 5 pts; 2 = 10 pts; 3 = 15 pts; >= 4 = 20 pts).
+  4. **Document Completeness (Max 15 pts):** Missing FDR copy elevates queue review priority (15 pts).
+  5. **Trust/Verification Dimension (Max 10 pts):** `L0_DECLARED` receives 10 pts for initial scrutiny; verified `L2`/`L3` receive 0 pts.
+- **Explainability:** Returns an itemized breakdown of each factor's points, max points, and plain-language basis.
+- **Missing Fields Handling:** Unknown inputs (e.g. unknown maturity date) are flagged with `is_missing: True` and award 0 points without penalizing the institution.
+- **Safety Constraints:** Never modifies `trust_level`, never approves/rejects releases, and weights are explicitly labeled as prototype operational assumptions.
+
+---
+
+## 9. Verification & Test Suite
+
+All 203 unit, integration, and scenario tests pass with **0 failures**:
+
+```
+====================== 203 passed in 7.78s ======================
+- test_auth_rbac.py:                                    14 passed
+- test_documents_module.py:                             16 passed
+- test_documents_upload_download.py:                    20 passed
+- test_health.py:                                        5 passed
+- test_institutions_users.py:                           14 passed
+- test_instruments_registry.py:                         12 passed
+- test_module1_acceptance.py:                           18 passed
+- test_module3_deterministic_rules.py:                  25 passed
+- test_module3_prompt3_evidence_reconciliation.py:      15 passed
+- test_module3_prompt4_review_queue.py:                 17 passed
+- test_module3_validation.py:                           43 passed
+- test_modules.py:                                       4 passed
+```
+
+### Prompt 4 Scenarios Verified:
+1. **Allowed and forbidden finding transitions:** Enforces valid lifecycle paths and rejects illegal transitions from terminal states.
+2. **Resolution without reason rejected:** Empty or whitespace-only reasons trigger `422 REASON_REQUIRED`.
+3. **Dismissal without reason rejected:** Empty or whitespace-only reasons trigger `422 REASON_REQUIRED`.
+4. **Unauthorized user resolution attempt:** Non-officer roles (`INSTITUTION_USER`, `AUDITOR`) are rejected with `403 Forbidden`.
+5. **Cross-institution finding access denial:** Scoped officers cannot access or modify other institutions' findings.
+6. **Auditor read-only behavior:** Auditors can inspect findings and queue but cannot transition, dismiss, or return submissions.
+7. **Institution-user visibility restrictions:** Institution users only see actionable deficiencies for their institution and cannot view internal-only rules like cross-institution duplicates (`VAL-DUP-002`).
+8. **Concurrent resolution attempts:** Optimistic concurrency control rejects stale `concurrency_version` with `409 ConflictException`.
+9. **Historical finding retention:** All review notes, transitions, actors, and reasons persist in chronological audit trail.
+10. **Reevaluation after corrected data:** Correcting instrument data clears discrepancies and automatically transitions finding to `RESOLVED`.
+11. **Return-for-correction requiring a reason:** Enforces mandatory explanation before setting instrument to `RETURNED_FOR_CORRECTION`.
+12. **Advisory warning does not become an automatic blocker:** Heuristic findings remain advisory and do not modify trust levels.
+13. **Priority-score contribution breakdown:** Verifies deterministic 0–100 score with explicit factor contribution itemization.
+14. **Unknown fields handling in the score:** Missing fields assign 0 points, are flagged with `is_missing: True`, and do not penalize.
+15. **Score changes when valid inputs change:** Approaching maturity dates deterministically increase priority score.
+16. **Score never changes trust or release authorization:** Trust levels and release states remain completely unaffected by scoring.
+17. **Audit records for all material review actions:** Full audit logging for transitions, assignments, observations, and returns for correction.
 
 ---
 
