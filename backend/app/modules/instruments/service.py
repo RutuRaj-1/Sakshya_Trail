@@ -365,6 +365,18 @@ def create_instrument(
     except Exception:
         pass
 
+    # Module 4: Initialize baseline field provenance (L0_DECLARED)
+    try:
+        from app.modules.verification.provenance_service import initialize_instrument_provenance
+        initialize_instrument_provenance(
+            db=db,
+            instrument=instrument,
+            actor_user_id=current_user.id,
+            source_type="INSTITUTION_ENTERED" if current_user.role == "INSTITUTION_USER" else "OFFICER_ENTERED",
+        )
+    except Exception:
+        pass
+
     return InstrumentResponse(
         id=instrument.id,
         institution_id=instrument.institution_id,
@@ -509,6 +521,24 @@ def update_instrument(
     try:
         from app.modules.validation.engine import trigger_post_save_validation
         trigger_post_save_validation(db=db, instrument_id=inst.id, triggered_by_user_id=current_user.id)
+    except Exception:
+        pass
+
+    # Module 4: Record provenance for updated fields
+    try:
+        from app.modules.verification.provenance_service import record_field_provenance
+        from app.modules.verification.enums import TRACKED_FIELDS_SET
+        for f_name, f_diff in changed_fields.items():
+            if f_name in TRACKED_FIELDS_SET:
+                record_field_provenance(
+                    db=db,
+                    instrument_id=inst.id,
+                    field_name=f_name,
+                    value=getattr(inst, f_name),
+                    source_type="INSTITUTION_ENTERED" if current_user.role == "INSTITUTION_USER" else "OFFICER_ENTERED",
+                    actor_user_id=current_user.id,
+                    evidence_reference="Instrument field update",
+                )
     except Exception:
         pass
 

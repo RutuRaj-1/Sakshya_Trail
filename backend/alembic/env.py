@@ -19,6 +19,7 @@ import app.modules.audit.models
 import app.modules.documents.models
 import app.modules.validation.models
 import app.modules.validation.extracted_fields_model
+import app.modules.verification.models
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
