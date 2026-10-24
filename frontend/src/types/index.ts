@@ -32,10 +32,33 @@ export interface ReadinessState {
   };
 }
 
+export type ApplicationRole =
+  | 'SYSTEM_ADMIN'
+  | 'SCRUTINY_OFFICER'
+  | 'BRANCH_HEAD'
+  | 'COMPETENT_AUTHORITY'
+  | 'FINANCE_OFFICER'
+  | 'INSTITUTION_USER'
+  | 'AUDITOR';
+
+export interface User {
+  id: string;
+  full_name: string;
+  email: string;
+  role: ApplicationRole;
+  is_active: boolean;
+  must_change_password: boolean;
+  institution_id?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface RoleInfo {
   name: string;
   display_name: string;
   description: string;
+  is_internal?: boolean;
+  requires_institution?: boolean;
 }
 
 export interface Institution {

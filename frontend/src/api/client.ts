@@ -29,6 +29,7 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
 
   try {
     const res = await fetch(url, {
+      credentials: 'include',
       ...options,
       headers,
     });

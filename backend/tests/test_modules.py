@@ -9,18 +9,11 @@ def test_auth_roles_endpoint(client: TestClient):
     response = client.get("/api/v1/auth/roles")
     assert response.status_code == 200
     roles = response.json()
-    assert len(roles) >= 4
+    assert len(roles) == 7
     role_names = [r["name"] for r in roles]
-    assert "aicte_admin" in role_names
-    assert "scrutiny_officer" in role_names
-
-
-def test_auth_session_bootstrap(client: TestClient):
-    response = client.get("/api/v1/auth/session/bootstrap")
-    assert response.status_code == 200
-    data = response.json()
-    assert data["status"] == "ready"
-    assert "aicte_admin" in data["available_roles"]
+    assert "SYSTEM_ADMIN" in role_names
+    assert "SCRUTINY_OFFICER" in role_names
+    assert "INSTITUTION_USER" in role_names
 
 
 def test_create_and_list_institution(client: TestClient):

@@ -5,11 +5,30 @@ import { InstrumentsPage } from '@/app/routes/InstrumentsPage';
 import { InstitutionsPage } from '@/app/routes/InstitutionsPage';
 import { HealthPage } from '@/app/routes/HealthPage';
 import { AuditPage } from '@/app/routes/AuditPage';
+import { LoginPage } from '@/app/routes/LoginPage';
+import { ChangePasswordPage } from '@/app/routes/ChangePasswordPage';
+import { ProtectedRoute } from '@/features/auth/ProtectedRoute';
 
 export const router = createBrowserRouter([
   {
+    path: '/login',
+    element: <LoginPage />,
+  },
+  {
+    path: '/change-password',
+    element: (
+      <ProtectedRoute>
+        <ChangePasswordPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
     path: '/',
-    element: <MainLayout />,
+    element: (
+      <ProtectedRoute>
+        <MainLayout />
+      </ProtectedRoute>
+    ),
     children: [
       {
         index: true,
@@ -29,7 +48,11 @@ export const router = createBrowserRouter([
       },
       {
         path: 'audit',
-        element: <AuditPage />,
+        element: (
+          <ProtectedRoute allowedRoles={['SYSTEM_ADMIN', 'AUDITOR', 'BRANCH_HEAD', 'COMPETENT_AUTHORITY']}>
+            <AuditPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: '*',

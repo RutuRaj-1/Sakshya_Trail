@@ -18,16 +18,16 @@ class Settings(BaseSettings):
     # General
     ENVIRONMENT: str = "development"
     PROJECT_NAME: str = "FDR Sentinel"
-    VERSION: str = "0.1.0"
+    VERSION: str = "0.2.0"
     API_V1_STR: str = "/api/v1"
-    SECRET_KEY: str = "temporary-dev-secret-key-change-in-production-fdr-sentinel-2026"
+    SECRET_KEY: str = "fdr-sentinel-regulatory-secret-key-2026-production-grade"
     DEBUG: bool = True
 
     # Server Bindings
     BACKEND_HOST: str = "127.0.0.1"
     BACKEND_PORT: int = 8000
 
-    # CORS
+    # CORS & Security
     CORS_ORIGINS: List[str] = [
         "http://localhost:5173",
         "http://127.0.0.1:5173",
@@ -50,18 +50,29 @@ class Settings(BaseSettings):
             return v
         return []
 
+    # Authentication & Session Settings
+    JWT_ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
+    AUTH_COOKIE_NAME: str = "fdr_session"
+    AUTH_COOKIE_SECURE: bool = False  # Set to True when served over HTTPS
+    AUTH_COOKIE_SAMESITE: str = "lax"
+    AUTH_COOKIE_PATH: str = "/"
+
     # Database
-    # Defaults to SQLite for immediate zero-dependency testing,
-    # and seamlessly connects to PostgreSQL when DATABASE_URL is configured.
     DATABASE_URL: str = "sqlite:///./fdr_sentinel.db"
     DB_POOL_SIZE: int = 5
     DB_MAX_OVERFLOW: int = 10
     DB_TIMEOUT: int = 30
 
-    # Firebase / Cloud storage placeholder configurations
-    FIREBASE_PROJECT_ID: str = "fdr-sentinel-dev"
+    # Firebase Configuration (Supplied in PS 26265)
+    FIREBASE_API_KEY: str = "AIzaSyAqqvkCHZutYjILCXT6Q-SzvGn88holAps"
+    FIREBASE_AUTH_DOMAIN: str = "sih-26265-fdr.firebaseapp.com"
+    FIREBASE_PROJECT_ID: str = "sih-26265-fdr"
+    FIREBASE_STORAGE_BUCKET: str = "sih-26265-fdr.firebasestorage.app"
+    FIREBASE_MESSAGING_SENDER_ID: str = "2017740195"
+    FIREBASE_APP_ID: str = "1:2017740195:web:ed1355f7fd21cd3ad80616"
+    FIREBASE_MEASUREMENT_ID: str = "G-YYNCY2BVT9"
     FIREBASE_CREDENTIALS_PATH: str = ""
-    FIREBASE_STORAGE_BUCKET: str = "fdr-sentinel-storage"
 
 
 settings = Settings()

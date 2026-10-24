@@ -1,6 +1,6 @@
 """
 Database Initialization and Seed Script
-Populates initial sample institutions and FDR instruments for demonstration.
+Populates foundational sample institutions, provisioned users, and FDR instruments for demonstration.
 """
 import sys
 import os
@@ -12,52 +12,146 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 from app.db.base import Base
 from app.db.session import engine, SessionLocal
 from app.modules.institutions.models import Institution
+from app.modules.auth.models import User
 from app.modules.instruments.models import Instrument
+from app.modules.auth.service import provision_user
 from app.modules.audit.service import log_audit_event
+from app.core.security import (
+    ROLE_SYSTEM_ADMIN,
+    ROLE_SCRUTINY_OFFICER,
+    ROLE_INSTITUTION_USER,
+    ROLE_AUDITOR,
+)
 
 
 def seed_database():
-    print("[FDR Sentinel] Creating database tables...")
+    print("[FDR Sentinel] Ensuring database tables exist...")
     Base.metadata.create_all(bind=engine)
 
     db = SessionLocal()
     try:
         # Check if already seeded
-        existing = db.query(Institution).first()
-        if existing:
-            print("[FDR Sentinel] Database already contains records. Skipping seed.")
+        existing_inst = db.query(Institution).first()
+        if existing_inst:
+            print("[FDR Sentinel] Database already contains records. Skipping duplicate seeding.")
             return
 
         print("[FDR Sentinel] Seeding sample institutions...")
         inst1 = Institution(
-            aicte_id="1-10924811",
-            name="Delhi Institute of Engineering and Technology",
-            state="Delhi",
-            category="Engineering & Technology",
+            code="1-10924811",
+            legal_name="Delhi Institute of Engineering and Technology",
+            display_name="DIET Delhi",
+            institution_type="TECHNICAL_INSTITUTE",
+            contact_name="Dr. R. K. Sharma (Registrar)",
             contact_email="registrar@diet-delhi.ac.in",
-            status="ACTIVE",
+            contact_phone="+91-11-23891000",
+            address_line1="Sector 14, Dwarka Institutional Area",
+            city="New Delhi",
+            state="Delhi",
+            postal_code="110078",
+            is_active=True,
+            is_synthetic=True,
         )
         inst2 = Institution(
-            aicte_id="1-20491823",
-            name="Maharashtra State Institute of Management",
-            state="Maharashtra",
-            category="Management",
+            code="1-20491823",
+            legal_name="Maharashtra State Institute of Management Studies",
+            display_name="MSIMS Pune",
+            institution_type="MANAGEMENT_INSTITUTE",
+            contact_name="Prof. S. Patil (Director)",
             contact_email="nodal@msim-pune.edu.in",
-            status="ACTIVE",
+            contact_phone="+91-20-25678000",
+            address_line1="Shivajinagar Campus, Ganeshkhind Road",
+            city="Pune",
+            state="Maharashtra",
+            postal_code="411005",
+            is_active=True,
+            is_synthetic=True,
         )
         inst3 = Institution(
-            aicte_id="1-30918274",
-            name="Karnataka Academy of Pharmaceutical Sciences",
-            state="Karnataka",
-            category="Pharmacy",
+            code="1-30918274",
+            legal_name="Karnataka Academy of Pharmaceutical Sciences",
+            display_name="KAPS Bengaluru",
+            institution_type="PHARMACY_COLLEGE",
+            contact_name="Dr. V. Rao (Dean)",
             contact_email="admin@kaps-blr.ac.in",
-            status="ACTIVE",
+            contact_phone="+91-80-22961000",
+            address_line1="Rajajinagar 2nd Block",
+            city="Bengaluru",
+            state="Karnataka",
+            postal_code="560010",
+            is_active=True,
+            is_synthetic=True,
         )
         db.add_all([inst1, inst2, inst3])
         db.commit()
         db.refresh(inst1)
         db.refresh(inst2)
         db.refresh(inst3)
+
+        print("[FDR Sentinel] Seeding provisioned demo accounts...")
+        # 1. System Administrator
+        try:
+            admin = provision_user(
+                db=db,
+                full_name="AICTE Regulation Administrator",
+                email="admin@aicte-india.org",
+                password="AdminPassword@2026",
+                role=ROLE_SYSTEM_ADMIN,
+                institution_id=None,
+                must_change_password=False,
+                actor_email="SYSTEM_INIT",
+                actor_role="SYSTEM",
+            )
+        except ConflictException:
+            print("  - Admin user already exists, skipping.")
+
+        # 2. Scrutiny Officer
+        try:
+            officer = provision_user(
+                db=db,
+                full_name="Officer Ramesh Verma",
+                email="scrutiny.verma@aicte-india.org",
+                password="OfficerPassword@2026",
+                role=ROLE_SCRUTINY_OFFICER,
+                institution_id=None,
+                must_change_password=False,
+                actor_email="SYSTEM_INIT",
+                actor_role="SYSTEM",
+            )
+        except ConflictException:
+            print("  - Scrutiny officer already exists, skipping.")
+
+        # 3. Institution User (DIET Delhi)
+        try:
+            inst_user = provision_user(
+                db=db,
+                full_name="DIET Nodal Officer",
+                email="nodal@diet-delhi.ac.in",
+                password="NodalPassword@2026",
+                role=ROLE_INSTITUTION_USER,
+                institution_id=inst1.id,
+                must_change_password=True,  # Needs password rotation on first login
+                actor_email="SYSTEM_INIT",
+                actor_role="SYSTEM",
+            )
+        except ConflictException:
+            print("  - Institution user already exists, skipping.")
+
+        # 4. Auditor
+        try:
+            auditor = provision_user(
+                db=db,
+                full_name="Auditor Sunita Deshmukh",
+                email="auditor.compliance@aicte-india.org",
+                password="AuditorPassword@2026",
+                role=ROLE_AUDITOR,
+                institution_id=None,
+                must_change_password=False,
+                actor_email="SYSTEM_INIT",
+                actor_role="SYSTEM",
+            )
+        except ConflictException:
+            print("  - Auditor user already exists, skipping.")
 
         print("[FDR Sentinel] Seeding sample FDR instruments...")
         today = date.today()
@@ -108,43 +202,8 @@ def seed_database():
         )
         db.add_all([fdr1, fdr2, fdr3])
         db.commit()
-        db.refresh(fdr1)
-        db.refresh(fdr2)
-        db.refresh(fdr3)
 
-        print("[FDR Sentinel] Seeding initial audit events...")
-        log_audit_event(
-            db=db,
-            entity_type="instrument",
-            entity_id=fdr1.id,
-            action="FDR_VERIFIED",
-            actor_email="officer.verma@aicte-india.org",
-            actor_role="scrutiny_officer",
-            details="Verified joint FDR deposit against physical and bank verification records.",
-            ip_address="10.0.4.12",
-        )
-        log_audit_event(
-            db=db,
-            entity_type="instrument",
-            entity_id=fdr2.id,
-            action="BANK_CONFIRMED",
-            actor_email="bank.nodal@hdfcbank.com",
-            actor_role="bank_api",
-            details="Simulated API bank confirmation token validated (Level 4 evidence).",
-            ip_address="192.168.1.100",
-        )
-        log_audit_event(
-            db=db,
-            entity_type="instrument",
-            entity_id=fdr3.id,
-            action="FDR_SUBMISSION",
-            actor_email="admin@kaps-blr.ac.in",
-            actor_role="institution_user",
-            details="New FDR instrument submitted for pharmacy intake extension.",
-            ip_address="115.240.82.11",
-        )
-
-        print("[FDR Sentinel] Seed completed successfully!")
+        print("[FDR Sentinel] Seeding completed successfully!")
     finally:
         db.close()
 

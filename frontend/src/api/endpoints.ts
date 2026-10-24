@@ -1,11 +1,12 @@
 import { apiClient } from './client';
-import {
+import type {
   SystemHealth,
   ReadinessState,
   RoleInfo,
   Institution,
   Instrument,
   InstrumentSummary,
+  User,
 } from '@/types';
 
 export const healthApi = {
@@ -14,6 +15,15 @@ export const healthApi = {
 };
 
 export const authApi = {
+  login: (credentials: { email: string; password: string }) =>
+    apiClient.post<{ success: boolean; message: string; user: User; access_token: string }>(
+      '/auth/login',
+      credentials
+    ),
+  logout: () => apiClient.post<{ success: boolean; message: string }>('/auth/logout'),
+  me: () => apiClient.get<User>('/auth/me'),
+  changePassword: (payload: { current_password: string; new_password: string; confirm_new_password: string }) =>
+    apiClient.post<{ success: boolean; message: string }>('/auth/change-password', payload),
   getRoles: () => apiClient.get<RoleInfo[]>('/auth/roles'),
   getBootstrap: () => apiClient.get<any>('/auth/session/bootstrap'),
 };
