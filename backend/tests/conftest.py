@@ -29,7 +29,14 @@ TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=test_
 def setup_test_db():
     Base.metadata.create_all(bind=test_engine)
     yield
-    Base.metadata.drop_all(bind=test_engine)
+    # For SQLite with foreign key cycles (documents <-> document_versions),
+    # disable foreign key checks during cleanup
+    from sqlalchemy import text
+    with test_engine.connect() as conn:
+        conn.execute(text("PRAGMA foreign_keys = OFF"))
+        Base.metadata.drop_all(bind=conn)
+        conn.execute(text("PRAGMA foreign_keys = ON"))
+        conn.commit()
 
 
 @pytest.fixture

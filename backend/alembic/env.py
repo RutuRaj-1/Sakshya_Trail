@@ -16,6 +16,7 @@ import app.modules.auth.models
 import app.modules.institutions.models
 import app.modules.instruments.models
 import app.modules.audit.models
+import app.modules.documents.models
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
