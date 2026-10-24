@@ -18,6 +18,21 @@ from app.modules.documents.storage import (
     get_storage_provider,
     set_storage_provider,
 )
+from app.modules.documents.scanner import (
+    ScannerProvider,
+    ScanResult,
+    DisabledScannerProvider,
+    DemoScannerProvider,
+    DevelopmentBypassScannerProvider,
+    get_scanner_provider,
+    set_scanner_provider,
+)
+from app.modules.documents.validation import (
+    validate_upload,
+    UploadValidationError,
+    normalize_filename,
+)
+from app.modules.documents.router import router as documents_router
 
 __all__ = [
     "Document",
@@ -33,4 +48,15 @@ __all__ = [
     "LocalFileStorageProvider",
     "get_storage_provider",
     "set_storage_provider",
+    "ScannerProvider",
+    "ScanResult",
+    "DisabledScannerProvider",
+    "DemoScannerProvider",
+    "DevelopmentBypassScannerProvider",
+    "get_scanner_provider",
+    "set_scanner_provider",
+    "validate_upload",
+    "UploadValidationError",
+    "normalize_filename",
+    "documents_router",
 ]

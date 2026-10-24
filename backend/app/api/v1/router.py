@@ -7,6 +7,7 @@ from app.api.v1.endpoints.health import router as health_router
 from app.modules.auth.router import router as auth_router
 from app.modules.institutions.router import router as institutions_router
 from app.modules.instruments.router import router as instruments_router
+from app.modules.documents.router import router as documents_router
 from app.modules.audit.router import router as audit_router
 
 api_v1_router = APIRouter()
@@ -18,4 +19,5 @@ api_v1_router.include_router(health_router)
 api_v1_router.include_router(auth_router)
 api_v1_router.include_router(institutions_router)
 api_v1_router.include_router(instruments_router)
+api_v1_router.include_router(documents_router)
 api_v1_router.include_router(audit_router)
