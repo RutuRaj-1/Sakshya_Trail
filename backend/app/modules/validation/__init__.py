@@ -24,7 +24,10 @@ from app.modules.validation.registry import (
 # Import all rules to trigger self-registration
 import app.modules.validation.rules  # noqa: F401
 
-from app.modules.validation.router import router as validation_router
+from app.modules.validation.router import (
+    router as validation_router,
+    instruments_validation_router,
+)
 
 __all__ = [
     # Enums
@@ -43,6 +46,8 @@ __all__ = [
     "RuleContext",
     "rule_registry",
     "compute_finding_fingerprint",
-    # Router
+    # Routers
     "validation_router",
+    "instruments_validation_router",
 ]
+

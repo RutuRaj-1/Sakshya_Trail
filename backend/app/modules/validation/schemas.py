@@ -21,6 +21,10 @@ class RunValidationRequest(BaseModel):
         default=None,
         description="Optional list of specific rule IDs to run. If omitted, all enabled rules run.",
     )
+    category: Optional[str] = Field(
+        default=None,
+        description="Optional rule category to filter (e.g., 'DATE_CONSISTENCY', 'AMOUNT_CONSISTENCY').",
+    )
 
 
 class RuleOutcomeDetail(BaseModel):
@@ -45,12 +49,40 @@ class ValidationRunResponse(BaseModel):
     """Response returned after a validation run completes."""
     run_id: str
     instrument_id: str
-    outcomes: List[RuleOutcomeDetail]
-    summary: Dict[str, int]
-    new_findings_count: int
-    resolved_findings_count: int
-    policy_version_ref: str
+    outcomes: List[RuleOutcomeDetail] = Field(default_factory=list)
+    summary: Dict[str, int] = Field(default_factory=dict)
+    rules_evaluated: List[str] = Field(default_factory=list)
+    passes_count: int = 0
+    failures_count: int = 0
+    warnings_count: int = 0
+    not_applicable_count: int = 0
+    unable_to_evaluate_count: int = 0
+    new_findings_count: int = 0
+    resolved_findings_count: int = 0
+    policy_version_ref: str = "no-policy"
     run_at: str
+
+
+class ValidationRunSummaryResponse(BaseModel):
+    """Lightweight summary of a historical validation run."""
+    id: str
+    instrument_id: str
+    triggered_by_user_id: Optional[str] = None
+    run_at: datetime
+    rules_evaluated: List[str] = Field(default_factory=list)
+    outcome_summary: Dict[str, int] = Field(default_factory=dict)
+    new_findings_count: int = 0
+    resolved_findings_count: int = 0
+    run_status: str = "COMPLETED"
+    policy_version_ref: Optional[str] = None
+
+
+class ValidationRunListResponse(BaseModel):
+    """Paginated list of validation runs."""
+    items: List[ValidationRunSummaryResponse]
+    total: int
+    skip: int
+    limit: int
 
 
 # ---------------------------------------------------------------------------

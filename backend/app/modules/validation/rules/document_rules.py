@@ -123,3 +123,72 @@ class FDRCopyPresentRule(BaseValidationRule):
 
 # Self-register
 rule_registry.register(FDRCopyPresentRule())
+
+
+class DocumentCompletenessIntegrationRule(BaseValidationRule):
+    """
+    VAL-DOC-002 — Document Completeness Integration Rule (Rule E).
+
+    Reads Module 2's existing checklist result if available.
+    Does NOT reimplement the completeness engine in Module 3.
+    If Module 2 has no applicable checklist/profile, reports the limitation explicitly
+    rather than automatically declaring all document categories missing.
+    """
+    rule_id = "VAL-DOC-002"
+    rule_version = "1.0"
+    rule_type = RuleType.DETERMINISTIC
+    category = FindingCategory.DOCUMENT_COMPLETENESS
+    severity = RuleSeverity.HIGH
+    description = (
+        "Integrate Module 2 checklist result for document completeness verification. "
+        "Reports explicit limitation when no Module 2 checklist profile is available."
+    )
+    enabled = True
+
+    def evaluate(self, context: RuleContext) -> RuleResult:
+        checklist = context.checklist_result
+
+        # If Module 2 has no applicable checklist/profile, report limitation explicitly
+        if checklist is None:
+            return self._unable_to_evaluate(
+                "Document completeness integration unavailable: No Module 2 checklist "
+                "or document profile is configured for this instrument/case type. "
+                "Completeness cannot be evaluated without an approved Module 2 checklist profile."
+            )
+
+        # Module 2 checklist result is present; inspect status and items
+        is_complete = checklist.get("is_complete", False)
+        items = checklist.get("items", [])
+        evidence = checklist.get("evidence_refs", [])
+
+        if not is_complete:
+            missing_categories = [
+                item.get("category", "UNKNOWN")
+                for item in items
+                if item.get("status") in ("MISSING", "REQUIRED_NOT_MET", "UNREADABLE")
+            ]
+            category_list_str = ", ".join(sorted(missing_categories)) if missing_categories else "Unsatisfied items"
+
+            return self._make_result(
+                outcome=RuleOutcome.FAIL,
+                title="Module 2 document completeness checklist has unsatisfied items",
+                explanation=(
+                    f"Module 2 checklist evaluation indicates incomplete documentation. "
+                    f"Unsatisfied category requirements: {category_list_str}."
+                ),
+                observed_value=f"Unsatisfied: {missing_categories}",
+                expected_value="All Module 2 checklist requirements satisfied (is_complete=True)",
+                evidence_refs=evidence,
+                suggested_action=(
+                    "Upload the required documents identified in Module 2's checklist "
+                    f"({category_list_str}) and ensure they reach PROCESSED status."
+                ),
+                fingerprint_key=f"checklist_incomplete={category_list_str}",
+            )
+
+        return self._pass(
+            f"Module 2 document completeness checklist satisfied ({len(items)} items verified)."
+        )
+
+
+rule_registry.register(DocumentCompletenessIntegrationRule())

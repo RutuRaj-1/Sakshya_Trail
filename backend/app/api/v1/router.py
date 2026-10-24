@@ -10,7 +10,7 @@ from app.modules.instruments.router import router as instruments_router
 from app.modules.documents.router import router as documents_router
 from app.modules.audit.router import router as audit_router
 from app.modules.dashboard.router import router as dashboard_router
-from app.modules.validation.router import router as validation_router
+from app.modules.validation.router import router as validation_router, instruments_validation_router
 
 api_v1_router = APIRouter()
 
@@ -27,3 +27,4 @@ api_v1_router.include_router(dashboard_router)
 
 # Module 3: Validation, Discrepancy & Explainable Intelligence
 api_v1_router.include_router(validation_router)
+api_v1_router.include_router(instruments_validation_router)

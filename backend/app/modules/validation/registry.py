@@ -124,14 +124,25 @@ class RuleContext:
     joint_with_aicte: Optional[bool] = None
     assigned_office: Optional[str] = None
 
+    branch: Optional[str] = None
+    lien_details: Optional[str] = None
+
     # Institution
     institution_is_active: bool = True
     institution_type: str = "TECHNICAL_INSTITUTE"
+    institution_legal_name: Optional[str] = None
+    institution_code: Optional[str] = None
 
     # Document metadata: list of dicts, each with keys:
     # {document_id, document_version_id, category, processing_status, sha256_hash, ...}
     # Content fields are NEVER included.
     available_documents: List[Dict[str, Any]] = field(default_factory=list)
+
+    # Document completeness / checklist result from Module 2 (if available)
+    checklist_result: Optional[Dict[str, Any]] = None
+
+    # Extracted field metadata from document versions (if available)
+    extracted_fields: List[Dict[str, Any]] = field(default_factory=list)
 
     # Policy configuration: {config_key: parsed_value}
     policy: Dict[str, Any] = field(default_factory=dict)

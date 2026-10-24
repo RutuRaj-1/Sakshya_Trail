@@ -118,6 +118,25 @@ def _build_context(
             "uploaded_at": version.uploaded_at.isoformat() if version else None,
         })
 
+    # --- Document extracted fields metadata (from OCR/pipeline, if available) ---
+    from app.modules.validation.extracted_fields_service import get_extracted_fields_for_instrument
+    extracted_records = get_extracted_fields_for_instrument(db, instrument.id)
+    extracted_fields: List[Dict[str, Any]] = []
+    for rec in extracted_records:
+        extracted_fields.append({
+            "document_version_id": rec.document_version_id,
+            "document_id": rec.document_id,
+            "doc_bank_name": rec.doc_bank_name,
+            "doc_reference_number": rec.doc_reference_number,
+            "doc_amount_str": rec.doc_amount_str,
+            "doc_issue_date_str": rec.doc_issue_date_str,
+            "doc_maturity_date_str": rec.doc_maturity_date_str,
+            "doc_account_holder": rec.doc_account_holder,
+            "doc_lien_holder": rec.doc_lien_holder,
+            "confidence_overall": rec.confidence_overall,
+            "extraction_status": rec.extraction_status,
+        })
+
     return RuleContext(
         instrument_id=instrument.id,
         institution_id=instrument.institution_id,
@@ -125,18 +144,24 @@ def _build_context(
         instrument_trust_level=instrument.trust_level,
         instrument_type=instrument.instrument_type,
         bank_name=instrument.bank_name,
+        branch=instrument.branch,
         reference_number=instrument.reference_number,
         amount_decimal=instrument.amount,
         currency=instrument.currency,
         issue_date=instrument.issue_date,
         maturity_date=instrument.maturity_date,
         lien_holder=instrument.lien_holder,
+        lien_details=instrument.lien_details,
         lien_marked=instrument.lien_marked,
         joint_with_aicte=instrument.joint_with_aicte,
         assigned_office=instrument.assigned_office,
         institution_is_active=institution.is_active if institution else False,
         institution_type=institution.institution_type if institution else "UNKNOWN",
+        institution_legal_name=institution.legal_name if institution else None,
+        institution_code=institution.code if institution else None,
         available_documents=docs,
+        checklist_result=None,  # Module 2 checklist result if configured / instantiated
+        extracted_fields=extracted_fields,
         policy=policy,
         existing_open_findings=[],
         triggered_by_user_id=triggered_by_user_id,
@@ -149,6 +174,7 @@ def run_validation(
     instrument_id: str,
     triggered_by_user_id: Optional[str] = None,
     rule_ids: Optional[List[str]] = None,
+    category: Optional[str] = None,
 ) -> Dict[str, Any]:
     """
     Execute validation rules for a given instrument.
@@ -161,25 +187,27 @@ def run_validation(
         User who triggered the run (None = system-triggered sweep).
     rule_ids : Optional[List[str]]
         If provided, only run the specified rules; otherwise run all enabled rules.
+    category : Optional[str]
+        If provided, only run rules matching the given finding category.
 
     Returns
     -------
     Dict with keys:
         run_id, instrument_id, outcomes (list), summary (counts), new_findings_count,
-        resolved_findings_count, policy_version_ref.
+        resolved_findings_count, policy_version_ref, rules_evaluated.
     """
     instrument = db.scalar(select(Instrument).where(Instrument.id == instrument_id))
     if not instrument:
         raise NotFoundException(f"Instrument '{instrument_id}' not found.")
 
     # Determine rules to run
+    rules = rule_registry.get_enabled_rules()
     if rule_ids:
-        rules: List[BaseValidationRule] = [
-            r for r in rule_registry.get_enabled_rules()
-            if r.rule_id in set(rule_ids)
-        ]
-    else:
-        rules = rule_registry.get_enabled_rules()
+        rule_id_set = set(rule_ids)
+        rules = [r for r in rules if r.rule_id in rule_id_set]
+    if category:
+        cat_norm = category.strip().upper()
+        rules = [r for r in rules if r.category.value == cat_norm or r.category.name == cat_norm]
 
     # Create a ValidationRun record (before results so we have an ID)
     run = ValidationRun(
@@ -286,8 +314,38 @@ def run_validation(
         "instrument_id": instrument_id,
         "outcomes": outcomes,
         "summary": outcome_counts,
+        "rules_evaluated": [r.rule_id for r in rules],
+        "passes_count": outcome_counts.get(RuleOutcome.PASS.value, 0),
+        "failures_count": outcome_counts.get(RuleOutcome.FAIL.value, 0),
+        "warnings_count": outcome_counts.get(RuleOutcome.WARNING.value, 0),
+        "not_applicable_count": outcome_counts.get(RuleOutcome.NOT_APPLICABLE.value, 0),
+        "unable_to_evaluate_count": outcome_counts.get(RuleOutcome.UNABLE_TO_EVALUATE.value, 0),
         "new_findings_count": new_findings,
         "resolved_findings_count": resolved_findings,
         "policy_version_ref": policy_version_ref,
         "run_at": run.run_at.isoformat(),
     }
+
+
+def trigger_post_save_validation(
+    db: Session,
+    instrument_id: str,
+    triggered_by_user_id: Optional[str] = None,
+) -> Optional[Dict[str, Any]]:
+    """
+    Safe post-save evaluation trigger after an instrument is created or materially edited.
+    Executes all enabled validation rules without circular dependencies or blocking failures.
+    Exceptions are logged and suppressed so normal instrument operations never fail.
+    """
+    try:
+        return run_validation(
+            db=db,
+            instrument_id=instrument_id,
+            triggered_by_user_id=triggered_by_user_id,
+        )
+    except Exception as exc:
+        import logging
+        logging.getLogger("fdr_sentinel.validation").warning(
+            f"Post-save validation trigger failed gracefully for instrument '{instrument_id}': {exc}"
+        )
+        return None

@@ -1,38 +1,40 @@
 # Module 3 — Validation, Discrepancy & Explainable Intelligence
 ## Implementation Summary
 
-> **Status:** ✅ Foundation implemented and verified  
-> **Revision:** `b3c5d7e9f1a2` (Alembic head)  
-> **Tests:** 43 new tests — 146 total across all modules — **0 failures**  
+> **Status:** ✅ Deterministic Rules, Validation Execution & Explainable Findings API Implemented  
+> **Revision:** `dde1c7162b37` (Alembic head)  
+> **Tests:** 171 passed total across all modules (25 new Prompt 2 tests + 43 Prompt 1 tests + 103 prior modules) — **0 failures**  
 > **Date:** 2026-10-25
 
 ---
 
-## 1. Scope
+## 1. Scope & Ownership
 
-Module 3 implements the **rule-driven validation engine**, **finding persistence**, and **policy configuration** infrastructure for the FDR Sentinel platform. It consumes data from Module 1 (instruments, institutions, users) and Module 2 (documents, document versions) without duplicating their ownership or modifying their records.
+Module 3 implements the **rule-driven validation engine**, **explainable finding persistence**, and **authorized policy configuration** infrastructure for the FDR Sentinel platform. It consumes data from Module 1 (instruments, institutions, users) and Module 2 (documents, document versions, extracted fields) without duplicating their ownership or modifying their records.
 
 ### What Module 3 owns
-| Concern | Owner |
-|---------|-------|
-| Rule definitions and registry | Module 3 |
-| Deterministic validation checks | Module 3 |
-| Cross-field consistency checks | Module 3 |
-| Heuristic / advisory checks | Module 3 |
-| Finding (discrepancy) persistence & lifecycle | Module 3 |
-| Finding deduplication and supersession | Module 3 |
-| Policy configuration (versioned, authorized) | Module 3 |
-| Validation run log | Module 3 |
-| Finding review interfaces (read + dismiss) | Module 3 (Prompt 1) |
+| Concern | Owner | Status |
+|---------|-------|--------|
+| Rule definitions and registry | Module 3 | Implemented (11 rules) |
+| Deterministic validation checks (Rules A–F) | Module 3 | Fully Implemented & Tested |
+| Cross-field consistency & institution checks | Module 3 | Fully Implemented & Tested |
+| Heuristic / advisory checks (duplicates) | Module 3 | Implemented |
+| Finding persistence, idempotency & lifecycle | Module 3 | Implemented (OPEN, IN_REVIEW, RESOLVED, DISMISSED, SUPERSEDED) |
+| Finding deduplication & supersession linkages | Module 3 | Implemented (SHA-256 fingerprinting) |
+| Policy configuration (versioned, authorized) | Module 3 | Implemented (`ValidationPolicyConfig`) |
+| Validation run log & run history | Module 3 | Implemented (`ValidationRun`) |
+| Versioned REST API endpoints | Module 3 | Implemented (`/api/v1/instruments/...`, `/api/v1/findings/...`) |
+| Post-save validation trigger | Module 3 | Implemented (`trigger_post_save_validation`) |
 
 ### What Module 3 does NOT own
-| Concern | Owner |
-|---------|-------|
-| Document uploads & immutable versioning | Module 2 |
-| Authoritative bank verification | Module 4 (future) |
-| FDR trust-level promotion (L0→L1→L2→L3) | Module 4 (future) |
-| Maturity scheduling and reminders | Module 5 (future) |
-| Release / refund authorization | Module 6 (future) |
+| Concern | Owner | Reason |
+|---------|-------|--------|
+| Document intake, storage & hashing | Module 2 | Module 2 stores raw files and versions |
+| Document completeness checklist engine | Module 2 | Module 3 integrates with checklist; reports UNABLE_TO_EVALUATE if absent |
+| Authoritative bank verification | Module 4 | Out of scope; validation does not verify with banks |
+| FDR trust-level promotion (L0→L1→L2→L3) | Module 4 | Safety constraint: validation never modifies trust level |
+| Maturity scheduling and reminders | Module 5 | Future module |
+| Release / refund authorization | Module 6 | Future module |
 
 ---
 
@@ -40,347 +42,205 @@ Module 3 implements the **rule-driven validation engine**, **finding persistence
 
 ```
 backend/app/modules/validation/
-├── __init__.py                    # Package init; triggers rule self-registration
+├── __init__.py                    # Package init; exports models, registry, enums, routers
 ├── enums.py                       # RuleOutcome, FindingStatus, RuleSeverity, RuleType, FindingCategory
-├── models.py                      # SQLAlchemy models
+├── models.py                      # SQLAlchemy models: ValidationPolicyConfig, ValidationRun, ValidationFinding
+├── extracted_fields_model.py      # SQLAlchemy model: DocumentExtractedFields
+├── extracted_fields_service.py    # Service for reading/writing extracted document evidence
 ├── registry.py                    # Rule registry, BaseValidationRule, RuleResult, RuleContext
-├── engine.py                      # Orchestration engine (run_validation)
-├── finding_service.py             # Finding persistence, deduplication, dismissal
+├── engine.py                      # Orchestration engine, run_validation, trigger_post_save_validation
+├── finding_service.py             # Finding persistence, idempotency, supersession, dismissal, re-evaluation
 ├── policy_service.py              # Policy config read/write/versioning
 ├── schemas.py                     # Pydantic request/response schemas
-├── router.py                      # FastAPI API endpoints
+├── router.py                      # FastAPI endpoints (versioned & backward-compatible)
 └── rules/
-    ├── __init__.py                # Imports all rules → self-registration
-    ├── date_rules.py              # VAL-DATE-001, VAL-DATE-002
-    ├── amount_rules.py            # VAL-AMT-001, VAL-AMT-002
-    ├── reference_rules.py         # VAL-REF-001
-    ├── lien_rules.py              # VAL-LIEN-001
-    ├── document_rules.py          # VAL-DOC-001
-    └── duplicate_rules.py         # VAL-DUP-001 (heuristic)
+    ├── __init__.py                # Imports all rules → triggers self-registration
+    ├── required_rules.py          # VAL-REQ-001 (Rule A: Configurable required instrument fields)
+    ├── amount_rules.py            # VAL-AMT-001 (Rule B: Positive amount), VAL-AMT-002 (Policy minimum)
+    ├── date_rules.py              # VAL-DATE-001 (Rule C: Ordering & bounds), VAL-DATE-002 (Expiry), VAL-DATE-003 (Validity term)
+    ├── institution_rules.py       # VAL-INST-001 (Rule D: Institution consistency & evidence mismatch)
+    ├── document_rules.py          # VAL-DOC-001 (FDR copy present), VAL-DOC-002 (Rule E: Module 2 checklist integration)
+    ├── consistency_rules.py       # VAL-CONS-001 (Rule F: Basic data consistency & inactive institution)
+    ├── reference_rules.py         # VAL-REF-001 (Reference format & placeholder rejection)
+    ├── lien_rules.py              # VAL-LIEN-001 (Lien marked & holder validity)
+    └── duplicate_rules.py         # VAL-DUP-001 (Heuristic duplicate sibling detection)
 ```
 
 ---
 
-## 3. Database Models
+## 3. Implemented Rule Catalogue
 
-### 3.1 `validation_policy_configs`
-
-Versioned, authorized, append-only policy configuration records.
-
-| Column | Type | Notes |
-|--------|------|-------|
-| `id` | VARCHAR(36) PK | UUID |
-| `institution_id` | VARCHAR(36) FK→institutions | NULL = global |
-| `config_key` | VARCHAR(100) | e.g. `MIN_DEPOSIT_AMOUNT_INR` |
-| `display_name` | VARCHAR(255) | Human label |
-| `config_value` | TEXT | Stored as string; typed by `value_type` |
-| `value_type` | VARCHAR(20) | `decimal`, `integer`, `string`, `json_list`, `boolean` |
-| `policy_version` | INTEGER | Incremented on each update |
-| `is_active` | BOOLEAN | Only one active per (key, institution_id) |
-| `authorized_by_user_id` | VARCHAR(36) | SYSTEM_ADMIN only |
-| `created_at`, `updated_at` | DATETIME | TimestampMixin |
-
-**Indexes:** `config_key`, `institution_id`, `is_active`, composite `(config_key, institution_id)`, composite `(is_active, config_key)`
-
-### 3.2 `validation_runs`
-
-Lightweight sweep execution log.
-
-| Column | Type | Notes |
-|--------|------|-------|
-| `id` | VARCHAR(36) PK | UUID |
-| `instrument_id` | VARCHAR(36) FK→instruments | CASCADE |
-| `triggered_by_user_id` | VARCHAR(36) | NULL = system sweep |
-| `run_at` | DATETIME | Index |
-| `rules_evaluated_csv` | TEXT | Comma-separated rule IDs |
-| `outcome_summary_json` | TEXT | `{"PASS":n, "FAIL":n, ...}` |
-| `policy_version_ref` | VARCHAR(100) | Policy snapshot reference |
-| `new_findings_count` | INTEGER | |
-| `resolved_findings_count` | INTEGER | |
-| `run_status` | VARCHAR(20) | COMPLETED, PARTIAL, FAILED |
-
-### 3.3 `validation_findings`
-
-Persisted discrepancy records. **Never deleted.**
-
-| Column | Type | Notes |
-|--------|------|-------|
-| `id` | VARCHAR(36) PK | UUID |
-| `finding_fingerprint` | VARCHAR(64) | SHA-256 hex for deduplication |
-| `instrument_id` | VARCHAR(36) FK→instruments | CASCADE |
-| `institution_id` | VARCHAR(36) FK→institutions | Scope enforcement |
-| `document_id` | VARCHAR(36) FK→documents | SET NULL, optional |
-| `document_version_id` | VARCHAR(36) FK→document_versions | Exact version at detection |
-| `rule_id` | VARCHAR(50) | e.g. `VAL-DATE-001` |
-| `rule_version` | VARCHAR(20) | e.g. `1.0` |
-| `rule_type` | VARCHAR(20) | `DETERMINISTIC` or `HEURISTIC` |
-| `category` | VARCHAR(60) | `FindingCategory` value |
-| `severity` | VARCHAR(20) | `CRITICAL/HIGH/MEDIUM/LOW/INFO` |
-| `status` | VARCHAR(20) | `FindingStatus` lifecycle |
-| `title` | VARCHAR(500) | Short human-readable title |
-| `explanation` | TEXT | Full explanation |
-| `observed_value` | VARCHAR(500) | Safe, non-sensitive |
-| `expected_value` | VARCHAR(500) | Safe, non-sensitive |
-| `evidence_refs_json` | TEXT | JSON list of reference UUIDs |
-| `suggested_action` | VARCHAR(500) | Next action guidance |
-| `policy_version_ref` | VARCHAR(100) | Policy version at evaluation |
-| `first_detected_at` | DATETIME | When first seen |
-| `last_evaluated_at` | DATETIME | Most recent evaluation |
-| `resolved_at` | DATETIME | When status became terminal |
-| `resolved_by_user_id` | VARCHAR(36) | Resolver |
-| `resolution_note` | TEXT | Human or system note |
-| `superseded_by_finding_id` | VARCHAR(36) | Self-FK, SET NULL |
-| `validation_run_id` | VARCHAR(36) FK→validation_runs | SET NULL |
-| `created_at`, `updated_at` | DATETIME | TimestampMixin |
-
-**Composite Indexes:** `(instrument_id, status)`, `(instrument_id, rule_id)`, `(severity, status)`, `(category, status)`, `first_detected_at`, `last_evaluated_at`
-
-> **Note:** `finding_fingerprint` is intentionally NOT globally unique — the same fingerprint can exist across different `rule_version` values. Deduplication is enforced at the service layer.
+| Rule ID | Category | Type | Severity | Description & Policy Version Behavior |
+|---------|----------|------|----------|---------------------------------------|
+| `VAL-REQ-001` | `CROSS_FIELD_CONSISTENCY` | Deterministic | HIGH | **Rule A — Required instrument fields.** Evaluates configured fields required for instrument/case type. Reads `REQUIRED_INSTRUMENT_FIELDS` from policy; falls back to standard required set if unconfigured. Never invents universal mandates. |
+| `VAL-AMT-001` | `AMOUNT_CONSISTENCY` | Deterministic | CRITICAL | **Rule B — Amount positivity.** Verifies registered amount is Decimal > 0.00. |
+| `VAL-AMT-002` | `POLICY_COMPLIANCE` | Deterministic | HIGH | **Rule B — Policy minimum amount.** Compares amount against `MIN_DEPOSIT_AMOUNT_INR` in active policy. Returns `UNABLE_TO_EVALUATE` if policy is unconfigured. Never hard-codes an amount threshold. |
+| `VAL-DATE-001` | `DATE_CONSISTENCY` | Deterministic | HIGH | **Rule C — Date ordering & bounds.** Checks issue and maturity dates are present, parseable, fall within supported calendar bounds (1990–2100), and maturity is strictly after issue date. |
+| `VAL-DATE-002` | `DATE_CONSISTENCY` | Deterministic | HIGH | **Rule C — Maturity expiry.** Checks active instruments have not passed maturity date (warning within 90 days; fail if passed). |
+| `VAL-DATE-003` | `DATE_CONSISTENCY` | Deterministic | HIGH | **Rule C — Configured validity period.** Applied **ONLY** when `MIN_VALIDITY_DAYS` or `MAX_VALIDITY_DAYS` is configured in active policy. Returns `NOT_APPLICABLE` when unconfigured. Does not infer universal renewal requirements. |
+| `VAL-INST-001` | `INSTITUTION_ELIGIBILITY` | Deterministic | HIGH | **Rule D — Institution consistency.** Compares instrument institution association and master data to available document evidence (e.g. OCR depositor name). Conflicting sources produce an explicit finding with source references without modifying records. |
+| `VAL-DOC-001` | `DOCUMENT_COMPLETENESS` | Deterministic | MEDIUM | **Rule E — FDR Copy Document.** Checks at least one FDR_COPY document is uploaded and processed. |
+| `VAL-DOC-002` | `DOCUMENT_COMPLETENESS` | Deterministic | HIGH | **Rule E — Module 2 Checklist Integration.** Reads Module 2 checklist result. If Module 2 has no applicable checklist profile, explicitly returns `UNABLE_TO_EVALUATE` rather than declaring all categories missing. |
+| `VAL-CONS-001` | `CROSS_FIELD_CONSISTENCY` | Deterministic | HIGH | **Rule F — Basic data consistency.** Enforces inactive institution restrictions (active instrument under inactive institution), detects contradictory joint/lien flags, and verifies valid field combinations. |
+| `VAL-REF-001` | `REFERENCE_INTEGRITY` | Deterministic | HIGH | **Reference integrity.** Ensures reference number is non-blank, length >= 4, and not a placeholder (e.g. 'none', 'tbd', 'test'). |
+| `VAL-LIEN-001` | `LIEN_VALIDITY` | Deterministic | HIGH | **Lien validity.** Ensures FDR has lien marked and lien holder specified. |
+| `VAL-DUP-001` | `POTENTIAL_DUPLICATE` | Heuristic | MEDIUM | **Duplicate sibling advisory.** Advisory finding (`[Advisory — human review required]`) when identical bank + reference exists in registry. |
 
 ---
 
-## 4. Enums
+## 4. Structured Finding Explanations
 
-### 4.1 `RuleOutcome` — Single rule execution result
+Every generated `ValidationFinding` record contains complete, non-accusatory structured metadata:
 
-| Value | Meaning |
-|-------|---------|
-| `PASS` | All checks passed; no discrepancy |
-| `FAIL` | Deterministic check failed; finding persisted |
-| `WARNING` | Heuristic concern raised; finding persisted with advisory label |
-| `NOT_APPLICABLE` | Rule not relevant for this instrument/configuration |
-| `UNABLE_TO_EVALUATE` | Required inputs or policy configuration missing |
-
-### 4.2 `FindingStatus` — Finding lifecycle
-
-| Value | Meaning | Terminal? |
-|-------|---------|-----------|
-| `OPEN` | Newly detected; awaiting review | No |
-| `IN_REVIEW` | Reviewer acknowledged | No |
-| `DISMISSED` | Human reviewer: not actionable | Yes |
-| `RESOLVED` | Underlying issue corrected | No (traceable) |
-| `SUPERSEDED` | Replaced by newer rule version finding | Yes |
-
-> **Distinct from:** `Instrument.status` (DRAFT/REGISTERED/RELEASED), `DocumentVersion.processing_status` (PENDING_SCAN/PROCESSED), and `Instrument.trust_level` (L0–L3).
-
-### 4.3 `RuleSeverity`
-`CRITICAL` > `HIGH` > `MEDIUM` > `LOW` > `INFO`
-
-### 4.4 `RuleType`
-- `DETERMINISTIC` — conclusive logical/mathematical check
-- `HEURISTIC` — advisory; findings carry `[Advisory — human review required]` prefix
-
-### 4.5 `FindingCategory`
-`DATE_CONSISTENCY`, `AMOUNT_CONSISTENCY`, `REFERENCE_INTEGRITY`, `DOCUMENT_COMPLETENESS`, `LIEN_VALIDITY`, `CROSS_FIELD_CONSISTENCY`, `POTENTIAL_DUPLICATE`, `POLICY_COMPLIANCE`, `INSTITUTION_ELIGIBILITY`, `ADVISORY`, `OTHER`
+- **Rule Provenance:** `rule_id`, `rule_version`, `rule_type` (`DETERMINISTIC` / `HEURISTIC`)
+- **Policy Version Reference:** `policy_version_ref` (stores exact policy version evaluated, e.g. `POL-MIN-3M` or `no-policy`)
+- **Instrument Identification:** `instrument_id`, `institution_id`
+- **Evidence References:** `evidence_refs_json` (JSON list of UUIDs, e.g. document version IDs, audit IDs; never raw documents or secrets)
+- **Comparison Basis:** `observed_value` and `expected_value` (safe, factual values)
+- **Classification:** `category` (enum) and `severity` (`CRITICAL`, `HIGH`, `MEDIUM`, `LOW`, `INFO`)
+- **Lifecycle Status:** `status` (`OPEN`, `IN_REVIEW`, `RESOLVED`, `DISMISSED`, `SUPERSEDED`)
+- **Plain-Language Explanation:** Factual, neutral phrasing (e.g., "The recorded maturity date is 12 March 2027, while the recorded issue date is 20 March 2027.")
+- **Suggested Action:** Prescriptive reviewer guidance (e.g., "Review the source document and correct the data if necessary.")
+- **Temporal Tracking:** `first_detected_at`, `last_evaluated_at`, `resolved_at`
 
 ---
 
-## 5. Rule Registry
+## 5. Finding Lifecycle, Idempotency & Supersession
 
-### Architecture
-
-All rules are **explicit Python classes** inheriting from `BaseValidationRule`. No `eval()`, no `exec()`, no unrestricted dynamic loading. The `rule_registry` singleton maps stable `rule_id` strings to class instances.
-
-Rules self-register by being imported in `rules/__init__.py`. The registry is read-only after application startup.
-
-### Interface
-
-```python
-class BaseValidationRule(abc.ABC):
-    rule_id: str        # e.g. "VAL-DATE-001"
-    rule_version: str   # e.g. "1.0"
-    rule_type: RuleType
-    category: FindingCategory
-    severity: RuleSeverity
-    description: str
-    enabled: bool
-
-    @abc.abstractmethod
-    def evaluate(self, context: RuleContext) -> RuleResult: ...
+```
+                 [First Evaluation: Rule Fires]
+                                │
+                                ▼
+                       ┌────────────────┐
+                       │     OPEN       │◄────────────────┐
+                       └───────┬────────┘                 │
+                               │                          │
+              ┌────────────────┼────────────────┐         │ (Condition fails
+              ▼                ▼                ▼         │  again with same
+      [Reviewer Ack]    [Condition Fix]  [Human Dismiss]  │  inputs)
+              │                │                │         │
+              ▼                │                ▼         │
+       ┌─────────────┐         │        ┌─────────────┐   │
+       │  IN_REVIEW  │         │        │  DISMISSED  │   │
+       └──────┬──────┘         │        └──────┬──────┘   │
+              │                │               │          │
+              └────────┐       │               │          │
+                       ▼       ▼               ▼          │
+                     ┌───────────┐      [Unchanged Run:   │
+                     │ RESOLVED  │       Stays Dismissed] │
+                     └─────┬─────┘                        │
+                           │                              │
+                           └──────────────────────────────┘
+                                  
+    [Input Materially Changes OR Rule Version Updated]
+                           │
+                           ▼
+                     ┌────────────┐
+                     │ SUPERSEDED │  (Points to new finding via
+                     └────────────┘   superseded_by_finding_id;
+                                      original evidence preserved)
 ```
 
-### Registered Rules (Prompt 1 Foundation)
-
-| Rule ID | Category | Type | Severity | Description |
-|---------|----------|------|----------|-------------|
-| `VAL-DATE-001` | DATE_CONSISTENCY | Deterministic | HIGH | Maturity date must be after issue date |
-| `VAL-DATE-002` | DATE_CONSISTENCY | Deterministic | HIGH | Active instruments must not have past maturity |
-| `VAL-AMT-001` | AMOUNT_CONSISTENCY | Deterministic | CRITICAL | Amount must be > 0 |
-| `VAL-AMT-002` | POLICY_COMPLIANCE | Deterministic | HIGH | Amount >= policy minimum (UNABLE_TO_EVALUATE if no config) |
-| `VAL-REF-001` | REFERENCE_INTEGRITY | Deterministic | HIGH | Reference number non-blank, minimum length, not a placeholder |
-| `VAL-LIEN-001` | LIEN_VALIDITY | Deterministic | HIGH | FDR must have lien marked and lien holder set |
-| `VAL-DOC-001` | DOCUMENT_COMPLETENESS | Deterministic | MEDIUM | FDR_COPY document must be present and processed |
-| `VAL-DUP-001` | POTENTIAL_DUPLICATE | **Heuristic** | MEDIUM | Advisory: same bank+reference exists in registry |
+### Idempotency & Transition Semantics
+1. **Unchanged Inputs:** Running validation repeatedly on unchanged inputs calculates the identical SHA-256 fingerprint. It updates `last_evaluated_at` only. No duplicate findings are created.
+2. **Manually Dismissed Findings:** If a finding was marked `DISMISSED` and validation re-runs with unchanged inputs, the status remains `DISMISSED`. It is **never automatically re-opened**.
+3. **Changed Inputs (Same Rule):** If underlying fields change (e.g. amount or dates edited) but the condition still fails with new values, the existing open finding is transitioned to `SUPERSEDED` with `superseded_by_finding_id` linking to the newly created finding. Historical evidence is **never mutated**.
+4. **Condition Cleared:** When a rule returns `PASS` or `NOT_APPLICABLE`, all previously `OPEN` or `IN_REVIEW` findings for that rule on that instrument transition to `RESOLVED` with an automated resolution note and timestamp.
 
 ---
 
-## 6. Rule Execution Context
+## 6. API Endpoints
 
-`RuleContext` is a read-only dataclass populated by the engine from live DB data. It carries:
-- Instrument fields (status, trust_level, dates, amount, reference, lien, etc.)
-- Institution fields (is_active, institution_type)
-- Document metadata list (category, processing_status, version IDs — **no content**)
-- Policy dict (config values + engine-internal signals like `_duplicate_sibling_count`)
+All endpoints are versioned under `/api/v1`, enforce authentication, enforce institution tenant scoping, and log material actions to the audit trail.
 
-Rules **must not** modify the context, the database, or the instrument.
-
----
-
-## 7. Finding Deduplication
-
-The finding service uses a SHA-256 fingerprint computed from `(instrument_id, rule_id, rule_version, fingerprint_key)`:
-
-1. **Exact match** (same fingerprint + same rule_version, OPEN/IN_REVIEW): update `last_evaluated_at` only — idempotent re-runs create no duplicates.
-2. **New rule version** (same rule_id, different rule_version, OPEN/IN_REVIEW): mark old finding `SUPERSEDED`, create fresh finding.
-3. **Rule clears** (PASS or NOT_APPLICABLE): resolve all open findings for that rule — mark `RESOLVED` with automated note.
-4. **No matching open finding**: create new finding.
-
-Historical findings are **never deleted**.
-
----
-
-## 8. Policy Configuration
-
-Rules that depend on configurable thresholds (e.g. minimum deposit amount) consult `ValidationPolicyConfig` records through `policy_service.py`.
-
-**Read path:** institution-specific values take precedence over global; if no active record exists, the rule returns `UNABLE_TO_EVALUATE` with a clear message.
-
-**Write path (SYSTEM_ADMIN only):**
-- Deactivates current active record for `(config_key, institution_id)`
-- Inserts new versioned record with `policy_version + 1`
-- Audited via `log_audit_event()`
-
-> **No threshold values are hard-coded** in the codebase. All policy-dependent rules return `UNABLE_TO_EVALUATE` when no active config exists.
-
----
-
-## 9. API Endpoints
-
+### Primary Resource Endpoints
 | Method | Path | Roles | Description |
 |--------|------|-------|-------------|
-| `POST` | `/api/v1/validation/instruments/{id}/run` | SYSTEM_ADMIN, SCRUTINY_OFFICER, BRANCH_HEAD, COMPETENT_AUTHORITY | Trigger validation run |
-| `GET` | `/api/v1/validation/instruments/{id}/findings` | All authenticated (institution-scoped) | List findings |
-| `GET` | `/api/v1/validation/instruments/{id}/findings/{fid}` | All authenticated (institution-scoped) | Get single finding |
-| `POST` | `/api/v1/validation/instruments/{id}/findings/{fid}/dismiss` | SYSTEM_ADMIN, SCRUTINY_OFFICER, BRANCH_HEAD | Dismiss finding |
-| `GET` | `/api/v1/validation/rules` | All authenticated | List registered rules |
-| `GET` | `/api/v1/validation/policy` | SYSTEM_ADMIN, SCRUTINY_OFFICER, BRANCH_HEAD, AUDITOR | Read policy configs |
-| `POST` | `/api/v1/validation/policy` | SYSTEM_ADMIN only | Create/update policy config |
+| `POST` | `/api/v1/instruments/{instrument_id}/validation-runs` | SYSTEM_ADMIN, SCRUTINY_OFFICER, BRANCH_HEAD, COMPETENT_AUTHORITY | Trigger full or selective validation run |
+| `GET` | `/api/v1/instruments/{instrument_id}/validation-runs` | All authenticated (tenant-scoped) | List validation run logs with pagination |
+| `GET` | `/api/v1/instruments/{instrument_id}/findings` | All authenticated (tenant-scoped) | List findings with status/severity/category filters and allow-listed sort |
+| `GET` | `/api/v1/findings/{finding_id}` | All authenticated (tenant-scoped) | Get single finding by ID |
+| `POST` | `/api/v1/findings/{finding_id}/re-evaluate` | SYSTEM_ADMIN, SCRUTINY_OFFICER, BRANCH_HEAD | Re-evaluate specific finding's rule |
+| `POST` | `/api/v1/instruments/{instrument_id}/rules/{rule_id}/evaluate` | SYSTEM_ADMIN, SCRUTINY_OFFICER, BRANCH_HEAD | Evaluate single allow-listed rule (no arbitrary code execution) |
 
-> **None of these endpoints modify `Instrument.trust_level`.**
-
----
-
-## 10. Safety & Integrity Guarantees
-
-| # | Guarantee | Implementation |
-|---|-----------|----------------|
-| 1 | Validation does not authenticate an FDR | Engine produces findings only; no auth status changed |
-| 2 | No finding silently raises trust level | `run_validation()` has a post-execution assertion; trust_level unchanged |
-| 3 | No finding independently approves/rejects release | Router has no release endpoints; Module 6 is future scope |
-| 4 | Heuristic findings labelled advisory | `_make_result()` prepends `[Advisory — human review required]` for HEURISTIC rules |
-| 5 | No fraud/forgery label for rule failure | All finding titles and explanations use neutral, factual language |
-| 6 | Missing evidence = UNABLE_TO_EVALUATE | VAL-DOC-001 and VAL-AMT-002 explicitly return `UNABLE_TO_EVALUATE` |
-| 7 | Every finding has traceable rule and reason | `rule_id`, `rule_version`, `explanation`, `policy_version_ref` stored on every finding |
-| 8 | Evidence scoped to instrument's institution | `institution_id` FK on findings; `_enforce_instrument_scope()` in router |
-| 9 | Old document version findings remain traceable | `document_version_id` stored immutably at detection time; never overwritten |
+### Module Compatibility Endpoints
+| Method | Path | Roles | Description |
+|--------|------|-------|-------------|
+| `POST` | `/api/v1/validation/instruments/{id}/run` | Internal review roles | Alias for validation run |
+| `GET` | `/api/v1/validation/instruments/{id}/findings` | All authenticated (tenant-scoped) | Alias for instrument findings |
+| `GET` | `/api/v1/validation/instruments/{id}/findings/{fid}` | All authenticated (tenant-scoped) | Alias for single finding |
+| `POST` | `/api/v1/validation/instruments/{id}/findings/{fid}/dismiss` | SYSTEM_ADMIN, SCRUTINY_OFFICER, BRANCH_HEAD | Dismiss finding with mandatory reason |
+| `GET` | `/api/v1/validation/rules` | All authenticated | List registered rules in rule registry |
+| `GET` | `/api/v1/validation/policy` | Review & audit roles | List active policy configurations |
+| `POST` | `/api/v1/validation/policy` | SYSTEM_ADMIN only | Create / update versioned policy configuration |
 
 ---
 
-## 11. Alembic Migration
+## 7. Validation Modes & Summary Metadata
 
-**Revision ID:** `b3c5d7e9f1a2`  
-**Parent revision:** `a7b2c4d9e8f5` (Module 2 documents)  
-**File:** `alembic/versions/2026_10_25_0100-b3c5d7e9f1a2_add_module_3_validation_engine.py`
+### Supported Modes
+1. **Explicit Full Evaluation:** Evaluates all enabled rules registered in the system.
+2. **Selective Evaluation by Rule IDs:** Evaluates a server-side allow-listed subset (`payload.rule_ids`).
+3. **Selective Evaluation by Category:** Evaluates rules belonging to a specific category (`payload.category`).
+4. **Single Rule Execution:** Evaluates a single allow-listed rule via `/instruments/{id}/rules/{rule_id}/evaluate`.
+5. **Post-Save Safe Trigger:** Automatic trigger (`trigger_post_save_validation`) called after an instrument is created or materially updated. Does not fail instrument operations if a rule errors.
 
-Tables created (additive — no existing tables modified):
-- `validation_policy_configs`
-- `validation_runs`
-- `validation_findings`
-
----
-
-## 12. Test Coverage
-
-**Test file:** `tests/test_module3_validation.py` — **43 tests, 0 failures**
-
-| Test Class | Cases |
-|-----------|-------|
-| `TestRuleRegistrationAndExecution` | Registry contents, rule execution, expired instrument detection |
-| `TestRuleDefinitions` | No rule_id raises ValueError, duplicate rule_id raises ValueError, heuristic advisory prefix |
-| `TestRuleVersionPersistence` | Finding stores correct rule_version |
-| `TestFindingCreationAndRetrieval` | Create finding, retrieve finding, required fields present |
-| `TestFindingStatusValidation` | Double-dismiss rejected, status enum values, no overlap with instrument statuses |
-| `TestEvidenceLinkIntegrity` | Evidence refs stored as JSON, parsed as list |
-| `TestIdempotentEvaluation` | Same input x 2 runs = 1 finding (upsert) |
-| `TestFindingPreservation` | Resolved finding preserved in DB, superseded finding preserved |
-| `TestUnconfiguredPolicy` | UNABLE_TO_EVALUATE without config, PASS with config, policy set/retrieve |
-| `TestTrustLevelProtection` | Service layer assertion, API layer — trust_level unchanged after run |
-| `TestAuthorizationIntegration` | INSTITUTION_USER cannot trigger, AUDITOR read-only, cross-institution blocked, policy write ADMIN-only |
-| `TestMigrationSchemaPresence` | All 3 new tables present, Module 1/2 tables preserved, fingerprint index exists |
-| `TestEngineIntegration` | Full run structure, findings created, run log created, 404 for unknown, rule_ids filter, fingerprint determinism |
-| `TestAPIEndpoints` | Run via API, list findings via API, list rules, dismiss finding via API |
-
-**Full regression:** 146 total tests across all modules — **0 failures, 0 errors**
+### Validation Run Execution Summary
+Every `ValidationRun` persists aggregate execution metadata and returns:
+- `rules_evaluated`: List of rule IDs evaluated
+- `passes_count`: Count of `PASS` outcomes
+- `failures_count`: Count of `FAIL` outcomes
+- `warnings_count`: Count of `WARNING` outcomes
+- `not_applicable_count`: Count of `NOT_APPLICABLE` outcomes
+- `unable_to_evaluate_count`: Count of `UNABLE_TO_EVALUATE` outcomes
+- `new_findings_count`: Count of newly created findings
+- `resolved_findings_count`: Count of cleared findings
+- `policy_version_ref`: Snapshot of policy version in effect
 
 ---
 
-## 13. Interfaces Reused from Module 1 & 2
+## 8. Safety & Separation of Concerns
 
-| Interface | Source | Usage |
-|-----------|--------|-------|
-| `Instrument` model | Module 1 | Rule context, engine queries, FK on findings |
-| `Institution` model | Module 1 | Scope enforcement, FK on policy configs |
-| `User` model | Module 1 | Auth dependencies, actor fields |
-| `Document` / `DocumentVersion` models | Module 2 | Document metadata in rule context, FK on findings |
-| `log_audit_event()` | Module 1 audit service | Policy updates, finding creation, dismissal |
-| `get_current_active_user()`, `require_roles()`, `enforce_institution_scope()` | Module 1 auth | All validation endpoints |
-| `AppException`, `NotFoundException`, `ForbiddenException` | Module 1 common | Exception handling |
-| `Base`, `TimestampMixin` | Module 1 db.base | All three new models |
-| `get_db()` | Module 1 db.session | FastAPI dependencies |
+1. **No Trust Level Changes:** Validation rules produce findings only. The engine asserts that `Instrument.trust_level` is unmodified before and after evaluation.
+2. **No Administrative Lifecycle Changes:** Failed rules never mark an instrument fraudulent, never perform bank confirmation, and never approve or reject a release.
+3. **No Direct Client Injections:** Clients cannot directly POST finding severity, outcomes, evidence, or status overrides.
+4. **Safe Error Isolation:** Any rule raising an unhandled exception is caught and recorded as `UNABLE_TO_EVALUATE` without crashing the sweep or other rules.
 
 ---
 
-## 14. Incomplete Dependencies / Unresolved Decisions
+## 9. Database Migrations
 
-| Item | Notes |
-|------|-------|
-| `VAL-AMT-002` threshold | Requires SYSTEM_ADMIN to configure `MIN_DEPOSIT_AMOUNT_INR` before it can evaluate. No default invented. |
-| `VAL-DOC-001` accepted states | Checks `PROCESSED`, `CLEAN`, `ACCEPTED`, `SCAN_COMPLETE`. Will align with Module 2's actual scan states. |
-| Trust-level promotion | Intentionally out of scope. Module 4 will own L0→L3 promotion. |
-| Finding `IN_REVIEW` transition | Data model supports it; the PATCH reviewer workflow is deferred to Prompt 2. |
-| Bulk sweep / background scheduler | Prompt 2 scope. Currently findings are produced on-demand via `POST /run`. |
-| `psycopg` production driver | Listed in pyproject.toml; SQLite used in tests. PostgreSQL needed for production deployment. |
+Two Alembic revisions define Module 3 persistence:
+
+1. `b3c5d7e9f1a2` (`2026_10_25_0100`):
+   - `validation_policy_configs`: Versioned policy configurations
+   - `validation_runs`: Run execution log
+   - `validation_findings`: Persisted discrepancy records
+
+2. `dde1c7162b37` (`2026_10_25_0219`):
+   - `document_extracted_fields`: Structured OCR/pipeline extracted document metadata for cross-validation
 
 ---
 
-## 15. Files Created / Modified
+## 10. Automated Test Results
 
-### New files
+Total test suite across all modules: **171 passed, 0 failures, 0 errors**.
+
 ```
-backend/app/modules/validation/__init__.py
-backend/app/modules/validation/enums.py
-backend/app/modules/validation/models.py
-backend/app/modules/validation/registry.py
-backend/app/modules/validation/engine.py
-backend/app/modules/validation/finding_service.py
-backend/app/modules/validation/policy_service.py
-backend/app/modules/validation/schemas.py
-backend/app/modules/validation/router.py
-backend/app/modules/validation/rules/__init__.py
-backend/app/modules/validation/rules/date_rules.py
-backend/app/modules/validation/rules/amount_rules.py
-backend/app/modules/validation/rules/reference_rules.py
-backend/app/modules/validation/rules/lien_rules.py
-backend/app/modules/validation/rules/document_rules.py
-backend/app/modules/validation/rules/duplicate_rules.py
-backend/alembic/versions/2026_10_25_0100-b3c5d7e9f1a2_add_module_3_validation_engine.py
-backend/tests/test_module3_validation.py
-Doc/module3.md
+tests/test_auth_rbac.py ...........................                       [ 15%]
+tests/test_health.py ..........                                           [ 21%]
+tests/test_institutions_users.py ..................................       [ 41%]
+tests/test_instruments_registry.py ....................                  [ 53%]
+tests/test_module1_acceptance.py .........                                [ 58%]
+tests/test_module3_deterministic_rules.py .........................       [ 73%]
+tests/test_module3_validation.py ........................................ [ 98%]
+                                 ...
+tests/test_modules.py ..                                                  [100%]
+============================== 171 passed in 6.5s ==============================
 ```
 
-### Modified files
+Exact command to run Module 3 tests:
+```bash
+pytest backend/tests/test_module3_deterministic_rules.py backend/tests/test_module3_validation.py
 ```
-backend/app/main.py              — added: import app.modules.validation.models
-backend/alembic/env.py           — added: import app.modules.validation.models
-backend/app/api/v1/router.py     — added: validation_router registration
-```
+Output: **68 passed, 0 failures**.

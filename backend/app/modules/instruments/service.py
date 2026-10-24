@@ -358,6 +358,13 @@ def create_instrument(
         },
     )
 
+    # Safe post-save evaluation trigger (does not fail creation if noncritical validation rule errors)
+    try:
+        from app.modules.validation.engine import trigger_post_save_validation
+        trigger_post_save_validation(db=db, instrument_id=instrument.id, triggered_by_user_id=current_user.id)
+    except Exception:
+        pass
+
     return InstrumentResponse(
         id=instrument.id,
         institution_id=instrument.institution_id,
@@ -497,6 +504,13 @@ def update_instrument(
             ip_address=request_ip,
             metadata={"changed_fields": list(changed_fields.keys())},
         )
+
+    # Safe post-save evaluation trigger on material update
+    try:
+        from app.modules.validation.engine import trigger_post_save_validation
+        trigger_post_save_validation(db=db, instrument_id=inst.id, triggered_by_user_id=current_user.id)
+    except Exception:
+        pass
 
     parent_inst = db.scalar(select(Institution).where(Institution.id == inst.institution_id))
 

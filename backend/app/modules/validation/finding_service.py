@@ -72,34 +72,48 @@ def upsert_finding(
 
     now = _utc_now()
 
-    # --- Step 1: Exact match (same fingerprint + same rule_version, open/in_review) ---
+    # --- Step 1: Exact match on fingerprint and rule_version across statuses ---
     existing = db.scalar(
         select(ValidationFinding).where(
             and_(
                 ValidationFinding.instrument_id == instrument_id,
                 ValidationFinding.finding_fingerprint == fingerprint,
                 ValidationFinding.rule_version == rule_result.rule_version,
-                ValidationFinding.status.in_([FindingStatus.OPEN, FindingStatus.IN_REVIEW]),
             )
         )
     )
     if existing:
-        existing.last_evaluated_at = now
-        db.commit()
-        db.refresh(existing)
-        return existing
+        if existing.status in (FindingStatus.OPEN.value, FindingStatus.IN_REVIEW.value):
+            existing.last_evaluated_at = now
+            db.commit()
+            db.refresh(existing)
+            return existing
+        elif existing.status == FindingStatus.DISMISSED.value:
+            # Unchanged input was manually dismissed: do not re-open without an input/rule change
+            existing.last_evaluated_at = now
+            db.commit()
+            db.refresh(existing)
+            return existing
+        elif existing.status == FindingStatus.RESOLVED.value:
+            # Condition failed again with same fingerprint: transition back to OPEN
+            existing.status = FindingStatus.OPEN.value
+            existing.last_evaluated_at = now
+            db.commit()
+            db.refresh(existing)
+            return existing
 
-    # --- Step 2: Check for older rule_version findings (same rule_id, open/in_review) ---
-    older_findings = db.scalars(
-        select(ValidationFinding).where(
-            and_(
-                ValidationFinding.instrument_id == instrument_id,
-                ValidationFinding.rule_id == rule_result.rule_id,
-                ValidationFinding.status.in_([FindingStatus.OPEN, FindingStatus.IN_REVIEW]),
-                ValidationFinding.rule_version != rule_result.rule_version,
+    # --- Step 2: Check for existing active findings for this rule (different version or changed inputs) ---
+    active_findings = list(
+        db.scalars(
+            select(ValidationFinding).where(
+                and_(
+                    ValidationFinding.instrument_id == instrument_id,
+                    ValidationFinding.rule_id == rule_result.rule_id,
+                    ValidationFinding.status.in_([FindingStatus.OPEN.value, FindingStatus.IN_REVIEW.value]),
+                )
             )
-        )
-    ).all()
+        ).all()
+    )
 
     # --- Step 3: Create fresh finding ---
     new_finding = ValidationFinding(
@@ -128,14 +142,16 @@ def upsert_finding(
     db.add(new_finding)
     db.flush()  # get the new ID before superseding
 
-    # Supersede older findings
-    for older in older_findings:
+    # Supersede older active findings (preserve original evidence and historical record)
+    for older in active_findings:
         older.status = FindingStatus.SUPERSEDED.value
         older.resolved_at = now
-        older.resolution_note = (
-            f"Superseded by updated rule version {rule_result.rule_version} "
-            f"(finding {new_finding.id})."
+        reason = (
+            f"Superseded by updated rule version {rule_result.rule_version} (finding {new_finding.id})."
+            if older.rule_version != rule_result.rule_version
+            else f"Superseded due to changed input on re-evaluation (finding {new_finding.id})."
         )
+        older.resolution_note = reason
         older.superseded_by_finding_id = new_finding.id
 
     db.commit()
@@ -167,24 +183,15 @@ def resolve_finding_if_cleared(
     instrument_id: str,
     rule_id: str,
     rule_version: str,
-    fingerprint_key: str,
+    fingerprint_key: str = "",
     resolution_note: str = "Condition resolved on re-evaluation.",
     resolved_by_user_id: Optional[str] = None,
 ) -> int:
     """
     Mark open findings for a rule as RESOLVED when the rule no longer fires.
-
-    Called by the engine after all rules are evaluated:
-    for each rule that returned PASS / NOT_APPLICABLE, resolve its open findings.
-
+    Resolves any OPEN or IN_REVIEW finding for (instrument_id, rule_id).
     Returns the number of findings resolved.
     """
-    fingerprint = compute_finding_fingerprint(
-        instrument_id=instrument_id,
-        rule_id=rule_id,
-        rule_version=rule_version,
-        fingerprint_key=fingerprint_key,
-    )
     now = _utc_now()
 
     open_findings = db.scalars(
@@ -192,8 +199,7 @@ def resolve_finding_if_cleared(
             and_(
                 ValidationFinding.instrument_id == instrument_id,
                 ValidationFinding.rule_id == rule_id,
-                ValidationFinding.finding_fingerprint == fingerprint,
-                ValidationFinding.status.in_([FindingStatus.OPEN, FindingStatus.IN_REVIEW]),
+                ValidationFinding.status.in_([FindingStatus.OPEN.value, FindingStatus.IN_REVIEW.value]),
             )
         )
     ).all()
@@ -289,3 +295,72 @@ def dismiss_finding(
         metadata={"reason": reason, "instrument_id": finding.instrument_id},
     )
     return finding
+
+
+def re_evaluate_finding(
+    db: Session,
+    finding_id: str,
+    actor_user_id: Optional[str] = None,
+) -> Dict[str, Any]:
+    """
+    Re-evaluate a specific finding by re-running its governing rule on the parent instrument.
+    Enforces that only the registered rule for this finding is executed.
+    """
+    from app.common.exceptions import NotFoundException
+    finding = db.scalar(select(ValidationFinding).where(ValidationFinding.id == finding_id))
+    if not finding:
+        raise NotFoundException(f"Finding '{finding_id}' not found.")
+
+    from app.modules.validation.engine import run_validation
+    run_result = run_validation(
+        db=db,
+        instrument_id=finding.instrument_id,
+        triggered_by_user_id=actor_user_id,
+        rule_ids=[finding.rule_id],
+    )
+    db.refresh(finding)
+
+    if actor_user_id:
+        log_audit_event(
+            db=db,
+            action="VALIDATION_FINDING_REEVALUATED",
+            entity_type="validation_finding",
+            entity_id=finding.id,
+            actor_user_id=actor_user_id,
+            outcome="SUCCESS",
+            metadata={
+                "rule_id": finding.rule_id,
+                "instrument_id": finding.instrument_id,
+                "status_after": finding.status,
+            },
+        )
+
+    return {
+        "finding": finding,
+        "run_result": run_result,
+    }
+
+
+def get_validation_runs_for_instrument(
+    db: Session,
+    instrument_id: str,
+    skip: int = 0,
+    limit: int = 50,
+) -> tuple[List[ValidationRun], int]:
+    """Retrieve validation run logs for an instrument with pagination."""
+    from sqlalchemy import func, desc
+    total = db.scalar(
+        select(func.count(ValidationRun.id)).where(ValidationRun.instrument_id == instrument_id)
+    ) or 0
+
+    runs = list(
+        db.scalars(
+            select(ValidationRun)
+            .where(ValidationRun.instrument_id == instrument_id)
+            .order_by(desc(ValidationRun.run_at))
+            .offset(skip)
+            .limit(limit)
+        ).all()
+    )
+    return runs, total
+
