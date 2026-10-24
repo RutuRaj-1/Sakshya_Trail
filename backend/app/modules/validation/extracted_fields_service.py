@@ -126,6 +126,14 @@ def upsert_extracted_fields(
 
     db.commit()
     db.refresh(rec)
+
+    # Deterministic re-evaluation after extraction results become available
+    try:
+        from app.modules.validation.engine import trigger_post_save_validation
+        trigger_post_save_validation(db, rec.instrument_id)
+    except Exception:
+        pass
+
     return rec
 
 

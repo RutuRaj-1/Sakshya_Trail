@@ -175,6 +175,13 @@ async def create_and_upload_document(
             "scan_provider": scan_result.provider,
         },
     )
+
+    # Trigger post-save validation for the instrument
+    try:
+        from app.modules.validation.engine import trigger_post_save_validation
+        trigger_post_save_validation(db, doc.instrument_id, triggered_by_user_id=current_user.id)
+    except Exception:
+        pass
     
     return {
         "success": True,

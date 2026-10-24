@@ -147,6 +147,11 @@ class RuleContext:
     # Policy configuration: {config_key: parsed_value}
     policy: Dict[str, Any] = field(default_factory=dict)
 
+    # Duplicate detection matches (populated by engine)
+    duplicate_same_inst_matches: List[Dict[str, Any]] = field(default_factory=list)
+    duplicate_cross_inst_matches: List[Dict[str, Any]] = field(default_factory=list)
+    duplicate_hash_matches: List[Dict[str, Any]] = field(default_factory=list)
+
     # Snapshot of currently open findings for this instrument (for cross-check rules)
     existing_open_findings: List[Dict[str, Any]] = field(default_factory=list)
 

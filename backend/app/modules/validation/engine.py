@@ -64,30 +64,44 @@ def _build_context(
         select(Institution).where(Institution.id == instrument.institution_id)
     )
 
-    # --- Duplicate sibling count ---
-    sibling_count = 0
-    sibling_ids: List[str] = []
-    norm_bank = (instrument.bank_name or "").strip().lower()
-    norm_ref = (instrument.reference_number or "").strip().lower()
-
-    siblings = db.scalars(
-        select(Instrument).where(
-            func.lower(func.trim(Instrument.bank_name)) == norm_bank,
-            func.lower(func.trim(Instrument.reference_number)) == norm_ref,
-            Instrument.id != instrument.id,
-        )
-    ).all()
-    sibling_count = len(siblings)
-    sibling_ids = [s.id for s in siblings]
-
-    # --- Policy context ---
-    policy = build_policy_context(
-        db=db,
-        institution_id=instrument.institution_id,
-        instrument_id=instrument.id,
-        sibling_count=sibling_count,
-        sibling_ids=sibling_ids,
+    # --- Bank-aware and reference-aware duplicate matching ---
+    from app.modules.validation.normalization import (
+        normalize_reference_number,
+        normalize_bank_name,
     )
+
+    norm_ref = normalize_reference_number(instrument.reference_number)
+    norm_bank = normalize_bank_name(instrument.bank_name)
+
+    duplicate_same_inst_matches: List[Dict[str, Any]] = []
+    duplicate_cross_inst_matches: List[Dict[str, Any]] = []
+
+    if norm_ref and norm_bank:
+        candidates = db.scalars(
+            select(Instrument).where(Instrument.id != instrument.id)
+        ).all()
+        for cand in candidates:
+            cand_ref = normalize_reference_number(cand.reference_number)
+            cand_bank = normalize_bank_name(cand.bank_name)
+            if cand_ref == norm_ref and cand_bank == norm_bank:
+                if cand.institution_id == instrument.institution_id:
+                    duplicate_same_inst_matches.append({
+                        "id": cand.id,
+                        "reference_number": cand.reference_number,
+                        "bank_name": cand.bank_name,
+                        "status": cand.status,
+                        "created_at": cand.created_at.isoformat() if hasattr(cand, "created_at") and cand.created_at else None,
+                    })
+                else:
+                    # Preserve tenant isolation: mask cross-institution IDs and details
+                    duplicate_cross_inst_matches.append({
+                        "masked_id": f"...{cand.id[-8:]}",
+                        "bank_name": cand.bank_name,
+                        "is_cross_institution": True,
+                    })
+
+    sibling_count = len(duplicate_same_inst_matches) + len(duplicate_cross_inst_matches)
+    sibling_ids = [m["id"] for m in duplicate_same_inst_matches]
 
     # --- Document metadata (safe, no content) ---
     docs: List[Dict[str, Any]] = []
@@ -118,23 +132,93 @@ def _build_context(
             "uploaded_at": version.uploaded_at.isoformat() if version else None,
         })
 
+    # --- Exact document-hash duplicate checking across instruments ---
+    current_hashes = {d["sha256_hash"] for d in docs if d.get("sha256_hash")}
+    duplicate_hash_matches: List[Dict[str, Any]] = []
+    if current_hashes:
+        other_versions = db.scalars(
+            select(DocumentVersion)
+            .join(Document, DocumentVersion.document_id == Document.id)
+            .where(
+                DocumentVersion.sha256_hash.in_(current_hashes),
+                Document.instrument_id != instrument.id,
+            )
+        ).all()
+        for ov in other_versions:
+            other_doc = ov.document
+            other_inst_id = other_doc.instrument_id if other_doc else None
+            other_inst = db.scalar(select(Instrument).where(Instrument.id == other_inst_id)) if other_inst_id else None
+            is_same_inst = other_inst and other_inst.institution_id == instrument.institution_id
+
+            matched_current = next((d for d in docs if d.get("sha256_hash") == ov.sha256_hash), None)
+            current_doc_ref = matched_current.get("document_id") if matched_current else None
+            current_version_ref = matched_current.get("document_version_id") if matched_current else None
+
+            if is_same_inst:
+                duplicate_hash_matches.append({
+                    "sha256_hash": ov.sha256_hash,
+                    "current_document_id": current_doc_ref,
+                    "current_document_version_id": current_version_ref,
+                    "previously_observed_document_id": ov.document_id,
+                    "previously_observed_document_version_id": ov.id,
+                    "associated_instrument_id": other_inst_id,
+                    "is_cross_institution": False,
+                    "detected_at": datetime.now(timezone.utc).isoformat(),
+                })
+            else:
+                # Respect tenant isolation!
+                duplicate_hash_matches.append({
+                    "sha256_hash": ov.sha256_hash,
+                    "current_document_id": current_doc_ref,
+                    "current_document_version_id": current_version_ref,
+                    "previously_observed_document_id": "[tenant-masked]",
+                    "previously_observed_document_version_id": f"...{ov.id[-8:]}",
+                    "associated_instrument_id": "[tenant-masked]",
+                    "is_cross_institution": True,
+                    "detected_at": datetime.now(timezone.utc).isoformat(),
+                })
+
+    # --- Policy context ---
+    policy = build_policy_context(
+        db=db,
+        institution_id=instrument.institution_id,
+        instrument_id=instrument.id,
+        sibling_count=sibling_count,
+        sibling_ids=sibling_ids,
+    )
+    policy["_duplicate_same_inst_matches"] = duplicate_same_inst_matches
+    policy["_duplicate_cross_inst_matches"] = duplicate_cross_inst_matches
+    policy["_duplicate_hash_matches"] = duplicate_hash_matches
+
     # --- Document extracted fields metadata (from OCR/pipeline, if available) ---
     from app.modules.validation.extracted_fields_service import get_extracted_fields_for_instrument
     extracted_records = get_extracted_fields_for_instrument(db, instrument.id)
+    doc_current_versions = {d["document_id"]: d.get("document_version_id") for d in docs}
     extracted_fields: List[Dict[str, Any]] = []
     for rec in extracted_records:
+        curr_ver = doc_current_versions.get(rec.document_id)
+        is_stale = bool(curr_ver and rec.document_version_id != curr_ver)
         extracted_fields.append({
             "document_version_id": rec.document_version_id,
             "document_id": rec.document_id,
             "doc_bank_name": rec.doc_bank_name,
+            "doc_bank_name_confidence": rec.doc_bank_name_confidence,
             "doc_reference_number": rec.doc_reference_number,
+            "doc_reference_number_confidence": rec.doc_reference_number_confidence,
             "doc_amount_str": rec.doc_amount_str,
+            "doc_amount_confidence": rec.doc_amount_confidence,
             "doc_issue_date_str": rec.doc_issue_date_str,
+            "doc_issue_date_confidence": rec.doc_issue_date_confidence,
             "doc_maturity_date_str": rec.doc_maturity_date_str,
+            "doc_maturity_date_confidence": rec.doc_maturity_date_confidence,
             "doc_account_holder": rec.doc_account_holder,
+            "doc_account_holder_confidence": rec.doc_account_holder_confidence,
             "doc_lien_holder": rec.doc_lien_holder,
+            "doc_lien_holder_confidence": rec.doc_lien_holder_confidence,
             "confidence_overall": rec.confidence_overall,
             "extraction_status": rec.extraction_status,
+            "is_stale": is_stale,
+            "current_version_id": curr_ver,
         })
 
     return RuleContext(
@@ -163,6 +247,9 @@ def _build_context(
         checklist_result=None,  # Module 2 checklist result if configured / instantiated
         extracted_fields=extracted_fields,
         policy=policy,
+        duplicate_same_inst_matches=duplicate_same_inst_matches,
+        duplicate_cross_inst_matches=duplicate_cross_inst_matches,
+        duplicate_hash_matches=duplicate_hash_matches,
         existing_open_findings=[],
         triggered_by_user_id=triggered_by_user_id,
         run_id=run_id,

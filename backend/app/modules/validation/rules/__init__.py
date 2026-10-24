@@ -24,6 +24,8 @@ from app.modules.validation.rules.document_rules import (
 )
 from app.modules.validation.rules.duplicate_rules import (
     PotentialDuplicateHeuristicRule,
+    CrossInstitutionReferenceDuplicateRule,
+    DocumentHashDuplicateRule,
 )
 from app.modules.validation.rules.required_rules import (
     RequiredFieldsRule,
@@ -33,6 +35,20 @@ from app.modules.validation.rules.institution_rules import (
 )
 from app.modules.validation.rules.consistency_rules import (
     BasicDataConsistencyRule,
+)
+from app.modules.validation.rules.reconciliation_rules import (
+    StaleDocumentExtractionRule,
+    CrossSourceAmountRule,
+    CrossSourceReferenceRule,
+    CrossSourceDateRule,
+    CrossSourceBankRule,
+    CrossSourceLienRule,
+)
+from app.modules.validation.rules.name_similarity_rules import (
+    NameSimilarityAdvisoryRule,
+)
+from app.modules.validation.rules.metadata_advisory_rules import (
+    DocumentMetadataAdvisoryRule,
 )
 
 __all__ = [
@@ -46,8 +62,17 @@ __all__ = [
     "FDRCopyPresentRule",
     "DocumentCompletenessIntegrationRule",
     "PotentialDuplicateHeuristicRule",
+    "CrossInstitutionReferenceDuplicateRule",
+    "DocumentHashDuplicateRule",
     "RequiredFieldsRule",
     "InstitutionConsistencyRule",
     "BasicDataConsistencyRule",
+    "StaleDocumentExtractionRule",
+    "CrossSourceAmountRule",
+    "CrossSourceReferenceRule",
+    "CrossSourceDateRule",
+    "CrossSourceBankRule",
+    "CrossSourceLienRule",
+    "NameSimilarityAdvisoryRule",
+    "DocumentMetadataAdvisoryRule",
 ]
-

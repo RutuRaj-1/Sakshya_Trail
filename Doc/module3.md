@@ -1,37 +1,42 @@
 # Module 3 — Validation, Discrepancy & Explainable Intelligence
 ## Implementation Summary
 
-> **Status:** ✅ Deterministic Rules, Validation Execution & Explainable Findings API Implemented  
+> **Status:** ✅ Prompt 3: Evidence Reconciliation, Duplicate Detection & Explainable Advisory Indicators Implemented  
 > **Revision:** `dde1c7162b37` (Alembic head)  
-> **Tests:** 171 passed total across all modules (25 new Prompt 2 tests + 43 Prompt 1 tests + 103 prior modules) — **0 failures**  
+> **Tests:** 186 passed total across all modules (15 Prompt 3 tests + 25 Prompt 2 tests + 43 Prompt 1 tests + 103 prior modules) — **0 failures**  
 > **Date:** 2026-10-25
 
 ---
 
 ## 1. Scope & Ownership
 
-Module 3 implements the **rule-driven validation engine**, **explainable finding persistence**, and **authorized policy configuration** infrastructure for the FDR Sentinel platform. It consumes data from Module 1 (instruments, institutions, users) and Module 2 (documents, document versions, extracted fields) without duplicating their ownership or modifying their records.
+Module 3 implements the **rule-driven validation engine**, **cross-source evidence reconciliation**, **tenant-isolated duplicate detection**, **explainable finding persistence**, and **authorized policy configuration** infrastructure for the FDR Sentinel platform. It connects data from Module 1 (instruments, institutions, users) and Module 2 (documents, document versions, extracted OCR fields) without duplicating their ownership or overwriting authoritative records.
 
 ### What Module 3 owns
 | Concern | Owner | Status |
 |---------|-------|--------|
-| Rule definitions and registry | Module 3 | Implemented (11 rules) |
+| Rule definitions and registry | Module 3 | Implemented (20 rules registered) |
 | Deterministic validation checks (Rules A–F) | Module 3 | Fully Implemented & Tested |
-| Cross-field consistency & institution checks | Module 3 | Fully Implemented & Tested |
-| Heuristic / advisory checks (duplicates) | Module 3 | Implemented |
+| Cross-source evidence reconciliation (Amount, Reference, Dates, Bank, Lien) | Module 3 | Fully Implemented & Tested |
+| Stale extraction detection against document version changes | Module 3 | Implemented (`VAL-XSRC-STALE`) |
+| Bank-aware & reference-aware duplicate detection | Module 3 | Implemented (`VAL-DUP-001`, `VAL-DUP-002`) |
+| Exact document-hash (SHA-256) byte duplicate detection | Module 3 | Implemented (`VAL-DUP-003`) |
+| Name similarity advisory checks (difflib SequenceMatcher) | Module 3 | Implemented (`VAL-SIM-001`) |
+| Document metadata & file tamper advisory indicators | Module 3 | Implemented (`VAL-META-001`) |
+| Normalization utilities (reference, bank, depositor names) | Module 3 | Implemented (`normalization.py`) |
 | Finding persistence, idempotency & lifecycle | Module 3 | Implemented (OPEN, IN_REVIEW, RESOLVED, DISMISSED, SUPERSEDED) |
 | Finding deduplication & supersession linkages | Module 3 | Implemented (SHA-256 fingerprinting) |
 | Policy configuration (versioned, authorized) | Module 3 | Implemented (`ValidationPolicyConfig`) |
 | Validation run log & run history | Module 3 | Implemented (`ValidationRun`) |
 | Versioned REST API endpoints | Module 3 | Implemented (`/api/v1/instruments/...`, `/api/v1/findings/...`) |
-| Post-save validation trigger | Module 3 | Implemented (`trigger_post_save_validation`) |
+| Post-save validation triggers | Module 3 | Triggered on instrument edit, document upload, extraction save |
 
 ### What Module 3 does NOT own
 | Concern | Owner | Reason |
 |---------|-------|--------|
-| Document intake, storage & hashing | Module 2 | Module 2 stores raw files and versions |
+| Document intake, storage & file hashing | Module 2 | Module 2 stores raw files and computes SHA-256 upon upload |
 | Document completeness checklist engine | Module 2 | Module 3 integrates with checklist; reports UNABLE_TO_EVALUATE if absent |
-| Authoritative bank verification | Module 4 | Out of scope; validation does not verify with banks |
+| Authoritative bank confirmation | Module 4 | Out of scope; machine extractions are suggestions, not bank confirmation |
 | FDR trust-level promotion (L0→L1→L2→L3) | Module 4 | Safety constraint: validation never modifies trust level |
 | Maturity scheduling and reminders | Module 5 | Future module |
 | Release / refund authorization | Module 6 | Future module |
@@ -46,9 +51,10 @@ backend/app/modules/validation/
 ├── enums.py                       # RuleOutcome, FindingStatus, RuleSeverity, RuleType, FindingCategory
 ├── models.py                      # SQLAlchemy models: ValidationPolicyConfig, ValidationRun, ValidationFinding
 ├── extracted_fields_model.py      # SQLAlchemy model: DocumentExtractedFields
-├── extracted_fields_service.py    # Service for reading/writing extracted document evidence
+├── extracted_fields_service.py    # Service for reading/writing extracted document evidence & auto-triggering
+├── normalization.py               # Deterministic reference, bank, and name normalizations
 ├── registry.py                    # Rule registry, BaseValidationRule, RuleResult, RuleContext
-├── engine.py                      # Orchestration engine, run_validation, trigger_post_save_validation
+├── engine.py                      # Orchestration engine, duplicate matcher, hash scanner, trigger_post_save
 ├── finding_service.py             # Finding persistence, idempotency, supersession, dismissal, re-evaluation
 ├── policy_service.py              # Policy config read/write/versioning
 ├── schemas.py                     # Pydantic request/response schemas
@@ -63,184 +69,129 @@ backend/app/modules/validation/
     ├── consistency_rules.py       # VAL-CONS-001 (Rule F: Basic data consistency & inactive institution)
     ├── reference_rules.py         # VAL-REF-001 (Reference format & placeholder rejection)
     ├── lien_rules.py              # VAL-LIEN-001 (Lien marked & holder validity)
-    └── duplicate_rules.py         # VAL-DUP-001 (Heuristic duplicate sibling detection)
+    ├── reconciliation_rules.py    # Cross-source rules (VAL-XSRC-STALE, VAL-XSRC-001, -002, -003, -004, -006)
+    ├── duplicate_rules.py         # Duplicate rules (VAL-DUP-001, VAL-DUP-002, VAL-DUP-003)
+    ├── name_similarity_rules.py   # VAL-SIM-001 (Name similarity advisory comparison)
+    └── metadata_advisory_rules.py # VAL-META-001 (Document metadata & conversion tool advisory)
 ```
 
 ---
 
 ## 3. Implemented Rule Catalogue
 
-| Rule ID | Category | Type | Severity | Description & Policy Version Behavior |
-|---------|----------|------|----------|---------------------------------------|
-| `VAL-REQ-001` | `CROSS_FIELD_CONSISTENCY` | Deterministic | HIGH | **Rule A — Required instrument fields.** Evaluates configured fields required for instrument/case type. Reads `REQUIRED_INSTRUMENT_FIELDS` from policy; falls back to standard required set if unconfigured. Never invents universal mandates. |
-| `VAL-AMT-001` | `AMOUNT_CONSISTENCY` | Deterministic | CRITICAL | **Rule B — Amount positivity.** Verifies registered amount is Decimal > 0.00. |
-| `VAL-AMT-002` | `POLICY_COMPLIANCE` | Deterministic | HIGH | **Rule B — Policy minimum amount.** Compares amount against `MIN_DEPOSIT_AMOUNT_INR` in active policy. Returns `UNABLE_TO_EVALUATE` if policy is unconfigured. Never hard-codes an amount threshold. |
-| `VAL-DATE-001` | `DATE_CONSISTENCY` | Deterministic | HIGH | **Rule C — Date ordering & bounds.** Checks issue and maturity dates are present, parseable, fall within supported calendar bounds (1990–2100), and maturity is strictly after issue date. |
-| `VAL-DATE-002` | `DATE_CONSISTENCY` | Deterministic | HIGH | **Rule C — Maturity expiry.** Checks active instruments have not passed maturity date (warning within 90 days; fail if passed). |
-| `VAL-DATE-003` | `DATE_CONSISTENCY` | Deterministic | HIGH | **Rule C — Configured validity period.** Applied **ONLY** when `MIN_VALIDITY_DAYS` or `MAX_VALIDITY_DAYS` is configured in active policy. Returns `NOT_APPLICABLE` when unconfigured. Does not infer universal renewal requirements. |
-| `VAL-INST-001` | `INSTITUTION_ELIGIBILITY` | Deterministic | HIGH | **Rule D — Institution consistency.** Compares instrument institution association and master data to available document evidence (e.g. OCR depositor name). Conflicting sources produce an explicit finding with source references without modifying records. |
-| `VAL-DOC-001` | `DOCUMENT_COMPLETENESS` | Deterministic | MEDIUM | **Rule E — FDR Copy Document.** Checks at least one FDR_COPY document is uploaded and processed. |
-| `VAL-DOC-002` | `DOCUMENT_COMPLETENESS` | Deterministic | HIGH | **Rule E — Module 2 Checklist Integration.** Reads Module 2 checklist result. If Module 2 has no applicable checklist profile, explicitly returns `UNABLE_TO_EVALUATE` rather than declaring all categories missing. |
-| `VAL-CONS-001` | `CROSS_FIELD_CONSISTENCY` | Deterministic | HIGH | **Rule F — Basic data consistency.** Enforces inactive institution restrictions (active instrument under inactive institution), detects contradictory joint/lien flags, and verifies valid field combinations. |
-| `VAL-REF-001` | `REFERENCE_INTEGRITY` | Deterministic | HIGH | **Reference integrity.** Ensures reference number is non-blank, length >= 4, and not a placeholder (e.g. 'none', 'tbd', 'test'). |
+| Rule ID | Category | Type | Severity | Description & Operational Behavior |
+|---------|----------|------|----------|------------------------------------|
+| `VAL-REQ-001` | `CROSS_FIELD_CONSISTENCY` | Deterministic | HIGH | **Required instrument fields.** Evaluates configured fields required for instrument/case type via `REQUIRED_INSTRUMENT_FIELDS` policy. |
+| `VAL-AMT-001` | `AMOUNT_CONSISTENCY` | Deterministic | CRITICAL | **Amount positivity.** Verifies registered amount is Decimal > 0.00. |
+| `VAL-AMT-002` | `POLICY_COMPLIANCE` | Deterministic | HIGH | **Policy minimum amount.** Compares amount against `MIN_DEPOSIT_AMOUNT_INR` in active policy. Returns `UNABLE_TO_EVALUATE` if unconfigured. |
+| `VAL-DATE-001` | `DATE_CONSISTENCY` | Deterministic | HIGH | **Date ordering & bounds.** Checks issue and maturity dates are present, valid calendar dates (1990–2100), and maturity is strictly after issue date. |
+| `VAL-DATE-002` | `DATE_CONSISTENCY` | Deterministic | HIGH | **Maturity expiry.** Checks active instruments have not passed maturity date (warning within 90 days; fail if passed). |
+| `VAL-DATE-003` | `DATE_CONSISTENCY` | Deterministic | HIGH | **Configured validity period.** Enforces `MIN_VALIDITY_DAYS` / `MAX_VALIDITY_DAYS` only when configured. Returns `NOT_APPLICABLE` when unconfigured. |
+| `VAL-INST-001` | `INSTITUTION_ELIGIBILITY` | Deterministic | HIGH | **Institution consistency.** Compares instrument institution association to document evidence. |
+| `VAL-DOC-001` | `DOCUMENT_COMPLETENESS` | Deterministic | MEDIUM | **FDR Copy Document.** Checks at least one FDR_COPY document is uploaded and processed. |
+| `VAL-DOC-002` | `DOCUMENT_COMPLETENESS` | Deterministic | HIGH | **Module 2 Checklist Integration.** Reads Module 2 checklist result. If no profile exists, returns `UNABLE_TO_EVALUATE`. |
+| `VAL-CONS-001` | `CROSS_FIELD_CONSISTENCY` | Deterministic | HIGH | **Basic data consistency.** Enforces inactive institution restrictions and detects contradictory joint/lien flags. |
+| `VAL-REF-001` | `REFERENCE_INTEGRITY` | Deterministic | HIGH | **Reference integrity.** Ensures reference number is non-blank, length >= 4, and not a placeholder. |
 | `VAL-LIEN-001` | `LIEN_VALIDITY` | Deterministic | HIGH | **Lien validity.** Ensures FDR has lien marked and lien holder specified. |
-| `VAL-DUP-001` | `POTENTIAL_DUPLICATE` | Heuristic | MEDIUM | **Duplicate sibling advisory.** Advisory finding (`[Advisory — human review required]`) when identical bank + reference exists in registry. |
+| `VAL-XSRC-STALE` | `DOCUMENT_INTEGRITY` | Heuristic | MEDIUM | **Stale extraction detector.** Detects extractions performed on older document versions when a newer version has been uploaded. Requires reprocessing. |
+| `VAL-XSRC-001` | `CROSS_SOURCE_RECONCILIATION` | Deterministic | HIGH | **Amount reconciliation.** Reconciles entered amount against machine-extracted suggestion. Returns `UNABLE_TO_EVALUATE` if extraction missing/invalid. Never silently overwrites. |
+| `VAL-XSRC-002` | `CROSS_SOURCE_RECONCILIATION` | Deterministic | HIGH | **Reference reconciliation.** Compares normalized entered reference with extracted certificate reference. |
+| `VAL-XSRC-003` | `CROSS_SOURCE_RECONCILIATION` | Deterministic | HIGH | **Date reconciliation.** Compares entered issue/maturity dates against extracted certificate dates. |
+| `VAL-XSRC-004` | `CROSS_SOURCE_RECONCILIATION` | Heuristic | MEDIUM | **Bank reconciliation.** Compares normalized issuing bank names. |
+| `VAL-XSRC-006` | `LIEN_VALIDITY` | Heuristic | MEDIUM | **Lien holder reconciliation.** Compares lien holder text only where explicit, readable, and confident (>= 0.70). Otherwise returns `NOT_APPLICABLE`. |
+| `VAL-DUP-001` | `POTENTIAL_DUPLICATE` | Heuristic | HIGH | **Intra-institution duplicate reference.** Bank-aware duplicate check detecting instruments sharing same bank + reference in the same institution. Includes permitted summaries. |
+| `VAL-DUP-002` | `POTENTIAL_DUPLICATE` | Heuristic | HIGH | **Cross-institution duplicate reference.** Bank-aware duplicate check across institutions. **Preserves tenant isolation by masking foreign institution data.** Routes to authorized officer review. |
+| `VAL-DUP-003` | `POTENTIAL_DUPLICATE` | Deterministic | HIGH | **Exact document-hash duplicate bytes.** Detects identical SHA-256 file bytes across instruments. Uses prescribed wording: *"Identical file bytes were previously uploaded. Review the associated instruments and submission context."* Does NOT claim proof of forgery or improper reuse. |
+| `VAL-SIM-001` | `CROSS_SOURCE_RECONCILIATION` | Heuristic | MEDIUM | **Name similarity advisory.** Compares registered institution legal name vs extracted depositor name using `difflib.SequenceMatcher`. Shows both strings, method, score, and threshold. Advisory only. |
+| `VAL-META-001` | `DOCUMENT_INTEGRITY` | Heuristic | LOW | **Document metadata advisory.** Inspects metadata for conversion tool markers (e.g. iLovePDF, Sejda) or timestamp inversions. Disclaims scanning/conversion artifacts. |
 
 ---
 
-## 4. Structured Finding Explanations
+## 4. Cross-Source Validation Principles
 
-Every generated `ValidationFinding` record contains complete, non-accusatory structured metadata:
-
-- **Rule Provenance:** `rule_id`, `rule_version`, `rule_type` (`DETERMINISTIC` / `HEURISTIC`)
-- **Policy Version Reference:** `policy_version_ref` (stores exact policy version evaluated, e.g. `POL-MIN-3M` or `no-policy`)
-- **Instrument Identification:** `instrument_id`, `institution_id`
-- **Evidence References:** `evidence_refs_json` (JSON list of UUIDs, e.g. document version IDs, audit IDs; never raw documents or secrets)
-- **Comparison Basis:** `observed_value` and `expected_value` (safe, factual values)
-- **Classification:** `category` (enum) and `severity` (`CRITICAL`, `HIGH`, `MEDIUM`, `LOW`, `INFO`)
-- **Lifecycle Status:** `status` (`OPEN`, `IN_REVIEW`, `RESOLVED`, `DISMISSED`, `SUPERSEDED`)
-- **Plain-Language Explanation:** Factual, neutral phrasing (e.g., "The recorded maturity date is 12 March 2027, while the recorded issue date is 20 March 2027.")
-- **Suggested Action:** Prescriptive reviewer guidance (e.g., "Review the source document and correct the data if necessary.")
-- **Temporal Tracking:** `first_detected_at`, `last_evaluated_at`, `resolved_at`
+1. **Extraction is a Suggestion, Not Authoritative Truth:**
+   Machine-extracted values (OCR/parsers) are advisory suggestions. They never override or silently overwrite authoritative entered instrument fields.
+2. **Missing Extraction is Not a Mismatch:**
+   When an extraction is missing, disabled, failed, or unparseable, rules return `UNABLE_TO_EVALUATE`. No false mismatch findings are created.
+3. **Stale Extractions are Quarantined:**
+   If a new document version is uploaded after extraction, `VAL-XSRC-STALE` flags the discrepancy. Downstream cross-source comparison rules refuse to evaluate against stale versions until reprocessed.
+4. **Extraction Never Establishes Legal Authenticity:**
+   Machine extractions do not confirm bank validity or release eligibility.
 
 ---
 
-## 5. Finding Lifecycle, Idempotency & Supersession
+## 5. Duplicate Detection & Tenant Privacy Isolation
+
+### Strategy
+- **Bank-Aware Reference Matching:**
+  Normalizes bank names and reference strings (`[\s\-\/\._]` stripped, uppercase).
+  Naive matching across different banks is strictly prevented (e.g., ref `12345` in SBI and ref `12345` in ICICI are recognized as different instruments and produce no duplicate finding).
+- **Tenant Isolation:**
+  - When a duplicate reference or identical SHA-256 document appears in *another institution*, details of the other institution (legal name, code, contact information, internal IDs) are **masked** (`[tenant-masked]`).
+  - Standard institution users cannot see another institution's confidential records through the duplicate detector.
+  - The finding is routed exclusively to authorized regulatory scrutiny officers for privileged cross-case investigation.
+- **SHA-256 Exact Byte Checks:**
+  Uses hashes generated by Module 2 at upload time (never browser-supplied or unverified storage reads).
+  Produces neutral, factual advisory findings without accusatory language.
+
+---
+
+## 6. Name Similarity Advisory Architecture
+
+- **Algorithm:** Python standard library `difflib.SequenceMatcher` (Gestalt pattern matching) after prefix, honorific, punctuation, and whitespace normalization.
+- **Output:** Explainable output detailing:
+  - Both original strings (String A and String B).
+  - Normalization and comparison method.
+  - Exact similarity score (e.g. `0.880`).
+  - Active threshold (default: `0.85`, configurable via policy).
+- **Non-Accusatory Classification:**
+  - Prefix: `[Advisory — human review required]`
+  - Explicit disclaimer: The similarity metric is an advisory heuristic and does not determine legal identity. Borderline matches do not reject a submission or modify instrument trust level.
+
+---
+
+## 7. Finding Lifecycle & Idempotency
+
+- **SHA-256 Fingerprint Deduplication:** Re-running validation sweeps with unchanged inputs updates `last_evaluated_at` idempotently. No duplicate database rows are created.
+- **Dismissal Preservation:** Findings dismissed by human reviewers with justification notes remain dismissed on subsequent sweeps unless inputs materially change.
+- **Supersession on Changed Inputs:** If inputs change on re-evaluation (e.g. amount corrected, but still failing another threshold), the previous finding transitions to `SUPERSEDED` with `superseded_by_finding_id` pointing to the fresh finding.
+- **Resolution on Cleared Condition:** When an issue is fixed and the rule returns `PASS` or `NOT_APPLICABLE`, open/in-review findings for that rule automatically transition to `RESOLVED` with an automated resolution note.
+
+---
+
+## 8. Verification & Test Suite
+
+All 186 unit, integration, and scenario tests pass with **0 failures**:
 
 ```
-                 [First Evaluation: Rule Fires]
-                                │
-                                ▼
-                       ┌────────────────┐
-                       │     OPEN       │◄────────────────┐
-                       └───────┬────────┘                 │
-                               │                          │
-              ┌────────────────┼────────────────┐         │ (Condition fails
-              ▼                ▼                ▼         │  again with same
-      [Reviewer Ack]    [Condition Fix]  [Human Dismiss]  │  inputs)
-              │                │                │         │
-              ▼                │                ▼         │
-       ┌─────────────┐         │        ┌─────────────┐   │
-       │  IN_REVIEW  │         │        │  DISMISSED  │   │
-       └──────┬──────┘         │        └──────┬──────┘   │
-              │                │               │          │
-              └────────┐       │               │          │
-                       ▼       ▼               ▼          │
-                     ┌───────────┐      [Unchanged Run:   │
-                     │ RESOLVED  │       Stays Dismissed] │
-                     └─────┬─────┘                        │
-                           │                              │
-                           └──────────────────────────────┘
-                                  
-    [Input Materially Changes OR Rule Version Updated]
-                           │
-                           ▼
-                     ┌────────────┐
-                     │ SUPERSEDED │  (Points to new finding via
-                     └────────────┘   superseded_by_finding_id;
-                                      original evidence preserved)
+====================== 186 passed in 7.04s ======================
+- test_auth_rbac.py:                                    14 passed
+- test_documents_module.py:                             16 passed
+- test_documents_upload_download.py:                    20 passed
+- test_health.py:                                        5 passed
+- test_institutions_users.py:                           14 passed
+- test_instruments_registry.py:                         12 passed
+- test_module1_acceptance.py:                           18 passed
+- test_module3_deterministic_rules.py:                  25 passed
+- test_module3_prompt3_evidence_reconciliation.py:      15 passed
+- test_module3_validation.py:                           43 passed
+- test_modules.py:                                       4 passed
 ```
 
-### Idempotency & Transition Semantics
-1. **Unchanged Inputs:** Running validation repeatedly on unchanged inputs calculates the identical SHA-256 fingerprint. It updates `last_evaluated_at` only. No duplicate findings are created.
-2. **Manually Dismissed Findings:** If a finding was marked `DISMISSED` and validation re-runs with unchanged inputs, the status remains `DISMISSED`. It is **never automatically re-opened**.
-3. **Changed Inputs (Same Rule):** If underlying fields change (e.g. amount or dates edited) but the condition still fails with new values, the existing open finding is transitioned to `SUPERSEDED` with `superseded_by_finding_id` linking to the newly created finding. Historical evidence is **never mutated**.
-4. **Condition Cleared:** When a rule returns `PASS` or `NOT_APPLICABLE`, all previously `OPEN` or `IN_REVIEW` findings for that rule on that instrument transition to `RESOLVED` with an automated resolution note and timestamp.
-
----
-
-## 6. API Endpoints
-
-All endpoints are versioned under `/api/v1`, enforce authentication, enforce institution tenant scoping, and log material actions to the audit trail.
-
-### Primary Resource Endpoints
-| Method | Path | Roles | Description |
-|--------|------|-------|-------------|
-| `POST` | `/api/v1/instruments/{instrument_id}/validation-runs` | SYSTEM_ADMIN, SCRUTINY_OFFICER, BRANCH_HEAD, COMPETENT_AUTHORITY | Trigger full or selective validation run |
-| `GET` | `/api/v1/instruments/{instrument_id}/validation-runs` | All authenticated (tenant-scoped) | List validation run logs with pagination |
-| `GET` | `/api/v1/instruments/{instrument_id}/findings` | All authenticated (tenant-scoped) | List findings with status/severity/category filters and allow-listed sort |
-| `GET` | `/api/v1/findings/{finding_id}` | All authenticated (tenant-scoped) | Get single finding by ID |
-| `POST` | `/api/v1/findings/{finding_id}/re-evaluate` | SYSTEM_ADMIN, SCRUTINY_OFFICER, BRANCH_HEAD | Re-evaluate specific finding's rule |
-| `POST` | `/api/v1/instruments/{instrument_id}/rules/{rule_id}/evaluate` | SYSTEM_ADMIN, SCRUTINY_OFFICER, BRANCH_HEAD | Evaluate single allow-listed rule (no arbitrary code execution) |
-
-### Module Compatibility Endpoints
-| Method | Path | Roles | Description |
-|--------|------|-------|-------------|
-| `POST` | `/api/v1/validation/instruments/{id}/run` | Internal review roles | Alias for validation run |
-| `GET` | `/api/v1/validation/instruments/{id}/findings` | All authenticated (tenant-scoped) | Alias for instrument findings |
-| `GET` | `/api/v1/validation/instruments/{id}/findings/{fid}` | All authenticated (tenant-scoped) | Alias for single finding |
-| `POST` | `/api/v1/validation/instruments/{id}/findings/{fid}/dismiss` | SYSTEM_ADMIN, SCRUTINY_OFFICER, BRANCH_HEAD | Dismiss finding with mandatory reason |
-| `GET` | `/api/v1/validation/rules` | All authenticated | List registered rules in rule registry |
-| `GET` | `/api/v1/validation/policy` | Review & audit roles | List active policy configurations |
-| `POST` | `/api/v1/validation/policy` | SYSTEM_ADMIN only | Create / update versioned policy configuration |
-
----
-
-## 7. Validation Modes & Summary Metadata
-
-### Supported Modes
-1. **Explicit Full Evaluation:** Evaluates all enabled rules registered in the system.
-2. **Selective Evaluation by Rule IDs:** Evaluates a server-side allow-listed subset (`payload.rule_ids`).
-3. **Selective Evaluation by Category:** Evaluates rules belonging to a specific category (`payload.category`).
-4. **Single Rule Execution:** Evaluates a single allow-listed rule via `/instruments/{id}/rules/{rule_id}/evaluate`.
-5. **Post-Save Safe Trigger:** Automatic trigger (`trigger_post_save_validation`) called after an instrument is created or materially updated. Does not fail instrument operations if a rule errors.
-
-### Validation Run Execution Summary
-Every `ValidationRun` persists aggregate execution metadata and returns:
-- `rules_evaluated`: List of rule IDs evaluated
-- `passes_count`: Count of `PASS` outcomes
-- `failures_count`: Count of `FAIL` outcomes
-- `warnings_count`: Count of `WARNING` outcomes
-- `not_applicable_count`: Count of `NOT_APPLICABLE` outcomes
-- `unable_to_evaluate_count`: Count of `UNABLE_TO_EVALUATE` outcomes
-- `new_findings_count`: Count of newly created findings
-- `resolved_findings_count`: Count of cleared findings
-- `policy_version_ref`: Snapshot of policy version in effect
-
----
-
-## 8. Safety & Separation of Concerns
-
-1. **No Trust Level Changes:** Validation rules produce findings only. The engine asserts that `Instrument.trust_level` is unmodified before and after evaluation.
-2. **No Administrative Lifecycle Changes:** Failed rules never mark an instrument fraudulent, never perform bank confirmation, and never approve or reject a release.
-3. **No Direct Client Injections:** Clients cannot directly POST finding severity, outcomes, evidence, or status overrides.
-4. **Safe Error Isolation:** Any rule raising an unhandled exception is caught and recorded as `UNABLE_TO_EVALUATE` without crashing the sweep or other rules.
-
----
-
-## 9. Database Migrations
-
-Two Alembic revisions define Module 3 persistence:
-
-1. `b3c5d7e9f1a2` (`2026_10_25_0100`):
-   - `validation_policy_configs`: Versioned policy configurations
-   - `validation_runs`: Run execution log
-   - `validation_findings`: Persisted discrepancy records
-
-2. `dde1c7162b37` (`2026_10_25_0219`):
-   - `document_extracted_fields`: Structured OCR/pipeline extracted document metadata for cross-validation
-
----
-
-## 10. Automated Test Results
-
-Total test suite across all modules: **171 passed, 0 failures, 0 errors**.
-
-```
-tests/test_auth_rbac.py ...........................                       [ 15%]
-tests/test_health.py ..........                                           [ 21%]
-tests/test_institutions_users.py ..................................       [ 41%]
-tests/test_instruments_registry.py ....................                  [ 53%]
-tests/test_module1_acceptance.py .........                                [ 58%]
-tests/test_module3_deterministic_rules.py .........................       [ 73%]
-tests/test_module3_validation.py ........................................ [ 98%]
-                                 ...
-tests/test_modules.py ..                                                  [100%]
-============================== 171 passed in 6.5s ==============================
-```
-
-Exact command to run Module 3 tests:
-```bash
-pytest backend/tests/test_module3_deterministic_rules.py backend/tests/test_module3_validation.py
-```
-Output: **68 passed, 0 failures**.
+### Prompt 3 Test Scenarios Verified:
+1. Entered amount differs from extracted amount (`VAL-XSRC-001` fires `FAIL`).
+2. Matching entered and extracted values produce no discrepancy (`VAL-XSRC-001` passes).
+3. Missing extraction creates no false mismatch (`UNABLE_TO_EVALUATE`).
+4. Invalid/unparseable extraction output handled gracefully (`UNABLE_TO_EVALUATE`).
+5. Stale extraction against older document version identified (`VAL-XSRC-STALE` fires).
+6. Intra-institution reference duplicate detected with permitted summaries (`VAL-DUP-001`).
+7. Bank-aware cross-institution reference duplicate detected with tenant masking (`VAL-DUP-002`).
+8. Similar-looking references from different banks handled conservatively (no false duplicate).
+9. Duplicate SHA-256 file bytes across instruments flagged with prescribed neutral wording (`VAL-DUP-003`).
+10. Duplicate hash results do not leak cross-tenant records (tenant isolation preserved).
+11. Name similarity explains method, strings, score, and threshold (`VAL-SIM-001`).
+12. Name similarity does not reject or modify instrument trust level.
+13. Metadata advisory labelled as heuristic with disclaimer (`VAL-META-001`).
+14. No finding promotes trust level or authorizes financial release.
+15. Repeat runs remain idempotent (fingerprints identical, no duplicate rows).
+16. Module 1 and Module 2 regression test suites stay 100% green.
