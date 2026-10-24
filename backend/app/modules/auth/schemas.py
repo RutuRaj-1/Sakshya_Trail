@@ -1,9 +1,10 @@
 """
 Auth Module - Pydantic Request & Response Schemas
+Includes authentication, profile rotation, user provisioning, and user administration schemas.
 """
 from typing import Optional, List
 from datetime import datetime
-from pydantic import BaseModel, EmailStr, Field, ConfigDict, model_validator
+from pydantic import BaseModel, EmailStr, Field, ConfigDict, model_validator, field_validator
 
 
 class LoginRequest(BaseModel):
@@ -17,10 +18,48 @@ class UserBase(BaseModel):
     role: str
     institution_id: Optional[str] = None
 
+    @field_validator("full_name", mode="before")
+    @classmethod
+    def trim_name(cls, v):
+        if isinstance(v, str):
+            v_stripped = v.strip()
+            return v_stripped if v_stripped else None
+        return v
+
 
 class UserProvisionRequest(UserBase):
     password: str = Field(..., min_length=8, description="Initial account password")
     must_change_password: bool = Field(default=True, description="Force password rotation on first login")
+
+
+class UserUpdate(BaseModel):
+    full_name: Optional[str] = Field(None, min_length=2, max_length=255)
+    role: Optional[str] = None
+    institution_id: Optional[str] = None
+
+    @field_validator("full_name", mode="before")
+    @classmethod
+    def trim_name(cls, v):
+        if isinstance(v, str):
+            v_stripped = v.strip()
+            return v_stripped if v_stripped else None
+        return v
+
+
+class UserStatusUpdate(BaseModel):
+    is_active: bool = Field(..., description="Target active account status")
+    reason: Optional[str] = Field(None, max_length=500, description="Optional administrative rationale")
+
+
+class UserResetPasswordRequest(BaseModel):
+    temporary_password: Optional[str] = Field(None, min_length=8, description="Optional explicit temporary password")
+
+
+class UserResetPasswordResponse(BaseModel):
+    success: bool = True
+    message: str = "Password reset successful"
+    temporary_password: str
+    must_change_password: bool = True
 
 
 class UserRead(UserBase):
@@ -31,6 +70,13 @@ class UserRead(UserBase):
     must_change_password: bool
     created_at: datetime
     updated_at: datetime
+
+
+class UserListResponse(BaseModel):
+    items: List[UserRead]
+    total: int
+    skip: int
+    limit: int
 
 
 class LoginResponse(BaseModel):

@@ -8,25 +8,34 @@ import {
   Activity,
   Layers,
   FileCheck2,
+  Users,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/features/auth/AuthContext';
 
 interface NavItem {
   name: string;
   to: string;
   icon: React.ComponentType<{ className?: string }>;
   badge?: string;
+  adminOnly?: boolean;
 }
 
-const navItems: NavItem[] = [
+const baseNavItems: NavItem[] = [
   { name: 'Dashboard', to: '/', icon: LayoutDashboard },
   { name: 'FDR Instruments', to: '/instruments', icon: FileSpreadsheet, badge: 'Core' },
   { name: 'Institutions', to: '/institutions', icon: Building2 },
+  { name: 'User Admin', to: '/users', icon: Users, badge: 'Admin', adminOnly: true },
   { name: 'Audit History', to: '/audit', icon: History },
   { name: 'System Diagnostics', to: '/health', icon: Activity },
 ];
 
 export const Sidebar: React.FC = () => {
+  const { user } = useAuth();
+  const isSystemAdmin = user?.role === 'SYSTEM_ADMIN';
+
+  const visibleItems = baseNavItems.filter((item) => !item.adminOnly || isSystemAdmin);
+
   return (
     <aside className="w-64 bg-slate-900 text-slate-300 flex flex-col shrink-0 border-r border-slate-800 select-none">
       {/* Brand Subheader */}
@@ -44,7 +53,7 @@ export const Sidebar: React.FC = () => {
 
       {/* Main Navigation */}
       <nav className="flex-1 p-3 space-y-1">
-        {navItems.map((item) => (
+        {visibleItems.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}

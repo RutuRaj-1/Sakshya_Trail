@@ -3,6 +3,8 @@ import { MainLayout } from '@/layouts/MainLayout';
 import { DashboardPage } from '@/app/routes/DashboardPage';
 import { InstrumentsPage } from '@/app/routes/InstrumentsPage';
 import { InstitutionsPage } from '@/app/routes/InstitutionsPage';
+import { InstitutionDetailPage } from '@/app/routes/InstitutionDetailPage';
+import { UserAdminPage } from '@/app/routes/UserAdminPage';
 import { HealthPage } from '@/app/routes/HealthPage';
 import { AuditPage } from '@/app/routes/AuditPage';
 import { LoginPage } from '@/app/routes/LoginPage';
@@ -41,6 +43,18 @@ export const router = createBrowserRouter([
       {
         path: 'institutions',
         element: <InstitutionsPage />,
+      },
+      {
+        path: 'institutions/:id',
+        element: <InstitutionDetailPage />,
+      },
+      {
+        path: 'users',
+        element: (
+          <ProtectedRoute allowedRoles={['SYSTEM_ADMIN']}>
+            <UserAdminPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: 'health',

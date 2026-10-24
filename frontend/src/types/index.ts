@@ -53,6 +53,13 @@ export interface User {
   updated_at: string;
 }
 
+export interface UserListResponse {
+  items: User[];
+  total: number;
+  skip: number;
+  limit: number;
+}
+
 export interface RoleInfo {
   name: string;
   display_name: string;
@@ -63,14 +70,34 @@ export interface RoleInfo {
 
 export interface Institution {
   id: string;
-  aicte_id: string;
-  name: string;
-  state: string;
-  category: string;
+  code: string;
+  aicte_id?: string;
+  legal_name: string;
+  name?: string;
+  display_name?: string | null;
+  institution_type: string;
+  category?: string;
+  contact_name: string;
   contact_email: string;
-  status: string;
+  contact_phone: string;
+  address_line1: string;
+  address_line2?: string | null;
+  city: string;
+  state: string;
+  postal_code: string;
+  assigned_office?: string | null;
+  is_active: boolean;
+  status?: string;
+  is_synthetic?: boolean;
   created_at: string;
   updated_at: string;
+}
+
+export interface InstitutionListResponse {
+  items: Institution[];
+  total: number;
+  skip: number;
+  limit: number;
 }
 
 export type FDRStatus = 

@@ -4,9 +4,11 @@ import type {
   ReadinessState,
   RoleInfo,
   Institution,
+  InstitutionListResponse,
   Instrument,
   InstrumentSummary,
   User,
+  UserListResponse,
 } from '@/types';
 
 export const healthApi = {
@@ -25,16 +27,74 @@ export const authApi = {
   changePassword: (payload: { current_password: string; new_password: string; confirm_new_password: string }) =>
     apiClient.post<{ success: boolean; message: string }>('/auth/change-password', payload),
   getRoles: () => apiClient.get<RoleInfo[]>('/auth/roles'),
-  getBootstrap: () => apiClient.get<any>('/auth/session/bootstrap'),
 };
 
 export const institutionsApi = {
-  list: (params?: { state?: string }) => {
-    const query = params?.state ? `?state=${encodeURIComponent(params.state)}` : '';
-    return apiClient.get<Institution[]>(`/institutions${query}`);
+  list: (params?: {
+    search?: string;
+    state?: string;
+    institution_type?: string;
+    is_active?: boolean;
+    skip?: number;
+    limit?: number;
+  }) => {
+    const sp = new URLSearchParams();
+    if (params?.search) sp.append('search', params.search);
+    if (params?.state) sp.append('state', params.state);
+    if (params?.institution_type) sp.append('institution_type', params.institution_type);
+    if (params?.is_active !== undefined) sp.append('is_active', String(params.is_active));
+    if (params?.skip !== undefined) sp.append('skip', String(params.skip));
+    if (params?.limit !== undefined) sp.append('limit', String(params.limit));
+    const query = sp.toString() ? `?${sp.toString()}` : '';
+    return apiClient.get<InstitutionListResponse>(`/institutions${query}`);
   },
-  create: (data: Partial<Institution>) =>
-    apiClient.post<Institution>('/institutions', data),
+  get: (id: string) => apiClient.get<Institution>(`/institutions/${id}`),
+  create: (data: Partial<Institution>) => apiClient.post<Institution>('/institutions', data),
+  update: (id: string, data: Partial<Institution>) =>
+    apiClient.patch<Institution>(`/institutions/${id}`, data),
+  setStatus: (id: string, is_active: boolean, reason?: string) =>
+    apiClient.post<Institution>(`/institutions/${id}/status`, { is_active, reason }),
+};
+
+export const usersApi = {
+  list: (params?: {
+    search?: string;
+    role?: string;
+    is_active?: boolean;
+    institution_id?: string;
+    skip?: number;
+    limit?: number;
+  }) => {
+    const sp = new URLSearchParams();
+    if (params?.search) sp.append('search', params.search);
+    if (params?.role) sp.append('role', params.role);
+    if (params?.is_active !== undefined) sp.append('is_active', String(params.is_active));
+    if (params?.institution_id) sp.append('institution_id', params.institution_id);
+    if (params?.skip !== undefined) sp.append('skip', String(params.skip));
+    if (params?.limit !== undefined) sp.append('limit', String(params.limit));
+    const query = sp.toString() ? `?${sp.toString()}` : '';
+    return apiClient.get<UserListResponse>(`/auth/users${query}`);
+  },
+  get: (id: string) => apiClient.get<User>(`/auth/users/${id}`),
+  provision: (data: {
+    full_name: string;
+    email: string;
+    password: string;
+    role: string;
+    institution_id?: string | null;
+    must_change_password?: boolean;
+  }) => apiClient.post<User>('/auth/users', data),
+  update: (id: string, data: { full_name?: string; role?: string; institution_id?: string | null }) =>
+    apiClient.patch<User>(`/auth/users/${id}`, data),
+  setStatus: (id: string, is_active: boolean, reason?: string) =>
+    apiClient.post<User>(`/auth/users/${id}/status`, { is_active, reason }),
+  resetPassword: (id: string, temporary_password?: string) =>
+    apiClient.post<{
+      success: boolean;
+      message: string;
+      temporary_password: string;
+      must_change_password: boolean;
+    }>(`/auth/users/${id}/reset-password`, { temporary_password }),
 };
 
 export const instrumentsApi = {

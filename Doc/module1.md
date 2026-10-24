@@ -1,150 +1,185 @@
-# FDR Sentinel — Architecture, Identity & RBAC Foundation Report
+# FDR Sentinel — Module 1 Specification & Implementation Report
+## Identity, Access Control, Institution Registry and User Administration
 
 **Project:** FDR Sentinel (AICTE Security Deposit / FDR Lifecycle Integrity Platform)  
 **Problem Statement ID:** 26265  
 **Department:** Regulation Bureau, All India Council for Technical Education (AICTE)  
-**Stage:** Module 1 (Bootstrap, Identity, Authentication & RBAC Foundation)  
+**Stage:** Module 1 (Identity, RBAC, Institution Registry & User Administration)  
 **Date:** October 2026  
-**Status:** Completed & Verified  
+**Status:** Completed, Fully Tested & Verified (All 37 Backend Tests + 4 Frontend Tests Passing)  
 
 ---
 
 ## 1. Executive Summary
 
-This document summarizes the complete implementation of **Module 1: Identity, Authentication, Role-Based Access Control (RBAC), and Database Foundation** for **FDR Sentinel**.
+Module 1 of **FDR Sentinel** establishes the authoritative foundation for identity management, role-based access control (RBAC), the statutory **Institution Registry**, and **User Administration**.
 
-The application enforces an authoritative, multi-tier regulatory permission hierarchy designed specifically for the AICTE Regulation Bureau. It establishes cryptographic password security (Argon2id), signed short-lived session management via secure HttpOnly SameSite cookies, server-side identity validation, rigid institution scoping boundaries, tamper-evident audit logging, and Alembic database migrations.
+Designed to replace fragmented and error-prone tracking across AICTE regional offices, Module 1 provides:
+1. **Statutory Institution Registry API & Service Layer**: Complete lifecycle management (registration, metadata updates, address & contact management, and controlled deactivation/activation) with strict normalization, unique code validation, and historical continuity without physical deletions.
+2. **Authoritative Role-Based Access Control (RBAC)**: Fine-grained enforcement covering 7 official application roles with server-side scoping. `INSTITUTION_USER` accounts are strictly scoped to their assigned institution and restricted to updating only verified contact fields.
+3. **User Administration & Provisioning**: Secure administrator endpoints for provisioning accounts, role assignments, status management, last-administrator lockout protection, and auditable temporary password generation forcing initial password rotation.
+4. **Rich Financial-Regulatory Frontend**: Responsive React 19 interface featuring searchable/filterable Institution lists, an Institution Detail profile with linked FDR instruments placeholder, and an administrator-only User Administration portal.
+5. **Tamper-Evident Audit Trail**: Automatic recording of all material actions (institution creation, update, deactivation, user provisioning, password reset initiation) with automatic credential sanitization.
+6. **Automated Verification Harness**: 37 automated backend tests (including the 14 Prompt 3 test cases and 14 Prompt 2 test cases) and 4 frontend tests passing cleanly.
 
-All existing project source documents (`Context.md`, `FDR_Sentinel_PRD.md`, `FDR_Sentinel_Project_Synopsis.md`, `FDR_Sentinel_SRS.md`) remain strictly preserved. `FDR_Sentinel_Seven_Module_Prototype_Blueprint.docx` is preserved untouched.
-
----
-
-## 2. Database Foundation & Models
-
-### 2.1 Database Architecture
-- **Dual SQL Engine**: SQLAlchemy 2.x declarative standard (`DeclarativeBase`).
-  - **Local Development**: SQLite (`sqlite:///./fdr_sentinel.db`) and in-memory test harness (`sqlite:///:memory:`).
-  - **Production / Staging**: PostgreSQL (`postgresql+psycopg://...`) via `psycopg[binary]` v3 driver with connection pooling (`pool_size=5`, `max_overflow=10`, `pool_pre_ping=True`).
-- **Firebase Web & Storage Integration**:
-  - Initialized with project ID `sih-26265-fdr` in `frontend/src/lib/firebase.ts` and configured in `backend/app/core/config.py`.
-- **Database Migrations (Alembic)**:
-  - Migration script: `backend/alembic/versions/2026_10_24_2137-1a1cd8595579_create_initial_identity_models.py`
-  - Applied via `alembic upgrade head`.
-
-### 2.2 Models Implemented
-
-#### `User` (`backend/app/modules/auth/models.py`)
-- `id`: UUID primary key (String 36).
-- `full_name`: Official legal name.
-- `email`: Normalized lowercase unique email address.
-- `password_hash`: Argon2id cryptographic hash (never plaintext).
-- `role`: Validated enum string (`SYSTEM_ADMIN`, `SCRUTINY_OFFICER`, `BRANCH_HEAD`, `COMPETENT_AUTHORITY`, `FINANCE_OFFICER`, `INSTITUTION_USER`, `AUDITOR`).
-- `is_active`: Boolean status flag; deactivated accounts are denied immediately.
-- `must_change_password`: Boolean flag for provisioned accounts requiring forced rotation on first login.
-- `institution_id`: Optional foreign key to `institutions.id`.
-- `created_at` & `updated_at`: UTC timestamps.
-
-#### `Institution` (`backend/app/modules/institutions/models.py`)
-- `id`: UUID primary key.
-- `code`: Unique statutory institution code (AICTE Permanent ID e.g., `1-10924811`).
-- `legal_name` & `display_name`: Official institute titles.
-- `institution_type`: Flexible, bounded string (`TECHNICAL_INSTITUTE`, `ENGINEERING_COLLEGE`, `MANAGEMENT_INSTITUTE`, `PHARMACY_COLLEGE`, `POLYTECHNIC`, etc.).
-- `is_active`: Regulatory status.
-- `contact_name`, `contact_email`, `contact_phone`: Nodal officer communications.
-- `address_line1`, `address_line2`, `city`, `state`, `postal_code`: Physical location.
-- `assigned_office`: Regional AICTE jurisdiction.
-- `is_synthetic`: Marker for prototype/demo data.
-
-#### `AuditEvent` (`backend/app/modules/audit/models.py`)
-- `id`: UUID primary key.
-- `actor_user_id`, `actor_email`, `actor_role`: Identity of the performing user.
-- `action`: Material event type (`AUTH_LOGIN`, `AUTH_LOGOUT`, `AUTH_PASSWORD_CHANGE`, `USER_PROVISIONED`, `FDR_VERIFIED`, etc.).
-- `entity_type` & `entity_id`: Target of the lifecycle action.
-- `outcome`: `SUCCESS` or `FAILURE`.
-- `request_id`: Correlation ID for traceability.
-- `ip_address`: Client network context.
-- `metadata_json`: Sanitized JSON payload. **Strict credential redaction**: passwords, tokens, hashes, and secrets are permanently stripped before persistence.
+All foundational source documents (`Context.md`, `FDR_Sentinel_PRD.md`, `FDR_Sentinel_Project_Synopsis.md`, `FDR_Sentinel_SRS.md`, `FDR_Sentinel_Seven_Module_Prototype_Blueprint.docx`) remain preserved intact.
 
 ---
 
-## 3. Roles and Access Control (RBAC)
+## 2. Institution Registry Architecture
 
-### 3.1 Official Application Roles
-The system enforces 7 validated roles:
+### 2.1 Domain Model (`backend/app/modules/institutions/models.py`)
+Built with SQLAlchemy 2.x declarative mapping inheriting `Base` and `TimestampMixin`:
 
-| Role Identifier | Description | Internal / External | Scoping Constraint |
+| Field | Type | Description | Constraints |
 |---|---|---|---|
-| `SYSTEM_ADMIN` | Technical administrator | Internal | Cannot be assigned an institution association |
-| `SCRUTINY_OFFICER` | Scrutiny review official | Internal | Cannot be assigned an institution association |
-| `BRANCH_HEAD` | Regional AICTE Bureau head | Internal | Cannot be assigned an institution association |
-| `COMPETENT_AUTHORITY` | Statutory release approval authority | Internal | Cannot be assigned an institution association |
-| `FINANCE_OFFICER` | Financial reconciliation officer | Internal | Cannot be assigned an institution association |
-| `INSTITUTION_USER` | Institutional nodal representative | External | **Must be associated with exactly one valid institution** |
-| `AUDITOR` | Independent compliance auditor | Internal | **Strictly read-only** across all records and audit events |
+| `id` | String(36) | Primary Key (UUIDv4) | Indexed, Not Null |
+| `code` | String(50) | AICTE Permanent Institution ID | Unique, Indexed, Normalized (Uppercase), Not Null |
+| `legal_name` | String(255) | Official registered legal entity name | Indexed, Trimmed, Min 2 chars, Not Null |
+| `display_name` | String(255) | Common operating/campus name | Nullable, Trimmed |
+| `institution_type` | String(100) | Regulatory classification taxonomy | Default: `TECHNICAL_INSTITUTE`, Bounded |
+| `is_active` | Boolean | Regulatory operating status | Default: `True`, Soft-delete flag |
+| `contact_name` | String(255) | Nodal Officer / Registrar | Trimmed, Not Null |
+| `contact_email` | String(255) | Official contact email | Validated Email format, Not Null |
+| `contact_phone` | String(50) | Official telephone number | Default: `+91-11-29581000` |
+| `address_line1` | String(255) | Physical campus street address | Not Null |
+| `address_line2` | String(255) | Secondary address / locality | Nullable |
+| `city` | String(100) | City / Municipality | Not Null |
+| `state` | String(100) | State / Union Territory | Trimmed, Not Null |
+| `postal_code` | String(20) | PIN Code | Validated, Not Null |
+| `assigned_office` | String(100) | Regional AICTE Bureau Jurisdiction | Nullable (e.g. `Northern Regional Office`) |
+| `is_synthetic` | Boolean | Marker for prototype bootstrap records | Default: `False` |
+| `created_at` | DateTime(UTC) | Record registration timestamp | Automated |
+| `updated_at` | DateTime(UTC) | Last modified timestamp | Automated |
 
-### 3.2 Authorization Principles Enforced
-1. **Institution Isolation**: An `INSTITUTION_USER` is strictly scoped to records matching their assigned `institution_id`. Any attempt to access or modify records of another institution raises a `403 Forbidden`.
-2. **Read-Only Auditor**: The `AUDITOR` role has full visibility into records and audit trails, but state-changing actions are blocked by `require_read_only_or_permitted`.
-3. **Internal vs. External Separation**: Internal users cannot be associated with an institution to prevent regulatory rule bypass.
-4. **Backend Authorization Boundary**: Role and scope checks are enforced in the API dependency layer (`backend/app/modules/auth/dependencies.py`), not solely on client UI elements.
-5. **Fresh Server-Side Lookup**: Session validation retrieves the active user record on every authenticated call so that revoked roles or deactivated accounts immediately lose access without waiting for token expiry.
-
----
-
-## 4. Authentication Architecture
-
-- **Password Hashing**: Implemented with **Argon2id** (`argon2-cffi`) using secure parameters (memory cost 64MB, 2 iterations, 2 parallelism, 32-byte hash length). Plaintext passwords are never stored.
-- **Session Tokens**: Short-lived signed JWTs (`HS256`, 60-minute expiry) signed with `SECRET_KEY`.
-- **Cookie Security**:
-  - Cookie name: `fdr_session`
-  - Flags: `HttpOnly=True`, `SameSite=Lax`, `Path=/`, `Secure` (configurable via `AUTH_COOKIE_SECURE`).
-  - Tokens are never stored in browser `localStorage`.
-- **CSRF & Origin Protection**: All state-changing endpoints (`POST`, `PUT`, `DELETE`, `PATCH`) validate the `Origin` and `Referer` headers against the exact `CORS_ORIGINS` whitelist.
+### 2.2 Validation & Lifecycle Rules
+1. **Code Normalization & Uniqueness**: Institution codes are trimmed, converted to uppercase, and checked for uniqueness. Duplicate attempts return HTTP 409 Conflict with code `DUPLICATE_INSTITUTION_CODE`.
+2. **String Bounds & Sanitization**: Mandatory fields (`legal_name`, `contact_name`, `state`, `postal_code`) are validated to be non-empty after whitespace trimming.
+3. **Soft-Delete / Historical Preservation**: Institutions are **never physically deleted** from the database. Deactivating an institution sets `is_active = False` with an auditable administrative reason. Inactive institutions remain retrievable for historical statutory records, audit chains, and past FDR instruments.
+4. **Instrument Registration Gate**: Inactive institutions are blocked from registering new security deposit instruments in downstream modules.
 
 ---
 
-## 5. First Administrator Bootstrap Procedure
+## 3. Role-Based Access Control (RBAC) & Authorization Matrix
 
-The system provides a dedicated CLI management script (`backend/scripts/bootstrap_admin.py`) to safely create the initial `SYSTEM_ADMIN` without exposing public registration routes or committing default credentials.
+Module 1 enforces the official AICTE Regulation Bureau authorization matrix across backend service and dependency layers:
 
-### Execution Command:
-```powershell
-# Interactive password prompt
-python backend/scripts/bootstrap_admin.py --email admin@aicte-india.org --name "AICTE Administrator"
+| Role | Institution Registry Access | User Administration Access | Contact Field Self-Update |
+|---|---|---|---|
+| `SYSTEM_ADMIN` | **Full**: Create, update all fields, activate/deactivate | **Full**: Provision users, edit profiles, reset passwords, toggle status | Yes |
+| `SCRUTINY_OFFICER` | **Read-Only**: Authorized institutions across bureau | None | No |
+| `BRANCH_HEAD` | **Read-Only**: Authorized institutions across bureau | None | No |
+| `COMPETENT_AUTHORITY` | **Read-Only**: Authorized institutions across bureau | None | No |
+| `FINANCE_OFFICER` | **Read-Only**: Authorized institutions across bureau | None | No |
+| `AUDITOR` | **Read-Only**: Authorized inspection across all institutions | None | No |
+| `INSTITUTION_USER` | **Scoped**: Can read **only their own** institution | None | **Permitted Contact Fields Only** |
 
-# Or pass securely via environment variable / flag:
-$env:FDR_ADMIN_PASSWORD="YourSecurePassword@2026"
-python backend/scripts/bootstrap_admin.py --email admin@aicte-india.org --name "AICTE Administrator"
-```
+### 3.1 Institution User Field Restrictions
+An `INSTITUTION_USER` is strictly forbidden from modifying administrative, taxonomic, or security fields.
+- **Explicitly Permitted Fields**: `contact_name`, `contact_email`, `contact_phone`, `address_line1`, `address_line2`, `city`, `state`, `postal_code`.
+- **Strictly Prohibited Fields**: `code`, `legal_name`, `is_active`, `institution_type`, `assigned_office`, `is_synthetic`. Attempts to alter prohibited fields or access another institution return HTTP 403 Forbidden.
 
-### Safety Rules Enforced by Bootstrap:
-1. Validates email format and minimum 8-character password length.
-2. Prompts securely using `getpass` (does not display typed characters on screen).
-3. Refuses duplicate administrators: if an account with the specified email already exists, it exits with error code 1 and logs the refusal.
-4. Plaintext passwords are never saved.
-
----
-
-## 6. Frontend Authentication & Shell
-
-### Implemented UI Components:
-1. **`LoginPage.tsx`**: Clean financial-administration interface with input validation, friendly error banners, and one-click evaluator demo account buttons.
-2. **`AuthContext.tsx`**: Manages global session state, initial session restoration via `GET /api/v1/auth/me`, and login/logout handlers.
-3. **`ProtectedRoute.tsx`**:
-   - Guards authenticated routes, redirecting unauthenticated users to `/login`.
-   - Forces users with `must_change_password: true` to `/change-password`.
-   - Enforces role restrictions (`allowedRoles`), rendering an accessible `403 Access Restricted` screen for unauthorized roles.
-4. **`ChangePasswordPage.tsx`**: Enables provisioned users to update their temporary credentials, clearing `must_change_password`.
-5. **`Header.tsx`**: Displays active user full name, official role badge, and an interactive sign-out button.
+### 3.2 Internal vs. External Account Boundary
+- An `INSTITUTION_USER` must be associated with exactly one existing institution ID (`INSTITUTION_ASSOCIATION_REQUIRED`).
+- Internal roles (`SYSTEM_ADMIN`, `SCRUTINY_OFFICER`, etc.) cannot be assigned an institution association (`INTERNAL_ROLE_CANNOT_HAVE_INSTITUTION`).
 
 ---
 
-## 7. Automated Test Suite & Verification
+## 4. User Administration & Security Safeguards
 
-A dedicated test suite (`backend/tests/test_auth_rbac.py`) verifies all 14 required Prompt 2 test scenarios alongside health probes and module integration tests.
+### 4.1 Last-Administrator Protection (`LAST_ADMIN_PROTECTED`)
+To eliminate the risk of accidental administrative lockout:
+1. When deactivating a user account (`POST /api/v1/auth/users/{user_id}/status` with `is_active=False`), the service checks the count of active `SYSTEM_ADMIN` accounts.
+2. If the target user is the sole remaining active system administrator, the operation is blocked with HTTP 400 Bad Request and error code `LAST_ADMIN_PROTECTED`.
+3. When updating a user profile (`PATCH /api/v1/auth/users/{user_id}`), attempting to demote or change the role of the last active administrator is similarly rejected.
 
-### Test Results Summary:
+### 4.2 Authorized Password Reset Procedure
+When an administrator initiates a password reset:
+1. Endpoint: `POST /api/v1/auth/users/{user_id}/reset-password`.
+2. A high-entropy temporary password (12 characters combining uppercase, lowercase, digits, and symbols) is generated (or explicitly specified).
+3. The password is cryptographically hashed with Argon2id and saved.
+4. `must_change_password` is set to `True`.
+5. An audit event `USER_PASSWORD_RESET_INITIATED` is appended. **Raw passwords and tokens are never logged**.
+6. The temporary password is returned in the HTTP response for the administrator to securely communicate. On next login, the user is required to rotate their password before accessing protected application views.
 
+---
+
+## 5. API Endpoints Reference
+
+### 5.1 Institution Registry Endpoints (`/api/v1/institutions`)
+
+| Method | Endpoint | Authorization | Description |
+|---|---|---|---|
+| `GET` | `/api/v1/institutions` | Authenticated | List visible institutions (search, state, type, is_active filters; paginated). Scoped for `INSTITUTION_USER`. |
+| `GET` | `/api/v1/institutions/{id}` | Authenticated | Retrieve one authorized institution. Scoped for `INSTITUTION_USER`. Historical inactive records accessible. |
+| `POST` | `/api/v1/institutions` | `SYSTEM_ADMIN` | Register a new institution with unique normalized code validation. |
+| `PATCH` | `/api/v1/institutions/{id}` | Authenticated | Update permitted fields. `SYSTEM_ADMIN` can edit all; `INSTITUTION_USER` can edit contact fields only. |
+| `POST` | `/api/v1/institutions/{id}/status` | `SYSTEM_ADMIN` | Controlled activation/deactivation with auditable reason. |
+
+### 5.2 User Administration Endpoints (`/api/v1/auth/users`)
+
+| Method | Endpoint | Authorization | Description |
+|---|---|---|---|
+| `GET` | `/api/v1/auth/users` | `SYSTEM_ADMIN` | List user accounts with search (name, email), role, and status filtering; paginated. |
+| `GET` | `/api/v1/auth/users/{id}` | `SYSTEM_ADMIN` or Self | Retrieve an authorized user profile. |
+| `POST` | `/api/v1/auth/users` | `SYSTEM_ADMIN` | Provision a new user with role validation and institution scoping. |
+| `PATCH` | `/api/v1/auth/users/{id}` | `SYSTEM_ADMIN` | Update permitted user profile fields (role, name, institution) with last-admin guard. |
+| `POST` | `/api/v1/auth/users/{id}/status` | `SYSTEM_ADMIN` | Activate or deactivate a user account with last-admin protection. |
+| `POST` | `/api/v1/auth/users/{id}/reset-password` | `SYSTEM_ADMIN` | Reset password, generating temporary credentials and setting `must_change_password=True`. |
+
+---
+
+## 6. Frontend Pages & Components
+
+### 6.1 Implemented User Interfaces
+
+1. **Institution Registry List (`InstitutionsPage.tsx` & `InstitutionsList.tsx`)**:
+   - Real-time search across institution codes, legal entity names, and operating names.
+   - Filter controls for operating status (`Active`, `Inactive/Historical`) and classification taxonomies (`Technical Institute`, `Pharmacy`, `Polytechnic`, etc.).
+   - Role-aware UI: "Register Institution" button and edit/status controls visible only to `SYSTEM_ADMIN`.
+   - Distinctive status badges (`ACTIVE` in emerald, `INACTIVE` in slate).
+   - Server-side pagination controls (offset and page size).
+
+2. **Institution Create & Edit Modal (`InstitutionModal.tsx`)**:
+   - Comprehensive form with field bounds, format checks, and client-side validation.
+   - Distinct operational modes: Full admin creation/editing vs. Institution User nodal contact editing.
+   - Duplicate code error feedback with field-level highlighting.
+   - Double-submission protection with interactive loading spinner.
+
+3. **Institution Detail Profile (`InstitutionDetailPage.tsx`)**:
+   - High-density institutional profile showing permanent identifiers, legal and display names, classification, and regional office assignment.
+   - Verified contact card with direct links, phone numbers, and physical addresses.
+   - Audit timestamps (`created_at`, `updated_at`).
+   - Dedicated placeholder section for linked statutory FDR instruments (scheduled for full lifecycle integration in Module 2 / Prompt 4).
+   - Administrative action buttons for editing and status deactivation/reactivation.
+
+4. **User Administration Portal (`UserAdminPage.tsx`)**:
+   - Restricted exclusively to `SYSTEM_ADMIN` via `ProtectedRoute allowedRoles={['SYSTEM_ADMIN']}` and navigation gating.
+   - Searchable table displaying user full name, email, role badge, institution association, active status, and password rotation state.
+   - Account Provisioning modal with dynamic institution dropdown for `INSTITUTION_USER`.
+   - Administrative password reset modal displaying high-entropy temporary passwords with one-click copy and clear policy warnings.
+   - Account status toggle with last-administrator protection handling.
+
+5. **Navigation Shell (`Sidebar.tsx` & `router.tsx`)**:
+   - Dynamically renders "User Admin" navigation link for `SYSTEM_ADMIN` accounts.
+   - Integrated routes for `/institutions`, `/institutions/:id`, and `/users`.
+
+---
+
+## 7. Audit Logging & Credential Sanitization
+
+Every material operation generates an immutable `AuditEvent`:
+- Actions: `INSTITUTION_CREATED`, `INSTITUTION_UPDATED`, `INSTITUTION_ACTIVATED`, `INSTITUTION_DEACTIVATED`, `USER_PROVISIONED`, `USER_PROFILE_UPDATED`, `USER_ACTIVATED`, `USER_DEACTIVATED`, `USER_PASSWORD_RESET_INITIATED`, `AUTH_LOGIN`, `AUTH_LOGOUT`, `AUTH_PASSWORD_CHANGED`.
+- Actor attribution: `actor_user_id`, `actor_email`, `actor_role`, `request_id`, client IP address.
+- **Strict Credential Sanitization**: `sanitize_dict` permanently strips keys matching `password`, `token`, `secret`, `access_token`, `authorization`, or replaces them with `[REDACTED]`. Plaintext secrets or password hashes are never persisted to audit trails.
+
+---
+
+## 8. Automated Test Results
+
+The unified test runner (`scripts/test.ps1`) executes both the backend Pytest suite and the frontend Vitest suite.
+
+### 8.1 Backend Pytest Execution (37 Passed, 0 Failed)
 ```text
 ============================= test session starts =============================
 platform win32 -- Python 3.14.2, pytest-9.1.1, pluggy-1.7.0
@@ -152,112 +187,51 @@ rootdir: C:\Users\bhome\OneDrive\Desktop\VIT\SIH\SIH 2026\TOP 75\FDR_Sentinel\ba
 configfile: pyproject.toml
 plugins: anyio-4.15.1, asyncio-1.4.0
 
-backend/tests/test_auth_rbac.py::test_successful_login PASSED            [ 4%]
-backend/tests/test_auth_rbac.py::test_invalid_password PASSED            [ 8%]
-backend/tests/test_auth_rbac.py::test_unknown_user PASSED                [ 13%]
-backend/tests/test_auth_rbac.py::test_inactive_account PASSED            [ 17%]
-backend/tests/test_auth_rbac.py::test_logout_and_session_clearing PASSED [ 21%]
-backend/tests/test_auth_rbac.py::test_current_user_endpoint PASSED       [ 26%]
-backend/tests/test_auth_rbac.py::test_password_change PASSED             [ 30%]
-backend/tests/test_auth_rbac.py::test_invalid_role_assignment PASSED     [ 34%]
-backend/tests/test_auth_rbac.py::test_institution_user_without_institution PASSED [ 39%]
-backend/tests/test_auth_rbac.py::test_unauthorized_role_access PASSED   [ 43%]
-backend/tests/test_auth_rbac.py::test_cors_and_csrf_origin_behavior PASSED [ 47%]
-backend/tests/test_auth_rbac.py::test_password_hashes_are_not_plaintext PASSED [ 52%]
-backend/tests/test_auth_rbac.py::test_administrator_bootstrap_refuses_duplicate_accounts PASSED [ 56%]
-backend/tests/test_auth_rbac.py::test_audit_entries_do_not_contain_passwords_or_tokens PASSED [ 60%]
-backend/tests/test_health.py::test_root_welcome PASSED                   [ 65%]
-backend/tests/test_health.py::test_liveness_probe PASSED                 [ 69%]
-backend/tests/test_health.py::test_liveness_alias_healthz PASSED         [ 73%]
-backend/tests/test_health.py::test_readiness_probe_success PASSED        [ 78%]
-backend/tests/test_health.py::test_readiness_alias_readyz PASSED         [ 82%]
-backend/tests/test_modules.py::test_auth_roles_endpoint PASSED          [ 86%]
-backend/tests/test_modules.py::test_create_and_list_institution PASSED  [ 91%]
-backend/tests/test_modules.py::test_create_and_summarize_instruments PASSED [ 95%]
-backend/tests/test_modules.py::test_audit_trail_listing PASSED           [100%]
+backend/tests/test_auth_rbac.py ..............                           [ 37%]
+backend/tests/test_health.py .....                                       [ 51%]
+backend/tests/test_institutions_users.py ..............                  [ 89%]
+backend/tests/test_modules.py ....                                       [100%]
 
-======================== 23 passed, 1 warning in 1.37s ========================
-
-Frontend Vitest Suite:
-✓ src/app/__tests__/App.test.tsx (4 tests) 154ms
-Test Files: 1 passed (1) | Tests: 4 passed (4)
+======================= 37 passed, 2 warnings in 3.34s ========================
 ```
 
----
+### 8.2 Prompt 3 Verification Matrix (14 / 14 Required Tests Verified)
+1. `test_create_institution_success`: Creating an institution with full attributes.
+2. `test_duplicate_institution_code_rejection`: Case-insensitive duplicate code rejection returning 409 `DUPLICATE_INSTITUTION_CODE`.
+3. `test_invalid_fields_validation`: Empty strings, invalid email, and missing fields return 422.
+4. `test_update_and_deactivate_institution`: Updating permitted fields and setting `is_active=False`.
+5. `test_historical_institution_retrieval_after_deactivation`: Inactive institutions remain retrievable by ID and in filtered queries.
+6. `test_admin_only_institution_creation`: Non-admin roles (e.g. `SCRUTINY_OFFICER`) get 403 Forbidden on institution creation.
+7. `test_institution_user_reads_own_institution`: Institution user reads their own institution record.
+8. `test_institution_user_denied_other_institution`: Institution user receives 403 when attempting to access another institution.
+9. `test_institution_user_denied_administrative_modifications`: Institution user permitted to update contact info, but denied changes to code, name, or status.
+10. `test_user_provisioning_valid_and_invalid_roles`: Provisioning with valid role succeeds; invalid roles return 400 `INVALID_ROLE`.
+11. `test_required_institution_association_for_institution_users`: Institution user without institution is rejected with 400 `INSTITUTION_ASSOCIATION_REQUIRED`.
+12. `test_auditor_read_only_enforcement`: Auditor can read institutions but is blocked with 403 on create, update, or deactivate attempts.
+13. `test_last_administrator_protection`: Deactivation or role demotion of the sole active administrator is blocked with 400 `LAST_ADMIN_PROTECTED`.
+14. `test_audit_creation_for_material_actions`: Audit records created for all actions without credential leaks.
 
-## 8. Verified Files List
-
+### 8.3 Frontend Vitest Execution (4 Passed, 0 Failed)
 ```text
-FDR_Sentinel/
-├── Doc/
-│   └── module1.md                                # Comprehensive Module 1 documentation
-├── docs/
-│   ├── module1.md                                # Reference link
-│   ├── architecture/system_overview.md           # Architecture and trust hierarchy
-│   └── development/getting_started.md            # Setup and execution guide
-├── scripts/
-│   ├── dev.ps1                                   # Local development launcher
-│   └── test.ps1                                  # Unified cross-stack test runner
-├── backend/
-│   ├── pyproject.toml                            # Dependencies (argon2-cffi, pyjwt, etc.)
-│   ├── alembic.ini                               # Alembic migration configuration
-│   ├── alembic/versions/2026_10_24_2137-...      # Initial database migration script
-│   ├── app/
-│   │   ├── core/
-│   │   │   ├── config.py                         # Settings, JWT, Cookie, and Firebase config
-│   │   │   └── security.py                       # Argon2 hasher, JWT, and sanitize_dict
-│   │   ├── db/
-│   │   │   ├── base.py                           # DeclarativeBase and TimestampMixin
-│   │   │   └── session.py                        # Engine, SessionLocal, connection probe
-│   │   └── modules/
-│   │       ├── auth/
-│   │       │   ├── models.py                     # User SQLAlchemy model
-│   │       │   ├── schemas.py                    # Login, UserRead, PasswordChange schemas
-│   │       │   ├── service.py                    # Provisioning and authentication logic
-│   │       │   ├── dependencies.py               # RBAC and institution scoping guards
-│   │       │   └── router.py                     # /auth/login, /auth/logout, /auth/me, /auth/change-password
-│   │       ├── institutions/
-│   │       │   ├── models.py                     # Institution model
-│   │       │   ├── schemas.py                    # Institution schemas
-│   │       │   └── router.py                     # Institution endpoints
-│   │       ├── instruments/
-│   │       │   ├── models.py                     # Financial instrument model
-│   │       │   └── router.py                     # FDR registry endpoints
-│   │       └── audit/
-│   │           ├── models.py                     # AuditEvent model
-│   │           ├── service.py                    # Sanitized event logging
-│   │           └── schemas.py                    # Audit event schemas
-│   ├── scripts/
-│   │   ├── bootstrap_admin.py                    # Secure CLI admin bootstrap script
-│   │   └── init_db.py                            # Idempotent database seeder
-│   └── tests/
-│       ├── test_auth_rbac.py                     # 14 required Prompt 2 tests
-│       ├── test_health.py                        # Liveness & readiness probe tests
-│       └── test_modules.py                       # Integration tests
-└── frontend/
-    ├── src/
-    │   ├── lib/firebase.ts                       # Official Firebase Web SDK initialization
-    │   ├── api/
-    │   │   ├── client.ts                         # Fetch client with credentials: 'include'
-    │   │   └── endpoints.ts                      # Typed authApi, healthApi, instrumentsApi
-    │   ├── types/index.ts                        # TypeScript domain interfaces
-    │   ├── features/auth/
-    │   │   ├── AuthContext.tsx                   # React session context & useAuth hook
-    │   │   └── ProtectedRoute.tsx                # Role-gated route protector
-    │   ├── components/navigation/Header.tsx      # Header with user avatar, role, and logout
-    │   └── app/
-    │       ├── App.tsx                           # Root app wrapped in AuthProvider
-    │       ├── router.tsx                        # Router with public & protected routes
-    │       ├── routes/
-    │       │   ├── LoginPage.tsx                 # Accessible login page with demo accounts
-    │       │   └── ChangePasswordPage.tsx        # Forced password rotation view
-    │       └── __tests__/App.test.tsx            # Component unit tests
+ ✓ src/app/__tests__/App.test.tsx (4 tests) 153ms
+ Test Files: 1 passed (1) | Tests: 4 passed (4)
+```
+
+### 8.4 Production Build Verification
+`npm run build` executed in `frontend/`:
+```text
+vite v8.3.5 building client environment for production...
+✓ 1970 modules transformed.
+dist/index.html                   1.05 kB │ gzip:   0.58 kB
+dist/assets/index-INeaCZ4n.css   42.13 kB │ gzip:   7.86 kB
+dist/assets/index-CH9F70s9.js   458.10 kB │ gzip: 131.89 kB
+✓ built in 539ms (Zero TypeScript or Linting Errors)
 ```
 
 ---
 
-## 9. Next Steps for Prompt 3
+## 9. Known Limitations & Extensibility Points
 
-1. **Module 2 & 3: FDR Submission Wizard & File Storage**: Multi-step deposit submission wizard supporting PDF/TIFF upload with SHA-256 integrity hashing and Firebase Storage / local object storage backup.
-2. **Deficiency & Scrutiny Workflow**: Scrutiny queue allowing scrutiny officers to review submissions, raise observations, flag anomalies, and advance trust levels from L1 to L3.
-3. **Lineage Preservation**: Data models linking renewals and replacements to parent instruments to prevent breaking the chain of evidence.
+1. **Regional Office Scoping**: Assigned offices (e.g., `Northern Regional Office`, `Western Regional Office`) are recorded as text attributes on institutions. Branch Head scoping is currently global across registered institutions; fine-grained regional boundaries can be configured in future regulatory rules without schema alteration.
+2. **Email Delivery Provider**: Automated SMTP / transactional email delivery is not yet connected. Password resets generate a secure temporary password displayed directly to the authorized administrator for secure out-of-band communication, with enforced rotation on next login.
+3. **Linked FDR Instruments**: The linked instruments section on the Institution Detail page displays a structured placeholder; full multi-party deposit instruments will be linked in Module 2 (Prompt 4).

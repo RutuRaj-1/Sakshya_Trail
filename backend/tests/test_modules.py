@@ -3,6 +3,31 @@ Module Functional Integration Tests
 Tests initial modular domain boundaries: Auth roles, Institutions, Instruments, and Audit trails.
 """
 from fastapi.testclient import TestClient
+from sqlalchemy.orm import Session
+from app.modules.auth.service import provision_user
+from app.core.security import ROLE_SYSTEM_ADMIN, create_access_token
+from app.core.config import settings
+
+
+def set_admin_cookie(client: TestClient, db_session: Session):
+    admin = provision_user(
+        db=db_session,
+        full_name="Integration Admin",
+        email="integration.admin@aicte.gov.in",
+        password="SecurePass@2026",
+        role=ROLE_SYSTEM_ADMIN,
+    )
+    token = create_access_token(
+        user_id=admin.id,
+        email=admin.email,
+        role=admin.role,
+    )
+    client.cookies.set(
+        name=settings.AUTH_COOKIE_NAME,
+        value=token,
+        path=settings.AUTH_COOKIE_PATH,
+    )
+    return admin
 
 
 def test_auth_roles_endpoint(client: TestClient):
@@ -16,39 +41,42 @@ def test_auth_roles_endpoint(client: TestClient):
     assert "INSTITUTION_USER" in role_names
 
 
-def test_create_and_list_institution(client: TestClient):
+def test_create_and_list_institution(client: TestClient, db_session: Session):
+    set_admin_cookie(client, db_session)
     payload = {
-        "aicte_id": "1-99887766",
-        "name": "Delhi Institute of Advanced Technology",
+        "code": "1-99887766",
+        "legal_name": "Delhi Institute of Advanced Technology",
         "state": "Delhi",
-        "category": "Engineering & Technology",
+        "institution_type": "Engineering & Technology",
         "contact_email": "registrar@diat.ac.in",
-        "status": "ACTIVE",
+        "is_active": True,
     }
     create_res = client.post("/api/v1/institutions", json=payload)
     assert create_res.status_code == 201
     inst = create_res.json()
     assert inst["id"] is not None
-    assert inst["aicte_id"] == "1-99887766"
+    assert inst["code"] == "1-99887766"
 
     # List institutions
     list_res = client.get("/api/v1/institutions")
     assert list_res.status_code == 200
-    items = list_res.json()
-    assert any(i["aicte_id"] == "1-99887766" for i in items)
+    data = list_res.json()
+    items = data["items"]
+    assert any(i["code"] == "1-99887766" for i in items)
 
 
-def test_create_and_summarize_instruments(client: TestClient):
+def test_create_and_summarize_instruments(client: TestClient, db_session: Session):
+    set_admin_cookie(client, db_session)
     # First create institution
     inst_res = client.post(
         "/api/v1/institutions",
         json={
-            "aicte_id": "1-55443322",
-            "name": "Mumbai Technical Campus",
+            "code": "1-55443322",
+            "legal_name": "Mumbai Technical Campus",
             "state": "Maharashtra",
-            "category": "Pharmacy",
+            "institution_type": "Pharmacy",
             "contact_email": "dean@mtc.edu.in",
-            "status": "ACTIVE",
+            "is_active": True,
         },
     )
     inst_id = inst_res.json()["id"]
@@ -83,7 +111,8 @@ def test_create_and_summarize_instruments(client: TestClient):
     assert summary["total_deposit_value"] >= 2500000.00
 
 
-def test_audit_trail_listing(client: TestClient):
+def test_audit_trail_listing(client: TestClient, db_session: Session):
+    set_admin_cookie(client, db_session)
     res = client.get("/api/v1/audit")
     assert res.status_code == 200
     assert isinstance(res.json(), list)

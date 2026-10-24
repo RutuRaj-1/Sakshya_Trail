@@ -1,8 +1,8 @@
 """
-Auth Module - API Endpoints for Login, Logout, Session, Password Rotation, and Roles
+Auth Module - API Endpoints for Login, Logout, Session, Password Rotation, Roles, and User Administration
 """
 from typing import List, Optional
-from fastapi import APIRouter, Depends, Response, Request, status
+from fastapi import APIRouter, Depends, Response, Request, Query, status
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
@@ -24,12 +24,22 @@ from app.modules.auth.schemas import (
     ChangePasswordRequest,
     UserRead,
     UserProvisionRequest,
+    UserUpdate,
+    UserStatusUpdate,
+    UserResetPasswordRequest,
+    UserResetPasswordResponse,
+    UserListResponse,
     RoleInfo,
 )
 from app.modules.auth.service import (
     authenticate_user,
     change_user_password,
     provision_user,
+    list_users,
+    get_user_by_id,
+    update_user_profile,
+    set_user_status,
+    admin_reset_user_password,
 )
 from app.modules.auth.dependencies import (
     get_current_active_user,
@@ -37,7 +47,7 @@ from app.modules.auth.dependencies import (
     verify_csrf_origin,
 )
 from app.modules.audit.service import log_audit_event
-from app.common.schemas import StandardResponse
+from app.common.exceptions import ForbiddenException
 
 router = APIRouter(prefix="/auth", tags=["Authentication & Access Control"])
 
@@ -215,6 +225,57 @@ async def list_roles():
     return ROLE_METADATA
 
 
+# ==============================================================================
+# USER ADMINISTRATION ENDPOINTS (SYSTEM_ADMIN ONLY)
+# ==============================================================================
+
+@router.get("/users", response_model=UserListResponse)
+def get_users_list(
+    search: Optional[str] = Query(None, description="Search by name or email"),
+    role: Optional[str] = Query(None, description="Filter by role"),
+    is_active: Optional[bool] = Query(None, description="Filter by active status"),
+    institution_id: Optional[str] = Query(None, description="Filter by institution association"),
+    skip: int = Query(0, ge=0, description="Pagination offset"),
+    limit: int = Query(50, ge=1, le=100, description="Page limit"),
+    current_admin: User = Depends(require_roles(ROLE_SYSTEM_ADMIN)),
+    db: Session = Depends(get_db),
+):
+    """
+    List user accounts with pagination, search, and role filtering.
+    Restricted to SYSTEM_ADMIN.
+    """
+    items, total = list_users(
+        db=db,
+        search=search,
+        role=role,
+        is_active=is_active,
+        institution_id=institution_id,
+        skip=skip,
+        limit=limit,
+    )
+    return UserListResponse(
+        items=items,
+        total=total,
+        skip=skip,
+        limit=limit,
+    )
+
+
+@router.get("/users/{user_id}", response_model=UserRead)
+def get_user_profile(
+    user_id: str,
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db),
+):
+    """
+    Retrieve one user profile.
+    Authorized for SYSTEM_ADMIN or the individual user themselves.
+    """
+    if current_user.role != ROLE_SYSTEM_ADMIN and current_user.id != user_id:
+        raise ForbiddenException("You are not authorized to view another user's profile.")
+    return get_user_by_id(db, user_id)
+
+
 @router.post("/users", response_model=UserRead, status_code=status.HTTP_201_CREATED)
 async def provision_new_user(
     payload: UserProvisionRequest,
@@ -224,6 +285,7 @@ async def provision_new_user(
 ):
     """
     Authorized endpoint for SYSTEM_ADMIN to provision new application accounts.
+    Enforces role allow-list and institution scoping requirements.
     """
     verify_csrf_origin(request)
     client_ip = request.client.host if request.client else None
@@ -243,3 +305,94 @@ async def provision_new_user(
         ip_address=client_ip,
     )
     return user
+
+
+@router.patch("/users/{user_id}", response_model=UserRead)
+def update_user(
+    user_id: str,
+    payload: UserUpdate,
+    request: Request,
+    current_admin: User = Depends(require_roles(ROLE_SYSTEM_ADMIN)),
+    db: Session = Depends(get_db),
+):
+    """
+    Update permitted user profile fields (full name, role, institution association).
+    Restricted to SYSTEM_ADMIN. Enforces last-administrator protection.
+    """
+    verify_csrf_origin(request)
+    client_ip = request.client.host if request.client else None
+    request_id = request.headers.get("x-request-id")
+
+    return update_user_profile(
+        db=db,
+        current_admin=current_admin,
+        user_id=user_id,
+        full_name=payload.full_name,
+        role=payload.role,
+        institution_id=payload.institution_id,
+        request_ip=client_ip,
+        request_id=request_id,
+    )
+
+
+@router.post("/users/{user_id}/status", response_model=UserRead)
+def toggle_user_status(
+    user_id: str,
+    payload: UserStatusUpdate,
+    request: Request,
+    current_admin: User = Depends(require_roles(ROLE_SYSTEM_ADMIN)),
+    db: Session = Depends(get_db),
+):
+    """
+    Activate or deactivate a user account.
+    Restricted to SYSTEM_ADMIN.
+    Enforces last-administrator protection to prevent accidental lockout of all admins.
+    """
+    verify_csrf_origin(request)
+    client_ip = request.client.host if request.client else None
+    request_id = request.headers.get("x-request-id")
+
+    return set_user_status(
+        db=db,
+        current_admin=current_admin,
+        user_id=user_id,
+        is_active=payload.is_active,
+        reason=payload.reason,
+        request_ip=client_ip,
+        request_id=request_id,
+    )
+
+
+@router.post("/users/{user_id}/reset-password", response_model=UserResetPasswordResponse)
+def reset_user_password(
+    user_id: str,
+    payload: UserResetPasswordRequest,
+    request: Request,
+    current_admin: User = Depends(require_roles(ROLE_SYSTEM_ADMIN)),
+    db: Session = Depends(get_db),
+):
+    """
+    Administrative password reset procedure.
+    Sets temporary password and forces must_change_password on next login.
+    Returns temporary password in response for the administrator to securely communicate.
+    Never stores or logs raw password or secret in audit logs.
+    """
+    verify_csrf_origin(request)
+    client_ip = request.client.host if request.client else None
+    request_id = request.headers.get("x-request-id")
+
+    temp_pwd = admin_reset_user_password(
+        db=db,
+        current_admin=current_admin,
+        user_id=user_id,
+        temporary_password=payload.temporary_password,
+        request_ip=client_ip,
+        request_id=request_id,
+    )
+
+    return UserResetPasswordResponse(
+        success=True,
+        message="Password reset successfully. The temporary password must be changed upon next user login.",
+        temporary_password=temp_pwd,
+        must_change_password=True,
+    )
