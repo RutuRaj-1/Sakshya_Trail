@@ -38,10 +38,21 @@ class VerificationChannel(str, Enum):
     Verification transmission channel / mode.
     Simulated responses must NEVER promote trust level to L3.
     """
-    SIMULATED = "SIMULATED"
-    SFTP_BATCH = "SFTP_BATCH"
-    DIRECT_API = "DIRECT_API"
+    MANUAL = "MANUAL"
     AUTHORIZED_MANUAL = "AUTHORIZED_MANUAL"
+    SIMULATED = "SIMULATED"
+    LIVE_BANK_API = "LIVE_BANK_API"
+    DIRECT_API = "DIRECT_API"
+    SFTP_BATCH = "SFTP_BATCH"
+
+
+class SourceClassification(str, Enum):
+    """
+    Classification of verification source evidence.
+    """
+    AUTHORIZED_BANK_RESPONSE = "AUTHORIZED_BANK_RESPONSE"
+    MANUAL_EVIDENCE = "MANUAL_EVIDENCE"
+    SIMULATION = "SIMULATION"
 
 
 class VerificationResult(str, Enum):
@@ -50,15 +61,30 @@ class VerificationResult(str, Enum):
     """
     MATCH = "MATCH"
     MISMATCH = "MISMATCH"
+    INCONCLUSIVE = "INCONCLUSIVE"
+    TIMEOUT = "TIMEOUT"
+    SOURCE_UNAVAILABLE = "SOURCE_UNAVAILABLE"
+    ERROR = "ERROR"
     INDETERMINATE = "INDETERMINATE"
 
 
 class VerificationRequestStatus(str, Enum):
     """
-    Lifecycle status of a verification request.
+    Documented lifecycle statuses of a verification request.
+    Never marks a request MATCH before a qualifying response is recorded.
     """
-    REQUESTED = "REQUESTED"
+    DRAFT = "DRAFT"
     PENDING = "PENDING"
+    SENT = "SENT"
+    RESPONSE_RECEIVED = "RESPONSE_RECEIVED"
+    MATCH = "MATCH"
+    MISMATCH = "MISMATCH"
+    TIMEOUT = "TIMEOUT"
+    SOURCE_UNAVAILABLE = "SOURCE_UNAVAILABLE"
+    CANCELLED = "CANCELLED"
+    CLOSED = "CLOSED"
+    # Legacy/compatibility aliases
+    REQUESTED = "REQUESTED"
     COMPLETED = "COMPLETED"
     FAILED = "FAILED"
     EXPIRED = "EXPIRED"

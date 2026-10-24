@@ -1,8 +1,12 @@
 """
 Module 4 — Trust, Provenance & Verification Desk
 API Router
-Provides endpoints for field-level provenance, trust state assessments,
-durable transition history, and verification requests/responses.
+Provides versioned REST endpoints for:
+- Field-level provenance and history
+- Evidentiary trust assessments and transitions
+- Verification requests, dispatches, retries, cancellations
+- Manual external evidence recording
+- Verification response ingestion and comparison review
 """
 from typing import List, Optional
 from fastapi import APIRouter, Depends, Query, Request, status
@@ -19,17 +23,18 @@ from app.modules.auth.dependencies import (
 from app.modules.instruments.models import Instrument
 from app.modules.verification.schemas import (
     FieldProvenanceResponse,
-    RecordFieldProvenanceRequest,
     TrustAssessmentResponse,
     TrustTransitionRequest,
     TrustTransitionHistoryResponse,
     VerificationRequestCreate,
     VerificationRequestResponse,
-    VerificationResponseCreate,
     VerificationResponseOut,
+    VerificationDispatchAction,
+    ManualVerificationRecordRequest,
+    VerificationRetryRequest,
+    VerificationCancelRequest,
 )
 from app.modules.verification.provenance_service import (
-    record_field_provenance,
     get_active_field_provenances,
     get_field_provenance_history,
 )
@@ -37,8 +42,16 @@ from app.modules.verification.trust_service import (
     transition_trust_level,
     get_active_trust_assessments,
     get_trust_transition_history,
+)
+from app.modules.verification.verification_service import (
     create_verification_request,
-    record_verification_response,
+    list_instrument_verification_requests,
+    get_verification_request_by_id,
+    dispatch_verification_request,
+    record_manual_verification_result,
+    retry_verification_request,
+    cancel_verification_request,
+    get_verification_response_by_id,
 )
 
 router = APIRouter(prefix="/verification", tags=["Trust & Verification"])
@@ -54,6 +67,10 @@ def _assert_instrument_tenant_access(instrument: Instrument, current_user: User)
                 code="FORBIDDEN_CROSS_TENANT_ACCESS",
             )
 
+
+# ---------------------------------------------------------------------------
+# Provenance Endpoints
+# ---------------------------------------------------------------------------
 
 @router.get(
     "/instruments/{instrument_id}/provenance",
@@ -99,6 +116,10 @@ def get_field_provenance_chain(
     _assert_instrument_tenant_access(instrument, current_user)
     return get_field_provenance_history(db=db, instrument_id=instrument_id, field_name=field_name)
 
+
+# ---------------------------------------------------------------------------
+# Trust State Endpoints
+# ---------------------------------------------------------------------------
 
 @router.get(
     "/instruments/{instrument_id}/trust",
@@ -177,52 +198,189 @@ def execute_trust_transition(
     )
 
 
+# ---------------------------------------------------------------------------
+# Verification Request Endpoints
+# ---------------------------------------------------------------------------
+
 @router.post(
-    "/requests",
+    "/instruments/{instrument_id}/requests",
     response_model=VerificationRequestResponse,
     status_code=status.HTTP_201_CREATED,
-    summary="Create a verification request",
+    summary="Create a verification request for an instrument",
 )
-def create_request(
+def create_request_for_instrument(
+    instrument_id: str,
     payload: VerificationRequestCreate,
+    request: Request,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user),
     _csrf: None = Depends(verify_csrf_origin),
 ):
-    """Dispatches a bank or external verification request."""
+    """Dispatches a bank or external verification request for an instrument."""
+    client_ip = request.client.host if request.client else None
     return create_verification_request(
         db=db,
-        instrument_id=payload.instrument_id,
+        instrument_id=instrument_id,
         channel=payload.channel,
-        requested_by_user=current_user,
+        requested_fields=payload.requested_fields,
+        correlation_id=payload.correlation_id,
         notes=payload.notes,
+        current_user=current_user,
+        request_ip=client_ip,
+    )
+
+
+@router.get(
+    "/instruments/{instrument_id}/requests",
+    response_model=List[VerificationRequestResponse],
+    summary="List verification requests for an instrument",
+)
+def list_requests_for_instrument(
+    instrument_id: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+):
+    """Lists all verification requests associated with the given instrument."""
+    return list_instrument_verification_requests(
+        db=db, instrument_id=instrument_id, current_user=current_user
+    )
+
+
+@router.get(
+    "/requests/{request_id}",
+    response_model=VerificationRequestResponse,
+    summary="Get verification request details and history",
+)
+def get_request_details(
+    request_id: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+):
+    """Retrieves a specific verification request with its history and associated responses."""
+    return get_verification_request_by_id(
+        db=db, request_id=request_id, current_user=current_user
     )
 
 
 @router.post(
-    "/responses",
+    "/requests/{request_id}/dispatch",
     response_model=VerificationResponseOut,
     status_code=status.HTTP_201_CREATED,
-    summary="Record a verification response",
+    summary="Dispatch a verification request through configured adapter",
 )
-def record_response(
-    payload: VerificationResponseCreate,
+def dispatch_request(
+    request_id: str,
+    payload: VerificationDispatchAction,
+    request: Request,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user),
     _csrf: None = Depends(verify_csrf_origin),
 ):
-    """Records an incoming bank or adapter verification response with simulation flag integrity."""
-    return record_verification_response(
+    """Executes the adapter dispatch and ingests the resulting confirmation response."""
+    client_ip = request.client.host if request.client else None
+    return dispatch_verification_request(
         db=db,
-        request_id=payload.request_id,
-        channel=payload.channel,
+        request_id=request_id,
+        current_user=current_user,
+        scenario=payload.scenario,
+        request_ip=client_ip,
+    )
+
+
+@router.post(
+    "/requests/{request_id}/manual-record",
+    response_model=VerificationResponseOut,
+    status_code=status.HTTP_201_CREATED,
+    summary="Record manual external verification evidence",
+)
+def record_manual_evidence(
+    request_id: str,
+    payload: ManualVerificationRecordRequest,
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+    _csrf: None = Depends(verify_csrf_origin),
+):
+    """Records an authorized officer's external manual verification letter or certificate."""
+    client_ip = request.client.host if request.client else None
+    return record_manual_verification_result(
+        db=db,
+        request_id=request_id,
+        external_reference=payload.external_reference,
+        communication_date=payload.communication_date,
         result=payload.result,
-        is_simulated=payload.is_simulated,
-        idempotency_key=payload.idempotency_key,
-        recorded_by_user=current_user,
-        bank_reference_number=payload.bank_reference_number,
-        bank_values=payload.bank_values,
-        evidence_document_id=payload.evidence_document_id,
+        reason=payload.reason,
         evidence_document_version_id=payload.evidence_document_version_id,
-        notes=payload.notes,
+        bank_values=payload.bank_values,
+        current_user=current_user,
+        request_ip=client_ip,
+    )
+
+
+@router.post(
+    "/requests/{request_id}/retry",
+    response_model=VerificationResponseOut,
+    status_code=status.HTTP_201_CREATED,
+    summary="Retry a timed-out or unavailable verification request",
+)
+def retry_request(
+    request_id: str,
+    payload: VerificationRetryRequest,
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+    _csrf: None = Depends(verify_csrf_origin),
+):
+    """Retries a verification request within bounded attempt limits."""
+    client_ip = request.client.host if request.client else None
+    return retry_verification_request(
+        db=db,
+        request_id=request_id,
+        current_user=current_user,
+        scenario=payload.scenario,
+        request_ip=client_ip,
+    )
+
+
+@router.post(
+    "/requests/{request_id}/cancel",
+    response_model=VerificationRequestResponse,
+    summary="Cancel or close a verification request",
+)
+def cancel_request(
+    request_id: str,
+    payload: VerificationCancelRequest,
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+    _csrf: None = Depends(verify_csrf_origin),
+):
+    """Cancels an active or pending verification request with mandatory officer reason."""
+    client_ip = request.client.host if request.client else None
+    return cancel_verification_request(
+        db=db,
+        request_id=request_id,
+        reason=payload.reason,
+        current_user=current_user,
+        request_ip=client_ip,
+    )
+
+
+# ---------------------------------------------------------------------------
+# Verification Response Details Endpoints
+# ---------------------------------------------------------------------------
+
+@router.get(
+    "/responses/{response_id}",
+    response_model=VerificationResponseOut,
+    summary="Get verification response and field comparison details",
+)
+def get_response_details(
+    response_id: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+):
+    """Retrieves full details of a verification response including field-by-field comparisons."""
+    return get_verification_response_by_id(
+        db=db, response_id=response_id, current_user=current_user
     )

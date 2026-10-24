@@ -136,6 +136,24 @@ class VerificationRequest(Base, TimestampMixin):
     # Frozen JSON snapshot of instrument fields at dispatch time
     snapshot_data_json: Mapped[str] = mapped_column(Text, nullable=False)
 
+    # Requested fields subset (JSON list)
+    requested_fields_json: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
+    # Correlation / external idempotency tracking
+    correlation_id: Mapped[Optional[str]] = mapped_column(String(100), index=True, nullable=True)
+
+    # Attempt and retry tracking
+    attempt_count: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
+    last_attempt_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    next_retry_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+
+    # Error and failure diagnostics
+    error_details: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
+    # Expiry and closure metadata
+    closed_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    closed_reason: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+
     requested_by_user_id: Mapped[Optional[str]] = mapped_column(
         String(36), ForeignKey("users.id", ondelete="SET NULL"), nullable=True
     )
@@ -165,13 +183,24 @@ class VerificationResponse(Base):
         String(36), ForeignKey("verification_requests.id", ondelete="CASCADE"), index=True, nullable=False
     )
 
+    # Matching request code (asserted equal to request.reference_code)
+    request_code: Mapped[Optional[str]] = mapped_column(String(100), index=True, nullable=True)
+
     instrument_id: Mapped[str] = mapped_column(
         String(36), ForeignKey("instruments.id", ondelete="CASCADE"), index=True, nullable=False
     )
 
     channel: Mapped[str] = mapped_column(String(50), nullable=False)
 
-    # Outcome: MATCH, MISMATCH, INDETERMINATE
+    # Source classification: AUTHORIZED_BANK_RESPONSE, MANUAL_EVIDENCE, SIMULATION
+    source_classification: Mapped[str] = mapped_column(
+        String(50), default="SIMULATION", index=True, nullable=False
+    )
+
+    # Source identifier or institution label
+    source_identifier: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+
+    # Outcome: MATCH, MISMATCH, INDETERMINATE, TIMEOUT, SOURCE_UNAVAILABLE, ERROR
     result: Mapped[str] = mapped_column(String(50), index=True, nullable=False)
 
     # Official external confirmation identifier
@@ -180,7 +209,15 @@ class VerificationResponse(Base):
     # Structured bank response attributes
     bank_values_json: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
+    # Field-by-field comparison outcome
+    field_comparisons_json: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
     responded_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=get_utc_now, nullable=False
+    )
+
+    # Receipt timestamp
+    received_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=get_utc_now, nullable=False
     )
 
@@ -191,6 +228,7 @@ class VerificationResponse(Base):
     evidence_document_version_id: Mapped[Optional[str]] = mapped_column(
         String(36), ForeignKey("document_versions.id", ondelete="SET NULL"), nullable=True
     )
+    evidence_references_json: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
     # Strict simulation flag: Must be True if channel == SIMULATED
     is_simulated: Mapped[bool] = mapped_column(Boolean, default=False, index=True, nullable=False)
@@ -201,6 +239,10 @@ class VerificationResponse(Base):
     recorded_by_user_id: Mapped[Optional[str]] = mapped_column(
         String(36), ForeignKey("users.id", ondelete="SET NULL"), nullable=True
     )
+    recorded_by_service: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+
+    # Safe raw metadata (sanitized)
+    raw_metadata_json: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
     notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
@@ -215,7 +257,7 @@ class VerificationResponse(Base):
             name="ck_vr_sim_consistency"
         ),
         CheckConstraint(
-            "(channel != 'AUTHORIZED_MANUAL' OR evidence_document_version_id IS NOT NULL OR evidence_document_id IS NOT NULL)",
+            "(channel NOT IN ('MANUAL', 'AUTHORIZED_MANUAL') OR evidence_document_version_id IS NOT NULL OR evidence_document_id IS NOT NULL OR notes IS NOT NULL)",
             name="ck_vr_manual_evidence"
         ),
     )

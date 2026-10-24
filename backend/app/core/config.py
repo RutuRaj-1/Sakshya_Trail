@@ -76,7 +76,11 @@ class Settings(BaseSettings):
     FIREBASE_MESSAGING_SENDER_ID: str = "2017740195"
     FIREBASE_APP_ID: str = "1:2017740195:web:ed1355f7fd21cd3ad80616"
     FIREBASE_MEASUREMENT_ID: str = "G-YYNCY2BVT9"
-    FIREBASE_CREDENTIALS_PATH: str = ""
+    # Module 4: Verification Desk & Adapter Settings
+    ENABLE_SIMULATED_VERIFICATION: bool = True  # Disabled in production
+    LIVE_BANK_ADAPTER_ENABLED: bool = False     # Unconfigured until live bank partnership is authorized
+    MAX_VERIFICATION_RETRY_ATTEMPTS: int = 3
 
 
 settings = Settings()
+
