@@ -47,7 +47,7 @@ class ErrorResponse(BaseModel):
     success: bool = False
     error: str
     code: str = "INTERNAL_ERROR"
-    details: Optional[List[ErrorDetail]] = None
+    details: Optional[Any] = None
     timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 

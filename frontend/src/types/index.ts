@@ -100,40 +100,72 @@ export interface InstitutionListResponse {
   limit: number;
 }
 
-export type FDRStatus = 
-  | 'DRAFT'
-  | 'SUBMITTED'
-  | 'UNDER_SCRUTINY'
-  | 'VERIFIED'
-  | 'ACTIVE'
-  | 'MATURED'
-  | 'RENEWED'
-  | 'RELEASE_REQUESTED'
-  | 'RELEASED';
+export type TrustLevel =
+  | 'L0_DECLARED'
+  | 'L1_DOCUMENT_CONSISTENT'
+  | 'L2_OFFICER_VERIFIED'
+  | 'L3_BANK_CONFIRMED';
 
-export type VerificationLevel = 
-  | 'L1_DECLARED'
-  | 'L2_DOCUMENT_CONSISTENT'
-  | 'L3_OFFICER_VERIFIED'
-  | 'L4_BANK_CONFIRMED';
+export type MaturityIndicator =
+  | 'ACTIVE'
+  | 'EXPIRING_SOON'
+  | 'EXPIRED';
 
 export interface Instrument {
   id: string;
   institution_id: string;
+  institution_code?: string | null;
+  institution_name?: string | null;
+  instrument_type: string;
   reference_number: string;
   bank_name: string;
-  branch?: string;
-  amount: number;
+  branch?: string | null;
+  amount: string | number;
   currency: string;
   issue_date: string;
   maturity_date: string;
-  status: FDRStatus;
-  verification_level: VerificationLevel;
+  maturity_indicator: MaturityIndicator;
+  lien_holder?: string | null;
+  lien_details?: string | null;
+  assigned_office?: string | null;
+  status: string; // Administrative workflow status: DRAFT, REGISTERED
+  trust_level: TrustLevel; // Separate trust hierarchy: L0, L1, L2, L3
+  verification_level: string; // Compatibility alias for trust_level
   joint_with_aicte: boolean;
   lien_marked: boolean;
-  remarks?: string;
+  is_synthetic: boolean;
+  created_by_user_id?: string | null;
+  updated_by_user_id?: string | null;
+  remarks?: string | null;
   created_at: string;
   updated_at: string;
+}
+
+export interface InstrumentListResponse {
+  items: Instrument[];
+  total: number;
+  skip: number;
+  limit: number;
+}
+
+export interface DuplicateMatch {
+  id: string;
+  reference_number: string;
+  bank_name: string;
+  institution_id: string;
+  institution_name?: string | null;
+  institution_code?: string | null;
+  amount: string | number;
+  issue_date: string;
+  maturity_date: string;
+  status: string;
+  trust_level: string;
+  created_at: string;
+}
+
+export interface DuplicateWarningDetail {
+  warning_message: string;
+  matching_records: DuplicateMatch[];
 }
 
 export interface InstrumentSummary {
@@ -142,5 +174,5 @@ export interface InstrumentSummary {
   expiring_soon_count: number;
   under_scrutiny_count: number;
   released_count: number;
-  total_deposit_value: number;
+  total_deposit_value: string | number;
 }

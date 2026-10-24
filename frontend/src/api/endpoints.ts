@@ -6,6 +6,7 @@ import type {
   Institution,
   InstitutionListResponse,
   Instrument,
+  InstrumentListResponse,
   InstrumentSummary,
   User,
   UserListResponse,
@@ -98,14 +99,36 @@ export const usersApi = {
 };
 
 export const instrumentsApi = {
-  list: (params?: { institution_id?: string; status?: string }) => {
+  list: (params?: {
+    search?: string;
+    institution_id?: string;
+    status?: string;
+    trust_level?: string;
+    maturity_start?: string;
+    maturity_end?: string;
+    sort_by?: string;
+    sort_order?: string;
+    skip?: number;
+    limit?: number;
+  }) => {
     const sp = new URLSearchParams();
+    if (params?.search) sp.append('search', params.search);
     if (params?.institution_id) sp.append('institution_id', params.institution_id);
     if (params?.status) sp.append('status', params.status);
+    if (params?.trust_level) sp.append('trust_level', params.trust_level);
+    if (params?.maturity_start) sp.append('maturity_start', params.maturity_start);
+    if (params?.maturity_end) sp.append('maturity_end', params.maturity_end);
+    if (params?.sort_by) sp.append('sort_by', params.sort_by);
+    if (params?.sort_order) sp.append('sort_order', params.sort_order);
+    if (params?.skip !== undefined) sp.append('skip', String(params.skip));
+    if (params?.limit !== undefined) sp.append('limit', String(params.limit));
     const query = sp.toString() ? `?${sp.toString()}` : '';
-    return apiClient.get<Instrument[]>(`/instruments${query}`);
+    return apiClient.get<InstrumentListResponse>(`/instruments${query}`);
   },
-  getSummary: () => apiClient.get<InstrumentSummary>('/instruments/summary'),
-  create: (data: Partial<Instrument>) =>
+  get: (id: string) => apiClient.get<Instrument>(`/instruments/${id}`),
+  create: (data: Partial<Instrument> & { confirm_duplicate?: boolean }) =>
     apiClient.post<Instrument>('/instruments', data),
+  update: (id: string, data: Partial<Instrument> & { confirm_duplicate?: boolean }) =>
+    apiClient.patch<Instrument>(`/instruments/${id}`, data),
+  getSummary: () => apiClient.get<InstrumentSummary>('/instruments/summary'),
 };

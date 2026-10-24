@@ -9,7 +9,7 @@ from app.common.schemas import ErrorResponse, ErrorDetail
 
 
 class AppException(Exception):
-    def __init__(self, message: str, status_code: int = 400, code: str = "BAD_REQUEST", details: Optional[List[ErrorDetail]] = None):
+    def __init__(self, message: str, status_code: int = 400, code: str = "BAD_REQUEST", details: Optional[Any] = None):
         super().__init__(message)
         self.message = message
         self.status_code = status_code

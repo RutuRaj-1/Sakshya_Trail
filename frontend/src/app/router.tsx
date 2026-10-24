@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { MainLayout } from '@/layouts/MainLayout';
 import { DashboardPage } from '@/app/routes/DashboardPage';
 import { InstrumentsPage } from '@/app/routes/InstrumentsPage';
+import { InstrumentDetailPage } from '@/app/routes/InstrumentDetailPage';
 import { InstitutionsPage } from '@/app/routes/InstitutionsPage';
 import { InstitutionDetailPage } from '@/app/routes/InstitutionDetailPage';
 import { UserAdminPage } from '@/app/routes/UserAdminPage';
@@ -39,6 +40,10 @@ export const router = createBrowserRouter([
       {
         path: 'instruments',
         element: <InstrumentsPage />,
+      },
+      {
+        path: 'instruments/:id',
+        element: <InstrumentDetailPage />,
       },
       {
         path: 'institutions',

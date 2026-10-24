@@ -101,14 +101,14 @@ def test_create_and_summarize_instruments(client: TestClient, db_session: Sessio
     assert create_instru.status_code == 201
     instru_data = create_instru.json()
     assert instru_data["reference_number"] == "FDR-SBI-2026-9901"
-    assert instru_data["amount"] == 2500000.00
+    assert float(instru_data["amount"]) == 2500000.00
 
     # Summary
     sum_res = client.get("/api/v1/instruments/summary")
     assert sum_res.status_code == 200
     summary = sum_res.json()
     assert summary["total_instruments"] >= 1
-    assert summary["total_deposit_value"] >= 2500000.00
+    assert float(summary["total_deposit_value"]) >= 2500000.00
 
 
 def test_audit_trail_listing(client: TestClient, db_session: Session):

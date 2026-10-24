@@ -45,6 +45,7 @@ class Institution(Base, TimestampMixin):
 
     # Relationships
     users: Mapped[List["User"]] = relationship("User", back_populates="institution", cascade="all, delete-orphan")
+    instruments: Mapped[List["Instrument"]] = relationship("Instrument", back_populates="institution", cascade="all, delete-orphan")
 
     # Compatibility properties for existing view layers
     @property

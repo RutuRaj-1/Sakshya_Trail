@@ -1,8 +1,18 @@
-import React from 'react';
-import { Instrument, VerificationLevel, FDRStatus } from '@/types';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import type { Instrument, TrustLevel, MaturityIndicator } from '@/types';
 import { Badge } from '@/components/common/Badge';
 import { formatINR, formatDate } from '@/lib/utils';
-import { ShieldCheck, AlertCircle, Building, Calendar, Hash } from 'lucide-react';
+import {
+  Building2,
+  Calendar,
+  Eye,
+  EyeOff,
+  Shield,
+  Clock,
+  AlertTriangle,
+  CheckCircle2,
+} from 'lucide-react';
 
 interface Props {
   instruments: Instrument[];
@@ -10,53 +20,92 @@ interface Props {
 }
 
 export const InstrumentsList: React.FC<Props> = ({ instruments, isLoading }) => {
-  const getVerificationBadge = (level: VerificationLevel) => {
-    switch (level) {
-      case 'L4_BANK_CONFIRMED':
-        return <Badge variant="purple">L4 Bank Confirmed</Badge>;
-      case 'L3_OFFICER_VERIFIED':
-        return <Badge variant="success">L3 Officer Verified</Badge>;
-      case 'L2_DOCUMENT_CONSISTENT':
-        return <Badge variant="info">L2 Doc Consistent</Badge>;
+  const navigate = useNavigate();
+  const [maskReferences, setMaskReferences] = useState(false);
+
+  const getTrustBadge = (trust: TrustLevel | string) => {
+    switch (trust) {
+      case 'L3_BANK_CONFIRMED':
+        return (
+          <span className="inline-flex items-center gap-1 font-mono text-[10px] font-bold px-2 py-0.5 rounded bg-purple-100 text-purple-800 border border-purple-200">
+            <Shield className="w-3 h-3 text-purple-700" />
+            <span>L3 — Bank Confirmed</span>
+          </span>
+        );
+      case 'L2_OFFICER_VERIFIED':
+        return (
+          <span className="inline-flex items-center gap-1 font-mono text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-200">
+            <Shield className="w-3 h-3 text-emerald-700" />
+            <span>L2 — Officer Verified</span>
+          </span>
+        );
+      case 'L1_DOCUMENT_CONSISTENT':
+        return (
+          <span className="inline-flex items-center gap-1 font-mono text-[10px] font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-800 border border-blue-200">
+            <Shield className="w-3 h-3 text-blue-700" />
+            <span>L1 — Doc Consistent</span>
+          </span>
+        );
+      case 'L0_DECLARED':
       default:
-        return <Badge variant="outline">L1 Declared</Badge>;
+        return (
+          <span className="inline-flex items-center gap-1 font-mono text-[10px] font-bold px-2 py-0.5 rounded bg-purple-50 text-purple-800 border border-purple-200">
+            <Shield className="w-3 h-3 text-purple-600" />
+            <span>L0 — Declared</span>
+          </span>
+        );
     }
   };
 
-  const getStatusBadge = (status: FDRStatus) => {
-    switch (status) {
+  const getMaturityBadge = (indicator: MaturityIndicator | string) => {
+    switch (indicator) {
+      case 'EXPIRED':
+        return (
+          <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded bg-rose-100 text-rose-800 border border-rose-200">
+            <AlertTriangle className="w-3 h-3 text-rose-600" />
+            <span>Expired Term</span>
+          </span>
+        );
+      case 'EXPIRING_SOON':
+        return (
+          <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-800 border border-amber-200">
+            <Clock className="w-3 h-3 text-amber-600" />
+            <span>Expiring &lt;90d</span>
+          </span>
+        );
       case 'ACTIVE':
-      case 'VERIFIED':
-        return <Badge variant="success">{status}</Badge>;
-      case 'UNDER_SCRUTINY':
-      case 'SUBMITTED':
-        return <Badge variant="info">{status}</Badge>;
-      case 'MATURED':
-      case 'RELEASE_REQUESTED':
-        return <Badge variant="warning">{status}</Badge>;
-      case 'RELEASED':
-        return <Badge variant="default">{status}</Badge>;
       default:
-        return <Badge variant="outline">{status}</Badge>;
+        return (
+          <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200">
+            <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+            <span>Active Term</span>
+          </span>
+        );
     }
+  };
+
+  const maskRef = (ref: string) => {
+    if (!maskReferences) return ref;
+    if (ref.length <= 6) return '••••••';
+    return `${ref.slice(0, 3)}••••${ref.slice(-4)}`;
   };
 
   if (isLoading) {
     return (
-      <div className="bg-white rounded-xl border border-slate-200 p-8 text-center text-slate-500">
+      <div className="bg-white rounded-xl border border-slate-200 p-12 text-center text-slate-500 shadow-xs">
         <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-slate-200 border-t-sentinel-600 mb-3" />
-        <p className="text-sm">Loading security deposit registry...</p>
+        <p className="text-sm font-medium">Loading security deposit registry records...</p>
       </div>
     );
   }
 
   if (instruments.length === 0) {
     return (
-      <div className="bg-white rounded-xl border border-slate-200 p-12 text-center">
-        <ShieldCheck className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-        <h3 className="text-base font-semibold text-slate-800">No Instruments Registered</h3>
-        <p className="text-sm text-slate-500 max-w-sm mx-auto mt-1">
-          No FDR instruments are recorded yet. You can submit initial test FDRs using the backend seed scripts or the submission action.
+      <div className="bg-white rounded-xl border border-slate-200 p-12 text-center shadow-xs">
+        <Shield className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+        <h3 className="text-base font-semibold text-slate-800">No Instruments Listed</h3>
+        <p className="text-xs text-slate-500 max-w-sm mx-auto mt-1">
+          No security deposit FDR certificates match the current filters or authorized scope.
         </p>
       </div>
     );
@@ -64,59 +113,105 @@ export const InstrumentsList: React.FC<Props> = ({ instruments, isLoading }) => 
 
   return (
     <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-xs">
+      {/* Table Subtoolbar */}
+      <div className="px-4 py-2.5 bg-slate-50/80 border-b border-slate-200 flex items-center justify-between text-xs text-slate-500">
+        <span className="font-semibold text-slate-700">
+          Showing {instruments.length} Statutory Instrument Records
+        </span>
+        <button
+          onClick={() => setMaskReferences(!maskReferences)}
+          className="inline-flex items-center gap-1 text-[11px] text-slate-600 hover:text-slate-900 font-medium px-2 py-1 rounded hover:bg-slate-200/60 transition-colors"
+        >
+          {maskReferences ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
+          <span>{maskReferences ? 'Reveal References' : 'Mask References'}</span>
+        </button>
+      </div>
+
       <div className="overflow-x-auto">
-        <table className="w-full text-left text-sm text-slate-700">
-          <thead className="bg-slate-50 border-b border-slate-200 text-xs uppercase font-semibold text-slate-500 tracking-wider">
+        <table className="w-full text-left text-xs text-slate-700">
+          <thead className="bg-slate-50 border-b border-slate-200 uppercase font-semibold text-slate-500 tracking-wider">
             <tr>
               <th className="py-3 px-4">Receipt Ref / Bank</th>
-              <th className="py-3 px-4">Principal Amount</th>
-              <th className="py-3 px-4">Maturity Date</th>
+              <th className="py-3 px-4">Institution Entity</th>
+              <th className="py-3 px-4">Deposit Principal</th>
+              <th className="py-3 px-4">Term Dates</th>
+              <th className="py-3 px-4">Maturity Window</th>
+              <th className="py-3 px-4">Administrative Status</th>
               <th className="py-3 px-4">Trust Level</th>
-              <th className="py-3 px-4">Status</th>
-              <th className="py-3 px-4">Joint AICTE Lien</th>
+              <th className="py-3 px-4 text-right">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100 font-normal">
+          <tbody className="divide-y divide-slate-100">
             {instruments.map((inst) => (
               <tr key={inst.id} className="hover:bg-slate-50/70 transition-colors">
-                <td className="py-3.5 px-4">
-                  <div className="font-medium text-slate-900 font-mono text-xs flex items-center gap-1.5">
-                    <Hash className="w-3.5 h-3.5 text-slate-400" />
-                    {inst.reference_number}
+                {/* Ref & Bank */}
+                <td className="py-3 px-4">
+                  <div className="font-mono font-bold text-slate-900 text-xs">
+                    {maskRef(inst.reference_number)}
                   </div>
-                  <div className="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
-                    <Building className="w-3 h-3 text-slate-400" />
-                    {inst.bank_name} {inst.branch ? `· ${inst.branch}` : ''}
-                  </div>
-                </td>
-                <td className="py-3.5 px-4 font-semibold text-slate-900">
-                  {formatINR(inst.amount)}
-                </td>
-                <td className="py-3.5 px-4">
-                  <div className="text-xs text-slate-700 flex items-center gap-1">
-                    <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                    {formatDate(inst.maturity_date)}
-                  </div>
-                  <div className="text-[11px] text-slate-400">
-                    Issued: {formatDate(inst.issue_date)}
-                  </div>
-                </td>
-                <td className="py-3.5 px-4">
-                  {getVerificationBadge(inst.verification_level)}
-                </td>
-                <td className="py-3.5 px-4">
-                  {getStatusBadge(inst.status)}
-                </td>
-                <td className="py-3.5 px-4 text-xs">
-                  {inst.joint_with_aicte && inst.lien_marked ? (
-                    <span className="inline-flex items-center text-emerald-700 font-medium text-xs">
-                      <ShieldCheck className="w-3.5 h-3.5 mr-1 text-emerald-600" /> Lien Active
+                  <div className="text-[11px] text-slate-500 flex items-center gap-1 mt-0.5">
+                    <Building2 className="w-3 h-3 text-slate-400" />
+                    <span>
+                      {inst.bank_name} {inst.branch ? `· ${inst.branch}` : ''}
                     </span>
-                  ) : (
-                    <span className="inline-flex items-center text-amber-700 font-medium text-xs">
-                      <AlertCircle className="w-3.5 h-3.5 mr-1 text-amber-600" /> Unconfirmed Lien
-                    </span>
+                  </div>
+                </td>
+
+                {/* Institution */}
+                <td className="py-3 px-4">
+                  <div className="font-medium text-slate-800">
+                    {inst.institution_name || 'AICTE Regulated Entity'}
+                  </div>
+                  {inst.institution_code && (
+                    <div className="font-mono text-[10px] text-sentinel-700 font-semibold">
+                      {inst.institution_code}
+                    </div>
                   )}
+                </td>
+
+                {/* Amount */}
+                <td className="py-3 px-4 font-bold text-slate-900 font-mono text-xs">
+                  {formatINR(Number(inst.amount))}
+                </td>
+
+                {/* Term Dates */}
+                <td className="py-3 px-4 font-mono text-[11px] text-slate-600">
+                  <div className="flex items-center gap-1">
+                    <Calendar className="w-3 h-3 text-slate-400" />
+                    <span>Mat: {formatDate(inst.maturity_date)}</span>
+                  </div>
+                  <div className="text-[10px] text-slate-400">
+                    Iss: {formatDate(inst.issue_date)}
+                  </div>
+                </td>
+
+                {/* Concept 3: Derived Maturity Window */}
+                <td className="py-3 px-4">
+                  {getMaturityBadge(inst.maturity_indicator)}
+                </td>
+
+                {/* Concept 1: Administrative Status */}
+                <td className="py-3 px-4">
+                  <Badge variant={inst.status === 'REGISTERED' ? 'info' : 'default'}>
+                    {inst.status}
+                  </Badge>
+                </td>
+
+                {/* Concept 2: Trust Level */}
+                <td className="py-3 px-4">
+                  {getTrustBadge(inst.trust_level)}
+                </td>
+
+                {/* Actions */}
+                <td className="py-3 px-4 text-right">
+                  <button
+                    onClick={() => navigate(`/instruments/${inst.id}`)}
+                    className="p-1.5 text-slate-600 hover:text-sentinel-700 hover:bg-sentinel-50 rounded-lg transition-colors inline-flex items-center gap-1 font-semibold"
+                    title="View Full Instrument Profile"
+                  >
+                    <Eye className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">Details</span>
+                  </button>
                 </td>
               </tr>
             ))}

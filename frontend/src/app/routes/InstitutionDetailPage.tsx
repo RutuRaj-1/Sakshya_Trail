@@ -1,9 +1,11 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { institutionsApi } from '@/api/endpoints';
-import type { Institution } from '@/types';
+import { institutionsApi, instrumentsApi } from '@/api/endpoints';
+import type { Institution, Instrument } from '@/types';
 import { Badge } from '@/components/common/Badge';
+import { formatINR, formatDate } from '@/lib/utils';
 import { InstitutionModal } from '@/features/institutions/InstitutionModal';
+import { InstrumentModal } from '@/features/instruments/InstrumentModal';
 import { useAuth } from '@/features/auth/AuthContext';
 import {
   Building2,
@@ -17,6 +19,9 @@ import {
   FileSpreadsheet,
   AlertCircle,
   Briefcase,
+  Plus,
+  Eye,
+  Shield,
 } from 'lucide-react';
 
 export const InstitutionDetailPage: React.FC = () => {
@@ -27,27 +32,33 @@ export const InstitutionDetailPage: React.FC = () => {
   const isInstitutionUser = user?.role === 'INSTITUTION_USER';
 
   const [institution, setInstitution] = useState<Institution | null>(null);
+  const [instruments, setInstruments] = useState<Instrument[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // Edit Modal
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isAddInstrumentOpen, setIsAddInstrumentOpen] = useState(false);
 
   // Status toggle confirmation
   const [showStatusConfirm, setShowStatusConfirm] = useState(false);
   const [statusReason, setStatusReason] = useState('');
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
 
-  const loadInstitution = useCallback(async () => {
+  const loadData = useCallback(async () => {
     if (!id) return;
     setIsLoading(true);
     setError(null);
     try {
-      const data = await institutionsApi.get(id);
-      setInstitution(data);
+      const [instData, instruRes] = await Promise.all([
+        institutionsApi.get(id),
+        instrumentsApi.list({ institution_id: id, limit: 50 }),
+      ]);
+      setInstitution(instData);
+      setInstruments(instruRes.items);
     } catch (err: any) {
       setError(
-        err?.response?.data?.message || err?.message || 'Failed to retrieve institution record.'
+        err?.response?.data?.message || err?.message || 'Failed to retrieve institution records.'
       );
     } finally {
       setIsLoading(false);
@@ -55,8 +66,8 @@ export const InstitutionDetailPage: React.FC = () => {
   }, [id]);
 
   useEffect(() => {
-    loadInstitution();
-  }, [loadInstitution]);
+    loadData();
+  }, [loadData]);
 
   const handleToggleStatus = async () => {
     if (!institution || isUpdatingStatus) return;
@@ -65,7 +76,7 @@ export const InstitutionDetailPage: React.FC = () => {
       const newStatus = !institution.is_active;
       await institutionsApi.setStatus(institution.id, newStatus, statusReason || undefined);
       setShowStatusConfirm(false);
-      await loadInstitution();
+      await loadData();
     } catch (err: any) {
       alert(err?.response?.data?.message || err?.message || 'Status update failed.');
     } finally {
@@ -101,6 +112,7 @@ export const InstitutionDetailPage: React.FC = () => {
 
   const isOwnInstitution = isInstitutionUser && user?.institution_id === institution.id;
   const canEdit = isSystemAdmin || isOwnInstitution;
+  const canRecordFDR = ['SYSTEM_ADMIN', 'SCRUTINY_OFFICER'].includes(user?.role || '') || isOwnInstitution;
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto text-xs">
@@ -264,39 +276,118 @@ export const InstitutionDetailPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Linked Instruments Section (Placeholder for Prompt 4) */}
+      {/* Linked Instruments Section (Connected to Real Instrument Registry) */}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <FileSpreadsheet className="w-5 h-5 text-sentinel-600" />
             <h2 className="text-sm font-bold text-slate-900">
-              Linked Statutory FDR Instruments
+              Linked Statutory FDR Instruments ({instruments.length})
             </h2>
           </div>
-          <span className="text-[11px] font-mono bg-slate-100 text-slate-600 px-2 py-0.5 rounded">
-            Module 2 Lifecycle Integration
-          </span>
+          {canRecordFDR && (
+            <button
+              onClick={() => setIsAddInstrumentOpen(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-sentinel-600 hover:bg-sentinel-700 text-white font-semibold text-xs shadow-2xs transition-colors"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Record FDR for Institution</span>
+            </button>
+          )}
         </div>
 
-        <div className="p-8 text-center border-2 border-dashed border-slate-200 rounded-xl bg-slate-50/50">
-          <FileSpreadsheet className="w-10 h-10 text-slate-300 mx-auto mb-2" />
-          <h3 className="text-xs font-semibold text-slate-700">
-            No Security Deposit Instruments Linked
-          </h3>
-          <p className="text-[11px] text-slate-500 max-w-sm mx-auto mt-1">
-            Statutory FDR instruments, multi-party bank verification levels, and automated lien
-            checks for this institution will be managed through Module 2 (Prompt 4).
-          </p>
-        </div>
+        {instruments.length === 0 ? (
+          <div className="p-8 text-center border-2 border-dashed border-slate-200 rounded-xl bg-slate-50/50">
+            <FileSpreadsheet className="w-10 h-10 text-slate-300 mx-auto mb-2" />
+            <h3 className="text-xs font-semibold text-slate-700">
+              No Security Deposit Instruments Linked
+            </h3>
+            <p className="text-[11px] text-slate-500 max-w-sm mx-auto mt-1">
+              No security deposit certificates have been recorded for this institution yet. Authorized
+              officials may record new instruments using the action above.
+            </p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto rounded-xl border border-slate-200">
+            <table className="w-full text-left text-xs">
+              <thead className="bg-slate-50 border-b border-slate-200 uppercase font-semibold text-slate-500">
+                <tr>
+                  <th className="py-2.5 px-3">Reference / Bank</th>
+                  <th className="py-2.5 px-3">Deposit Principal</th>
+                  <th className="py-2.5 px-3">Maturity Date</th>
+                  <th className="py-2.5 px-3">Maturity Window</th>
+                  <th className="py-2.5 px-3">Trust Level</th>
+                  <th className="py-2.5 px-3">Status</th>
+                  <th className="py-2.5 px-3 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {instruments.map((instru) => (
+                  <tr key={instru.id} className="hover:bg-slate-50/70">
+                    <td className="py-2.5 px-3">
+                      <div className="font-mono font-bold text-slate-900">{instru.reference_number}</div>
+                      <div className="text-[10px] text-slate-500">{instru.bank_name}</div>
+                    </td>
+                    <td className="py-2.5 px-3 font-mono font-bold text-slate-900">
+                      {formatINR(Number(instru.amount))}
+                    </td>
+                    <td className="py-2.5 px-3 font-mono text-slate-700">
+                      {formatDate(instru.maturity_date)}
+                    </td>
+                    <td className="py-2.5 px-3">
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                        instru.maturity_indicator === 'ACTIVE'
+                          ? 'bg-emerald-100 text-emerald-800'
+                          : instru.maturity_indicator === 'EXPIRING_SOON'
+                          ? 'bg-amber-100 text-amber-800'
+                          : 'bg-rose-100 text-rose-800'
+                      }`}>
+                        {instru.maturity_indicator}
+                      </span>
+                    </td>
+                    <td className="py-2.5 px-3">
+                      <span className="inline-flex items-center gap-1 font-mono text-[10px] font-bold px-2 py-0.5 rounded bg-purple-50 text-purple-800 border border-purple-200">
+                        <Shield className="w-2.5 h-2.5 text-purple-600" />
+                        <span>{instru.trust_level}</span>
+                      </span>
+                    </td>
+                    <td className="py-2.5 px-3">
+                      <Badge variant={instru.status === 'REGISTERED' ? 'info' : 'default'}>
+                        {instru.status}
+                      </Badge>
+                    </td>
+                    <td className="py-2.5 px-3 text-right">
+                      <button
+                        onClick={() => navigate(`/instruments/${instru.id}`)}
+                        className="p-1 text-slate-600 hover:text-sentinel-700 rounded transition-colors inline-flex items-center gap-1 font-semibold"
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                        <span>View</span>
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
       {/* Edit Modal */}
       <InstitutionModal
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
-        onSuccess={loadInstitution}
+        onSuccess={loadData}
         institutionToEdit={institution}
         isInstitutionUser={isInstitutionUser}
+      />
+
+      {/* Record Instrument Modal */}
+      <InstrumentModal
+        isOpen={isAddInstrumentOpen}
+        onClose={() => setIsAddInstrumentOpen(false)}
+        onSuccess={loadData}
+        defaultInstitutionId={institution.id}
       />
 
       {/* Status Confirmation Modal */}

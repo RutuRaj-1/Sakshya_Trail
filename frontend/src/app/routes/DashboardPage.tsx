@@ -25,7 +25,7 @@ export const DashboardPage: React.FC = () => {
           instrumentsApi.list(),
         ]);
         if (sumRes.status === 'fulfilled') setSummary(sumRes.value);
-        if (listRes.status === 'fulfilled') setInstruments(listRes.value);
+        if (listRes.status === 'fulfilled') setInstruments(listRes.value.items);
       } finally {
         setIsLoading(false);
       }

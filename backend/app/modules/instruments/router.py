@@ -1,96 +1,160 @@
 """
 Instruments Module - API Router
-Provides listing, registration, and administrative dashboard metrics for FDRs.
+Versioned endpoints for instrument registry, search, retrieval, creation, and updating.
+Enforces role-based authorization dependencies and delegates business logic to the service layer.
 """
 from typing import List, Optional
-from datetime import date, timedelta
-from fastapi import APIRouter, Depends, Query, status
+from datetime import date
+from fastapi import APIRouter, Depends, Query, Request, status
 from sqlalchemy.orm import Session
-from sqlalchemy import select, func
+
 from app.db.session import get_db
-from app.modules.instruments.models import Instrument
+from app.modules.auth.models import User
+from app.modules.auth.dependencies import (
+    get_current_active_user,
+    verify_csrf_origin,
+)
 from app.modules.instruments.schemas import (
-    InstrumentRead,
+    InstrumentResponse,
     InstrumentCreate,
+    InstrumentUpdate,
+    InstrumentListResponse,
     InstrumentSummary,
+)
+from app.modules.instruments.service import (
+    list_instruments,
+    get_instrument_by_id,
+    create_instrument,
+    update_instrument,
+    get_instruments_summary,
 )
 
 router = APIRouter(prefix="/instruments", tags=["Instruments"])
 
 
-@router.get("", response_model=List[InstrumentRead])
-def list_instruments(
-    institution_id: Optional[str] = Query(None, description="Filter by institution"),
-    status_filter: Optional[str] = Query(None, alias="status", description="Filter by status"),
+@router.get("", response_model=InstrumentListResponse)
+def list_registered_instruments(
+    search: Optional[str] = Query(None, description="Search by reference, bank name, or institution"),
+    institution_id: Optional[str] = Query(None, description="Filter by parent institution ID"),
+    status_filter: Optional[str] = Query(None, alias="status", description="Filter by administrative status"),
+    trust_level: Optional[str] = Query(None, description="Filter by trust level (L0-L3)"),
+    maturity_start: Optional[date] = Query(None, description="Filter instruments maturing on or after date"),
+    maturity_end: Optional[date] = Query(None, description="Filter instruments maturing on or before date"),
+    sort_by: str = Query("created_at", description="Sort field: created_at, maturity_date, issue_date, amount, reference_number, bank_name"),
+    sort_order: str = Query("desc", description="Sort direction: asc or desc"),
+    skip: int = Query(0, ge=0, description="Pagination offset"),
+    limit: int = Query(50, ge=1, le=100, description="Page limit"),
+    current_user: User = Depends(get_current_active_user),
     db: Session = Depends(get_db),
 ):
-    """Retrieve financial instruments / FDR records."""
-    stmt = select(Instrument)
-    if institution_id:
-        stmt = stmt.where(Instrument.institution_id == institution_id)
-    if status_filter:
-        stmt = stmt.where(Instrument.status == status_filter)
-    results = db.scalars(stmt.limit(100)).all()
-    return results
-
-
-@router.post("", response_model=InstrumentRead, status_code=status.HTTP_201_CREATED)
-def create_instrument(
-    payload: InstrumentCreate,
-    db: Session = Depends(get_db),
-):
-    """Record an initial Fixed Deposit Receipt (FDR) deposit."""
-    inst = Instrument(
-        institution_id=payload.institution_id,
-        reference_number=payload.reference_number,
-        bank_name=payload.bank_name,
-        branch=payload.branch,
-        amount=payload.amount,
-        currency=payload.currency,
-        issue_date=payload.issue_date,
-        maturity_date=payload.maturity_date,
-        status=payload.status,
-        verification_level=payload.verification_level,
-        joint_with_aicte=payload.joint_with_aicte,
-        lien_marked=payload.lien_marked,
-        remarks=payload.remarks,
+    """
+    Retrieve registered financial instruments with pagination, search, filters, and allow-listed sorting.
+    Enforces record scoping for INSTITUTION_USER.
+    """
+    items, total = list_instruments(
+        db=db,
+        current_user=current_user,
+        search=search,
+        institution_id=institution_id,
+        status_filter=status_filter,
+        trust_level=trust_level,
+        maturity_start=maturity_start,
+        maturity_end=maturity_end,
+        sort_by=sort_by,
+        sort_order=sort_order,
+        skip=skip,
+        limit=limit,
     )
-    db.add(inst)
-    db.commit()
-    db.refresh(inst)
-    return inst
+    return InstrumentListResponse(
+        items=items,
+        total=total,
+        skip=skip,
+        limit=limit,
+    )
 
 
 @router.get("/summary", response_model=InstrumentSummary)
-def get_instruments_summary(db: Session = Depends(get_db)):
-    """Executive KPI metrics for administrative oversight."""
-    today = date.today()
-    in_90_days = today + timedelta(days=90)
+def get_summary_metrics(
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db),
+):
+    """
+    Executive summary metrics for statutory deposit oversight.
+    """
+    summary = get_instruments_summary(db=db, current_user=current_user)
+    return InstrumentSummary(**summary)
 
-    total_count = db.scalar(select(func.count(Instrument.id))) or 0
-    active_count = db.scalar(
-        select(func.count(Instrument.id)).where(Instrument.status.in_(["SUBMITTED", "VERIFIED", "ACTIVE"]))
-    ) or 0
-    expiring_soon = db.scalar(
-        select(func.count(Instrument.id)).where(
-            Instrument.maturity_date >= today,
-            Instrument.maturity_date <= in_90_days,
-            Instrument.status != "RELEASED",
-        )
-    ) or 0
-    scrutiny_count = db.scalar(
-        select(func.count(Instrument.id)).where(Instrument.status.in_(["UNDER_SCRUTINY", "SUBMITTED"]))
-    ) or 0
-    released_count = db.scalar(
-        select(func.count(Instrument.id)).where(Instrument.status == "RELEASED")
-    ) or 0
-    total_val = db.scalar(select(func.coalesce(func.sum(Instrument.amount), 0.0))) or 0.0
 
-    return InstrumentSummary(
-        total_instruments=total_count,
-        active_count=active_count,
-        expiring_soon_count=expiring_soon,
-        under_scrutiny_count=scrutiny_count,
-        released_count=released_count,
-        total_deposit_value=float(total_val),
+@router.get("/{instrument_id}", response_model=InstrumentResponse)
+def retrieve_instrument(
+    instrument_id: str,
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db),
+):
+    """
+    Retrieve one authorized instrument by ID.
+    Scoped for INSTITUTION_USER.
+    """
+    return get_instrument_by_id(
+        db=db,
+        current_user=current_user,
+        instrument_id=instrument_id,
+    )
+
+
+@router.post("", response_model=InstrumentResponse, status_code=status.HTTP_201_CREATED)
+def record_instrument(
+    payload: InstrumentCreate,
+    request: Request,
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db),
+):
+    """
+    Record an initial Fixed Deposit Receipt (FDR) deposit.
+    - Enforces ownership scoping for INSTITUTION_USER.
+    - Requires active institution.
+    - Validates amount and date boundaries.
+    - Rejects trust escalation; starts at L0_DECLARED.
+    - Conservative duplicate warning path.
+    """
+    verify_csrf_origin(request)
+    client_ip = request.client.host if request.client else None
+    request_id = request.headers.get("x-request-id")
+
+    return create_instrument(
+        db=db,
+        current_user=current_user,
+        payload=payload,
+        request_ip=client_ip,
+        request_id=request_id,
+    )
+
+
+@router.patch("/{instrument_id}", response_model=InstrumentResponse)
+def patch_instrument(
+    instrument_id: str,
+    payload: InstrumentUpdate,
+    request: Request,
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db),
+):
+    """
+    Update permitted registry fields on an instrument:
+    - Scoped for INSTITUTION_USER to their own draft/registered instruments.
+    - Scrutiny Officer can make registry corrections, with audit trail.
+    - Modifying parent institution_id is prohibited.
+    - Trust level escalation is prohibited.
+    - Unsupported status transitions are rejected.
+    """
+    verify_csrf_origin(request)
+    client_ip = request.client.host if request.client else None
+    request_id = request.headers.get("x-request-id")
+
+    return update_instrument(
+        db=db,
+        current_user=current_user,
+        instrument_id=instrument_id,
+        payload=payload,
+        request_ip=client_ip,
+        request_id=request_id,
     )

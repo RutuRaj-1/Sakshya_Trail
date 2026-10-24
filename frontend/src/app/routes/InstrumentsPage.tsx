@@ -1,60 +1,294 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { InstrumentsList } from '@/features/instruments/InstrumentsList';
-import { instrumentsApi } from '@/api/endpoints';
-import type { Instrument } from '@/types';
+import { InstrumentModal } from '@/features/instruments/InstrumentModal';
+import { instrumentsApi, institutionsApi } from '@/api/endpoints';
+import type { Instrument, InstrumentSummary, Institution } from '@/types';
+import { formatINR } from '@/lib/utils';
+import {
+  Search,
+  Plus,
+  Filter,
+  FileSpreadsheet,
+  AlertTriangle,
+  ChevronLeft,
+  ChevronRight,
+  TrendingUp,
+  Clock,
+  ShieldCheck,
+} from 'lucide-react';
+import { useAuth } from '@/features/auth/AuthContext';
 
 export const InstrumentsPage: React.FC = () => {
-  const [instruments, setInstruments] = useState<Instrument[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [statusFilter, setStatusFilter] = useState<string>('');
+  const { user } = useAuth();
+  const isInstitutionUser = user?.role === 'INSTITUTION_USER';
+  const canRecord = ['SYSTEM_ADMIN', 'SCRUTINY_OFFICER', 'INSTITUTION_USER'].includes(
+    user?.role || ''
+  );
 
-  const fetchInstruments = async () => {
+  const [instruments, setInstruments] = useState<Instrument[]>([]);
+  const [total, setTotal] = useState(0);
+  const [summary, setSummary] = useState<InstrumentSummary | null>(null);
+  const [institutions, setInstitutions] = useState<Institution[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Filters
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState('ALL');
+  const [trustFilter, setTrustFilter] = useState('ALL');
+  const [selectedInstFilter, setSelectedInstFilter] = useState('');
+  const [page, setPage] = useState(1);
+  const pageSize = 15;
+
+  // Modal State
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Load institutions list for filter dropdown if internal user
+  useEffect(() => {
+    async function fetchInstitutions() {
+      try {
+        const res = await institutionsApi.list({ is_active: true, limit: 100 });
+        setInstitutions(res.items);
+      } catch (e) {
+        console.error('Failed to load institutions filter list', e);
+      }
+    }
+    if (!isInstitutionUser) {
+      fetchInstitutions();
+    }
+  }, [isInstitutionUser]);
+
+  const loadInstruments = useCallback(async () => {
     setIsLoading(true);
+    setError(null);
     try {
-      const data = await instrumentsApi.list({
-        status: statusFilter || undefined,
-      });
-      setInstruments(data);
+      const statusParam = statusFilter !== 'ALL' ? statusFilter : undefined;
+      const trustParam = trustFilter !== 'ALL' ? trustFilter : undefined;
+      const instParam = selectedInstFilter || undefined;
+
+      const [listRes, summaryRes] = await Promise.all([
+        instrumentsApi.list({
+          search: search.trim() || undefined,
+          status: statusParam,
+          trust_level: trustParam,
+          institution_id: instParam,
+          skip: (page - 1) * pageSize,
+          limit: pageSize,
+        }),
+        instrumentsApi.getSummary(),
+      ]);
+
+      setInstruments(listRes.items);
+      setTotal(listRes.total);
+      setSummary(summaryRes);
+    } catch (err: any) {
+      setError(err?.response?.data?.message || err?.message || 'Failed to retrieve instruments.');
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [search, statusFilter, trustFilter, selectedInstFilter, page]);
 
   useEffect(() => {
-    fetchInstruments();
-  }, [statusFilter]);
+    loadInstruments();
+  }, [loadInstruments]);
+
+  const totalPages = Math.ceil(total / pageSize) || 1;
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto">
+    <div className="space-y-6 max-w-7xl mx-auto text-xs">
+      {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-slate-900 tracking-tight">
-            Security Deposit / FDR Instruments
+          <h1 className="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+            <FileSpreadsheet className="w-5 h-5 text-sentinel-600" />
+            <span>Statutory FDR / Instrument Registry</span>
           </h1>
           <p className="text-xs text-slate-500">
-            Lifecycle registry of all submitted, verified, and active bank fixed deposit receipts
+            {isInstitutionUser
+              ? 'Institutional security deposit FDR certificates pledged under AICTE regulatory terms'
+              : 'Regulatory bureau registry of all pledged bank fixed deposit receipts and guarantees'}
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
-          {/* Filter Dropdown */}
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="text-xs border border-slate-300 rounded-lg px-3 py-2 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-sentinel-500"
+        {canRecord && (
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-sentinel-600 hover:bg-sentinel-700 text-white font-semibold shadow-xs transition-all"
           >
-            <option value="">All Statuses</option>
-            <option value="SUBMITTED">Submitted</option>
-            <option value="UNDER_SCRUTINY">Under Scrutiny</option>
-            <option value="VERIFIED">Verified</option>
-            <option value="ACTIVE">Active</option>
-            <option value="MATURED">Matured</option>
-            <option value="RELEASED">Released</option>
+            <Plus className="w-4 h-4" />
+            <span>Record FDR Instrument</span>
+          </button>
+        )}
+      </div>
+
+      {/* KPI Overview Strip */}
+      {summary && (
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs">
+            <span className="text-slate-500 text-[11px]">Total Deposit Portfolio</span>
+            <div className="text-base font-bold text-slate-900 font-mono mt-0.5">
+              {formatINR(Number(summary.total_deposit_value))}
+            </div>
+            <div className="text-[10px] text-slate-400 mt-1 flex items-center gap-1">
+              <TrendingUp className="w-3 h-3 text-sentinel-600" />
+              <span>{summary.total_instruments} registered certificates</span>
+            </div>
+          </div>
+
+          <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs">
+            <span className="text-slate-500 text-[11px]">Active Compliance</span>
+            <div className="text-base font-bold text-emerald-700 font-mono mt-0.5">
+              {summary.active_count}
+            </div>
+            <div className="text-[10px] text-slate-400 mt-1 flex items-center gap-1">
+              <ShieldCheck className="w-3 h-3 text-emerald-600" />
+              <span>Valid lien-marked deposits</span>
+            </div>
+          </div>
+
+          <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs">
+            <span className="text-slate-500 text-[11px]">Expiring Within 90 Days</span>
+            <div className="text-base font-bold text-amber-600 font-mono mt-0.5">
+              {summary.expiring_soon_count}
+            </div>
+            <div className="text-[10px] text-slate-400 mt-1 flex items-center gap-1">
+              <Clock className="w-3 h-3 text-amber-500" />
+              <span>Maturity review required</span>
+            </div>
+          </div>
+
+          <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs">
+            <span className="text-slate-500 text-[11px]">Under Initial Scrutiny</span>
+            <div className="text-base font-bold text-blue-700 font-mono mt-0.5">
+              {summary.under_scrutiny_count}
+            </div>
+            <div className="text-[10px] text-slate-400 mt-1 flex items-center gap-1">
+              <FileSpreadsheet className="w-3 h-3 text-blue-600" />
+              <span>Awaiting bureau review</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Filter Toolbar */}
+      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+        <div className="flex-1 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+          {/* Search */}
+          <div className="relative flex-1 max-w-md">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setPage(1);
+              }}
+              placeholder="Search by FDR reference, bank, or institute name/code..."
+              className="w-full pl-9 pr-3 py-2 border border-slate-300 rounded-lg text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sentinel-500 bg-white"
+            />
+          </div>
+
+          {/* Status Filter */}
+          <div className="flex items-center gap-1.5">
+            <Filter className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+            <select
+              value={statusFilter}
+              onChange={(e) => {
+                setStatusFilter(e.target.value);
+                setPage(1);
+              }}
+              className="border border-slate-300 rounded-lg px-2.5 py-2 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-sentinel-500"
+            >
+              <option value="ALL">All Workflow Statuses</option>
+              <option value="REGISTERED">REGISTERED</option>
+              <option value="DRAFT">DRAFT</option>
+            </select>
+          </div>
+
+          {/* Trust Level Filter */}
+          <select
+            value={trustFilter}
+            onChange={(e) => {
+              setTrustFilter(e.target.value);
+              setPage(1);
+            }}
+            className="border border-slate-300 rounded-lg px-2.5 py-2 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-sentinel-500"
+          >
+            <option value="ALL">All Trust Levels</option>
+            <option value="L0_DECLARED">L0 — DECLARED</option>
+            <option value="L1_DOCUMENT_CONSISTENT">L1 — DOC CONSISTENT</option>
+            <option value="L2_OFFICER_VERIFIED">L2 — OFFICER VERIFIED</option>
+            <option value="L3_BANK_CONFIRMED">L3 — BANK CONFIRMED</option>
           </select>
+
+          {/* Institution Filter for internal bureau officers */}
+          {!isInstitutionUser && institutions.length > 0 && (
+            <select
+              value={selectedInstFilter}
+              onChange={(e) => {
+                setSelectedInstFilter(e.target.value);
+                setPage(1);
+              }}
+              className="border border-slate-300 rounded-lg px-2.5 py-2 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-sentinel-500 max-w-[200px] truncate"
+            >
+              <option value="">All Institutions</option>
+              {institutions.map((i) => (
+                <option key={i.id} value={i.id}>
+                  {i.code} — {i.legal_name || i.name}
+                </option>
+              ))}
+            </select>
+          )}
+        </div>
+
+        <div className="text-right text-[11px] text-slate-500 self-center">
+          Showing <span className="font-semibold text-slate-800">{instruments.length}</span> of{' '}
+          <span className="font-semibold text-slate-800">{total}</span> records
         </div>
       </div>
 
+      {error && (
+        <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 flex items-center gap-2">
+          <AlertTriangle className="w-4 h-4 shrink-0" />
+          <span>{error}</span>
+        </div>
+      )}
+
+      {/* Instruments Table */}
       <InstrumentsList instruments={instruments} isLoading={isLoading} />
+
+      {/* Pagination Bar */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between bg-white px-4 py-3 rounded-xl border border-slate-200 text-xs">
+          <div className="text-slate-500">
+            Page <span className="font-semibold text-slate-800">{page}</span> of{' '}
+            <span className="font-semibold text-slate-800">{totalPages}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page === 1}
+              className="p-1.5 rounded-lg border border-slate-300 hover:bg-slate-50 disabled:opacity-40"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages}
+              className="p-1.5 rounded-lg border border-slate-300 hover:bg-slate-50 disabled:opacity-40"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Registration Modal */}
+      <InstrumentModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSuccess={loadInstruments}
+      />
     </div>
   );
 };
