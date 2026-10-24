@@ -1,7 +1,7 @@
 """
 Application Domain Exceptions and FastAPI Error Handlers
 """
-from typing import Optional, List
+from typing import Optional, List, Any
 from fastapi import Request, status
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
