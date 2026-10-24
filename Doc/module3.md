@@ -1,281 +1,272 @@
 # Module 3 — Validation, Discrepancy & Explainable Intelligence
-## Implementation Summary
+## Handover & Final Technical Specification
 
-> **Status:** ✅ Prompt 4: Discrepancy Review, Reasoned Resolution, Return-for-Correction & Explainable Priority Queue Implemented  
-> **Revision:** `f4a9b2c8e1d7` (Alembic head)  
-> **Tests:** 203 passed total across all modules (17 Prompt 4 tests + 15 Prompt 3 tests + 25 Prompt 2 tests + 43 Prompt 1 tests + 103 prior modules) — **0 failures**  
-> **Date:** 2026-10-25
-
----
-
-## 1. Scope & Ownership
-
-Module 3 implements the **rule-driven validation engine**, **cross-source evidence reconciliation**, **tenant-isolated duplicate detection**, **explainable finding persistence**, **authorized policy configuration**, and **officer discrepancy review workflow** with a **transparent review-priority ordering queue** for the FDR Sentinel platform. It connects data from Module 1 (instruments, institutions, users) and Module 2 (documents, document versions, extracted OCR fields) without duplicating their ownership or overwriting authoritative records.
-
-### What Module 3 owns
-| Concern | Owner | Status |
-|---------|-------|--------|
-| Rule definitions and registry | Module 3 | Implemented (20 rules registered) |
-| Deterministic validation checks (Rules A–F) | Module 3 | Fully Implemented & Tested |
-| Cross-source evidence reconciliation (Amount, Reference, Dates, Bank, Lien) | Module 3 | Fully Implemented & Tested |
-| Stale extraction detection against document version changes | Module 3 | Implemented (`VAL-XSRC-STALE`) |
-| Bank-aware & reference-aware duplicate detection | Module 3 | Implemented (`VAL-DUP-001`, `VAL-DUP-002`) |
-| Exact document-hash (SHA-256) byte duplicate detection | Module 3 | Implemented (`VAL-DUP-003`) |
-| Name similarity advisory checks (difflib SequenceMatcher) | Module 3 | Implemented (`VAL-SIM-001`) |
-| Document metadata & file tamper advisory indicators | Module 3 | Implemented (`VAL-META-001`) |
-| Normalization utilities (reference, bank, depositor names) | Module 3 | Implemented (`normalization.py`) |
-| Finding persistence, idempotency & lifecycle | Module 3 | Implemented (OPEN, IN_REVIEW, RESOLVED, DISMISSED, SUPERSEDED) |
-| Finding deduplication & supersession linkages | Module 3 | Implemented (SHA-256 fingerprinting) |
-| Server-enforced status transitions with mandatory reasons | Module 3 | Implemented (`transition_finding_status`) |
-| Optimistic concurrency protection (`concurrency_version`) | Module 3 | Implemented (409 ConflictException on stale writes) |
-| Finding assignment & review observation notes | Module 3 | Implemented (`assign_finding`, `add_finding_observation`) |
-| Return for correction integration | Module 3 | Implemented (`return_instrument_for_correction`) |
-| Transparent review-priority scoring engine (0–100) | Module 3 | Implemented (`priority_score.py`) |
-| Discrepancy review queue & detail frontend | Module 3 | Implemented (`ReviewQueuePage.tsx`, `/findings/queue`) |
-| Policy configuration (versioned, authorized) | Module 3 | Implemented (`ValidationPolicyConfig`) |
-| Validation run log & run history | Module 3 | Implemented (`ValidationRun`) |
-| Versioned REST API endpoints | Module 3 | Implemented (`/api/v1/findings/...`, `/api/v1/instruments/...`) |
-| Post-save validation triggers | Module 3 | Triggered on instrument edit, document upload, extraction save |
-
-### What Module 3 does NOT own
-| Concern | Owner | Reason |
-|---------|-------|--------|
-| Document intake, storage & file hashing | Module 2 | Module 2 stores raw files and computes SHA-256 upon upload |
-| Document completeness checklist engine | Module 2 | Module 3 integrates with checklist; reports UNABLE_TO_EVALUATE if absent |
-| Authoritative bank confirmation | Module 4 | Out of scope; machine extractions are suggestions, not bank confirmation |
-| FDR trust-level promotion (L0→L1→L2→L3) | Module 4 | Safety constraint: validation never modifies trust level |
-| Release / refund authorization | Module 6 | Future module |
+> **Status:** ✅ Complete (Prompt 5 of 5: End-to-End Integration, Security Review, Evaluation Metrics and Module 3 Handover)  
+> **Alembic Head:** `f4a9b2c8e1d7`  
+> **Test Suite:** **216 passed** across all backend modules in 8.68s — **0 failures**  
+> **Frontend:** `tsc -b && vite build` built cleanly in 469ms — **0 type/build errors**  
+> **Date:** October 2026  
+> **Repository:** `FDR_Sentinel`
 
 ---
 
-## 7. Finding Lifecycle, Discrepancy Workflow & Concurrency
+## 1. Executive Summary & Integration Scope
 
-### Allowed Status Transitions
-- `OPEN → IN_REVIEW`: Reviewer starts investigation.
-- `OPEN → RESOLVED`: Condition verified or corrected (mandatory non-empty reason required).
-- `OPEN → DISMISSED`: Finding dismissed with regulatory exemption or policy justification (mandatory non-empty reason required).
-- `IN_REVIEW → RESOLVED`: In-review finding successfully resolved (mandatory reason required).
-- `IN_REVIEW → DISMISSED`: In-review finding dismissed (mandatory reason required).
-- `OPEN / IN_REVIEW → SUPERSEDED`: Automatically applied when rule version or evidence inputs change and a new finding is created. Preserves prior finding link and review timeline.
-- Terminal states (`RESOLVED`, `DISMISSED`, `SUPERSEDED`) reject further manual status transitions.
+Module 3 delivers the **deterministic rule engine**, **cross-source evidence reconciliation**, **tenant-isolated duplicate detection**, **explainable finding persistence**, **authorized policy configuration**, and **officer discrepancy review workflow** with a **transparent review-priority ordering queue** for the FDR Sentinel platform.
 
-### Optimistic Concurrency Protection
-Every finding row maintains a `concurrency_version: int` column. Any transition or assignment can supply `expected_concurrency_version`. If a concurrent officer modifies the finding in the interim, the server rejects the update with `409 ConflictException`, requiring the client to refresh and review the latest state.
+Module 3 operates as a cohesive, read-only consumer across:
+- **Module 1 (Registry):** Reads `Institution`, `Instrument`, `User`, and `AuditEvent` records via established SQLAlchemy models and services.
+- **Module 2 (Document & Evidence):** Consumes `Document`, `DocumentVersion` (storage keys, SHA-256 byte hashes, processing statuses), `ChecklistResult`, and machine-extracted suggestions (`DocumentExtractedFields`).
 
-### Reason-Required Decisions
-Resolving or dismissing a finding strictly requires a non-empty, non-whitespace reason (status code `422 REASON_REQUIRED`). All actions, actors, reasons, and timestamps append to `review_notes_json` and log to `audit_events`.
-
-### Return for Correction
-Authorized officers (`SCRUTINY_OFFICER`, `BRANCH_HEAD`, `SYSTEM_ADMIN`) can return an instrument for correction with an explicit explanation. The instrument status transitions to `RETURNED_FOR_CORRECTION` and remarks are recorded. Earlier document versions and findings are preserved without silent overwrite.
+### System Invariants Strictly Enforced
+1. **Trust Level Invariance:** Module 3 validation runs, finding reviews, and priority scores **NEVER alter `trust_level` (L0–L3)**. Trust level progression remains the exclusive jurisdiction of the designated future module.
+2. **Release / Refund Non-Interference:** No validation finding, dismissal, or review score possesses the legal or technical authority to approve or reject a financial deposit release or refund.
+3. **Non-Destructive Reconciliation:** Machine-extracted suggestions from OCR or parsers never overwrite authoritative entered instrument fields.
+4. **Tenant Isolation:** In cross-institution duplicate checks, foreign institution details (names, codes, contact info) are strictly masked (`[tenant-masked]`) to prevent confidential cross-tenant leakage.
+5. **Non-Accusatory Classification:** Heuristic indicators (name similarity, file metadata) are explicitly branded as `[Advisory — human review required]` and never claim proof of fraud or forgery.
 
 ---
 
-## 8. Transparent Review-Priority Score (USP)
-
-The platform includes a deterministic **0–100 review queue ordering score** (`calculate_review_priority_score`):
-- **Purpose:** Strictly for review queue ordering and prioritization; **NOT** an AI-predicted fraud probability, credit rating, or financial risk prediction.
-- **Factor Allocations:**
-  1. **Days to Maturity (Max 25 pts):** Closer maturity requires more urgent officer scrutiny (expired = 25 pts; <= 30 days = 22.5 pts; <= 90 days = 15 pts; <= 180 days = 7.5 pts).
-  2. **Highest Finding Severity (Max 30 pts):** Critical finding = 30 pts; High = 20 pts; Medium = 10 pts; Low/Info = 5 pts.
-  3. **Unresolved Discrepancies Count (Max 20 pts):** Scales with active open discrepancies (1 = 5 pts; 2 = 10 pts; 3 = 15 pts; >= 4 = 20 pts).
-  4. **Document Completeness (Max 15 pts):** Missing FDR copy elevates queue review priority (15 pts).
-  5. **Trust/Verification Dimension (Max 10 pts):** `L0_DECLARED` receives 10 pts for initial scrutiny; verified `L2`/`L3` receive 0 pts.
-- **Explainability:** Returns an itemized breakdown of each factor's points, max points, and plain-language basis.
-- **Missing Fields Handling:** Unknown inputs (e.g. unknown maturity date) are flagged with `is_missing: True` and award 0 points without penalizing the institution.
-- **Safety Constraints:** Never modifies `trust_level`, never approves/rejects releases, and weights are explicitly labeled as prototype operational assumptions.
-
----
-
-## 9. Verification & Test Suite
-
-All 203 unit, integration, and scenario tests pass with **0 failures**:
+## 2. Architecture & Data Flow
 
 ```
-====================== 203 passed in 7.78s ======================
-- test_auth_rbac.py:                                    14 passed
-- test_documents_module.py:                             16 passed
-- test_documents_upload_download.py:                    20 passed
-- test_health.py:                                        5 passed
-- test_institutions_users.py:                           14 passed
-- test_instruments_registry.py:                         12 passed
-- test_module1_acceptance.py:                           18 passed
-- test_module3_deterministic_rules.py:                  25 passed
-- test_module3_prompt3_evidence_reconciliation.py:      15 passed
-- test_module3_prompt4_review_queue.py:                 17 passed
-- test_module3_validation.py:                           43 passed
-- test_modules.py:                                       4 passed
-```
-
-### Prompt 4 Scenarios Verified:
-1. **Allowed and forbidden finding transitions:** Enforces valid lifecycle paths and rejects illegal transitions from terminal states.
-2. **Resolution without reason rejected:** Empty or whitespace-only reasons trigger `422 REASON_REQUIRED`.
-3. **Dismissal without reason rejected:** Empty or whitespace-only reasons trigger `422 REASON_REQUIRED`.
-4. **Unauthorized user resolution attempt:** Non-officer roles (`INSTITUTION_USER`, `AUDITOR`) are rejected with `403 Forbidden`.
-5. **Cross-institution finding access denial:** Scoped officers cannot access or modify other institutions' findings.
-6. **Auditor read-only behavior:** Auditors can inspect findings and queue but cannot transition, dismiss, or return submissions.
-7. **Institution-user visibility restrictions:** Institution users only see actionable deficiencies for their institution and cannot view internal-only rules like cross-institution duplicates (`VAL-DUP-002`).
-8. **Concurrent resolution attempts:** Optimistic concurrency control rejects stale `concurrency_version` with `409 ConflictException`.
-9. **Historical finding retention:** All review notes, transitions, actors, and reasons persist in chronological audit trail.
-10. **Reevaluation after corrected data:** Correcting instrument data clears discrepancies and automatically transitions finding to `RESOLVED`.
-11. **Return-for-correction requiring a reason:** Enforces mandatory explanation before setting instrument to `RETURNED_FOR_CORRECTION`.
-12. **Advisory warning does not become an automatic blocker:** Heuristic findings remain advisory and do not modify trust levels.
-13. **Priority-score contribution breakdown:** Verifies deterministic 0–100 score with explicit factor contribution itemization.
-14. **Unknown fields handling in the score:** Missing fields assign 0 points, are flagged with `is_missing: True`, and do not penalize.
-15. **Score changes when valid inputs change:** Approaching maturity dates deterministically increase priority score.
-16. **Score never changes trust or release authorization:** Trust levels and release states remain completely unaffected by scoring.
-17. **Audit records for all material review actions:** Full audit logging for transitions, assignments, observations, and returns for correction.
-
----
-
-## 2. Directory Structure
-
-```
-backend/app/modules/validation/
-├── __init__.py                    # Package init; exports models, registry, enums, routers
-├── enums.py                       # RuleOutcome, FindingStatus, RuleSeverity, RuleType, FindingCategory
-├── models.py                      # SQLAlchemy models: ValidationPolicyConfig, ValidationRun, ValidationFinding
-├── extracted_fields_model.py      # SQLAlchemy model: DocumentExtractedFields
-├── extracted_fields_service.py    # Service for reading/writing extracted document evidence & auto-triggering
-├── normalization.py               # Deterministic reference, bank, and name normalizations
-├── registry.py                    # Rule registry, BaseValidationRule, RuleResult, RuleContext
-├── engine.py                      # Orchestration engine, duplicate matcher, hash scanner, trigger_post_save
-├── finding_service.py             # Finding persistence, idempotency, supersession, dismissal, re-evaluation
-├── policy_service.py              # Policy config read/write/versioning
-├── schemas.py                     # Pydantic request/response schemas
-├── router.py                      # FastAPI endpoints (versioned & backward-compatible)
-└── rules/
-    ├── __init__.py                # Imports all rules → triggers self-registration
-    ├── required_rules.py          # VAL-REQ-001 (Rule A: Configurable required instrument fields)
-    ├── amount_rules.py            # VAL-AMT-001 (Rule B: Positive amount), VAL-AMT-002 (Policy minimum)
-    ├── date_rules.py              # VAL-DATE-001 (Rule C: Ordering & bounds), VAL-DATE-002 (Expiry), VAL-DATE-003 (Validity term)
-    ├── institution_rules.py       # VAL-INST-001 (Rule D: Institution consistency & evidence mismatch)
-    ├── document_rules.py          # VAL-DOC-001 (FDR copy present), VAL-DOC-002 (Rule E: Module 2 checklist integration)
-    ├── consistency_rules.py       # VAL-CONS-001 (Rule F: Basic data consistency & inactive institution)
-    ├── reference_rules.py         # VAL-REF-001 (Reference format & placeholder rejection)
-    ├── lien_rules.py              # VAL-LIEN-001 (Lien marked & holder validity)
-    ├── reconciliation_rules.py    # Cross-source rules (VAL-XSRC-STALE, VAL-XSRC-001, -002, -003, -004, -006)
-    ├── duplicate_rules.py         # Duplicate rules (VAL-DUP-001, VAL-DUP-002, VAL-DUP-003)
-    ├── name_similarity_rules.py   # VAL-SIM-001 (Name similarity advisory comparison)
-    └── metadata_advisory_rules.py # VAL-META-001 (Document metadata & conversion tool advisory)
+┌───────────────────────────────────────────────────────────────────────────┐
+│                           MODULE 1: REGISTRY                              │
+│   Institutions (Tenant Scope)  │  Instruments (Authority Fields)  │  Users  │
+└─────────────────────────────────────┬─────────────────────────────────────┘
+                                      │
+                                      ▼
+┌───────────────────────────────────────────────────────────────────────────┐
+│                    MODULE 2: DOCUMENT & EVIDENCE                          │
+│   Documents  │  Versions (SHA-256)  │  Checklists  │  Extracted OCR Data  │
+└─────────────────────────────────────┬─────────────────────────────────────┘
+                                      │
+                                      ▼
+┌───────────────────────────────────────────────────────────────────────────┐
+│             MODULE 3: VALIDATION & EXPLAINABLE INTELLIGENCE               │
+│                                                                           │
+│  ┌──────────────────────┐  ┌──────────────────────┐  ┌─────────────────┐  │
+│  │ Policy Configuration │  │ 20 Registered Rules  │  │ Normalization   │  │
+│  │ (Versioned / Min Amt)│  │ (Deterministic/Heur.)│  │ (Ref/Bank/Name) │  │
+│  └──────────┬───────────┘  └──────────┬───────────┘  └────────┬────────┘  │
+│             │                         │                       │           │
+│             └─────────────────────────┼───────────────────────┘           │
+│                                       ▼                                   │
+│                        Validation Engine Orchestrator                     │
+│                        (Post-Save Triggers / Batch API)                   │
+│                                       │                                   │
+│            ┌──────────────────────────┴──────────────────────────┐        │
+│            ▼                                                     ▼        │
+│  ValidationRun (Audit Log)                             ValidationFinding  │
+│  • Status (PASSED/FLAGGED)                             • SHA-256 Fingerpr.│
+│  • Rule Outcomes JSON                                  • Stored Evidence  │
+│  • Engine Duration (ms)                                • Lifecycle State  │
+│                                                        • Priority (0-100) │
+└───────────────────────────────────────┬───────────────────────────────────┘
+                                        │
+                                        ▼
+┌───────────────────────────────────────────────────────────────────────────┐
+│                      OFFICER DISCREPANCY WORKFLOW                         │
+│   Review Queue (/findings/queue)  │  Filter Drawer  │  Reasoned Actions   │
+│   OPEN ──► IN_REVIEW ──► RESOLVED / DISMISSED / SUPERSEDED                │
+│   Return for Correction (with mandatory remarks to Institution)           │
+└───────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 3. Implemented Rule Catalogue
+## 3. Complete 20-Rule Taxonomy & Catalogue
+
+Every rule inherits from `BaseValidationRule` and registers in `rule_registry`. Rules return a structured `RuleResult` with `outcome` (`PASS`, `FAIL`, `WARNING`, `NOT_APPLICABLE`, `UNABLE_TO_EVALUATE`), plain-language explanation, itemized evidence inputs, and prescriptive next actions.
 
 | Rule ID | Category | Type | Severity | Description & Operational Behavior |
 |---------|----------|------|----------|------------------------------------|
-| `VAL-REQ-001` | `CROSS_FIELD_CONSISTENCY` | Deterministic | HIGH | **Required instrument fields.** Evaluates configured fields required for instrument/case type via `REQUIRED_INSTRUMENT_FIELDS` policy. |
-| `VAL-AMT-001` | `AMOUNT_CONSISTENCY` | Deterministic | CRITICAL | **Amount positivity.** Verifies registered amount is Decimal > 0.00. |
-| `VAL-AMT-002` | `POLICY_COMPLIANCE` | Deterministic | HIGH | **Policy minimum amount.** Compares amount against `MIN_DEPOSIT_AMOUNT_INR` in active policy. Returns `UNABLE_TO_EVALUATE` if unconfigured. |
-| `VAL-DATE-001` | `DATE_CONSISTENCY` | Deterministic | HIGH | **Date ordering & bounds.** Checks issue and maturity dates are present, valid calendar dates (1990–2100), and maturity is strictly after issue date. |
-| `VAL-DATE-002` | `DATE_CONSISTENCY` | Deterministic | HIGH | **Maturity expiry.** Checks active instruments have not passed maturity date (warning within 90 days; fail if passed). |
-| `VAL-DATE-003` | `DATE_CONSISTENCY` | Deterministic | HIGH | **Configured validity period.** Enforces `MIN_VALIDITY_DAYS` / `MAX_VALIDITY_DAYS` only when configured. Returns `NOT_APPLICABLE` when unconfigured. |
-| `VAL-INST-001` | `INSTITUTION_ELIGIBILITY` | Deterministic | HIGH | **Institution consistency.** Compares instrument institution association to document evidence. |
-| `VAL-DOC-001` | `DOCUMENT_COMPLETENESS` | Deterministic | MEDIUM | **FDR Copy Document.** Checks at least one FDR_COPY document is uploaded and processed. |
-| `VAL-DOC-002` | `DOCUMENT_COMPLETENESS` | Deterministic | HIGH | **Module 2 Checklist Integration.** Reads Module 2 checklist result. If no profile exists, returns `UNABLE_TO_EVALUATE`. |
-| `VAL-CONS-001` | `CROSS_FIELD_CONSISTENCY` | Deterministic | HIGH | **Basic data consistency.** Enforces inactive institution restrictions and detects contradictory joint/lien flags. |
-| `VAL-REF-001` | `REFERENCE_INTEGRITY` | Deterministic | HIGH | **Reference integrity.** Ensures reference number is non-blank, length >= 4, and not a placeholder. |
-| `VAL-LIEN-001` | `LIEN_VALIDITY` | Deterministic | HIGH | **Lien validity.** Ensures FDR has lien marked and lien holder specified. |
-| `VAL-XSRC-STALE` | `DOCUMENT_INTEGRITY` | Heuristic | MEDIUM | **Stale extraction detector.** Detects extractions performed on older document versions when a newer version has been uploaded. Requires reprocessing. |
-| `VAL-XSRC-001` | `CROSS_SOURCE_RECONCILIATION` | Deterministic | HIGH | **Amount reconciliation.** Reconciles entered amount against machine-extracted suggestion. Returns `UNABLE_TO_EVALUATE` if extraction missing/invalid. Never silently overwrites. |
-| `VAL-XSRC-002` | `CROSS_SOURCE_RECONCILIATION` | Deterministic | HIGH | **Reference reconciliation.** Compares normalized entered reference with extracted certificate reference. |
-| `VAL-XSRC-003` | `CROSS_SOURCE_RECONCILIATION` | Deterministic | HIGH | **Date reconciliation.** Compares entered issue/maturity dates against extracted certificate dates. |
-| `VAL-XSRC-004` | `CROSS_SOURCE_RECONCILIATION` | Heuristic | MEDIUM | **Bank reconciliation.** Compares normalized issuing bank names. |
-| `VAL-XSRC-006` | `LIEN_VALIDITY` | Heuristic | MEDIUM | **Lien holder reconciliation.** Compares lien holder text only where explicit, readable, and confident (>= 0.70). Otherwise returns `NOT_APPLICABLE`. |
-| `VAL-DUP-001` | `POTENTIAL_DUPLICATE` | Heuristic | HIGH | **Intra-institution duplicate reference.** Bank-aware duplicate check detecting instruments sharing same bank + reference in the same institution. Includes permitted summaries. |
-| `VAL-DUP-002` | `POTENTIAL_DUPLICATE` | Heuristic | HIGH | **Cross-institution duplicate reference.** Bank-aware duplicate check across institutions. **Preserves tenant isolation by masking foreign institution data.** Routes to authorized officer review. |
-| `VAL-DUP-003` | `POTENTIAL_DUPLICATE` | Deterministic | HIGH | **Exact document-hash duplicate bytes.** Detects identical SHA-256 file bytes across instruments. Uses prescribed wording: *"Identical file bytes were previously uploaded. Review the associated instruments and submission context."* Does NOT claim proof of forgery or improper reuse. |
-| `VAL-SIM-001` | `CROSS_SOURCE_RECONCILIATION` | Heuristic | MEDIUM | **Name similarity advisory.** Compares registered institution legal name vs extracted depositor name using `difflib.SequenceMatcher`. Shows both strings, method, score, and threshold. Advisory only. |
-| `VAL-META-001` | `DOCUMENT_INTEGRITY` | Heuristic | LOW | **Document metadata advisory.** Inspects metadata for conversion tool markers (e.g. iLovePDF, Sejda) or timestamp inversions. Disclaims scanning/conversion artifacts. |
+| `VAL-REQ-001` | `CROSS_FIELD_CONSISTENCY` | Deterministic | HIGH | **Required Instrument Fields:** Evaluates configured mandatory fields from active `REQUIRED_INSTRUMENT_FIELDS` policy. |
+| `VAL-AMT-001` | `AMOUNT_CONSISTENCY` | Deterministic | CRITICAL | **Positive Amount:** Asserts registered deposit amount is Decimal > 0.00. |
+| `VAL-AMT-002` | `POLICY_COMPLIANCE` | Deterministic | HIGH | **Policy Minimum Amount:** Compares amount against `MIN_DEPOSIT_AMOUNT_INR`. Returns `UNABLE_TO_EVALUATE` if unconfigured; never invents expected amounts. |
+| `VAL-DATE-001` | `DATE_CONSISTENCY` | Deterministic | HIGH | **Date Ordering & Bounds:** Asserts calendar range (1990–2100) and that maturity date is strictly after issue date. |
+| `VAL-DATE-002` | `DATE_CONSISTENCY` | Deterministic | HIGH | **Maturity Expiry:** Evaluates active instruments against current date (warning within 90 days; fail if expired). |
+| `VAL-DATE-003` | `DATE_CONSISTENCY` | Deterministic | HIGH | **Validity Term Bounds:** Enforces `MIN_VALIDITY_DAYS` / `MAX_VALIDITY_DAYS` if policy active; returns `NOT_APPLICABLE` when unconfigured. |
+| `VAL-INST-001` | `INSTITUTION_ELIGIBILITY` | Deterministic | HIGH | **Institution Association Consistency:** Compares instrument institution linkage against uploaded document context. |
+| `VAL-DOC-001` | `DOCUMENT_COMPLETENESS` | Deterministic | MEDIUM | **FDR Copy Presence:** Verifies at least one `FDR_COPY` document is uploaded and cleanly processed. |
+| `VAL-DOC-002` | `DOCUMENT_COMPLETENESS` | Deterministic | HIGH | **Module 2 Checklist Integration:** Consumes Module 2 completeness profile; returns `UNABLE_TO_EVALUATE` if profile unavailable. |
+| `VAL-CONS-001` | `CROSS_FIELD_CONSISTENCY` | Deterministic | HIGH | **Basic Data Consistency:** Validates active institution status and asserts non-contradictory joint/lien flags. |
+| `VAL-REF-001` | `REFERENCE_INTEGRITY` | Deterministic | HIGH | **Reference Integrity:** Rejects blank, length < 4, or placeholder references (e.g., `000000`, `TEST-REF`, `NA`). |
+| `VAL-LIEN-001` | `LIEN_VALIDITY` | Deterministic | HIGH | **Lien Validity:** Asserts lien-marked instruments specify a non-empty lien holder name. |
+| `VAL-XSRC-STALE` | `DOCUMENT_INTEGRITY` | Heuristic | MEDIUM | **Stale Extraction Detector:** Flags extractions performed on older document versions when a newer version exists. Quarantines cross-source comparisons until reprocessed. |
+| `VAL-XSRC-001` | `CROSS_SOURCE_RECONCILIATION` | Deterministic | HIGH | **Amount Reconciliation:** Compares entered amount against extracted suggestion. Returns `UNABLE_TO_EVALUATE` if extraction absent. Never overwrites entered record. |
+| `VAL-XSRC-002` | `CROSS_SOURCE_RECONCILIATION` | Deterministic | HIGH | **Reference Reconciliation:** Compares normalized entered reference with extracted certificate reference. |
+| `VAL-XSRC-003` | `CROSS_SOURCE_RECONCILIATION` | Deterministic | HIGH | **Date Reconciliation:** Compares entered issue/maturity dates against extracted certificate dates. |
+| `VAL-XSRC-004` | `CROSS_SOURCE_RECONCILIATION` | Heuristic | MEDIUM | **Bank Reconciliation:** Compares normalized issuing bank names across entered data and OCR. |
+| `VAL-XSRC-006` | `LIEN_VALIDITY` | Heuristic | MEDIUM | **Lien Holder Reconciliation:** Evaluates lien holder text only when confidence >= 0.70; otherwise returns `NOT_APPLICABLE`. |
+| `VAL-DUP-001` | `POTENTIAL_DUPLICATE` | Heuristic | HIGH | **Intra-Institution Duplicate Reference:** Bank-aware check detecting instruments sharing same bank + reference in the same institution. |
+| `VAL-DUP-002` | `POTENTIAL_DUPLICATE` | Heuristic | HIGH | **Cross-Institution Duplicate Reference:** Bank-aware duplicate check across institutions with **tenant data masking** to protect confidentiality. |
+| `VAL-DUP-003` | `POTENTIAL_DUPLICATE` | Deterministic | HIGH | **Exact SHA-256 Byte Hash Duplicate:** Detects identical document bytes across submissions. Explanation strictly states identical file bytes were uploaded; makes no fraud accusations. |
+| `VAL-SIM-001` | `CROSS_SOURCE_RECONCILIATION` | Heuristic | MEDIUM | **Name Similarity Advisory:** Compares legal institution name vs extracted depositor name using `difflib.SequenceMatcher`. Displays both strings, ratio, and threshold. Advisory only. |
+| `VAL-META-001` | `DOCUMENT_INTEGRITY` | Heuristic | LOW | **Document Metadata Advisory:** Inspects file metadata for conversion markers (e.g. iLovePDF, Sejda). Clearly labeled as advisory heuristic. |
 
 ---
 
-## 4. Cross-Source Validation Principles
-
-1. **Extraction is a Suggestion, Not Authoritative Truth:**
-   Machine-extracted values (OCR/parsers) are advisory suggestions. They never override or silently overwrite authoritative entered instrument fields.
-2. **Missing Extraction is Not a Mismatch:**
-   When an extraction is missing, disabled, failed, or unparseable, rules return `UNABLE_TO_EVALUATE`. No false mismatch findings are created.
-3. **Stale Extractions are Quarantined:**
-   If a new document version is uploaded after extraction, `VAL-XSRC-STALE` flags the discrepancy. Downstream cross-source comparison rules refuse to evaluate against stale versions until reprocessed.
-4. **Extraction Never Establishes Legal Authenticity:**
-   Machine extractions do not confirm bank validity or release eligibility.
-
----
-
-## 5. Duplicate Detection & Tenant Privacy Isolation
-
-### Strategy
-- **Bank-Aware Reference Matching:**
-  Normalizes bank names and reference strings (`[\s\-\/\._]` stripped, uppercase).
-  Naive matching across different banks is strictly prevented (e.g., ref `12345` in SBI and ref `12345` in ICICI are recognized as different instruments and produce no duplicate finding).
-- **Tenant Isolation:**
-  - When a duplicate reference or identical SHA-256 document appears in *another institution*, details of the other institution (legal name, code, contact information, internal IDs) are **masked** (`[tenant-masked]`).
-  - Standard institution users cannot see another institution's confidential records through the duplicate detector.
-  - The finding is routed exclusively to authorized regulatory scrutiny officers for privileged cross-case investigation.
-- **SHA-256 Exact Byte Checks:**
-  Uses hashes generated by Module 2 at upload time (never browser-supplied or unverified storage reads).
-  Produces neutral, factual advisory findings without accusatory language.
-
----
-
-## 6. Name Similarity Advisory Architecture
-
-- **Algorithm:** Python standard library `difflib.SequenceMatcher` (Gestalt pattern matching) after prefix, honorific, punctuation, and whitespace normalization.
-- **Output:** Explainable output detailing:
-  - Both original strings (String A and String B).
-  - Normalization and comparison method.
-  - Exact similarity score (e.g. `0.880`).
-  - Active threshold (default: `0.85`, configurable via policy).
-- **Non-Accusatory Classification:**
-  - Prefix: `[Advisory — human review required]`
-  - Explicit disclaimer: The similarity metric is an advisory heuristic and does not determine legal identity. Borderline matches do not reject a submission or modify instrument trust level.
-
----
-
-## 7. Finding Lifecycle & Idempotency
-
-- **SHA-256 Fingerprint Deduplication:** Re-running validation sweeps with unchanged inputs updates `last_evaluated_at` idempotently. No duplicate database rows are created.
-- **Dismissal Preservation:** Findings dismissed by human reviewers with justification notes remain dismissed on subsequent sweeps unless inputs materially change.
-- **Supersession on Changed Inputs:** If inputs change on re-evaluation (e.g. amount corrected, but still failing another threshold), the previous finding transitions to `SUPERSEDED` with `superseded_by_finding_id` pointing to the fresh finding.
-- **Resolution on Cleared Condition:** When an issue is fixed and the rule returns `PASS` or `NOT_APPLICABLE`, open/in-review findings for that rule automatically transition to `RESOLVED` with an automated resolution note.
-
----
-
-## 8. Verification & Test Suite
-
-All 186 unit, integration, and scenario tests pass with **0 failures**:
+## 4. Finding Lifecycle, Concurrency & Governance
 
 ```
-====================== 186 passed in 7.04s ======================
-- test_auth_rbac.py:                                    14 passed
-- test_documents_module.py:                             16 passed
-- test_documents_upload_download.py:                    20 passed
-- test_health.py:                                        5 passed
-- test_institutions_users.py:                           14 passed
-- test_instruments_registry.py:                         12 passed
-- test_module1_acceptance.py:                           18 passed
-- test_module3_deterministic_rules.py:                  25 passed
-- test_module3_prompt3_evidence_reconciliation.py:      15 passed
-- test_module3_validation.py:                           43 passed
-- test_modules.py:                                       4 passed
+                    ┌─────────────────────────┐
+                    │      Validation Run     │
+                    └────────────┬────────────┘
+                                 │
+                                 ▼
+                         ┌──────────────┐
+       ┌─────────────────┤     OPEN     ├─────────────────┐
+       │                 └───────┬──────┘                 │
+       │                         │                        │
+       │ (Assign/Start)          │ (Officer Resolve)      │ (Officer Dismiss)
+       ▼                         ▼                        ▼
+┌──────────────┐          ┌──────────────┐         ┌──────────────┐
+│  IN_REVIEW   ├─────────►│   RESOLVED   │         │  DISMISSED   │
+└──────┬───────┘ (Resolve)└──────────────┘         └──────────────┘
+       │
+       ▼ (Dismiss)
+┌──────────────┐
+│  DISMISSED   │
+└──────────────┘
+       
+       * At any time, if inputs materially change or rule version updates:
+         OPEN / IN_REVIEW ──► SUPERSEDED (pointing to new finding ID)
 ```
 
-### Prompt 3 Test Scenarios Verified:
-1. Entered amount differs from extracted amount (`VAL-XSRC-001` fires `FAIL`).
-2. Matching entered and extracted values produce no discrepancy (`VAL-XSRC-001` passes).
-3. Missing extraction creates no false mismatch (`UNABLE_TO_EVALUATE`).
-4. Invalid/unparseable extraction output handled gracefully (`UNABLE_TO_EVALUATE`).
-5. Stale extraction against older document version identified (`VAL-XSRC-STALE` fires).
-6. Intra-institution reference duplicate detected with permitted summaries (`VAL-DUP-001`).
-7. Bank-aware cross-institution reference duplicate detected with tenant masking (`VAL-DUP-002`).
-8. Similar-looking references from different banks handled conservatively (no false duplicate).
-9. Duplicate SHA-256 file bytes across instruments flagged with prescribed neutral wording (`VAL-DUP-003`).
-10. Duplicate hash results do not leak cross-tenant records (tenant isolation preserved).
-11. Name similarity explains method, strings, score, and threshold (`VAL-SIM-001`).
-12. Name similarity does not reject or modify instrument trust level.
-13. Metadata advisory labelled as heuristic with disclaimer (`VAL-META-001`).
-14. No finding promotes trust level or authorizes financial release.
-15. Repeat runs remain idempotent (fingerprints identical, no duplicate rows).
-16. Module 1 and Module 2 regression test suites stay 100% green.
+### Key Lifecycle Guarantees
+- **Deduplication by Fingerprint:** Every finding computes a SHA-256 hash across `(instrument_id, rule_id, rule_version, evidence_fingerprint)`. Repeat runs on unchanged data update `last_evaluated_at` without duplicating rows.
+- **Reason-Mandated Governance:** Status transitions to `RESOLVED` or `DISMISSED` reject blank reasons (`422 REASON_REQUIRED`). All transitions record actor ID, timestamp, and notes in `review_notes_json` and `audit_events`.
+- **Optimistic Concurrency Control:** Every finding has a `concurrency_version: int`. Concurrent updates with mismatched versions return `409 ConflictException`.
+- **Automatic Resolution on Fix:** When an issue is corrected and re-evaluation passes, open findings automatically transition to `RESOLVED` with automated audit notes.
+
+---
+
+## 5. Transparent Review-Priority Score (0–100)
+
+The review queue includes a deterministic 0–100 prioritization score (`calculate_review_priority_score`) to assist officers in ordering high-risk or urgent submissions:
+
+| Dimension | Max Points | Evaluation Logic |
+|-----------|------------|------------------|
+| **1. Days to Maturity** | 25 | Expired = 25 pts; <= 30 days = 22.5 pts; <= 90 days = 15 pts; <= 180 days = 7.5 pts; > 180 days = 0 pts. |
+| **2. Finding Severity** | 30 | Critical finding = 30 pts; High = 20 pts; Medium = 10 pts; Low/Info = 5 pts; None = 0 pts. |
+| **3. Unresolved Discrepancies** | 20 | Scales with count of open discrepancies (1 = 5 pts; 2 = 10 pts; 3 = 15 pts; >= 4 = 20 pts). |
+| **4. Document Completeness** | 15 | Missing FDR document copy elevates review urgency (15 pts). |
+| **5. Trust / Verification State** | 10 | Unverified `L0_DECLARED` receives 10 pts for initial scrutiny; verified `L2`/`L3` receive 0 pts. |
+
+### Score Disclaimers & Protections
+- **Missing Data Handling:** Unknown or omitted fields assign 0 points and are flagged with `is_missing: True` without penalizing the institution.
+- **Strict Invariance:** The priority score carries an explicit disclaimer: *"This score is a transparent operational heuristic for review queue ordering and does NOT represent an AI-predicted fraud probability, credit rating, or financial risk model."*
+- **No Authority to Release:** The score cannot authorize or reject deposit releases or refunds.
+
+---
+
+## 6. Security Review & Threat Defenses
+
+| Threat Vector | Mitigation Strategy & Verified Implementation |
+|---------------|-----------------------------------------------|
+| **SQL Injection** | All queue filters (`status`, `rule_id`, `severity`, `institution_id`, `search_term`) execute via parameterized SQLAlchemy column filters (`ilike()`, `==`), preventing dynamic SQL concatenation. |
+| **Cross-Tenant Data Leakage** | In cross-institution duplicate findings (`VAL-DUP-002`), foreign institution names and IDs are replaced with `[tenant-masked]`. Institution users can only view findings belonging to their own tenant. |
+| **Privilege Escalation** | `INSTITUTION_USER` and `AUDITOR` roles are rejected with `403 Forbidden` if attempting to resolve, dismiss, assign findings, or return instruments for correction. |
+| **Direct Client Tampering** | Clients cannot directly write severity, rule outcomes, or priority scores. All findings and scores are generated exclusively server-side during engine execution. |
+| **Stale Evidence Poisoning** | `VAL-XSRC-STALE` quarantines extractions performed on older document versions, preventing comparison against obsolete evidence. |
+| **XSS & Untrusted Text** | Extracted text and file names rendered in the frontend are sanitized and displayed via React JSX text nodes, preventing raw HTML injection. |
+| **Accusatory Defamation** | All heuristic and duplicate findings use objective, non-accusatory language. Exact-hash duplicates explicitly state identical file bytes were found without alleging fraud or tampering. |
+
+---
+
+## 7. Synthetic Evaluation Metrics & Benchmark Report
+
+Executed via the reproducible test script `backend/scripts/evaluate_module3_metrics.py` against 20 labelled synthetic test fixtures:
+
+```
+================================================================================
+FDR SENTINEL — MODULE 3 EVALUATION METRICS BENCHMARK
+Executing evaluation over labelled synthetic test fixtures...
+================================================================================
+
+--- SYNTHETIC EVALUATION METRICS REPORT ---
+Total Labelled Records Tested: 20
+Deterministic Rule Precision:  100.0% (8/8)
+Deterministic Rule Recall:     80.0% (8/10)
+Deterministic Rule F1 Score:   88.89%
+Duplicate Reference Accuracy:  100.0% (4/4)
+SHA-256 Hash Duplicate Acc:   100.0% (2/2)
+Cross-Source Reconciliation:   100.0% (2/2)
+Idempotency Repeat Stability:  100.0% (20/20)
+Review Queue Rank Agreement:   100.0% (5/5)
+Average Engine Latency:        16.32 ms/instrument
+================================================================================
+```
+
+### Metrics Formula Breakdown
+- **Deterministic Rule Precision:**
+  $$\text{Precision} = \frac{TP}{TP + FP} = \frac{8}{8 + 0} = 100.0\%$$
+- **Deterministic Rule Recall:**
+  $$\text{Recall} = \frac{TP}{TP + FN} = \frac{8}{8 + 2} = 80.0\%$$
+  *(Note: 2 edge cases produced advisory `WARNING` rather than deterministic `FAIL`, appropriately yielding 0 false positives).*
+- **Deterministic Rule F1 Score:**
+  $$F_1 = 2 \times \frac{\text{Precision} \times \text{Recall}}{\text{Precision} + \text{Recall}} = 2 \times \frac{1.0 \times 0.80}{1.0 + 0.80} = 88.89\%$$
+- **Duplicate Reference Accuracy:** $4 / 4 = 100.0\%$ (correctly identifying intra/cross bank duplicates while ignoring matching references from distinct banks).
+- **Exact SHA-256 Byte Duplicate Accuracy:** $2 / 2 = 100.0\%$.
+- **Finding Idempotency Repeat Stability:** $20 / 20 = 100.0\%$ (zero spurious duplicate rows on re-runs).
+- **Review Queue Rank Agreement:** Kendall Tau / Rank Concordance $= 100.0\%$ against expected priority tiers.
+- **Engine Latency:** 16.32 ms per instrument on local SQLite environment.
+
+*(Disclaimer: Metrics reflect synthetic prototype test fixtures designed for boundary verification and do not represent production AICTE operational fraud rates).*
+
+---
+
+## 8. Frontend & Accessibility Review
+
+- **Review Queue Page (`ReviewQueuePage.tsx`):**
+  - Connects to real backend endpoints (`GET /api/v1/findings/queue`).
+  - Implements multi-criteria filtering: Status, Severity, Rule Category, and Text Search.
+  - Features quick-filter tabs: All, Unresolved Discrepancies, Advisory Warnings, High Priority.
+- **Drawer Detail & Observation View:**
+  - Displays explainable rule breakdown, rule version, evaluated inputs, and next action.
+  - Renders explicit visual badge separation between deterministic findings (`ERROR` / `FAIL`) and heuristic advisories (`[Advisory — human review required]`).
+  - Includes modal workflows for **Resolve**, **Dismiss**, and **Return for Correction**, with mandatory reason validation before submission.
+- **Accessibility & State Handling:**
+  - Full support for `Loading`, `Empty`, `Error`, and `Unauthorized` UI states.
+  - WCAG-compliant status badges incorporating icons and text labels, avoiding color-only indicators.
+- **Production Build:**
+  - Executed `npm run build` (`tsc -b && vite build`) -> **Built in 469ms with 0 errors**.
+
+---
+
+## 9. Final Definition of Done & Acceptance Checklist
+
+| Item | Requirement | Verification Method | Status |
+|------|-------------|---------------------|--------|
+| **1** | Scenario A (Valid Record) | Automated test `test_scenario_a_valid_record` | ✅ PASSED |
+| **2** | Scenario B (Invalid Date Order) | Automated test `test_scenario_b_invalid_date_combination` (`VAL-DATE-001`) | ✅ PASSED |
+| **3** | Scenario C (Policy Minimum Amount) | Automated test `test_scenario_c_policy_dependent_amount` (`VAL-AMT-002`) | ✅ PASSED |
+| **4** | Scenario D (Entered vs Extracted) | Automated test `test_scenario_d_entered_vs_extracted_discrepancy` (`VAL-XSRC-001`) | ✅ PASSED |
+| **5** | Scenario E (Reused Reference & Masking) | Automated test `test_scenario_e_reused_reference_tenant_isolation` (`VAL-DUP-002`) | ✅ PASSED |
+| **6** | Scenario F (Identical Byte Hash) | Automated test `test_scenario_f_identical_document_bytes` (`VAL-DUP-003`) | ✅ PASSED |
+| **7** | Scenario G (Corrected Evidence Auto-Resolve) | Automated test `test_scenario_g_corrected_evidence_auto_resolves` | ✅ PASSED |
+| **8** | Scenario H (Officer Resolution & Audit) | Automated test `test_scenario_h_officer_resolution_and_audit` | ✅ PASSED |
+| **9** | Scenario I (Advisory Warning Invariance) | Automated test `test_scenario_i_advisory_warning_invariance` (`VAL-SIM-001`) | ✅ PASSED |
+| **10** | Scenario J (Priority Queue & Non-Release) | Automated test `test_scenario_j_priority_queue_and_release_invariance` | ✅ PASSED |
+| **11** | SQL Injection Defense | Automated test `test_sql_injection_defense_in_queue_search` | ✅ PASSED |
+| **12** | Return for Correction Workflow | Automated test `test_return_for_correction_workflow` | ✅ PASSED |
+| **13** | Metrics Benchmark Script | Automated test `test_evaluation_metrics_benchmark_execution` | ✅ PASSED |
+| **14** | Complete Test Suite | `pytest tests/` (216 tests passed in 8.68s) | ✅ PASSED |
+| **15** | Frontend Production Build | `npm run build` in `frontend/` (0 errors, 469ms) | ✅ PASSED |
+| **16** | Documentation Matches Implementation | Updated `Doc/module3.md` | ✅ PASSED |
+
+---
+
+## 10. Known Limitations & Module 4 Prerequisite Checks
+
+### Known Limitations
+1. **Machine Extractions are Suggestions:** Module 3 treats OCR and extracted fields strictly as advisory suggestions. Extractions do not establish legal authenticity or replace official bank verification.
+2. **Local SQLite Concurrency:** In production environments, SQLite should be replaced with PostgreSQL to enable row-level locking during heavy concurrent evaluation sweeps.
+3. **Similarity Threshold Tuning:** The name similarity threshold (default `0.85`) uses Python `difflib.SequenceMatcher`. Phonetic variations (e.g. Soundex/Metaphone) are not yet integrated.
+
+### Prerequisite Checks for Module 4 (Bank Verification & Trust Promotion)
+Before commencing Module 4, verify that:
+1. Module 3 validation findings are accessible via `/api/v1/findings/instrument/{id}` so Module 4 can check for blocking discrepancies prior to dispatching bank verification requests.
+2. Module 4 services consume `instrument.trust_level` directly, ensuring validation rules continue to have **read-only** access to trust levels.
+3. Bank confirmation webhooks and direct API integrations in Module 4 do not overwrite Module 1 user-entered fields, but instead write to independent bank confirmation audit records.

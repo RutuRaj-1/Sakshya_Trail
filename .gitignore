@@ -48,6 +48,8 @@ coverage.xml
 *.sqlite3
 fdr_sentinel.db
 backend/fdr_sentinel.db
+backend/storage/
+storage/
 
 # Node / Frontend
 frontend/node_modules/
