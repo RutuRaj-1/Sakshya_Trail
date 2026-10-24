@@ -15,6 +15,7 @@ import app.modules.auth.models
 import app.modules.institutions.models
 import app.modules.instruments.models
 import app.modules.audit.models
+import app.modules.documents.models
 
 from app.api.v1.router import api_v1_router
 from app.api.v1.endpoints.health import liveness_check, readiness_check

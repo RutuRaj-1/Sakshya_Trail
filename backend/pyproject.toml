@@ -6,7 +6,6 @@ build-backend = "setuptools.build_meta"
 name = "fdr-sentinel-backend"
 version = "0.1.0"
 description = "FDR Sentinel - AICTE Security Deposit / FDR Lifecycle Integrity Platform Backend"
-readme = "../README.md"
 requires-python = ">=3.11"
 authors = [
     { name = "Ukdiche_Modak Team" }
