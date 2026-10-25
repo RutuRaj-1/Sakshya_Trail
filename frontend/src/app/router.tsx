@@ -12,6 +12,8 @@ import { ReviewQueuePage } from '@/app/routes/ReviewQueuePage';
 import { TrustVerificationDeskPage } from '@/app/routes/TrustVerificationDeskPage';
 import { LoginPage } from '@/app/routes/LoginPage';
 import { ChangePasswordPage } from '@/app/routes/ChangePasswordPage';
+import { ReleaseCasesPage } from '@/app/routes/ReleaseCasesPage';
+import { ReleaseDetailPage } from '@/app/routes/ReleaseDetailPage';
 import { ProtectedRoute } from '@/features/auth/ProtectedRoute';
 
 export const router = createBrowserRouter([
@@ -54,6 +56,14 @@ export const router = createBrowserRouter([
       {
         path: 'institutions/:id',
         element: <InstitutionDetailPage />,
+      },
+      {
+        path: 'release',
+        element: <ReleaseCasesPage />,
+      },
+      {
+        path: 'release/:id',
+        element: <ReleaseDetailPage />,
       },
       {
         path: 'findings/queue',
