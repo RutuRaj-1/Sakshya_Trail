@@ -391,7 +391,7 @@ def approve_release_request_endpoint(
     id: str = Path(...),
     reason: str = Query(..., min_length=3, description="Mandatory approval justification"),
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_roles([ROLE_SYSTEM_ADMIN, ROLE_COMPETENT_AUTHORITY])),
+    current_user: User = Depends(require_roles([ROLE_COMPETENT_AUTHORITY])),
 ):
     """
     Competent authority grants final approval for release.

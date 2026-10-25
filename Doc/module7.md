@@ -2,7 +2,7 @@
 
 **Project:** FDR Sentinel (SIH 2026 Problem Statement ID 26265: “Streamline of Security Deposit/FDR Portal”)  
 **Module:** Module 7 — Command Center, Search, Reporting & Audit  
-**Status:** In Progress (Prompt 3 of 5 Complete)  
+**Status:** Complete (All 5 of 5 Prompts Implemented & Verified)  
 
 ---
 
@@ -298,6 +298,57 @@ The frontend test suite in `frontend/src/features/commandCenter/__tests__/Comman
 - **Frontend Vitest Suite:** `npx vitest run src/features/commandCenter/__tests__/OperationalReports.test.tsx` → **6 passed** in 0.54s.
 - **Combined Module 7 Frontend Suite:** `npx vitest run src/features/commandCenter/__tests__/` → **23 passed** across 3 test files in 1.89s.
 - **Production Build:** `npm run build` (`tsc -b && vite build`) completed cleanly with **0 errors**.
+---
 
+## Prompt 5: Complete Audit Integrity, Audit-Chain Verification, Security Hardening & End-to-End Integration
 
+### 1. Implemented Files & Architecture
 
+| File Path | Description |
+|:---|:---|
+| `backend/alembic/versions/2026_10_25_1300-b9c0d1e2f3a4_add_audit_hash_chain.py` | Database migration adding `sequence_number`, `previous_hash`, `current_hash`, `policy_version`, and creating database-level triggers rejecting any `UPDATE` or `DELETE` on `audit_events`. |
+| `backend/app/modules/audit/models.py` | Updated SQLAlchemy model for `AuditEvent` with monotonic sequence, block hashes, and ORM event listeners (`before_update`, `before_delete`) raising `PermissionError`. |
+| `backend/app/modules/audit/schemas.py` | Pydantic response models for `AuditEventRead`, `AuditInconsistencyDetail`, and `AuditChainVerificationResponse`. |
+| `backend/app/modules/audit/service.py` | Hardened central logging service with deterministic SHA-256 canonical hashing (`compute_canonical_event_hash`), monotonic sequence numbering, parent hash linking (`previous_hash`), and credential sanitization (`sanitize_dict`). |
+| `backend/app/modules/dashboard/audit_query_service.py` | Query service providing multi-attribute audit filtering, row-level tenant authorization, and the cryptographic verification engine (`verify_audit_log_integrity`). |
+| `backend/app/modules/audit/router.py` | REST API routes for `/audit/events`, `/audit/events/{id}`, `/audit/integrity`, and `/audit/verify`. |
+| `backend/app/modules/release/router.py` & `decision_service.py` | Security hardening: Release approval authority strictly restricted to `COMPETENT_AUTHORITY`. System Administrator role denied release approval authority. |
+| `frontend/src/api/endpoints.ts` | Added `auditApi` with `list()`, `get()`, and `verifyChain()` methods. |
+| `frontend/src/app/routes/AuditPage.tsx` | Complete Audit Explorer interface with live "Verify Audit Chain" action, cryptographic pass/tamper status banner, sequence filters, copyable hashes, and forensic inspection drawer. |
+| `docs/audit-integrity-and-verification.md` | Formal technical specification covering hashing rules, canonicalization, database triggers, verification engine, and residual risk disclosures. |
+| `docs/module-7-architecture.md` | Comprehensive architectural documentation of all Module 7 components, data flows, and security boundaries. |
+| `docs/module-7-acceptance-checklist.md` | PRD functional requirement mapping (PRD-FR-070 to PRD-FR-096) and verification summary. |
+| `backend/tests/test_module7_prompt5_audit_integrity.py` | 14 automated acceptance and security tests covering hash chaining, sanitization, mutation rejection, tamper detection, RBAC boundaries, cross-tenant isolation, and Scenarios A–F. |
+| `frontend/src/features/commandCenter/__tests__/AuditExplorer.test.tsx` | 5 automated Vitest tests verifying Audit Explorer rendering, table sequences, verifyChain invocation, forensic tamper alert rendering, and inspection modal. |
+
+---
+
+### 2. Implemented Endpoints
+
+| HTTP Method | Endpoint Path | Function & PRD Mapping | Authorized Roles |
+|:---|:---|:---|:---|
+| `GET` | `/api/v1/audit/events` | List audit events with multi-attribute filtering, search, and row-level tenant scoping (PRD-FR-090, PRD-FR-091). | All authenticated users (scoped) |
+| `GET` | `/api/v1/audit/events/{event_id}` | Retrieve full cryptographic details and state diffs for a single audit event (PRD-FR-091). | All authenticated users (scoped) |
+| `POST` | `/api/v1/audit/verify` | Cryptographically replays and verifies SHA-256 chain continuity, reporting earliest inconsistency (PRD-FR-093). | `SYSTEM_ADMIN`, `AUDITOR`, `BRANCH_HEAD`, `COMPETENT_AUTHORITY` |
+| `GET` | `/api/v1/audit/integrity` | Alias to verify audit chain integrity for compliance dashboards. | `SYSTEM_ADMIN`, `AUDITOR`, `BRANCH_HEAD`, `COMPETENT_AUTHORITY` |
+
+---
+
+### 3. Verification & Acceptance Journey Scenarios (A through F)
+
+- **Scenario A (New Instrument Creation):** Registered instrument with strict decimal currency, uploaded PDF document, recorded `INSTRUMENT_CREATED` in audit chain with monotonic sequence #.
+- **Scenario B (Discrepancy & Verification):** Flagged date mismatch finding, recorded officer scrutiny observation, verified resolution and cryptographic linking.
+- **Scenario C (Maturity & Renewal Lineage):** Approaching maturity instrument linked to successor renewal, preserving predecessor history without silent state mutation.
+- **Scenario D (Release/Refund Maker-Checker):** Release Gate blocks unauthorized advancement; officer review and Competent Authority approval enforced; System Admin denied approval authority.
+- **Scenario E (Operational Reports & Export):** Operational metrics match database calculations; CSV and PDF exported with statutory banners and export audit logging.
+- **Scenario F (Audit Integrity & Tamper Detection):** Intact chain verified with `status: "PASS"`; simulated payload tampering detected with `PAYLOAD_TAMPERED`; database trigger rejects direct SQL update/delete.
+
+---
+
+### 4. Automated Tests & Build Verification
+
+- **Backend Pytest Suite (Prompt 5):** `pytest tests/test_module7_prompt5_audit_integrity.py` → **14 passed** in 10.02s.
+- **Full Module 7 Backend Suite:** `pytest tests/test_module7_*.py` → **43 passed** in 15.42s (0 regressions).
+- **Frontend Vitest Suite (Prompt 5):** `npx vitest run src/features/commandCenter/__tests__/AuditExplorer.test.tsx` → **5 passed** in 0.47s.
+- **Combined Module 7 Frontend Suite:** `npx vitest run src/features/commandCenter/__tests__/` → **28 passed** across 4 test files in 1.99s.
+- **Frontend Production Build:** `npm run build` (`tsc -b && vite build`) completed cleanly with **0 errors**.

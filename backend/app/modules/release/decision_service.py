@@ -618,13 +618,13 @@ def approve_release_request(
     Authorized competent authority approves release.
     Verifies maker-checker separation and current readiness.
     """
-    # Authorization
+    # Authorization: Release approval strictly restricted to Competent Authority (Admin denied approval authority)
     auth_ok, auth_reason = check_user_authority(
         current_user,
-        ["COMPETENT_AUTHORITY", "SYSTEM_ADMIN"],
+        ["COMPETENT_AUTHORITY"],
     )
     if not auth_ok:
-        raise ForbiddenException(auth_reason)
+        raise ForbiddenException("System Administrator role does not possess release approval authority. Approval strictly reserved for Competent Authority.")
     
     # Validate reason
     clean_reason = (reason or "").strip()

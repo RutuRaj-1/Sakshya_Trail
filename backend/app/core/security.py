@@ -138,7 +138,11 @@ def sanitize_dict(data: Optional[Dict[str, Any]]) -> Dict[str, Any]:
         return {}
     sanitized: Dict[str, Any] = {}
     for k, v in data.items():
-        if k.lower() in SENSITIVE_KEYS:
+        k_lower = k.lower()
+        if (
+            k_lower in SENSITIVE_KEYS
+            or any(sub in k_lower for sub in ["password", "token", "secret", "api_key", "credential"])
+        ):
             sanitized[k] = "[REDACTED]"
         elif isinstance(v, dict):
             sanitized[k] = sanitize_dict(v)

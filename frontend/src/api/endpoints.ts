@@ -379,3 +379,88 @@ export const lifecycleApi = {
     ),
 };
 
+export interface AuditEventItem {
+  id: string;
+  sequence_number?: number | null;
+  created_at: string;
+  action: string;
+  entity_type: string;
+  entity_id: string;
+  actor_user_id?: string | null;
+  actor_email?: string | null;
+  actor_role?: string | null;
+  outcome: string;
+  request_id?: string | null;
+  ip_address?: string | null;
+  policy_version?: string | null;
+  metadata?: Record<string, any>;
+  previous_hash?: string | null;
+  current_hash?: string | null;
+}
+
+export interface AuditQueryResponse {
+  items: AuditEventItem[];
+  total: number;
+  skip: number;
+  limit: number;
+  has_more: boolean;
+}
+
+export interface AuditChainVerificationResponse {
+  status: 'PASS' | 'TAMPER_DETECTED' | 'ERROR';
+  is_chain_intact: boolean;
+  total_events_in_scope: number;
+  verified_count: number;
+  latest_sequence_number?: number | null;
+  chain_head_hash?: string | null;
+  first_inconsistency?: {
+    sequence_number: number;
+    event_id: string;
+    failure_type: string;
+    expected_hash?: string | null;
+    actual_hash?: string | null;
+    safe_explanation: string;
+  } | null;
+  verification_timestamp: string;
+  verification_scope_description: string;
+}
+
+export const auditApi = {
+  list: (params?: {
+    entity_type?: string;
+    entity_id?: string;
+    action?: string;
+    outcome?: string;
+    actor_email?: string;
+    actor_role?: string;
+    date_from?: string;
+    date_to?: string;
+    search?: string;
+    skip?: number;
+    limit?: number;
+  }) => {
+    const sp = new URLSearchParams();
+    if (params?.entity_type) sp.append('entity_type', params.entity_type);
+    if (params?.entity_id) sp.append('entity_id', params.entity_id);
+    if (params?.action) sp.append('action', params.action);
+    if (params?.outcome) sp.append('outcome', params.outcome);
+    if (params?.actor_email) sp.append('actor_email', params.actor_email);
+    if (params?.actor_role) sp.append('actor_role', params.actor_role);
+    if (params?.date_from) sp.append('date_from', params.date_from);
+    if (params?.date_to) sp.append('date_to', params.date_to);
+    if (params?.search) sp.append('search', params.search);
+    if (params?.skip !== undefined) sp.append('skip', String(params.skip));
+    if (params?.limit !== undefined) sp.append('limit', String(params.limit));
+    const query = sp.toString() ? `?${sp.toString()}` : '';
+    return apiClient.get<AuditQueryResponse>(`/audit/events${query}`);
+  },
+  get: (id: string) => apiClient.get<AuditEventItem>(`/audit/events/${id}`),
+  verifyChain: (params?: { sample_size?: number; start_sequence?: number }) => {
+    const sp = new URLSearchParams();
+    if (params?.sample_size) sp.append('sample_size', String(params.sample_size));
+    if (params?.start_sequence) sp.append('start_sequence', String(params.start_sequence));
+    const query = sp.toString() ? `?${sp.toString()}` : '';
+    return apiClient.post<AuditChainVerificationResponse>(`/audit/verify${query}`, {});
+  },
+};
+
