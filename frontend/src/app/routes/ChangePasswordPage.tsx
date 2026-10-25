@@ -158,6 +158,19 @@ export const ChangePasswordPage: React.FC = () => {
                   {isLoading ? 'Updating Credentials...' : 'Save New Password & Continue'}
                 </Button>
               </div>
+
+              <div className="text-center pt-3 border-t border-slate-100 mt-4">
+                <button
+                  type="button"
+                  onClick={() => {
+                    sessionStorage.setItem('dismiss_password_rotation', 'true');
+                    navigate('/', { replace: true });
+                  }}
+                  className="text-xs text-slate-500 hover:text-slate-800 underline font-medium transition-colors"
+                >
+                  Remind me later & Return to Dashboard →
+                </button>
+              </div>
             </form>
           )}
         </div>

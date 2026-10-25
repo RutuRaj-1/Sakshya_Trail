@@ -27,8 +27,9 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowe
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // Force password rotation for provisioned accounts
-  if (user.must_change_password && location.pathname !== '/change-password') {
+  // Force password rotation for provisioned accounts (unless user opted to continue to dashboard)
+  const isRotationDismissed = sessionStorage.getItem('dismiss_password_rotation') === 'true';
+  if (user.must_change_password && !isRotationDismissed && location.pathname !== '/change-password') {
     return <Navigate to="/change-password" replace />;
   }
 
