@@ -394,8 +394,8 @@ export const TrustVerificationDeskPage: React.FC = () => {
       case 'L0_DECLARED':
       default:
         return (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-300 shadow-2xs">
-            <ShieldAlert className="w-4 h-4 text-slate-500" />
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-[#253746] border border-[#8799A9] shadow-2xs">
+            <ShieldAlert className="w-4 h-4 text-[#5D6A75]" />
             <span>L0 DECLARED</span>
           </span>
         );
@@ -439,15 +439,15 @@ export const TrustVerificationDeskPage: React.FC = () => {
     return (
       <div className="space-y-6 max-w-7xl mx-auto pb-12">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#C9D3DB] pb-5">
           <div>
             <div className="flex items-center gap-2">
-              <ShieldCheck className="w-6 h-6 text-sentinel-700" />
-              <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
+              <ShieldCheck className="w-6 h-6 text-[#123B5D]" />
+              <h1 className="text-xl sm:text-2xl font-bold text-[#0D2538] tracking-tight">
                 Trust & Verification Desk
               </h1>
             </div>
-            <p className="text-sm text-slate-500 mt-1">
+            <p className="text-sm text-[#5D6A75] mt-1">
               Authoritative statutory FDR trust state enforcement, electronic bank confirmation and field provenance timeline.
             </p>
           </div>
@@ -467,20 +467,20 @@ export const TrustVerificationDeskPage: React.FC = () => {
 
         {/* Hierarchy Overview Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-2xs">
+          <div className="p-4 rounded-[10px] bg-white border border-[#C9D3DB] shadow-2xs">
             <div className="flex items-center justify-between mb-1">
-              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+              <span className="text-xs font-semibold text-[#5D6A75] uppercase tracking-wider">
                 Level 0 — Declared
               </span>
               <ShieldAlert className="w-4 h-4 text-slate-400" />
             </div>
-            <p className="text-2xl font-bold text-slate-800">
+            <p className="text-2xl font-bold text-[#253746]">
               {instrumentsDirectory.filter((i) => i.trust_level === 'L0_DECLARED').length}
             </p>
-            <p className="text-xs text-slate-500 mt-1">Self-declared statutory deposits</p>
+            <p className="text-xs text-[#5D6A75] mt-1">Self-declared statutory deposits</p>
           </div>
 
-          <div className="p-4 rounded-xl bg-white border border-blue-200 shadow-2xs">
+          <div className="p-4 rounded-[10px] bg-white border border-blue-200 shadow-2xs">
             <div className="flex items-center justify-between mb-1">
               <span className="text-xs font-semibold text-blue-600 uppercase tracking-wider">
                 Level 1 — Consistent
@@ -493,7 +493,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
             <p className="text-xs text-blue-600/80 mt-1">OCR document rules validated</p>
           </div>
 
-          <div className="p-4 rounded-xl bg-white border border-emerald-200 shadow-2xs">
+          <div className="p-4 rounded-[10px] bg-white border border-emerald-200 shadow-2xs">
             <div className="flex items-center justify-between mb-1">
               <span className="text-xs font-semibold text-emerald-600 uppercase tracking-wider">
                 Level 2 — Officer Verified
@@ -506,7 +506,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
             <p className="text-xs text-emerald-600/80 mt-1">Scrutiny officer reviewed & attested</p>
           </div>
 
-          <div className="p-4 rounded-xl bg-white border border-purple-200 shadow-2xs">
+          <div className="p-4 rounded-[10px] bg-white border border-purple-200 shadow-2xs">
             <div className="flex items-center justify-between mb-1">
               <span className="text-xs font-semibold text-purple-600 uppercase tracking-wider">
                 Level 3 — Bank Confirmed
@@ -521,7 +521,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
         </div>
 
         {/* Directory Search & Filter Bar */}
-        <div className="p-4 bg-white rounded-xl border border-slate-200 shadow-2xs space-y-3">
+        <div className="p-4 bg-white rounded-[10px] border border-[#C9D3DB] shadow-2xs space-y-3">
           <div className="flex flex-col md:flex-row gap-3">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
@@ -530,15 +530,15 @@ export const TrustVerificationDeskPage: React.FC = () => {
                 placeholder="Search by FDR reference number, bank name, institution..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sentinel-500 text-slate-800"
+                className="w-full pl-9 pr-4 py-2 border border-[#8799A9] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sentinel-500 text-[#253746]"
               />
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-xs font-medium text-slate-500 shrink-0">Trust Level:</span>
+              <span className="text-xs font-medium text-[#5D6A75] shrink-0">Trust Level:</span>
               <select
                 value={trustFilter}
                 onChange={(e) => setTrustFilter(e.target.value)}
-                className="px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-sentinel-500"
+                className="px-3 py-2 border border-[#8799A9] rounded-lg text-sm bg-white text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500"
               >
                 <option value="ALL">All Trust Levels</option>
                 <option value="L0_DECLARED">L0 — Declared</option>
@@ -551,18 +551,18 @@ export const TrustVerificationDeskPage: React.FC = () => {
         </div>
 
         {/* Directory Instruments Table */}
-        <div className="bg-white rounded-xl border border-slate-200 shadow-2xs overflow-hidden">
-          <div className="p-4 border-b border-slate-200 bg-slate-50/50 flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+        <div className="bg-white rounded-[10px] border border-[#C9D3DB] shadow-2xs overflow-hidden">
+          <div className="p-4 border-b border-[#C9D3DB] bg-[#F5F4EF]/50 flex items-center justify-between">
+            <span className="text-xs font-bold text-[#253746] uppercase tracking-wider">
               Registered Instruments ({filteredDirectory.length})
             </span>
-            <span className="text-xs text-slate-500">
+            <span className="text-xs text-[#5D6A75]">
               Select an instrument to inspect provenance, bank verification, or execute trust elevation
             </span>
           </div>
 
           {filteredDirectory.length === 0 ? (
-            <div className="py-16 text-center text-slate-500">
+            <div className="py-16 text-center text-[#5D6A75]">
               <FileSpreadsheet className="w-10 h-10 text-slate-300 mx-auto mb-2" />
               <p className="text-sm font-medium">No instruments match the selected criteria.</p>
             </div>
@@ -570,7 +570,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
                 <thead>
-                  <tr className="border-b border-slate-200 bg-slate-50 text-[11px] font-semibold uppercase text-slate-500 tracking-wider">
+                  <tr className="border-b border-[#C9D3DB] bg-[#F5F4EF] text-[11px] font-semibold uppercase text-[#5D6A75] tracking-wider">
                     <th className="py-3 px-4">Reference No.</th>
                     <th className="py-3 px-4">Bank & Branch</th>
                     <th className="py-3 px-4">Institution</th>
@@ -584,25 +584,25 @@ export const TrustVerificationDeskPage: React.FC = () => {
                   {filteredDirectory.map((item) => (
                     <tr
                       key={item.id}
-                      className="hover:bg-slate-50/80 transition-colors group cursor-pointer"
+                      className="hover:bg-[#F5F4EF]/80 transition-colors group cursor-pointer"
                       onClick={() => handleSelectInstrument(item.id)}
                     >
-                      <td className="py-3.5 px-4 font-mono font-bold text-sentinel-800">
+                      <td className="py-3.5 px-4 font-mono font-bold text-[#0D2538]">
                         {item.reference_number}
                       </td>
                       <td className="py-3.5 px-4">
-                        <div className="font-medium text-slate-800">{item.bank_name}</div>
+                        <div className="font-medium text-[#253746]">{item.bank_name}</div>
                         <div className="text-xs text-slate-400">{item.branch || '—'}</div>
                       </td>
                       <td className="py-3.5 px-4">
-                        <div className="font-medium text-slate-800">
+                        <div className="font-medium text-[#253746]">
                           {item.institution_name || item.institution_code || item.institution_id}
                         </div>
                       </td>
-                      <td className="py-3.5 px-4 text-right font-mono font-medium text-slate-900">
+                      <td className="py-3.5 px-4 text-right font-mono font-medium text-[#0D2538]">
                         {formatINR(item.amount)}
                       </td>
-                      <td className="py-3.5 px-4 text-xs font-mono text-slate-600">
+                      <td className="py-3.5 px-4 text-xs font-mono text-[#5D6A75]">
                         {formatDate(item.maturity_date)}
                       </td>
                       <td className="py-3.5 px-4 text-center">
@@ -612,7 +612,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
                         <Button
                           variant="outline"
                           size="sm"
-                          className="gap-1 text-xs group-hover:border-sentinel-500 group-hover:text-sentinel-700"
+                          className="gap-1 text-xs group-hover:border-sentinel-500 group-hover:text-[#123B5D]"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleSelectInstrument(item.id);
@@ -640,7 +640,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
     <div className="space-y-6 max-w-7xl mx-auto pb-16">
       {/* Alert Messages */}
       {errorMessage && (
-        <div className="p-4 bg-rose-50 border border-rose-200 rounded-xl text-rose-800 flex items-start justify-between gap-3 shadow-2xs">
+        <div className="p-4 bg-rose-50 border border-rose-200 rounded-[10px] text-rose-800 flex items-start justify-between gap-3 shadow-2xs">
           <div className="flex items-start gap-2.5">
             <AlertOctagon className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
             <div>
@@ -658,7 +658,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
       )}
 
       {successMessage && (
-        <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 flex items-start justify-between gap-3 shadow-2xs">
+        <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-[10px] text-emerald-800 flex items-start justify-between gap-3 shadow-2xs">
           <div className="flex items-start gap-2.5">
             <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
             <div>
@@ -676,27 +676,27 @@ export const TrustVerificationDeskPage: React.FC = () => {
       )}
 
       {/* Header & Breadcrumb */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#C9D3DB] pb-5">
         <div className="flex items-center gap-3">
           <Button
             variant="outline"
             size="sm"
             onClick={handleBackToDirectory}
-            className="gap-1.5 text-xs text-slate-600 hover:text-slate-900"
+            className="gap-1.5 text-xs text-[#5D6A75] hover:text-[#0D2538]"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>All Instruments</span>
           </Button>
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-mono text-xs font-bold text-sentinel-700 bg-sentinel-50 border border-sentinel-200 px-2 py-0.5 rounded">
+              <span className="font-mono text-xs font-bold text-[#123B5D] bg-[#EEF6FA] border border-[#C4DEED] px-2 py-0.5 rounded">
                 Desk
               </span>
-              <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight font-mono">
+              <h1 className="text-xl sm:text-2xl font-bold text-[#0D2538] tracking-tight font-mono">
                 {instrument?.reference_number || 'Loading FDR...'}
               </h1>
             </div>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <p className="text-xs text-[#5D6A75] mt-0.5">
               {instrument?.bank_name} • {instrument?.institution_name || instrument?.institution_code}
             </p>
           </div>
@@ -706,7 +706,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
           {instrument && (
             <Link
               to={`/instruments/${instrument.id}`}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-600 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors shadow-2xs"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[#5D6A75] bg-white border border-[#8799A9] rounded-lg hover:bg-[#F5F4EF] transition-colors shadow-2xs"
             >
               <ExternalLink className="w-3.5 h-3.5" />
               <span>Module 1 Detail</span>
@@ -728,7 +728,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
 
       {/* Summary Banner Card */}
       {instrument && (
-        <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-2xs space-y-4">
+        <div className="bg-white rounded-[10px] border border-[#C9D3DB] p-5 shadow-2xs space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-100">
             <div className="space-y-1">
               <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
@@ -736,12 +736,12 @@ export const TrustVerificationDeskPage: React.FC = () => {
               </span>
               <div className="flex items-center gap-3">
                 {renderTrustBadge(instrument.trust_level)}
-                <span className="text-xs font-medium text-slate-500">
+                <span className="text-xs font-medium text-[#5D6A75]">
                   Status:{' '}
-                  <span className="font-semibold text-slate-800">{instrument.status}</span>
+                  <span className="font-semibold text-[#253746]">{instrument.status}</span>
                 </span>
                 {trustAssessments.length > 0 && (
-                  <span className="text-[11px] font-mono bg-slate-100 text-slate-600 px-2 py-0.5 rounded border border-slate-200">
+                  <span className="text-[11px] font-mono bg-slate-100 text-[#5D6A75] px-2 py-0.5 rounded border border-[#C9D3DB]">
                     Concurrency Ver: {trustAssessments[0].concurrency_version}
                   </span>
                 )}
@@ -788,25 +788,25 @@ export const TrustVerificationDeskPage: React.FC = () => {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
             <div>
               <span className="text-slate-400 block font-medium">Principal Amount</span>
-              <span className="font-mono font-bold text-slate-900 text-sm">
+              <span className="font-mono font-bold text-[#0D2538] text-sm">
                 {formatINR(instrument.amount)}
               </span>
             </div>
             <div>
               <span className="text-slate-400 block font-medium">Maturity Date</span>
-              <span className="font-mono text-slate-900 text-sm">
+              <span className="font-mono text-[#0D2538] text-sm">
                 {formatDate(instrument.maturity_date)}
               </span>
             </div>
             <div>
               <span className="text-slate-400 block font-medium">Lien Status</span>
-              <span className="font-semibold text-slate-800 text-sm">
+              <span className="font-semibold text-[#253746] text-sm">
                 {instrument.lien_marked ? 'Lien Marked' : 'No Lien Recorded'}
               </span>
             </div>
             <div>
               <span className="text-slate-400 block font-medium">Verification Requests</span>
-              <span className="font-mono font-bold text-slate-900 text-sm">
+              <span className="font-mono font-bold text-[#0D2538] text-sm">
                 {verificationRequests.length} initiated
               </span>
             </div>
@@ -815,7 +815,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
       )}
 
       {/* Tabs Navigation */}
-      <div className="border-b border-slate-200">
+      <div className="border-b border-[#C9D3DB]">
         <nav className="flex space-x-6 text-sm font-medium">
           <button
             onClick={() => setActiveTab('trust')}
@@ -823,7 +823,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
               'pb-3 border-b-2 flex items-center gap-2 transition-colors',
               activeTab === 'trust'
                 ? 'border-sentinel-700 text-sentinel-900 font-bold'
-                : 'border-transparent text-slate-500 hover:text-slate-800'
+                : 'border-transparent text-[#5D6A75] hover:text-[#253746]'
             )}
           >
             <ShieldCheck className="w-4 h-4" />
@@ -836,7 +836,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
               'pb-3 border-b-2 flex items-center gap-2 transition-colors',
               activeTab === 'provenance'
                 ? 'border-sentinel-700 text-sentinel-900 font-bold'
-                : 'border-transparent text-slate-500 hover:text-slate-800'
+                : 'border-transparent text-[#5D6A75] hover:text-[#253746]'
             )}
           >
             <History className="w-4 h-4" />
@@ -849,7 +849,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
               'pb-3 border-b-2 flex items-center gap-2 transition-colors',
               activeTab === 'requests'
                 ? 'border-sentinel-700 text-sentinel-900 font-bold'
-                : 'border-transparent text-slate-500 hover:text-slate-800'
+                : 'border-transparent text-[#5D6A75] hover:text-[#253746]'
             )}
           >
             <Send className="w-4 h-4" />
@@ -862,7 +862,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
               'pb-3 border-b-2 flex items-center gap-2 transition-colors',
               activeTab === 'conflicts'
                 ? 'border-sentinel-700 text-sentinel-900 font-bold'
-                : 'border-transparent text-slate-500 hover:text-slate-800'
+                : 'border-transparent text-[#5D6A75] hover:text-[#253746]'
             )}
           >
             <AlertTriangle className="w-4 h-4" />
@@ -878,21 +878,21 @@ export const TrustVerificationDeskPage: React.FC = () => {
         <div className="space-y-6">
           {/* Aggregate Field Breakdown */}
           {trustSummary && (
-            <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-2xs space-y-4">
+            <div className="bg-white rounded-[10px] border border-[#C9D3DB] p-5 shadow-2xs space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-sm font-bold text-slate-900">
+                  <h3 className="text-sm font-bold text-[#0D2538]">
                     Aggregate Trust Assessment Breakdown
                   </h3>
-                  <p className="text-xs text-slate-500 mt-0.5">{trustSummary.note}</p>
+                  <p className="text-xs text-[#5D6A75] mt-0.5">{trustSummary.note}</p>
                 </div>
                 {renderTrustBadge(trustSummary.aggregate_trust_level)}
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-2">
                 {Object.entries(trustSummary.fields_by_level || {}).map(([lvl, fields]) => (
-                  <div key={lvl} className="p-3 bg-slate-50 rounded-lg border border-slate-200">
-                    <span className="text-[11px] font-mono font-bold text-slate-600 block uppercase mb-1">
+                  <div key={lvl} className="p-3 bg-[#F5F4EF] rounded-lg border border-[#C9D3DB]">
+                    <span className="text-[11px] font-mono font-bold text-[#5D6A75] block uppercase mb-1">
                       {lvl.replace('_', ' ')}
                     </span>
                     {fields.length === 0 ? (
@@ -902,7 +902,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
                         {fields.map((f) => (
                           <span
                             key={f}
-                            className="text-[10px] font-mono bg-white text-slate-700 px-1.5 py-0.5 rounded border border-slate-200"
+                            className="text-[10px] font-mono bg-white text-[#253746] px-1.5 py-0.5 rounded border border-[#C9D3DB]"
                           >
                             {f}
                           </span>
@@ -926,12 +926,12 @@ export const TrustVerificationDeskPage: React.FC = () => {
           )}
 
           {/* Transition History Table */}
-          <div className="bg-white rounded-xl border border-slate-200 shadow-2xs overflow-hidden">
-            <div className="p-4 border-b border-slate-200 bg-slate-50/50 flex items-center justify-between">
-              <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
+          <div className="bg-white rounded-[10px] border border-[#C9D3DB] shadow-2xs overflow-hidden">
+            <div className="p-4 border-b border-[#C9D3DB] bg-[#F5F4EF]/50 flex items-center justify-between">
+              <h3 className="text-xs font-bold text-[#253746] uppercase tracking-wider">
                 Audited Trust Transition History ({trustHistory.length})
               </h3>
-              <span className="text-xs text-slate-500 font-mono">
+              <span className="text-xs text-[#5D6A75] font-mono">
                 Immutable transition ledger
               </span>
             </div>
@@ -945,7 +945,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
                   <thead>
-                    <tr className="border-b border-slate-200 bg-slate-50 text-[10px] font-semibold uppercase text-slate-500 tracking-wider">
+                    <tr className="border-b border-[#C9D3DB] bg-[#F5F4EF] text-[10px] font-semibold uppercase text-[#5D6A75] tracking-wider">
                       <th className="py-2.5 px-4">Timestamp</th>
                       <th className="py-2.5 px-4">Level Transition</th>
                       <th className="py-2.5 px-4">Trigger & Actor</th>
@@ -956,13 +956,13 @@ export const TrustVerificationDeskPage: React.FC = () => {
                   </thead>
                   <tbody className="divide-y divide-slate-100 font-sans">
                     {trustHistory.map((item) => (
-                      <tr key={item.id} className="hover:bg-slate-50/80 transition-colors">
-                        <td className="py-3 px-4 font-mono text-slate-500 whitespace-nowrap">
+                      <tr key={item.id} className="hover:bg-[#F5F4EF]/80 transition-colors">
+                        <td className="py-3 px-4 font-mono text-[#5D6A75] whitespace-nowrap">
                           {formatDateTime(item.timestamp)}
                         </td>
                         <td className="py-3 px-4 whitespace-nowrap">
                           <div className="flex items-center gap-1.5 font-mono font-bold">
-                            <span className="text-slate-500">{item.prior_trust_level}</span>
+                            <span className="text-[#5D6A75]">{item.prior_trust_level}</span>
                             <span className="text-slate-400">→</span>
                             <span
                               className={cn(
@@ -979,17 +979,17 @@ export const TrustVerificationDeskPage: React.FC = () => {
                           </div>
                         </td>
                         <td className="py-3 px-4">
-                          <span className="font-semibold text-slate-800 block">
+                          <span className="font-semibold text-[#253746] block">
                             {item.trigger_type}
                           </span>
-                          <span className="text-[11px] text-slate-500 font-mono">
+                          <span className="text-[11px] text-[#5D6A75] font-mono">
                             {item.actor_user_id || item.actor_service || 'SYSTEM'}
                           </span>
                         </td>
-                        <td className="py-3 px-4 text-slate-700 max-w-xs font-serif italic">
+                        <td className="py-3 px-4 text-[#253746] max-w-xs font-serif italic">
                           "{item.reason}"
                         </td>
-                        <td className="py-3 px-4 font-mono text-[11px] text-slate-600 max-w-xs truncate">
+                        <td className="py-3 px-4 font-mono text-[11px] text-[#5D6A75] max-w-xs truncate">
                           {item.evidence_references_json || '—'}
                         </td>
                         <td className="py-3 px-4 text-center">
@@ -1019,23 +1019,23 @@ export const TrustVerificationDeskPage: React.FC = () => {
       {/* =================================================================== */}
       {activeTab === 'provenance' && (
         <div className="space-y-4">
-          <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="bg-white rounded-[10px] border border-[#C9D3DB] p-4 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <h3 className="text-sm font-bold text-slate-900">
+              <h3 className="text-sm font-bold text-[#0D2538]">
                 Field-Level Provenance & Audit Trail
               </h3>
-              <p className="text-xs text-slate-500 mt-0.5">
+              <p className="text-xs text-[#5D6A75] mt-0.5">
                 Every field mutation is tracked with source actor, service ID, timestamp, and supporting document version.
               </p>
             </div>
 
             {/* Field Filter */}
             <div className="flex items-center gap-2">
-              <span className="text-xs font-medium text-slate-500">Filter Field:</span>
+              <span className="text-xs font-medium text-[#5D6A75]">Filter Field:</span>
               <select
                 value={selectedFieldFilter}
                 onChange={(e) => setSelectedFieldFilter(e.target.value)}
-                className="px-3 py-1.5 border border-slate-300 rounded-lg text-xs bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-sentinel-500 font-mono"
+                className="px-3 py-1.5 border border-[#8799A9] rounded-lg text-xs bg-white text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500 font-mono"
               >
                 <option value="ALL">All Fields ({availableFieldNames.length})</option>
                 {availableFieldNames.map((name) => (
@@ -1048,7 +1048,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
           </div>
 
           {filteredProvenance.length === 0 ? (
-            <div className="p-12 bg-white rounded-xl border border-slate-200 text-center text-slate-400">
+            <div className="p-12 bg-white rounded-[10px] border border-[#C9D3DB] text-center text-slate-400">
               <FileText className="w-8 h-8 mx-auto mb-2 opacity-50" />
               <p className="text-xs font-medium">No provenance records logged for this filter.</p>
             </div>
@@ -1058,15 +1058,15 @@ export const TrustVerificationDeskPage: React.FC = () => {
                 <div
                   key={item.id}
                   className={cn(
-                    'p-4 rounded-xl border bg-white shadow-2xs transition-all',
+                    'p-4 rounded-[10px] border bg-white shadow-2xs transition-all',
                     item.is_active
-                      ? 'border-sentinel-300 bg-sentinel-50/20 ring-1 ring-sentinel-200'
-                      : 'border-slate-200 opacity-80'
+                      ? 'border-sentinel-300 bg-[#EEF6FA]/20 ring-1 ring-sentinel-200'
+                      : 'border-[#C9D3DB] opacity-80'
                   )}
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-100">
                     <div className="flex items-center gap-2">
-                      <span className="font-mono text-xs font-bold text-sentinel-900 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                      <span className="font-mono text-xs font-bold text-sentinel-900 bg-slate-100 px-2 py-0.5 rounded border border-[#C9D3DB]">
                         {item.field_name}
                       </span>
                       {item.is_active && (
@@ -1075,7 +1075,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
                         </span>
                       )}
                     </div>
-                    <span className="text-xs font-mono text-slate-500">
+                    <span className="text-xs font-mono text-[#5D6A75]">
                       Recorded: {formatDateTime(item.source_timestamp)}
                     </span>
                   </div>
@@ -1083,24 +1083,24 @@ export const TrustVerificationDeskPage: React.FC = () => {
                   <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
                     <div>
                       <span className="text-slate-400 font-medium block">Recorded Value</span>
-                      <span className="font-mono font-bold text-slate-900 text-sm mt-0.5 block break-all">
+                      <span className="font-mono font-bold text-[#0D2538] text-sm mt-0.5 block break-all">
                         {item.recorded_value || '—'}
                       </span>
                     </div>
 
                     <div>
                       <span className="text-slate-400 font-medium block">Source Channel & Actor</span>
-                      <span className="font-semibold text-slate-800 mt-0.5 block">
+                      <span className="font-semibold text-[#253746] mt-0.5 block">
                         {item.source_type}
                       </span>
-                      <span className="text-slate-500 font-mono text-[11px]">
+                      <span className="text-[#5D6A75] font-mono text-[11px]">
                         Actor: {item.source_actor_id || item.source_service_id || 'SYSTEM'}
                       </span>
                     </div>
 
                     <div>
                       <span className="text-slate-400 font-medium block">Evidence Reference</span>
-                      <span className="font-mono text-slate-700 text-xs mt-0.5 block">
+                      <span className="font-mono text-[#253746] text-xs mt-0.5 block">
                         {item.evidence_reference || item.related_document_version_id || 'None attached'}
                       </span>
                       {item.related_validation_run_id && (
@@ -1122,12 +1122,12 @@ export const TrustVerificationDeskPage: React.FC = () => {
       {/* =================================================================== */}
       {activeTab === 'requests' && (
         <div className="space-y-4">
-          <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="bg-white rounded-[10px] border border-[#C9D3DB] p-4 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <h3 className="text-sm font-bold text-slate-900">
+              <h3 className="text-sm font-bold text-[#0D2538]">
                 Electronic Bank Verification Pipeline
               </h3>
-              <p className="text-xs text-slate-500 mt-0.5">
+              <p className="text-xs text-[#5D6A75] mt-0.5">
                 Automated SFTP / Host-to-Host API reconciliation & manual banking confirmation workflows.
               </p>
             </div>
@@ -1146,7 +1146,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
           </div>
 
           {verificationRequests.length === 0 ? (
-            <div className="p-12 bg-white rounded-xl border border-slate-200 text-center text-slate-400">
+            <div className="p-12 bg-white rounded-[10px] border border-[#C9D3DB] text-center text-slate-400">
               <Send className="w-8 h-8 mx-auto mb-2 opacity-50" />
               <p className="text-xs font-medium">No bank verification requests dispatched yet.</p>
               {canPerformOfficerActions && (
@@ -1166,15 +1166,15 @@ export const TrustVerificationDeskPage: React.FC = () => {
               {verificationRequests.map((req) => (
                 <div
                   key={req.id}
-                  className="bg-white rounded-xl border border-slate-200 shadow-2xs overflow-hidden"
+                  className="bg-white rounded-[10px] border border-[#C9D3DB] shadow-2xs overflow-hidden"
                 >
                   {/* Request Header */}
-                  <div className="p-4 bg-slate-50/80 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3">
+                  <div className="p-4 bg-[#F5F4EF]/80 border-b border-[#C9D3DB] flex flex-wrap items-center justify-between gap-3">
                     <div className="flex items-center gap-3">
-                      <span className="font-mono text-xs font-bold text-sentinel-800 bg-sentinel-100/60 border border-sentinel-200 px-2.5 py-1 rounded">
+                      <span className="font-mono text-xs font-bold text-[#0D2538] bg-[#EEF6FA]/60 border border-[#C4DEED] px-2.5 py-1 rounded">
                         {req.reference_code}
                       </span>
-                      <span className="text-xs font-semibold text-slate-700">
+                      <span className="text-xs font-semibold text-[#253746]">
                         Channel: <span className="font-mono">{req.channel}</span>
                       </span>
                       <span
@@ -1186,7 +1186,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
                             ? 'bg-blue-100 text-blue-800'
                             : req.status === 'FAILED'
                             ? 'bg-rose-100 text-rose-800'
-                            : 'bg-slate-100 text-slate-700'
+                            : 'bg-slate-100 text-[#253746]'
                         )}
                       >
                         {req.status}
@@ -1218,7 +1218,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
                               setActiveRequestId(req.id);
                               setIsManualEvidenceModalOpen(true);
                             }}
-                            className="gap-1 text-xs border-slate-300 text-slate-700"
+                            className="gap-1 text-xs border-[#8799A9] text-[#253746]"
                           >
                             <FileText className="w-3.5 h-3.5" />
                             <span>Record Manual Evidence</span>
@@ -1257,25 +1257,25 @@ export const TrustVerificationDeskPage: React.FC = () => {
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                       <div>
                         <span className="text-slate-400 block font-medium">Attempt Count</span>
-                        <span className="font-mono font-semibold text-slate-800">
+                        <span className="font-mono font-semibold text-[#253746]">
                           {req.attempt_count}
                         </span>
                       </div>
                       <div>
                         <span className="text-slate-400 block font-medium">Last Attempt</span>
-                        <span className="font-mono text-slate-700">
+                        <span className="font-mono text-[#253746]">
                           {req.last_attempt_at ? formatDateTime(req.last_attempt_at) : 'None'}
                         </span>
                       </div>
                       <div>
                         <span className="text-slate-400 block font-medium">Requested Fields</span>
-                        <span className="font-mono text-slate-800 truncate block">
+                        <span className="font-mono text-[#253746] truncate block">
                           {req.requested_fields_json || 'ALL_CORE_FIELDS'}
                         </span>
                       </div>
                       <div>
                         <span className="text-slate-400 block font-medium">Created</span>
-                        <span className="font-mono text-slate-700">
+                        <span className="font-mono text-[#253746]">
                           {formatDateTime(req.created_at)}
                         </span>
                       </div>
@@ -1290,14 +1290,14 @@ export const TrustVerificationDeskPage: React.FC = () => {
                     {/* Received Responses */}
                     {req.responses && req.responses.length > 0 && (
                       <div className="mt-4 pt-3 border-t border-slate-100 space-y-3">
-                        <span className="text-xs font-bold text-slate-800 uppercase tracking-wider block">
+                        <span className="text-xs font-bold text-[#253746] uppercase tracking-wider block">
                           Received Bank Responses ({req.responses.length})
                         </span>
 
                         {req.responses.map((resp) => (
                           <div
                             key={resp.id}
-                            className="p-3 rounded-lg border border-slate-200 bg-slate-50/50 space-y-2"
+                            className="p-3 rounded-lg border border-[#C9D3DB] bg-[#F5F4EF]/50 space-y-2"
                           >
                             <div className="flex flex-wrap items-center justify-between gap-2">
                               <div className="flex items-center gap-2">
@@ -1313,7 +1313,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
                                 >
                                   {resp.result}
                                 </span>
-                                <span className="font-mono text-slate-600 text-[11px]">
+                                <span className="font-mono text-[#5D6A75] text-[11px]">
                                   Ref: {resp.bank_reference_number || 'None'}
                                 </span>
                                 {resp.is_simulated && (
@@ -1322,22 +1322,22 @@ export const TrustVerificationDeskPage: React.FC = () => {
                                   </span>
                                 )}
                               </div>
-                              <span className="text-[11px] font-mono text-slate-500">
+                              <span className="text-[11px] font-mono text-[#5D6A75]">
                                 Responded: {formatDateTime(resp.responded_at)}
                               </span>
                             </div>
 
                             {resp.notes && (
-                              <p className="text-xs text-slate-600 italic">"{resp.notes}"</p>
+                              <p className="text-xs text-[#5D6A75] italic">"{resp.notes}"</p>
                             )}
 
                             {/* Field Comparisons Table if available */}
                             {resp.field_comparisons_json && (
-                              <div className="mt-2 bg-white rounded border border-slate-200 p-2 text-[11px] font-mono">
+                              <div className="mt-2 bg-white rounded border border-[#C9D3DB] p-2 text-[11px] font-mono">
                                 <span className="text-slate-400 block text-[10px] uppercase font-bold mb-1">
                                   Bank Reconciliation Comparison
                                 </span>
-                                <pre className="text-slate-700 whitespace-pre-wrap">
+                                <pre className="text-[#253746] whitespace-pre-wrap">
                                   {resp.field_comparisons_json}
                                 </pre>
                               </div>
@@ -1381,12 +1381,12 @@ export const TrustVerificationDeskPage: React.FC = () => {
       {/* TAB 4: CONFLICT & DISCREPANCY MATRIX */}
       {/* =================================================================== */}
       {activeTab === 'conflicts' && (
-        <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-2xs space-y-4">
+        <div className="bg-white rounded-[10px] border border-[#C9D3DB] p-5 shadow-2xs space-y-4">
           <div className="border-b border-slate-100 pb-3">
-            <h3 className="text-sm font-bold text-slate-900">
+            <h3 className="text-sm font-bold text-[#0D2538]">
               Multi-Source Evidence Conflict Matrix
             </h3>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <p className="text-xs text-[#5D6A75] mt-0.5">
               Comparison across Declared Values, Ingested Document OCR Extractions, and Bank Confirmation Feeds.
             </p>
           </div>
@@ -1394,7 +1394,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead>
-                <tr className="border-b border-slate-200 bg-slate-50 text-[10px] font-semibold uppercase text-slate-500 tracking-wider">
+                <tr className="border-b border-[#C9D3DB] bg-[#F5F4EF] text-[10px] font-semibold uppercase text-[#5D6A75] tracking-wider">
                   <th className="py-2.5 px-3">Field Name</th>
                   <th className="py-2.5 px-3">Declared Value (L0)</th>
                   <th className="py-2.5 px-3">Document OCR (L1/L2)</th>
@@ -1404,12 +1404,12 @@ export const TrustVerificationDeskPage: React.FC = () => {
               </thead>
               <tbody className="divide-y divide-slate-100 font-mono">
                 <tr>
-                  <td className="py-3 px-3 font-semibold text-slate-800">amount</td>
-                  <td className="py-3 px-3 text-slate-700">{formatINR(instrument?.amount)}</td>
-                  <td className="py-3 px-3 text-slate-700">
+                  <td className="py-3 px-3 font-semibold text-[#253746]">amount</td>
+                  <td className="py-3 px-3 text-[#253746]">{formatINR(instrument?.amount)}</td>
+                  <td className="py-3 px-3 text-[#253746]">
                     {provenanceList.find((p) => p.field_name === 'amount' && p.source_type.includes('OCR'))?.recorded_value || '—'}
                   </td>
-                  <td className="py-3 px-3 text-slate-700">
+                  <td className="py-3 px-3 text-[#253746]">
                     {completedResponses[0]?.bank_reference_number ? formatINR(instrument?.amount) : 'Pending Confirmation'}
                   </td>
                   <td className="py-3 px-3 text-center">
@@ -1420,12 +1420,12 @@ export const TrustVerificationDeskPage: React.FC = () => {
                 </tr>
 
                 <tr>
-                  <td className="py-3 px-3 font-semibold text-slate-800">maturity_date</td>
-                  <td className="py-3 px-3 text-slate-700">{formatDate(instrument?.maturity_date)}</td>
-                  <td className="py-3 px-3 text-slate-700">
+                  <td className="py-3 px-3 font-semibold text-[#253746]">maturity_date</td>
+                  <td className="py-3 px-3 text-[#253746]">{formatDate(instrument?.maturity_date)}</td>
+                  <td className="py-3 px-3 text-[#253746]">
                     {provenanceList.find((p) => p.field_name === 'maturity_date' && p.source_type.includes('OCR'))?.recorded_value || '—'}
                   </td>
-                  <td className="py-3 px-3 text-slate-700">
+                  <td className="py-3 px-3 text-[#253746]">
                     {completedResponses[0]?.bank_reference_number ? formatDate(instrument?.maturity_date) : 'Pending Confirmation'}
                   </td>
                   <td className="py-3 px-3 text-center">
@@ -1436,12 +1436,12 @@ export const TrustVerificationDeskPage: React.FC = () => {
                 </tr>
 
                 <tr>
-                  <td className="py-3 px-3 font-semibold text-slate-800">reference_number</td>
-                  <td className="py-3 px-3 text-slate-700">{instrument?.reference_number}</td>
-                  <td className="py-3 px-3 text-slate-700">
+                  <td className="py-3 px-3 font-semibold text-[#253746]">reference_number</td>
+                  <td className="py-3 px-3 text-[#253746]">{instrument?.reference_number}</td>
+                  <td className="py-3 px-3 text-[#253746]">
                     {provenanceList.find((p) => p.field_name === 'reference_number' && p.source_type.includes('OCR'))?.recorded_value || '—'}
                   </td>
-                  <td className="py-3 px-3 text-slate-700">
+                  <td className="py-3 px-3 text-[#253746]">
                     {completedResponses[0]?.bank_reference_number || 'Pending Confirmation'}
                   </td>
                   <td className="py-3 px-3 text-center">
@@ -1454,8 +1454,8 @@ export const TrustVerificationDeskPage: React.FC = () => {
             </table>
           </div>
 
-          <div className="p-4 bg-slate-50 border border-slate-200 rounded-lg text-xs space-y-1.5 text-slate-600">
-            <p className="font-semibold text-slate-800">Automated Conflict Downgrade Policy:</p>
+          <div className="p-4 bg-[#F5F4EF] border border-[#C9D3DB] rounded-lg text-xs space-y-1.5 text-[#5D6A75]">
+            <p className="font-semibold text-[#253746]">Automated Conflict Downgrade Policy:</p>
             <p>
               Under Rule §4.3 of statutory verification protocols, any discrepancy between bank electronic feeds and declared fields blocks Level 3 confirmation and automatically downgrades the instrument trust state to Level 1, requiring reasoned scrutiny officer re-examination.
             </p>
@@ -1468,17 +1468,17 @@ export const TrustVerificationDeskPage: React.FC = () => {
       {/* =================================================================== */}
       {isL2ModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4">
-          <div className="bg-white rounded-2xl border border-slate-200 max-w-lg w-full shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-            <div className="p-5 border-b border-slate-200 bg-emerald-50/50 flex items-center justify-between">
+          <div className="bg-white rounded-[10px] border border-[#C9D3DB] max-w-lg w-full shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            <div className="p-5 border-b border-[#C9D3DB] bg-emerald-50/50 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <ShieldCheck className="w-5 h-5 text-emerald-600" />
-                <h3 className="font-bold text-slate-900 text-sm">
+                <h3 className="font-bold text-[#0D2538] text-sm">
                   Record L2 Officer Review Attestation
                 </h3>
               </div>
               <button
                 onClick={() => setIsL2ModalOpen(false)}
-                className="text-slate-400 hover:text-slate-700"
+                className="text-slate-400 hover:text-[#253746]"
               >
                 ×
               </button>
@@ -1486,7 +1486,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
 
             <form onSubmit={handleRecordL2Decision} className="p-5 space-y-4 text-xs">
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">
+                <label className="block font-semibold text-[#253746] mb-1">
                   Reasoned Officer Assessment Justification <span className="text-rose-500">*</span>
                 </label>
                 <textarea
@@ -1495,12 +1495,12 @@ export const TrustVerificationDeskPage: React.FC = () => {
                   placeholder="Detail the documentary inspection, seal verification, and branch confirmation reviewed..."
                   value={l2Reason}
                   onChange={(e) => setL2Reason(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-800"
+                  className="w-full px-3 py-2 border border-[#8799A9] rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-[#253746]"
                 />
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">
+                <label className="block font-semibold text-[#253746] mb-1">
                   Supporting Document Version ID (Optional)
                 </label>
                 <input
@@ -1508,12 +1508,12 @@ export const TrustVerificationDeskPage: React.FC = () => {
                   placeholder="e.g. DOC-VER-001"
                   value={l2DocVersion}
                   onChange={(e) => setL2DocVersion(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono text-slate-800"
+                  className="w-full px-3 py-2 border border-[#8799A9] rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono text-[#253746]"
                 />
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">
+                <label className="block font-semibold text-[#253746] mb-1">
                   Evidence References (Comma-separated)
                 </label>
                 <input
@@ -1521,11 +1521,11 @@ export const TrustVerificationDeskPage: React.FC = () => {
                   placeholder="BRANCH-EMAIL-REF-102, AICTE-SEAL-VERIFIED"
                   value={l2EvidenceRefs}
                   onChange={(e) => setL2EvidenceRefs(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono text-slate-800"
+                  className="w-full px-3 py-2 border border-[#8799A9] rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono text-[#253746]"
                 />
               </div>
 
-              <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg text-slate-500 space-y-1">
+              <div className="p-3 bg-[#F5F4EF] border border-[#C9D3DB] rounded-lg text-[#5D6A75] space-y-1">
                 <p>
                   <strong>Target Level:</strong> L2_OFFICER_VERIFIED
                 </p>
@@ -1564,17 +1564,17 @@ export const TrustVerificationDeskPage: React.FC = () => {
       {/* =================================================================== */}
       {isL3ModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4">
-          <div className="bg-white rounded-2xl border border-slate-200 max-w-lg w-full shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-            <div className="p-5 border-b border-slate-200 bg-purple-50/50 flex items-center justify-between">
+          <div className="bg-white rounded-[10px] border border-[#C9D3DB] max-w-lg w-full shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            <div className="p-5 border-b border-[#C9D3DB] bg-purple-50/50 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <ShieldCheck className="w-5 h-5 text-purple-600" />
-                <h3 className="font-bold text-slate-900 text-sm">
+                <h3 className="font-bold text-[#0D2538] text-sm">
                   Apply Level 3 Direct Bank Confirmation
                 </h3>
               </div>
               <button
                 onClick={() => setIsL3ModalOpen(false)}
-                className="text-slate-400 hover:text-slate-700"
+                className="text-slate-400 hover:text-[#253746]"
               >
                 ×
               </button>
@@ -1582,14 +1582,14 @@ export const TrustVerificationDeskPage: React.FC = () => {
 
             <form onSubmit={handleApplyL3Confirmation} className="p-5 space-y-4 text-xs">
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">
+                <label className="block font-semibold text-[#253746] mb-1">
                   Source Verification Response <span className="text-rose-500">*</span>
                 </label>
                 {completedResponses.length > 0 ? (
                   <select
                     value={l3ResponseId}
                     onChange={(e) => setL3ResponseId(e.target.value)}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 font-mono text-slate-800"
+                    className="w-full px-3 py-2 border border-[#8799A9] rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 font-mono text-[#253746]"
                     required
                   >
                     <option value="">Select verified bank response...</option>
@@ -1606,25 +1606,25 @@ export const TrustVerificationDeskPage: React.FC = () => {
                     placeholder="Enter completed verification response ID..."
                     value={l3ResponseId}
                     onChange={(e) => setL3ResponseId(e.target.value)}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 font-mono text-slate-800"
+                    className="w-full px-3 py-2 border border-[#8799A9] rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 font-mono text-[#253746]"
                   />
                 )}
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">
+                <label className="block font-semibold text-[#253746] mb-1">
                   Source Authorization Configuration
                 </label>
                 <input
                   type="text"
                   value={l3AuthConfig}
                   onChange={(e) => setL3AuthConfig(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 font-mono text-slate-800"
+                  className="w-full px-3 py-2 border border-[#8799A9] rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 font-mono text-[#253746]"
                 />
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">
+                <label className="block font-semibold text-[#253746] mb-1">
                   Reason & Confirmation Details <span className="text-rose-500">*</span>
                 </label>
                 <textarea
@@ -1633,7 +1633,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
                   placeholder="Detail the electronic confirmation payload received from the bank..."
                   value={l3Reason}
                   onChange={(e) => setL3Reason(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-slate-800"
+                  className="w-full px-3 py-2 border border-[#8799A9] rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-[#253746]"
                 />
               </div>
 
@@ -1667,17 +1667,17 @@ export const TrustVerificationDeskPage: React.FC = () => {
       {/* =================================================================== */}
       {isDowngradeModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4">
-          <div className="bg-white rounded-2xl border border-slate-200 max-w-lg w-full shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-            <div className="p-5 border-b border-slate-200 bg-rose-50/50 flex items-center justify-between">
+          <div className="bg-white rounded-[10px] border border-[#C9D3DB] max-w-lg w-full shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            <div className="p-5 border-b border-[#C9D3DB] bg-rose-50/50 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <ShieldAlert className="w-5 h-5 text-rose-600" />
-                <h3 className="font-bold text-slate-900 text-sm">
+                <h3 className="font-bold text-[#0D2538] text-sm">
                   Audited Trust Downgrade / Conflict Resolution
                 </h3>
               </div>
               <button
                 onClick={() => setIsDowngradeModalOpen(false)}
-                className="text-slate-400 hover:text-slate-700"
+                className="text-slate-400 hover:text-[#253746]"
               >
                 ×
               </button>
@@ -1685,13 +1685,13 @@ export const TrustVerificationDeskPage: React.FC = () => {
 
             <form onSubmit={handleDowngradeTrust} className="p-5 space-y-4 text-xs">
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">
+                <label className="block font-semibold text-[#253746] mb-1">
                   Target Trust Level
                 </label>
                 <select
                   value={downgradeTarget}
                   onChange={(e) => setDowngradeTarget(e.target.value as any)}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 font-mono text-slate-800"
+                  className="w-full px-3 py-2 border border-[#8799A9] rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 font-mono text-[#253746]"
                 >
                   <option value="L1_DOCUMENT_CONSISTENT">L1_DOCUMENT_CONSISTENT (Document Validated Only)</option>
                   <option value="L0_DECLARED">L0_DECLARED (Revert to Raw Declared State)</option>
@@ -1699,13 +1699,13 @@ export const TrustVerificationDeskPage: React.FC = () => {
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">
+                <label className="block font-semibold text-[#253746] mb-1">
                   Triggering Event
                 </label>
                 <select
                   value={downgradeTrigger}
                   onChange={(e) => setDowngradeTrigger(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 text-slate-800"
+                  className="w-full px-3 py-2 border border-[#8799A9] rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 text-[#253746]"
                 >
                   <option value="CONFLICTING_BANK_EVIDENCE">Conflicting Bank Evidence / Mismatch</option>
                   <option value="DOCUMENT_SUPERSEDED_OR_REVOKED">Document Revocation / Invalidation</option>
@@ -1715,7 +1715,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">
+                <label className="block font-semibold text-[#253746] mb-1">
                   Mandatory Downgrade Reason <span className="text-rose-500">*</span>
                 </label>
                 <textarea
@@ -1724,7 +1724,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
                   placeholder="Detail the discovered conflict or policy justification necessitating downgrade..."
                   value={downgradeReason}
                   onChange={(e) => setDowngradeReason(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 text-slate-800"
+                  className="w-full px-3 py-2 border border-[#8799A9] rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 text-[#253746]"
                 />
               </div>
 
@@ -1758,17 +1758,17 @@ export const TrustVerificationDeskPage: React.FC = () => {
       {/* =================================================================== */}
       {isNewRequestModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4">
-          <div className="bg-white rounded-2xl border border-slate-200 max-w-lg w-full shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-            <div className="p-5 border-b border-slate-200 bg-sentinel-50/50 flex items-center justify-between">
+          <div className="bg-white rounded-[10px] border border-[#C9D3DB] max-w-lg w-full shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            <div className="p-5 border-b border-[#C9D3DB] bg-[#EEF6FA]/50 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Send className="w-5 h-5 text-sentinel-700" />
-                <h3 className="font-bold text-slate-900 text-sm">
+                <Send className="w-5 h-5 text-[#123B5D]" />
+                <h3 className="font-bold text-[#0D2538] text-sm">
                   Initiate Bank Verification Request
                 </h3>
               </div>
               <button
                 onClick={() => setIsNewRequestModalOpen(false)}
-                className="text-slate-400 hover:text-slate-700"
+                className="text-slate-400 hover:text-[#253746]"
               >
                 ×
               </button>
@@ -1776,13 +1776,13 @@ export const TrustVerificationDeskPage: React.FC = () => {
 
             <form onSubmit={handleCreateVerificationRequest} className="p-5 space-y-4 text-xs">
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">
+                <label className="block font-semibold text-[#253746] mb-1">
                   Verification Channel
                 </label>
                 <select
                   value={newRequestChannel}
                   onChange={(e) => setNewRequestChannel(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sentinel-500 font-mono text-slate-800"
+                  className="w-full px-3 py-2 border border-[#8799A9] rounded-lg focus:outline-none focus:ring-2 focus:ring-sentinel-500 font-mono text-[#253746]"
                 >
                   <option value="SFTP_RECONCILIATION">SFTP_RECONCILIATION (Scheduled Batch)</option>
                   <option value="BANK_API">BANK_API (Synchronous Host-to-Host)</option>
@@ -1792,12 +1792,12 @@ export const TrustVerificationDeskPage: React.FC = () => {
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">
+                <label className="block font-semibold text-[#253746] mb-1">
                   Requested Fields to Reconcile
                 </label>
                 <div className="grid grid-cols-2 gap-2 mt-1">
                   {['amount', 'maturity_date', 'bank_name', 'reference_number', 'lien_holder'].map((f) => (
-                    <label key={f} className="flex items-center gap-2 font-mono text-slate-700">
+                    <label key={f} className="flex items-center gap-2 font-mono text-[#253746]">
                       <input
                         type="checkbox"
                         checked={newRequestFields.includes(f)}
@@ -1808,7 +1808,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
                             setNewRequestFields(newRequestFields.filter((item) => item !== f));
                           }
                         }}
-                        className="rounded border-slate-300 text-sentinel-600 focus:ring-sentinel-500"
+                        className="rounded border-[#8799A9] text-[#123B5D] focus:ring-sentinel-500"
                       />
                       <span>{f}</span>
                     </label>
@@ -1817,7 +1817,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">
+                <label className="block font-semibold text-[#253746] mb-1">
                   Request Notes & Instructions (Optional)
                 </label>
                 <textarea
@@ -1825,7 +1825,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
                   placeholder="e.g. Expedited scrutiny for annual AICTE approval cycle..."
                   value={newRequestNotes}
                   onChange={(e) => setNewRequestNotes(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sentinel-500 text-slate-800"
+                  className="w-full px-3 py-2 border border-[#8799A9] rounded-lg focus:outline-none focus:ring-2 focus:ring-sentinel-500 text-[#253746]"
                 />
               </div>
 
@@ -1859,17 +1859,17 @@ export const TrustVerificationDeskPage: React.FC = () => {
       {/* =================================================================== */}
       {isDispatchRequestModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4">
-          <div className="bg-white rounded-2xl border border-slate-200 max-w-md w-full shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-            <div className="p-5 border-b border-slate-200 bg-blue-50/50 flex items-center justify-between">
+          <div className="bg-white rounded-[10px] border border-[#C9D3DB] max-w-md w-full shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            <div className="p-5 border-b border-[#C9D3DB] bg-blue-50/50 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Send className="w-5 h-5 text-blue-600" />
-                <h3 className="font-bold text-slate-900 text-sm">
+                <h3 className="font-bold text-[#0D2538] text-sm">
                   Dispatch Verification to Bank Adapter
                 </h3>
               </div>
               <button
                 onClick={() => setIsDispatchRequestModalOpen(false)}
-                className="text-slate-400 hover:text-slate-700"
+                className="text-slate-400 hover:text-[#253746]"
               >
                 ×
               </button>
@@ -1877,20 +1877,20 @@ export const TrustVerificationDeskPage: React.FC = () => {
 
             <div className="p-5 space-y-4 text-xs">
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">
+                <label className="block font-semibold text-[#253746] mb-1">
                   Simulation Scenario / Adapter Response Mode
                 </label>
                 <select
                   value={dispatchScenario}
                   onChange={(e) => setDispatchScenario(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800 font-mono"
+                  className="w-full px-3 py-2 border border-[#8799A9] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-[#253746] font-mono"
                 >
                   <option value="NORMAL_MATCH">NORMAL_MATCH (Clean statutory bank confirmation)</option>
                   <option value="AMOUNT_MISMATCH">AMOUNT_MISMATCH (Discrepancy test scenario)</option>
                   <option value="BANK_NOT_FOUND">BANK_NOT_FOUND (Record missing at bank)</option>
                   <option value="NETWORK_TIMEOUT">NETWORK_TIMEOUT (Adapter timeout / retry test)</option>
                 </select>
-                <p className="text-[11px] text-slate-500 mt-1">
+                <p className="text-[11px] text-[#5D6A75] mt-1">
                   Executes the simulated or connected banking gateway for test & production reconciliation.
                 </p>
               </div>
@@ -1926,17 +1926,17 @@ export const TrustVerificationDeskPage: React.FC = () => {
       {/* =================================================================== */}
       {isManualEvidenceModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4">
-          <div className="bg-white rounded-2xl border border-slate-200 max-w-lg w-full shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-            <div className="p-5 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
+          <div className="bg-white rounded-[10px] border border-[#C9D3DB] max-w-lg w-full shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            <div className="p-5 border-b border-[#C9D3DB] bg-[#F5F4EF] flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <FileText className="w-5 h-5 text-slate-700" />
-                <h3 className="font-bold text-slate-900 text-sm">
+                <FileText className="w-5 h-5 text-[#253746]" />
+                <h3 className="font-bold text-[#0D2538] text-sm">
                   Record Manual Bank Confirmation Evidence
                 </h3>
               </div>
               <button
                 onClick={() => setIsManualEvidenceModalOpen(false)}
-                className="text-slate-400 hover:text-slate-700"
+                className="text-slate-400 hover:text-[#253746]"
               >
                 ×
               </button>
@@ -1945,7 +1945,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
             <form onSubmit={handleRecordManualEvidence} className="p-5 space-y-4 text-xs">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">
+                  <label className="block font-semibold text-[#253746] mb-1">
                     External Bank Reference <span className="text-rose-500">*</span>
                   </label>
                   <input
@@ -1954,12 +1954,12 @@ export const TrustVerificationDeskPage: React.FC = () => {
                     placeholder="e.g. SBI/CONF/2026/8912"
                     value={manualRef}
                     onChange={(e) => setManualRef(e.target.value)}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sentinel-500 font-mono text-slate-800"
+                    className="w-full px-3 py-2 border border-[#8799A9] rounded-lg focus:outline-none focus:ring-2 focus:ring-sentinel-500 font-mono text-[#253746]"
                   />
                 </div>
 
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">
+                  <label className="block font-semibold text-[#253746] mb-1">
                     Communication Date <span className="text-rose-500">*</span>
                   </label>
                   <input
@@ -1967,19 +1967,19 @@ export const TrustVerificationDeskPage: React.FC = () => {
                     required
                     value={manualDate}
                     onChange={(e) => setManualDate(e.target.value)}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sentinel-500 text-slate-800"
+                    className="w-full px-3 py-2 border border-[#8799A9] rounded-lg focus:outline-none focus:ring-2 focus:ring-sentinel-500 text-[#253746]"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">
+                <label className="block font-semibold text-[#253746] mb-1">
                   Verification Outcome
                 </label>
                 <select
                   value={manualResult}
                   onChange={(e) => setManualResult(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sentinel-500 text-slate-800"
+                  className="w-full px-3 py-2 border border-[#8799A9] rounded-lg focus:outline-none focus:ring-2 focus:ring-sentinel-500 text-[#253746]"
                 >
                   <option value="MATCH">MATCH (Bank confirms all deposit particulars)</option>
                   <option value="MISMATCH">MISMATCH (Bank reports conflicting particulars)</option>
@@ -1989,7 +1989,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">
+                  <label className="block font-semibold text-[#253746] mb-1">
                     Confirmed Principal Amount (Optional)
                   </label>
                   <input
@@ -1997,25 +1997,25 @@ export const TrustVerificationDeskPage: React.FC = () => {
                     placeholder="e.g. 1500000"
                     value={manualAmount}
                     onChange={(e) => setManualAmount(e.target.value)}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sentinel-500 font-mono text-slate-800"
+                    className="w-full px-3 py-2 border border-[#8799A9] rounded-lg focus:outline-none focus:ring-2 focus:ring-sentinel-500 font-mono text-[#253746]"
                   />
                 </div>
 
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">
+                  <label className="block font-semibold text-[#253746] mb-1">
                     Confirmed Maturity Date (Optional)
                   </label>
                   <input
                     type="date"
                     value={manualMaturityDate}
                     onChange={(e) => setManualMaturityDate(e.target.value)}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sentinel-500 text-slate-800"
+                    className="w-full px-3 py-2 border border-[#8799A9] rounded-lg focus:outline-none focus:ring-2 focus:ring-sentinel-500 text-[#253746]"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">
+                <label className="block font-semibold text-[#253746] mb-1">
                   Supporting Document Version Ref (Optional)
                 </label>
                 <input
@@ -2023,12 +2023,12 @@ export const TrustVerificationDeskPage: React.FC = () => {
                   placeholder="e.g. DOC-VER-BANK-CONF-01"
                   value={manualDocVersion}
                   onChange={(e) => setManualDocVersion(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sentinel-500 font-mono text-slate-800"
+                  className="w-full px-3 py-2 border border-[#8799A9] rounded-lg focus:outline-none focus:ring-2 focus:ring-sentinel-500 font-mono text-[#253746]"
                 />
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">
+                <label className="block font-semibold text-[#253746] mb-1">
                   Verification Explanation / Justification <span className="text-rose-500">*</span>
                 </label>
                 <textarea
@@ -2037,7 +2037,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
                   placeholder="Official bank confirmation letter or sealed certificate details..."
                   value={manualReason}
                   onChange={(e) => setManualReason(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sentinel-500 text-slate-800"
+                  className="w-full px-3 py-2 border border-[#8799A9] rounded-lg focus:outline-none focus:ring-2 focus:ring-sentinel-500 text-[#253746]"
                 />
               </div>
 

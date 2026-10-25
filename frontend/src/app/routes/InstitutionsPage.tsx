@@ -107,10 +107,10 @@ export const InstitutionsPage: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-slate-900 tracking-tight">
+          <h1 className="text-xl font-bold text-[#0D2538] tracking-tight">
             Institution Registry
           </h1>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-[#5D6A75]">
             {isInstitutionUser
               ? 'Institutional profile and compliance deposit records maintained with AICTE'
               : 'Statutory registry of technical education institutions under Regulation Bureau oversight'}
@@ -120,7 +120,7 @@ export const InstitutionsPage: React.FC = () => {
         {isSystemAdmin && (
           <button
             onClick={handleOpenCreate}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-sentinel-600 hover:bg-sentinel-700 text-white text-xs font-semibold shadow-xs transition-all"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#0F766E] hover:bg-[#09544E] text-white text-xs font-semibold shadow-xs transition-all"
           >
             <Plus className="w-4 h-4" />
             <span>Register Institution</span>
@@ -129,7 +129,7 @@ export const InstitutionsPage: React.FC = () => {
       </div>
 
       {/* Filter Toolbar */}
-      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 text-xs">
+      <div className="bg-white p-4 rounded-[10px] border border-[#C9D3DB] shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 text-xs">
         <div className="flex-1 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
           {/* Search Input */}
           <div className="relative flex-1 max-w-md">
@@ -142,7 +142,7 @@ export const InstitutionsPage: React.FC = () => {
                 setPage(1);
               }}
               placeholder="Search by permanent code, legal or display name..."
-              className="w-full pl-9 pr-3 py-2 border border-slate-300 rounded-lg text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sentinel-500 bg-white"
+              className="w-full pl-9 pr-3 py-2 border border-[#8799A9] rounded-lg text-[#253746] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sentinel-500 bg-white"
             />
           </div>
 
@@ -155,7 +155,7 @@ export const InstitutionsPage: React.FC = () => {
                 setStatusFilter(e.target.value as any);
                 setPage(1);
               }}
-              className="border border-slate-300 rounded-lg px-2.5 py-2 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-sentinel-500"
+              className="border border-[#8799A9] rounded-lg px-2.5 py-2 bg-white text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500"
             >
               <option value="ALL">All Statuses</option>
               <option value="ACTIVE">Active Only</option>
@@ -170,7 +170,7 @@ export const InstitutionsPage: React.FC = () => {
               setTypeFilter(e.target.value);
               setPage(1);
             }}
-            className="border border-slate-300 rounded-lg px-2.5 py-2 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-sentinel-500"
+            className="border border-[#8799A9] rounded-lg px-2.5 py-2 bg-white text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500"
           >
             {INSTITUTION_TYPES.map((t) => (
               <option key={t} value={t}>
@@ -180,14 +180,14 @@ export const InstitutionsPage: React.FC = () => {
           </select>
         </div>
 
-        <div className="text-right text-[11px] text-slate-500 self-center">
-          Showing <span className="font-semibold text-slate-800">{institutions.length}</span> of{' '}
-          <span className="font-semibold text-slate-800">{total}</span> records
+        <div className="text-right text-[11px] text-[#5D6A75] self-center">
+          Showing <span className="font-semibold text-[#253746]">{institutions.length}</span> of{' '}
+          <span className="font-semibold text-[#253746]">{total}</span> records
         </div>
       </div>
 
       {error && (
-        <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
+        <div className="p-4 rounded-[10px] bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
           <AlertTriangle className="w-4 h-4 shrink-0" />
           <span>{error}</span>
         </div>
@@ -203,23 +203,23 @@ export const InstitutionsPage: React.FC = () => {
 
       {/* Pagination Bar */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between bg-white px-4 py-3 rounded-xl border border-slate-200 text-xs">
-          <div className="text-slate-500">
-            Page <span className="font-semibold text-slate-800">{page}</span> of{' '}
-            <span className="font-semibold text-slate-800">{totalPages}</span>
+        <div className="flex items-center justify-between bg-white px-4 py-3 rounded-[10px] border border-[#C9D3DB] text-xs">
+          <div className="text-[#5D6A75]">
+            Page <span className="font-semibold text-[#253746]">{page}</span> of{' '}
+            <span className="font-semibold text-[#253746]">{totalPages}</span>
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1}
-              className="p-1.5 rounded-lg border border-slate-300 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed"
+              className="p-1.5 rounded-lg border border-[#8799A9] hover:bg-[#F5F4EF] disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
             <button
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}
-              className="p-1.5 rounded-lg border border-slate-300 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed"
+              className="p-1.5 rounded-lg border border-[#8799A9] hover:bg-[#F5F4EF] disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
@@ -239,10 +239,10 @@ export const InstitutionsPage: React.FC = () => {
       {/* Status Toggle Confirmation Modal */}
       {statusConfirmTarget && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md p-6 space-y-4 animate-in fade-in zoom-in-95 duration-150">
+          <div className="bg-white rounded-[10px] shadow-2xl border border-[#C9D3DB] w-full max-w-md p-6 space-y-4 animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-start gap-3">
               <div
-                className={`p-2.5 rounded-xl ${
+                className={`p-2.5 rounded-[10px] ${
                   statusConfirmTarget.is_active
                     ? 'bg-amber-100 text-amber-700'
                     : 'bg-emerald-100 text-emerald-700'
@@ -255,12 +255,12 @@ export const InstitutionsPage: React.FC = () => {
                 )}
               </div>
               <div>
-                <h3 className="text-base font-semibold text-slate-900">
+                <h3 className="text-base font-semibold text-[#0D2538]">
                   {statusConfirmTarget.is_active
                     ? 'Confirm Institution Deactivation'
                     : 'Confirm Institution Reactivation'}
                 </h3>
-                <p className="text-xs text-slate-500 mt-1">
+                <p className="text-xs text-[#5D6A75] mt-1">
                   {statusConfirmTarget.is_active
                     ? 'Deactivating this institution blocks new FDR registrations while preserving all historical records for statutory audit.'
                     : 'Reactivating this institution restores active regulatory status and permits new security deposit submissions.'}
@@ -268,14 +268,14 @@ export const InstitutionsPage: React.FC = () => {
               </div>
             </div>
 
-            <div className="p-3 bg-slate-50 rounded-lg border border-slate-200 text-xs">
-              <span className="font-semibold text-slate-700">Target Institution:</span>{' '}
-              <span className="text-slate-900">{statusConfirmTarget.legal_name}</span> (
-              <span className="font-mono text-sentinel-700">{statusConfirmTarget.code}</span>)
+            <div className="p-3 bg-[#F5F4EF] rounded-lg border border-[#C9D3DB] text-xs">
+              <span className="font-semibold text-[#253746]">Target Institution:</span>{' '}
+              <span className="text-[#0D2538]">{statusConfirmTarget.legal_name}</span> (
+              <span className="font-mono text-[#123B5D]">{statusConfirmTarget.code}</span>)
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-slate-700 mb-1">
+              <label className="block text-xs font-medium text-[#253746] mb-1">
                 Reason for status change (logged to immutable audit trail):
               </label>
               <textarea
@@ -283,7 +283,7 @@ export const InstitutionsPage: React.FC = () => {
                 value={statusReason}
                 onChange={(e) => setStatusReason(e.target.value)}
                 placeholder="e.g. Annual renewal lapsed, regulatory deficiency notice, or reactivation approved..."
-                className="w-full text-xs p-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sentinel-500 bg-white"
+                className="w-full text-xs p-2.5 border border-[#8799A9] rounded-lg focus:outline-none focus:ring-2 focus:ring-sentinel-500 bg-white"
               />
             </div>
 
@@ -292,7 +292,7 @@ export const InstitutionsPage: React.FC = () => {
                 type="button"
                 onClick={() => setStatusConfirmTarget(null)}
                 disabled={isTogglingStatus}
-                className="px-4 py-2 text-xs rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-100 font-medium transition-colors"
+                className="px-4 py-2 text-xs rounded-lg border border-[#8799A9] text-[#253746] hover:bg-slate-100 font-medium transition-colors"
               >
                 Cancel
               </button>

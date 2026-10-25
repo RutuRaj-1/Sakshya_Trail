@@ -142,10 +142,10 @@ export const AuditPage: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
-            <History className="w-5 h-5 text-sentinel-600" /> Tamper-Evident Audit Explorer
+          <h1 className="text-xl font-bold text-[#0D2538] tracking-tight flex items-center gap-2">
+            <History className="w-5 h-5 text-[#123B5D]" /> Tamper-Evident Audit Explorer
           </h1>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-[#5D6A75] mt-0.5">
             Cryptographically chained SHA-256 regulatory ledger enforcing append-only immutability (PRD-FR-091, FR-092, FR-093).
           </p>
         </div>
@@ -158,7 +158,7 @@ export const AuditPage: React.FC = () => {
               size="sm"
               disabled={isVerifying}
               onClick={handleVerifyChain}
-              className="gap-2 shadow-xs bg-sentinel-700 hover:bg-sentinel-800"
+              className="gap-2 shadow-xs bg-[#123B5D] hover:bg-[#0D2538]"
             >
               <ShieldCheck className={`w-4 h-4 ${isVerifying ? 'animate-spin' : ''}`} />
               {isVerifying ? 'Replaying Cryptographic Chain...' : 'Verify Audit Chain'}
@@ -171,7 +171,7 @@ export const AuditPage: React.FC = () => {
       {verificationResult && (
         <div
           data-testid="verification-status-banner"
-          className={`p-4 rounded-xl border transition-all ${
+          className={`p-4 rounded-[10px] border transition-all ${
             verificationResult.is_chain_intact
               ? 'bg-emerald-50/70 border-emerald-200 text-emerald-900'
               : 'bg-rose-50/90 border-rose-300 text-rose-900 shadow-sm'
@@ -195,32 +195,32 @@ export const AuditPage: React.FC = () => {
                     {verificationResult.status}
                   </Badge>
                 </div>
-                <p className="text-xs mt-1 text-slate-600">
+                <p className="text-xs mt-1 text-[#5D6A75]">
                   {verificationResult.verification_scope_description}
                 </p>
 
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-3 pt-3 border-t border-slate-200/60 font-mono text-[11px]">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-3 pt-3 border-t border-[#C9D3DB]/60 font-mono text-[11px]">
                   <div>
-                    <span className="text-slate-500 block">Verified Count:</span>
-                    <span className="font-semibold text-slate-800">
+                    <span className="text-[#5D6A75] block">Verified Count:</span>
+                    <span className="font-semibold text-[#253746]">
                       {verificationResult.verified_count} / {verificationResult.total_events_in_scope} events
                     </span>
                   </div>
                   <div>
-                    <span className="text-slate-500 block">Latest Sequence:</span>
-                    <span className="font-semibold text-slate-800">
+                    <span className="text-[#5D6A75] block">Latest Sequence:</span>
+                    <span className="font-semibold text-[#253746]">
                       Block #{verificationResult.latest_sequence_number ?? 'None'}
                     </span>
                   </div>
                   <div>
-                    <span className="text-slate-500 block">Verification Time:</span>
-                    <span className="text-slate-700">
+                    <span className="text-[#5D6A75] block">Verification Time:</span>
+                    <span className="text-[#253746]">
                       {formatDate(verificationResult.verification_timestamp)}
                     </span>
                   </div>
                   <div>
-                    <span className="text-slate-500 block">Chain Head Digest:</span>
-                    <span className="text-slate-700 truncate block max-w-40" title={verificationResult.chain_head_hash || ''}>
+                    <span className="text-[#5D6A75] block">Chain Head Digest:</span>
+                    <span className="text-[#253746] truncate block max-w-40" title={verificationResult.chain_head_hash || ''}>
                       {verificationResult.chain_head_hash ? `${verificationResult.chain_head_hash.slice(0, 12)}...` : 'N/A'}
                     </span>
                   </div>
@@ -245,7 +245,7 @@ export const AuditPage: React.FC = () => {
             </div>
             <button
               onClick={() => setVerificationResult(null)}
-              className="text-slate-400 hover:text-slate-600 p-1"
+              className="text-slate-400 hover:text-[#5D6A75] p-1"
               title="Dismiss banner"
             >
               <X className="w-4 h-4" />
@@ -255,7 +255,7 @@ export const AuditPage: React.FC = () => {
       )}
 
       {verificationError && (
-        <div className="p-4 rounded-xl border border-rose-200 bg-rose-50 text-rose-800 text-xs flex items-center justify-between">
+        <div className="p-4 rounded-[10px] border border-rose-200 bg-rose-50 text-rose-800 text-xs flex items-center justify-between">
           <div className="flex items-center gap-2">
             <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
             <span>Verification Request Failed: {verificationError}</span>
@@ -267,11 +267,11 @@ export const AuditPage: React.FC = () => {
       )}
 
       {/* Filter and Query Desk */}
-      <Card className="p-4 bg-white border border-slate-200 rounded-xl shadow-2xs space-y-3">
+      <Card className="p-4 bg-white border border-[#C9D3DB] rounded-[10px] shadow-2xs space-y-3">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
           {/* Keyword Search */}
           <div className="lg:col-span-2 relative">
-            <label className="text-[11px] font-semibold text-slate-600 uppercase tracking-wider block mb-1">
+            <label className="text-[11px] font-semibold text-[#5D6A75] uppercase tracking-wider block mb-1">
               Search Event / Entity ID / Actor
             </label>
             <div className="relative">
@@ -282,14 +282,14 @@ export const AuditPage: React.FC = () => {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && setPage(0)}
-                className="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg pl-8 pr-3 py-2 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sentinel-500 focus:bg-white transition-all font-mono"
+                className="w-full text-xs bg-[#F5F4EF] border border-[#C9D3DB] rounded-lg pl-8 pr-3 py-2 text-[#0D2538] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sentinel-500 focus:bg-white transition-all font-mono"
               />
             </div>
           </div>
 
           {/* Action Filter */}
           <div>
-            <label className="text-[11px] font-semibold text-slate-600 uppercase tracking-wider block mb-1">
+            <label className="text-[11px] font-semibold text-[#5D6A75] uppercase tracking-wider block mb-1">
               Action Family
             </label>
             <select
@@ -298,7 +298,7 @@ export const AuditPage: React.FC = () => {
                 setActionFilter(e.target.value);
                 setPage(0);
               }}
-              className="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-2 text-slate-800 focus:outline-none focus:ring-2 focus:ring-sentinel-500 font-mono"
+              className="w-full text-xs bg-[#F5F4EF] border border-[#C9D3DB] rounded-lg px-2.5 py-2 text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500 font-mono"
             >
               <option value="">All Action Types</option>
               <option value="AUTH_LOGIN_SUCCESS">AUTH_LOGIN_SUCCESS</option>
@@ -320,7 +320,7 @@ export const AuditPage: React.FC = () => {
 
           {/* Outcome Filter */}
           <div>
-            <label className="text-[11px] font-semibold text-slate-600 uppercase tracking-wider block mb-1">
+            <label className="text-[11px] font-semibold text-[#5D6A75] uppercase tracking-wider block mb-1">
               Outcome
             </label>
             <select
@@ -329,7 +329,7 @@ export const AuditPage: React.FC = () => {
                 setOutcomeFilter(e.target.value);
                 setPage(0);
               }}
-              className="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-2 text-slate-800 focus:outline-none focus:ring-2 focus:ring-sentinel-500 font-mono"
+              className="w-full text-xs bg-[#F5F4EF] border border-[#C9D3DB] rounded-lg px-2.5 py-2 text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500 font-mono"
             >
               <option value="">All Outcomes</option>
               <option value="SUCCESS">SUCCESS</option>
@@ -340,7 +340,7 @@ export const AuditPage: React.FC = () => {
 
           {/* Date Range & Controls */}
           <div>
-            <label className="text-[11px] font-semibold text-slate-600 uppercase tracking-wider block mb-1">
+            <label className="text-[11px] font-semibold text-[#5D6A75] uppercase tracking-wider block mb-1">
               Date Filter
             </label>
             <div className="flex items-center gap-1.5">
@@ -351,14 +351,14 @@ export const AuditPage: React.FC = () => {
                   setDateFrom(e.target.value);
                   setPage(0);
                 }}
-                className="w-full text-[11px] bg-slate-50 border border-slate-200 rounded-lg px-2 py-1.5 text-slate-800 focus:outline-none focus:ring-1 focus:ring-sentinel-500"
+                className="w-full text-[11px] bg-[#F5F4EF] border border-[#C9D3DB] rounded-lg px-2 py-1.5 text-[#253746] focus:outline-none focus:ring-1 focus:ring-sentinel-500"
                 title="Date From"
               />
               <Button
                 variant="outline"
                 size="sm"
                 onClick={handleResetFilters}
-                className="p-1.5 shrink-0 text-slate-500 hover:text-slate-800"
+                className="p-1.5 shrink-0 text-[#5D6A75] hover:text-[#253746]"
                 title="Reset Filters"
               >
                 <RefreshCw className="w-3.5 h-3.5" />
@@ -369,10 +369,10 @@ export const AuditPage: React.FC = () => {
       </Card>
 
       {/* Events Table Container */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+      <div className="bg-white rounded-[10px] border border-[#C9D3DB] shadow-xs overflow-hidden">
         {isLoading ? (
-          <div className="p-12 text-center text-slate-500">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-slate-200 border-t-sentinel-600 mb-3" />
+          <div className="p-12 text-center text-[#5D6A75]">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-[#C9D3DB] border-t-sentinel-600 mb-3" />
             <p className="text-sm font-medium">Replaying audit sequence...</p>
             <p className="text-xs text-slate-400 mt-1">Reading cryptographic hash chains from append-only storage</p>
           </div>
@@ -385,9 +385,9 @@ export const AuditPage: React.FC = () => {
             </Button>
           </div>
         ) : events.length === 0 ? (
-          <div className="p-12 text-center text-slate-500">
+          <div className="p-12 text-center text-[#5D6A75]">
             <Shield className="w-10 h-10 text-slate-300 mx-auto mb-3" />
-            <h3 className="text-sm font-semibold text-slate-800">No Matching Audit Records</h3>
+            <h3 className="text-sm font-semibold text-[#253746]">No Matching Audit Records</h3>
             <p className="text-xs text-slate-400 max-w-sm mx-auto mt-1">
               No audit events matched your filter criteria or tenant authorization scope.
             </p>
@@ -399,8 +399,8 @@ export const AuditPage: React.FC = () => {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs text-slate-700">
-              <thead className="bg-slate-50 border-b border-slate-200 uppercase font-semibold text-slate-500 tracking-wider">
+            <table className="w-full text-left text-xs text-[#253746]">
+              <thead className="bg-[#F5F4EF] border-b border-[#C9D3DB] uppercase font-semibold text-[#5D6A75] tracking-wider">
                 <tr>
                   <th className="py-3 px-4 w-16">Seq #</th>
                   <th className="py-3 px-4">Timestamp (UTC)</th>
@@ -414,11 +414,11 @@ export const AuditPage: React.FC = () => {
               </thead>
               <tbody className="divide-y divide-slate-100 font-mono">
                 {events.map((e) => (
-                  <tr key={e.id} className="hover:bg-slate-50/70 transition-colors">
+                  <tr key={e.id} className="hover:bg-[#F5F4EF]/70 transition-colors">
                     {/* Sequence */}
                     <td className="py-3 px-4">
                       {e.sequence_number !== null && e.sequence_number !== undefined ? (
-                        <span className="font-bold text-sentinel-800 bg-sentinel-50 border border-sentinel-200 px-1.5 py-0.5 rounded text-[11px]">
+                        <span className="font-bold text-[#0D2538] bg-[#EEF6FA] border border-[#C4DEED] px-1.5 py-0.5 rounded text-[11px]">
                           #{e.sequence_number}
                         </span>
                       ) : (
@@ -427,32 +427,32 @@ export const AuditPage: React.FC = () => {
                     </td>
 
                     {/* Timestamp */}
-                    <td className="py-3 px-4 text-slate-500 whitespace-nowrap text-[11px]">
+                    <td className="py-3 px-4 text-[#5D6A75] whitespace-nowrap text-[11px]">
                       {formatDate(e.created_at)}
                     </td>
 
                     {/* Action */}
-                    <td className="py-3 px-4 font-semibold text-slate-900">
-                      <span className="text-sentinel-700 truncate block max-w-44" title={e.action}>
+                    <td className="py-3 px-4 font-semibold text-[#0D2538]">
+                      <span className="text-[#123B5D] truncate block max-w-44" title={e.action}>
                         {e.action}
                       </span>
                     </td>
 
                     {/* Entity */}
-                    <td className="py-3 px-4 text-slate-700">
+                    <td className="py-3 px-4 text-[#253746]">
                       <div className="flex items-center gap-1">
                         <span className="text-[10px] text-slate-400 uppercase">{e.entity_type}</span>
                         {e.entity_type === 'INSTRUMENT' && e.entity_id ? (
                           <Link
                             to={`/instruments/${e.entity_id}`}
-                            className="text-sentinel-600 hover:text-sentinel-800 underline flex items-center gap-0.5"
+                            className="text-[#123B5D] hover:text-[#0D2538] underline flex items-center gap-0.5"
                             title={`Inspect Instrument ${e.entity_id}`}
                           >
                             <span>{e.entity_id.slice(0, 8)}</span>
                             <ExternalLink className="w-2.5 h-2.5" />
                           </Link>
                         ) : (
-                          <span className="text-slate-600 truncate max-w-28" title={e.entity_id}>
+                          <span className="text-[#5D6A75] truncate max-w-28" title={e.entity_id}>
                             {e.entity_id.slice(0, 10)}
                           </span>
                         )}
@@ -460,7 +460,7 @@ export const AuditPage: React.FC = () => {
                     </td>
 
                     {/* Actor */}
-                    <td className="py-3 px-4 text-slate-600">
+                    <td className="py-3 px-4 text-[#5D6A75]">
                       <div className="truncate max-w-36" title={e.actor_email || 'SYSTEM'}>
                         {e.actor_email || 'SYSTEM'}
                       </div>
@@ -477,14 +477,14 @@ export const AuditPage: React.FC = () => {
                     </td>
 
                     {/* Hash Digest */}
-                    <td className="py-3 px-4 text-[11px] text-slate-500">
+                    <td className="py-3 px-4 text-[11px] text-[#5D6A75]">
                       {e.current_hash ? (
                         <button
                           onClick={() => handleCopy(e.current_hash!, `hash-${e.id}`)}
-                          className="hover:text-sentinel-700 flex items-center gap-1 group text-left"
+                          className="hover:text-[#123B5D] flex items-center gap-1 group text-left"
                           title="Click to copy full SHA-256 hash"
                         >
-                          <span className="font-mono text-slate-600 group-hover:underline">
+                          <span className="font-mono text-[#5D6A75] group-hover:underline">
                             {e.current_hash.slice(0, 10)}...{e.current_hash.slice(-4)}
                           </span>
                           {copiedHash === `hash-${e.id}` ? (
@@ -504,10 +504,10 @@ export const AuditPage: React.FC = () => {
                         variant="outline"
                         size="sm"
                         onClick={() => setSelectedEvent(e)}
-                        className="py-1 px-2 text-[11px] gap-1 text-slate-700 hover:text-slate-900"
+                        className="py-1 px-2 text-[11px] gap-1 text-[#253746] hover:text-[#0D2538]"
                         title="View Full Cryptographic Event Payload"
                       >
-                        <Eye className="w-3 h-3 text-slate-500" /> Inspect
+                        <Eye className="w-3 h-3 text-[#5D6A75]" /> Inspect
                       </Button>
                     </td>
                   </tr>
@@ -518,7 +518,7 @@ export const AuditPage: React.FC = () => {
         )}
 
         {/* Pagination Bar */}
-        <div className="bg-slate-50 px-4 py-3 border-t border-slate-200 flex items-center justify-between text-xs text-slate-600">
+        <div className="bg-[#F5F4EF] px-4 py-3 border-t border-[#C9D3DB] flex items-center justify-between text-xs text-[#5D6A75]">
           <div>
             Showing <span className="font-semibold">{events.length > 0 ? page * pageSize + 1 : 0}</span> to{' '}
             <span className="font-semibold">{Math.min((page + 1) * pageSize, totalCount)}</span> of{' '}
@@ -551,23 +551,23 @@ export const AuditPage: React.FC = () => {
       {/* Forensic Event Detail Modal */}
       {selectedEvent && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-in fade-in duration-150">
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden">
+          <div className="bg-white rounded-[10px] border border-[#C9D3DB] shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden">
             {/* Modal Header */}
-            <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+            <div className="px-6 py-4 border-b border-[#C9D3DB] flex items-center justify-between bg-[#F5F4EF]">
               <div className="flex items-center gap-2">
-                <Database className="w-5 h-5 text-sentinel-700" />
+                <Database className="w-5 h-5 text-[#123B5D]" />
                 <div>
-                  <h3 className="font-bold text-slate-900 text-sm">
+                  <h3 className="font-bold text-[#0D2538] text-sm">
                     Audit Event Payload #{selectedEvent.sequence_number ?? 'Legacy'}
                   </h3>
-                  <span className="text-[11px] text-slate-500 font-mono">
+                  <span className="text-[11px] text-[#5D6A75] font-mono">
                     UUID: {selectedEvent.id}
                   </span>
                 </div>
               </div>
               <button
                 onClick={() => setSelectedEvent(null)}
-                className="text-slate-400 hover:text-slate-600 p-1 rounded-lg"
+                className="text-slate-400 hover:text-[#5D6A75] p-1 rounded-lg"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -576,7 +576,7 @@ export const AuditPage: React.FC = () => {
             {/* Modal Body */}
             <div className="p-6 overflow-y-auto space-y-4 font-mono text-xs">
               {/* Cryptographic Linkage Card */}
-              <div className="bg-slate-900 text-slate-100 p-4 rounded-xl space-y-2 border border-slate-800">
+              <div className="bg-slate-900 text-slate-100 p-4 rounded-[10px] space-y-2 border border-slate-800">
                 <div className="flex items-center justify-between text-slate-400 text-[11px] uppercase tracking-wider font-sans font-semibold">
                   <span>Cryptographic Proof & SHA-256 Linkage</span>
                   <Lock className="w-3.5 h-3.5 text-emerald-400" />
@@ -618,39 +618,39 @@ export const AuditPage: React.FC = () => {
               </div>
 
               {/* Event Attributes Grid */}
-              <div className="grid grid-cols-2 gap-3 bg-slate-50 p-3 rounded-lg border border-slate-200">
+              <div className="grid grid-cols-2 gap-3 bg-[#F5F4EF] p-3 rounded-lg border border-[#C9D3DB]">
                 <div>
-                  <span className="text-slate-500 text-[10px] block font-sans">Action Code:</span>
-                  <span className="font-bold text-sentinel-800">{selectedEvent.action}</span>
+                  <span className="text-[#5D6A75] text-[10px] block font-sans">Action Code:</span>
+                  <span className="font-bold text-[#0D2538]">{selectedEvent.action}</span>
                 </div>
                 <div>
-                  <span className="text-slate-500 text-[10px] block font-sans">Execution Outcome:</span>
+                  <span className="text-[#5D6A75] text-[10px] block font-sans">Execution Outcome:</span>
                   <div>{getOutcomeBadge(selectedEvent.outcome)}</div>
                 </div>
                 <div>
-                  <span className="text-slate-500 text-[10px] block font-sans">Target Entity:</span>
-                  <span className="text-slate-800">
+                  <span className="text-[#5D6A75] text-[10px] block font-sans">Target Entity:</span>
+                  <span className="text-[#253746]">
                     {selectedEvent.entity_type} ({selectedEvent.entity_id})
                   </span>
                 </div>
                 <div>
-                  <span className="text-slate-500 text-[10px] block font-sans">Actor Identity:</span>
-                  <span className="text-slate-800">
+                  <span className="text-[#5D6A75] text-[10px] block font-sans">Actor Identity:</span>
+                  <span className="text-[#253746]">
                     {selectedEvent.actor_email || 'SYSTEM'} [{selectedEvent.actor_role || 'N/A'}]
                   </span>
                 </div>
                 <div>
-                  <span className="text-slate-500 text-[10px] block font-sans">Recorded Timestamp (UTC):</span>
-                  <span className="text-slate-700">{selectedEvent.created_at}</span>
+                  <span className="text-[#5D6A75] text-[10px] block font-sans">Recorded Timestamp (UTC):</span>
+                  <span className="text-[#253746]">{selectedEvent.created_at}</span>
                 </div>
                 <div>
-                  <span className="text-slate-500 text-[10px] block font-sans">Policy Version:</span>
-                  <span className="text-slate-700">{selectedEvent.policy_version || 'N/A'}</span>
+                  <span className="text-[#5D6A75] text-[10px] block font-sans">Policy Version:</span>
+                  <span className="text-[#253746]">{selectedEvent.policy_version || 'N/A'}</span>
                 </div>
                 {selectedEvent.request_id && (
                   <div className="col-span-2">
-                    <span className="text-slate-500 text-[10px] block font-sans">Request Correlation ID:</span>
-                    <span className="text-slate-700">{selectedEvent.request_id}</span>
+                    <span className="text-[#5D6A75] text-[10px] block font-sans">Request Correlation ID:</span>
+                    <span className="text-[#253746]">{selectedEvent.request_id}</span>
                   </div>
                 )}
               </div>
@@ -658,13 +658,13 @@ export const AuditPage: React.FC = () => {
               {/* Recorded Metadata / State Transitions */}
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-slate-700 font-semibold font-sans text-xs flex items-center gap-1">
-                    <FileText className="w-3.5 h-3.5 text-slate-500" /> Canonical Metadata & State Diffs:
+                  <span className="text-[#253746] font-semibold font-sans text-xs flex items-center gap-1">
+                    <FileText className="w-3.5 h-3.5 text-[#5D6A75]" /> Canonical Metadata & State Diffs:
                   </span>
                   {selectedEvent.metadata && (
                     <button
                       onClick={() => handleCopy(JSON.stringify(selectedEvent.metadata, null, 2), 'json')}
-                      className="text-[11px] text-sentinel-600 hover:text-sentinel-800 flex items-center gap-1"
+                      className="text-[11px] text-[#123B5D] hover:text-[#0D2538] flex items-center gap-1"
                     >
                       {copiedHash === 'json' ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
                       Copy JSON
@@ -680,11 +680,11 @@ export const AuditPage: React.FC = () => {
             </div>
 
             {/* Modal Footer */}
-            <div className="px-6 py-3 border-t border-slate-200 bg-slate-50 flex items-center justify-between">
+            <div className="px-6 py-3 border-t border-[#C9D3DB] bg-[#F5F4EF] flex items-center justify-between">
               {selectedEvent.entity_type === 'INSTRUMENT' && selectedEvent.entity_id ? (
                 <Link
                   to={`/instruments/${selectedEvent.entity_id}`}
-                  className="text-xs text-sentinel-700 hover:text-sentinel-900 font-semibold flex items-center gap-1"
+                  className="text-xs text-[#123B5D] hover:text-sentinel-900 font-semibold flex items-center gap-1"
                 >
                   <ExternalLink className="w-3.5 h-3.5" /> Navigate to Instrument Record
                 </Link>

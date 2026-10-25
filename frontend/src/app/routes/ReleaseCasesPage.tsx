@@ -3,21 +3,27 @@ import { Link } from 'react-router-dom';
 import { Plus, Search, Filter, AlertCircle, Clock } from 'lucide-react';
 import { releaseApi, ReleaseRequest, ReleaseWorkflowStatus } from '@/api/release';
 import { useAuth } from '@/features/auth/AuthContext';
-import { cn } from '@/lib/utils';
+import { Badge } from '@/components/common/Badge';
 
-const statusColors: Record<ReleaseWorkflowStatus, string> = {
-  DRAFT: 'bg-slate-100 text-slate-800',
-  SUBMITTED: 'bg-blue-100 text-blue-800',
-  UNDER_REVIEW: 'bg-amber-100 text-amber-800',
-  RETURNED_FOR_CORRECTION: 'bg-orange-100 text-orange-800',
-  READY_FOR_AUTHORITY: 'bg-cyan-100 text-cyan-800',
-  APPROVED: 'bg-green-100 text-green-800',
-  REJECTED: 'bg-red-100 text-red-800',
-  RELEASE_ORDER_RECORDED: 'bg-purple-100 text-purple-800',
-  BANK_SIDE_ACTION_PENDING: 'bg-indigo-100 text-indigo-800',
-  COMPLETED: 'bg-emerald-100 text-emerald-800',
-  CLOSED: 'bg-slate-200 text-slate-900',
-  CANCELLED: 'bg-slate-300 text-slate-900',
+const getStatusBadgeVariant = (status: ReleaseWorkflowStatus): 'default' | 'success' | 'warning' | 'danger' | 'info' | 'purple' | 'teal' => {
+  switch (status) {
+    case 'APPROVED':
+    case 'COMPLETED':
+      return 'success';
+    case 'UNDER_REVIEW':
+    case 'BANK_SIDE_ACTION_PENDING':
+    case 'READY_FOR_AUTHORITY':
+      return 'warning';
+    case 'REJECTED':
+    case 'CANCELLED':
+      return 'danger';
+    case 'SUBMITTED':
+      return 'info';
+    case 'RELEASE_ORDER_RECORDED':
+      return 'purple';
+    default:
+      return 'default';
+  }
 };
 
 export const ReleaseCasesPage: React.FC = () => {
@@ -52,17 +58,19 @@ export const ReleaseCasesPage: React.FC = () => {
   const canCreateRequest = ['INSTITUTION_USER'].includes(user?.role || '');
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-7xl mx-auto font-sans">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#C9D3DB] pb-4">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Release / Refund Cases</h1>
-          <p className="text-slate-600 mt-2">Manage and track FDR release, discharge, and refund requests</p>
+          <h1 className="text-2xl font-extrabold text-[#0D2538] tracking-tight">Release & Refund Cases</h1>
+          <p className="text-xs text-[#5D6A75] mt-1 font-medium">
+            Manage and track statutory FDR release, discharge, and refund requests with maker-checker governance.
+          </p>
         </div>
         {canCreateRequest && (
           <Link
             to="/release/new"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-sentinel-600 text-white rounded-lg hover:bg-sentinel-700 font-medium transition"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-[#123B5D] text-white rounded-[8px] hover:bg-[#0D2538] text-xs font-semibold shadow-xs transition"
           >
             <Plus className="w-4 h-4" />
             New Request
@@ -70,27 +78,27 @@ export const ReleaseCasesPage: React.FC = () => {
         )}
       </div>
 
-      {/* Filters */}
-      <div className="bg-white rounded-lg shadow-sm p-4 space-y-4">
+      {/* Filters - Structured Brutalism */}
+      <div className="bg-white rounded-[10px] border border-[#C9D3DB] p-4 space-y-4 shadow-[0_1px_3px_rgba(13,37,56,0.04)]">
         <div className="flex gap-4 flex-wrap">
           <div className="flex-1 min-w-64">
             <div className="relative">
-              <Search className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
+              <Search className="absolute left-3 top-2.5 w-4 h-4 text-[#5D6A75]" />
               <input
                 type="text"
                 placeholder="Search by case number, instrument..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sentinel-500 focus:border-transparent"
+                className="w-full pl-9 pr-4 py-2 border border-[#C9D3DB] rounded-[6px] text-xs text-[#253746] focus:ring-2 focus:ring-[#145DA0] focus:border-transparent font-mono bg-[#F5F4EF]"
               />
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Filter className="w-4 h-4 text-slate-600" />
+            <Filter className="w-4 h-4 text-[#5D6A75]" />
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value as any)}
-              className="px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sentinel-500 focus:border-transparent"
+              className="px-3 py-2 border border-[#C9D3DB] rounded-[6px] text-xs text-[#253746] focus:ring-2 focus:ring-[#145DA0] focus:border-transparent bg-[#F5F4EF] font-mono"
             >
               <option value="ALL">All Status</option>
               <option value="DRAFT">Draft</option>
@@ -109,32 +117,33 @@ export const ReleaseCasesPage: React.FC = () => {
 
       {/* Error State */}
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex gap-3">
-          <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
+        <div className="bg-[#FDF2F1] border border-[#FECDCA] rounded-[8px] p-4 flex gap-3 text-xs">
+          <AlertCircle className="w-5 h-5 text-[#B42318] shrink-0" />
           <div>
-            <h3 className="font-semibold text-red-900">Error Loading Cases</h3>
-            <p className="text-red-700">{error}</p>
+            <h3 className="font-semibold text-[#B42318]">Error Loading Cases</h3>
+            <p className="text-[#B42318]/90 mt-0.5">{error}</p>
           </div>
         </div>
       )}
 
       {/* Loading State */}
       {isLoading && (
-        <div className="bg-white rounded-lg shadow-sm p-8 text-center">
-          <Clock className="w-8 h-8 text-slate-400 mx-auto mb-3 animate-spin" />
-          <p className="text-slate-600">Loading release cases...</p>
+        <div className="bg-white rounded-[10px] border border-[#C9D3DB] p-8 text-center">
+          <Clock className="w-8 h-8 text-[#5D6A75] mx-auto mb-3 animate-spin" />
+          <p className="text-xs text-[#5D6A75]">Loading release cases...</p>
         </div>
       )}
 
       {/* Empty State */}
       {!isLoading && requests.length === 0 && (
-        <div className="bg-white rounded-lg shadow-sm p-8 text-center">
-          <AlertCircle className="w-8 h-8 text-slate-400 mx-auto mb-3" />
-          <p className="text-slate-600 mb-4">No release cases found</p>
+        <div className="bg-white rounded-[10px] border border-[#C9D3DB] p-8 text-center">
+          <AlertCircle className="w-8 h-8 text-[#8799A9] mx-auto mb-3" />
+          <p className="text-sm font-semibold text-[#0D2538] mb-1">No release cases found</p>
+          <p className="text-xs text-[#5D6A75] mb-4">No records matched your search criteria or tenant scope.</p>
           {canCreateRequest && (
             <Link
               to="/release/new"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-sentinel-600 text-white rounded-lg hover:bg-sentinel-700 font-medium transition"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-[#123B5D] text-white rounded-[8px] hover:bg-[#0D2538] text-xs font-semibold transition"
             >
               <Plus className="w-4 h-4" />
               Create First Request
@@ -143,47 +152,47 @@ export const ReleaseCasesPage: React.FC = () => {
         </div>
       )}
 
-      {/* Cases Table */}
+      {/* Cases Table - Structured Brutalism */}
       {!isLoading && requests.length > 0 && (
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-          <table className="w-full">
-            <thead className="bg-slate-50 border-b border-slate-200">
+        <div className="bg-white rounded-[10px] border border-[#C9D3DB] overflow-hidden shadow-[0_1px_3px_rgba(13,37,56,0.04)]">
+          <table className="w-full text-xs text-left">
+            <thead className="bg-[#F5F4EF] border-b border-[#C9D3DB] uppercase tracking-wider font-semibold text-[#5D6A75]">
               <tr>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-slate-900">Case Number</th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-slate-900">Instrument</th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-slate-900">Type</th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-slate-900">Status</th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-slate-900">Created</th>
-                <th className="px-6 py-3 text-left text-sm font-semibold text-slate-900">Action</th>
+                <th className="px-6 py-3 font-semibold">Case Number</th>
+                <th className="px-6 py-3 font-semibold">Instrument</th>
+                <th className="px-6 py-3 font-semibold">Type</th>
+                <th className="px-6 py-3 font-semibold">Status</th>
+                <th className="px-6 py-3 font-semibold">Created</th>
+                <th className="px-6 py-3 font-semibold text-right">Action</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-200">
+            <tbody className="divide-y divide-[#C9D3DB] font-mono">
               {requests.map((request) => (
-                <tr key={request.id} className="hover:bg-slate-50 transition">
-                  <td className="px-6 py-4">
+                <tr key={request.id} className="hover:bg-[#F5F4EF]/70 transition-colors">
+                  <td className="px-6 py-3.5 font-bold text-[#123B5D]">
                     <Link
                       to={`/release/${request.id}`}
-                      className="text-sentinel-600 hover:text-sentinel-700 font-medium"
+                      className="hover:underline flex items-center gap-1"
                     >
                       {request.case_number}
                     </Link>
                   </td>
-                  <td className="px-6 py-4 text-sm text-slate-600">{request.instrument_id}</td>
-                  <td className="px-6 py-4 text-sm text-slate-600">{request.request_type}</td>
-                  <td className="px-6 py-4">
-                    <span className={cn('text-xs font-semibold px-3 py-1 rounded-full', statusColors[request.workflow_status])}>
+                  <td className="px-6 py-3.5 text-[#253746] font-mono">{request.instrument_id}</td>
+                  <td className="px-6 py-3.5 text-[#5D6A75] font-sans font-medium">{request.request_type}</td>
+                  <td className="px-6 py-3.5">
+                    <Badge variant={getStatusBadgeVariant(request.workflow_status)}>
                       {request.workflow_status.replace(/_/g, ' ')}
-                    </span>
+                    </Badge>
                   </td>
-                  <td className="px-6 py-4 text-sm text-slate-600">
+                  <td className="px-6 py-3.5 text-[#5D6A75]">
                     {new Date(request.created_at).toLocaleDateString()}
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-3.5 text-right font-sans">
                     <Link
                       to={`/release/${request.id}`}
-                      className="text-sentinel-600 hover:text-sentinel-700 text-sm font-medium"
+                      className="text-[#0F766E] hover:text-[#09544E] font-semibold text-xs inline-flex items-center gap-1"
                     >
-                      View →
+                      View Details →
                     </Link>
                   </td>
                 </tr>
@@ -195,3 +204,4 @@ export const ReleaseCasesPage: React.FC = () => {
     </div>
   );
 };
+

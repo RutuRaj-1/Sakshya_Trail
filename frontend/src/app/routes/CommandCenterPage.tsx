@@ -138,19 +138,19 @@ export const CommandCenterPage: React.FC = () => {
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-12">
-      {/* Top Cockpit Header */}
-      <div className="bg-linear-to-r from-slate-900 via-slate-850 to-slate-900 rounded-2xl p-6 text-white shadow-lg border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      {/* Top Cockpit Header - Structured Brutalism Container */}
+      <div className="bg-[#0D2538] rounded-[10px] p-6 text-white shadow-[0_1px_3px_rgba(13,37,56,0.08)] border border-[#1e3c54] flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="space-y-1.5 max-w-2xl">
           <div className="flex items-center gap-2">
-            <span className="bg-sentinel-500/20 text-sentinel-300 border border-sentinel-400/30 text-[11px] font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider">
-              {isInstitutionUser ? 'Institution Command Center' : 'AICTE Bureau Executive Cockpit'}
+            <span className="bg-[#123B5D] text-[#8ACEC8] border border-[#0F766E]/40 text-[11px] font-semibold px-2.5 py-0.5 rounded-[4px] uppercase tracking-wider font-mono">
+              {isInstitutionUser ? 'Institution Command Center' : 'Bureau Executive Cockpit'}
             </span>
-            <span className="text-slate-400 text-xs font-mono">Module 7 Operational Desk</span>
+            <span className="text-[#8799A9] text-xs font-mono">SIH 26265</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
             Security Deposit & FDR Command Center
           </h1>
-          <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+          <p className="text-xs sm:text-sm text-[#C9D3DB] leading-relaxed">
             Real-time multi-dimensional operational metrics, explainable priority triage, maturity window monitoring, and regulatory compliance status.
           </p>
         </div>
@@ -163,9 +163,9 @@ export const CommandCenterPage: React.FC = () => {
               setInspectedMetricId(null);
               setDictionaryOpen(true);
             }}
-            className="inline-flex items-center gap-1.5 px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium rounded-lg border border-slate-700 shadow-xs transition"
+            className="inline-flex items-center gap-1.5 px-3 py-2 bg-[#123B5D] hover:bg-[#0D2538] text-white text-xs font-medium rounded-[8px] border border-[#8799A9] shadow-2xs transition cursor-pointer"
           >
-            <BookOpen className="w-4 h-4 text-sentinel-400" />
+            <BookOpen className="w-4 h-4 text-[#8ACEC8]" />
             <span>Metric Dictionary (PRD-FR-077)</span>
           </button>
 
@@ -173,13 +173,14 @@ export const CommandCenterPage: React.FC = () => {
             type="button"
             onClick={loadCommandCenterData}
             disabled={isLoading}
-            className="inline-flex items-center gap-1.5 px-3 py-2 bg-sentinel-600 hover:bg-sentinel-700 text-white text-xs font-medium rounded-lg shadow-xs transition disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 px-3 py-2 bg-[#0F766E] hover:bg-[#09544E] text-white text-xs font-semibold rounded-[8px] shadow-2xs transition disabled:opacity-50 cursor-pointer"
           >
             <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
             <span>{isLoading ? 'Refreshing...' : 'Refresh Live Data'}</span>
           </button>
         </div>
       </div>
+
 
       {/* Error Banner with Retry */}
       {error && (

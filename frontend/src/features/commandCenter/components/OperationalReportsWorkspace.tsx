@@ -193,10 +193,10 @@ export const OperationalReportsWorkspace: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-900 border border-slate-800 p-6 rounded-xl shadow-lg">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#0D2538] border border-[#1e3c54] p-6 rounded-[10px] shadow-lg">
         <div>
           <div className="flex items-center gap-2">
-            <FileSpreadsheet className="w-6 h-6 text-sentinel-400" />
+            <FileSpreadsheet className="w-6 h-6 text-[#0F766E]" />
             <h1 className="text-2xl font-bold text-white tracking-tight">Operational Reports Workspace</h1>
           </div>
           <p className="text-slate-400 text-sm mt-1">
@@ -216,7 +216,7 @@ export const OperationalReportsWorkspace: React.FC = () => {
                 : 'bg-slate-900 text-slate-600 border border-slate-800 cursor-not-allowed'
             }`}
           >
-            {exportingCsv ? <RefreshCw className="w-4 h-4 animate-spin text-sentinel-400" /> : <Download className="w-4 h-4" />}
+            {exportingCsv ? <RefreshCw className="w-4 h-4 animate-spin text-[#0F766E]" /> : <Download className="w-4 h-4" />}
             <span>Export CSV</span>
           </button>
 
@@ -226,7 +226,7 @@ export const OperationalReportsWorkspace: React.FC = () => {
             title={canExport ? 'Export official compliance PDF' : 'Export permission required (Officer/Auditor/Admin)'}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-all shadow-sm ${
               canExport
-                ? 'bg-sentinel-600 hover:bg-sentinel-500 text-white shadow-sentinel-950/40'
+                ? 'bg-[#0F766E] hover:bg-[#09544E] text-white shadow-sentinel-950/40'
                 : 'bg-slate-900 text-slate-600 border border-slate-800 cursor-not-allowed'
             }`}
           >
@@ -237,13 +237,13 @@ export const OperationalReportsWorkspace: React.FC = () => {
       </div>
 
       {/* Tabs Selector */}
-      <div className="flex border-b border-slate-800 space-x-1 overflow-x-auto">
+      <div className="flex border-b border-[#C9D3DB] space-x-1 overflow-x-auto">
         <button
           onClick={() => setActiveTab('PENDING_VERIFICATION')}
           className={`flex items-center gap-2 px-4 py-3 border-b-2 font-medium text-sm transition-all whitespace-nowrap ${
             activeTab === 'PENDING_VERIFICATION'
-              ? 'border-sentinel-500 text-sentinel-400 bg-slate-800/40'
-              : 'border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-900/40'
+              ? 'border-[#0F766E] text-[#0F766E] bg-[#EEF6FA]'
+              : 'border-transparent text-[#5D6A75] hover:text-[#0D2538] hover:bg-[#F5F4EF]'
           }`}
         >
           <Clock className="w-4 h-4" />
@@ -259,8 +259,8 @@ export const OperationalReportsWorkspace: React.FC = () => {
           onClick={() => setActiveTab('UPCOMING_MATURITIES')}
           className={`flex items-center gap-2 px-4 py-3 border-b-2 font-medium text-sm transition-all whitespace-nowrap ${
             activeTab === 'UPCOMING_MATURITIES'
-              ? 'border-sentinel-500 text-sentinel-400 bg-slate-800/40'
-              : 'border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-900/40'
+              ? 'border-[#0F766E] text-[#0F766E] bg-[#EEF6FA]'
+              : 'border-transparent text-[#5D6A75] hover:text-[#0D2538] hover:bg-[#F5F4EF]'
           }`}
         >
           <Calendar className="w-4 h-4" />
@@ -276,8 +276,8 @@ export const OperationalReportsWorkspace: React.FC = () => {
           onClick={() => setActiveTab('MISSING_DOCUMENTS')}
           className={`flex items-center gap-2 px-4 py-3 border-b-2 font-medium text-sm transition-all whitespace-nowrap ${
             activeTab === 'MISSING_DOCUMENTS'
-              ? 'border-sentinel-500 text-sentinel-400 bg-slate-800/40'
-              : 'border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-900/40'
+              ? 'border-[#0F766E] text-[#0F766E] bg-[#EEF6FA]'
+              : 'border-transparent text-[#5D6A75] hover:text-[#0D2538] hover:bg-[#F5F4EF]'
           }`}
         >
           <FileCheck2 className="w-4 h-4" />
@@ -293,8 +293,8 @@ export const OperationalReportsWorkspace: React.FC = () => {
           onClick={() => setActiveTab('INTERVENTIONS')}
           className={`flex items-center gap-2 px-4 py-3 border-b-2 font-medium text-sm transition-all whitespace-nowrap ${
             activeTab === 'INTERVENTIONS'
-              ? 'border-sentinel-500 text-sentinel-400 bg-slate-800/40'
-              : 'border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-900/40'
+              ? 'border-[#0F766E] text-[#0F766E] bg-[#EEF6FA]'
+              : 'border-transparent text-[#5D6A75] hover:text-[#0D2538] hover:bg-[#F5F4EF]'
           }`}
         >
           <AlertTriangle className="w-4 h-4" />
@@ -308,15 +308,15 @@ export const OperationalReportsWorkspace: React.FC = () => {
       </div>
 
       {/* Filter Control Bar */}
-      <div className="bg-slate-900/80 border border-slate-800 p-4 rounded-xl space-y-4">
+      <div className="bg-slate-900/80 border border-slate-800 p-4 rounded-[10px] space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-slate-300 text-sm font-semibold">
-            <SlidersHorizontal className="w-4 h-4 text-sentinel-400" />
+            <SlidersHorizontal className="w-4 h-4 text-[#0F766E]" />
             <span>Operational Filter Criteria</span>
           </div>
           <button
             onClick={handleResetFilters}
-            className="text-xs text-sentinel-400 hover:text-sentinel-300 underline font-mono"
+            className="text-xs text-[#0F766E] hover:text-sentinel-300 underline font-mono"
           >
             Reset Filters
           </button>
@@ -481,13 +481,13 @@ export const OperationalReportsWorkspace: React.FC = () => {
       {/* Active Filter Criteria Summary Bar */}
       <div className="flex items-center justify-between text-xs text-slate-400 px-2">
         <div className="flex items-center gap-2">
-          <Info className="w-3.5 h-3.5 text-sentinel-400" />
+          <Info className="w-3.5 h-3.5 text-[#0F766E]" />
           <span>
             Showing records scoped by server-side tenancy. Export generation timestamp and applied filters are sealed in export headers.
           </span>
         </div>
         {loading && (
-          <div className="flex items-center gap-1.5 text-sentinel-400">
+          <div className="flex items-center gap-1.5 text-[#0F766E]">
             <RefreshCw className="w-3.5 h-3.5 animate-spin" />
             <span>Querying verified records...</span>
           </div>
@@ -496,7 +496,7 @@ export const OperationalReportsWorkspace: React.FC = () => {
 
       {/* Error State */}
       {error && (
-        <div className="p-4 bg-rose-950/40 border border-rose-800/80 rounded-xl text-rose-300 text-sm flex items-center gap-3">
+        <div className="p-4 bg-rose-950/40 border border-rose-800/80 rounded-[10px] text-rose-300 text-sm flex items-center gap-3">
           <AlertCircle className="w-5 h-5 shrink-0 text-rose-400" />
           <div>{error}</div>
         </div>
@@ -506,8 +506,8 @@ export const OperationalReportsWorkspace: React.FC = () => {
           REPORT VIEW A: PENDING VERIFICATION
          ========================================================================= */}
       {activeTab === 'PENDING_VERIFICATION' && (
-        <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-lg">
-          <div className="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/40">
+        <div className="bg-slate-900 border border-slate-800 rounded-[10px] overflow-hidden shadow-lg">
+          <div className="p-4 border-b border-[#C9D3DB] flex items-center justify-between bg-slate-950/40">
             <div>
               <h2 className="text-base font-semibold text-white">Pending Electronic Verification Report</h2>
               <p className="text-xs text-slate-400 mt-0.5">
@@ -523,7 +523,7 @@ export const OperationalReportsWorkspace: React.FC = () => {
 
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs text-slate-300">
-              <thead className="bg-slate-950/80 text-slate-400 uppercase font-mono tracking-wider border-b border-slate-800">
+              <thead className="bg-slate-950/80 text-slate-400 uppercase font-mono tracking-wider border-b border-[#C9D3DB]">
                 <tr>
                   <th className="py-3 px-4">Instrument Reference</th>
                   <th className="py-3 px-4">Institution</th>
@@ -603,7 +603,7 @@ export const OperationalReportsWorkspace: React.FC = () => {
                           </button>
                           <button
                             onClick={() => navigate(row.drill_down_path)}
-                            className="flex items-center gap-1 text-sentinel-400 hover:text-sentinel-300 font-medium text-xs ml-1"
+                            className="flex items-center gap-1 text-[#0F766E] hover:text-sentinel-300 font-medium text-xs ml-1"
                           >
                             <span>Inspect</span>
                             <ExternalLink className="w-3 h-3" />
@@ -625,15 +625,15 @@ export const OperationalReportsWorkspace: React.FC = () => {
       {activeTab === 'UPCOMING_MATURITIES' && (
         <div className="space-y-4">
           {/* Statutory Notice Callout */}
-          <div className="p-4 bg-blue-950/30 border border-blue-900/60 rounded-xl flex items-start gap-3">
+          <div className="p-4 bg-blue-950/30 border border-blue-900/60 rounded-[10px] flex items-start gap-3">
             <Info className="w-5 h-5 text-blue-400 shrink-0 mt-0.5" />
             <div className="text-xs text-blue-200 leading-relaxed">
               <span className="font-semibold text-blue-100">Statutory Notice:</span> Approaching calendar maturity does not equate to release eligibility. Replacement instruments must be separately verified and validated prior to encashment or discharge authorization.
             </div>
           </div>
 
-          <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-lg">
-            <div className="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/40">
+          <div className="bg-slate-900 border border-slate-800 rounded-[10px] overflow-hidden shadow-lg">
+            <div className="p-4 border-b border-[#C9D3DB] flex items-center justify-between bg-slate-950/40">
               <div>
                 <h2 className="text-base font-semibold text-white">Upcoming Deposit Maturities Report</h2>
                 <p className="text-xs text-slate-400 mt-0.5">
@@ -654,7 +654,7 @@ export const OperationalReportsWorkspace: React.FC = () => {
 
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs text-slate-300">
-                <thead className="bg-slate-950/80 text-slate-400 uppercase font-mono tracking-wider border-b border-slate-800">
+                <thead className="bg-slate-950/80 text-slate-400 uppercase font-mono tracking-wider border-b border-[#C9D3DB]">
                   <tr>
                     <th className="py-3 px-4">Instrument Reference</th>
                     <th className="py-3 px-4">Institution</th>
@@ -728,7 +728,7 @@ export const OperationalReportsWorkspace: React.FC = () => {
                             </button>
                             <button
                               onClick={() => navigate(row.drill_down_path)}
-                              className="flex items-center gap-1 text-sentinel-400 hover:text-sentinel-300 font-medium text-xs ml-1"
+                              className="flex items-center gap-1 text-[#0F766E] hover:text-sentinel-300 font-medium text-xs ml-1"
                             >
                               <span>Inspect</span>
                               <ExternalLink className="w-3 h-3" />
@@ -749,8 +749,8 @@ export const OperationalReportsWorkspace: React.FC = () => {
           REPORT VIEW C: MISSING DOCUMENTS
          ========================================================================= */}
       {activeTab === 'MISSING_DOCUMENTS' && (
-        <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-lg">
-          <div className="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/40">
+        <div className="bg-slate-900 border border-slate-800 rounded-[10px] overflow-hidden shadow-lg">
+          <div className="p-4 border-b border-[#C9D3DB] flex items-center justify-between bg-slate-950/40">
             <div>
               <h2 className="text-base font-semibold text-white">Missing & Non-Compliant Documents Report</h2>
               <p className="text-xs text-slate-400 mt-0.5">
@@ -766,7 +766,7 @@ export const OperationalReportsWorkspace: React.FC = () => {
 
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs text-slate-300">
-              <thead className="bg-slate-950/80 text-slate-400 uppercase font-mono tracking-wider border-b border-slate-800">
+              <thead className="bg-slate-950/80 text-slate-400 uppercase font-mono tracking-wider border-b border-[#C9D3DB]">
                 <tr>
                   <th className="py-3 px-4">Instrument Reference</th>
                   <th className="py-3 px-4">Institution</th>
@@ -828,7 +828,7 @@ export const OperationalReportsWorkspace: React.FC = () => {
                       <td className="py-3 px-4 text-right">
                         <button
                           onClick={() => navigate(row.drill_down_path)}
-                          className="flex items-center gap-1 text-sentinel-400 hover:text-sentinel-300 font-medium text-xs ml-auto"
+                          className="flex items-center gap-1 text-[#0F766E] hover:text-sentinel-300 font-medium text-xs ml-auto"
                         >
                           <span>Inspect</span>
                           <ExternalLink className="w-3 h-3" />
@@ -847,8 +847,8 @@ export const OperationalReportsWorkspace: React.FC = () => {
           REPORT VIEW D: INTERVENTIONS REQUIRED
          ========================================================================= */}
       {activeTab === 'INTERVENTIONS' && (
-        <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-lg">
-          <div className="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/40">
+        <div className="bg-slate-900 border border-slate-800 rounded-[10px] overflow-hidden shadow-lg">
+          <div className="p-4 border-b border-[#C9D3DB] flex items-center justify-between bg-slate-950/40">
             <div>
               <h2 className="text-base font-semibold text-white">Operational Interventions Report</h2>
               <p className="text-xs text-slate-400 mt-0.5">
@@ -864,7 +864,7 @@ export const OperationalReportsWorkspace: React.FC = () => {
 
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs text-slate-300">
-              <thead className="bg-slate-950/80 text-slate-400 uppercase font-mono tracking-wider border-b border-slate-800">
+              <thead className="bg-slate-950/80 text-slate-400 uppercase font-mono tracking-wider border-b border-[#C9D3DB]">
                 <tr>
                   <th className="py-3 px-4">Intervention Type</th>
                   <th className="py-3 px-4">Reference</th>
@@ -930,7 +930,7 @@ export const OperationalReportsWorkspace: React.FC = () => {
                       <td className="py-3 px-4 text-right">
                         <button
                           onClick={() => navigate(row.drill_down_path)}
-                          className="flex items-center gap-1 text-sentinel-400 hover:text-sentinel-300 font-medium text-xs ml-auto"
+                          className="flex items-center gap-1 text-[#0F766E] hover:text-sentinel-300 font-medium text-xs ml-auto"
                         >
                           <span>Review</span>
                           <ExternalLink className="w-3 h-3" />
@@ -950,11 +950,11 @@ export const OperationalReportsWorkspace: React.FC = () => {
          ========================================================================= */}
       {showEvidenceModal && (
         <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-slate-900 border border-slate-800 rounded-xl max-w-3xl w-full p-6 space-y-6 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-[10px] max-w-3xl w-full p-6 space-y-6 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-[#C9D3DB] pb-4">
               <div>
                 <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                  <ShieldCheck className="w-5 h-5 text-sentinel-400" />
+                  <ShieldCheck className="w-5 h-5 text-[#0F766E]" />
                   <span>Instrument Audit Evidence Pack</span>
                 </h3>
                 <p className="text-xs text-slate-400 mt-0.5">
@@ -971,7 +971,7 @@ export const OperationalReportsWorkspace: React.FC = () => {
 
             {evidencePackLoading ? (
               <div className="py-12 flex flex-col items-center justify-center text-slate-400 space-y-3">
-                <RefreshCw className="w-8 h-8 animate-spin text-sentinel-400" />
+                <RefreshCw className="w-8 h-8 animate-spin text-[#0F766E]" />
                 <span className="text-sm">Compiling verified cryptographic digests...</span>
               </div>
             ) : evidencePackData ? (

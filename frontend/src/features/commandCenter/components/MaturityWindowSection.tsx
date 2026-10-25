@@ -34,26 +34,26 @@ export const MaturityWindowSection: React.FC<MaturityWindowSectionProps> = ({
   ];
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+    <div className="bg-white rounded-[8px] border border-[#C9D3DB] shadow-xs overflow-hidden">
       {/* Header with window controls */}
-      <div className="p-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50/50">
+      <div className="p-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#F5F4EF]/50">
         <div>
           <div className="flex items-center gap-2">
-            <Calendar className="w-4 h-4 text-sentinel-600" />
-            <h3 className="font-semibold text-slate-900 text-sm">
+            <Calendar className="w-4 h-4 text-[#123B5D]" />
+            <h3 className="font-semibold text-[#0D2538] text-sm">
               Maturity Window Monitor
             </h3>
-            <span className="text-[10px] font-mono text-slate-500 bg-slate-200/80 px-1.5 py-0.5 rounded">
+            <span className="text-[10px] font-mono text-[#5D6A75] bg-slate-200/80 px-1.5 py-0.5 rounded">
               PRD-FR-070b
             </span>
           </div>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-[#5D6A75] mt-0.5">
             Instruments maturing within inclusive selectable calendar window.
           </p>
         </div>
 
         {/* Window Selector Buttons */}
-        <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200">
+        <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border border-[#C9D3DB]">
           {windowOptions.map((opt) => (
             <button
               key={opt.value}
@@ -61,8 +61,8 @@ export const MaturityWindowSection: React.FC<MaturityWindowSectionProps> = ({
               onClick={() => onWindowChange(opt.value)}
               className={`px-2.5 py-1 text-xs font-medium rounded-md transition-all ${
                 selectedWindowDays === opt.value
-                  ? 'bg-white text-slate-900 shadow-xs border border-slate-200/60 font-semibold'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/50'
+                  ? 'bg-white text-[#0D2538] shadow-xs border border-[#C9D3DB]/60 font-semibold'
+                  : 'text-[#5D6A75] hover:text-[#0D2538] hover:bg-slate-200/50'
               }`}
             >
               {opt.label}
@@ -82,26 +82,26 @@ export const MaturityWindowSection: React.FC<MaturityWindowSectionProps> = ({
       {/* Summary KPI Strip */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 border-b border-slate-100 bg-white">
         <div>
-          <span className="text-xs text-slate-500">Maturing Count</span>
-          <div className="text-lg font-bold text-slate-900">
+          <span className="text-xs text-[#5D6A75]">Maturing Count</span>
+          <div className="text-lg font-bold text-[#0D2538]">
             {isLoading ? '...' : data?.total_instruments ?? 0} FDRs
           </div>
         </div>
         <div>
-          <span className="text-xs text-slate-500">Total Volume</span>
-          <div className="text-lg font-bold text-slate-900">
+          <span className="text-xs text-[#5D6A75]">Total Volume</span>
+          <div className="text-lg font-bold text-[#0D2538]">
             {isLoading ? '...' : formatINR(data?.total_deposit_value ?? '0.00')}
           </div>
         </div>
         <div>
-          <span className="text-xs text-slate-500">Window Range</span>
-          <div className="text-xs font-medium text-slate-700 mt-1">
+          <span className="text-xs text-[#5D6A75]">Window Range</span>
+          <div className="text-xs font-medium text-[#253746] mt-1">
             {data ? `${data.start_date} → ${data.end_date}` : 'Calculating...'}
           </div>
         </div>
         <div>
-          <span className="text-xs text-slate-500">Top Issuing Bank</span>
-          <div className="text-xs font-medium text-slate-700 mt-1 truncate">
+          <span className="text-xs text-[#5D6A75]">Top Issuing Bank</span>
+          <div className="text-xs font-medium text-[#253746] mt-1 truncate">
             {data && Object.keys(data.by_bank).length > 0
               ? Object.entries(data.by_bank).sort((a, b) => b[1] - a[1])[0][0]
               : 'None in window'}
@@ -112,7 +112,7 @@ export const MaturityWindowSection: React.FC<MaturityWindowSectionProps> = ({
       {/* Table */}
       <div className="overflow-x-auto">
         <table className="w-full text-left text-xs">
-          <thead className="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200">
+          <thead className="bg-[#F5F4EF] text-[#5D6A75] font-semibold border-b border-[#C9D3DB]">
             <tr>
               <th className="px-4 py-2.5">Reference #</th>
               <th className="px-4 py-2.5">Institution</th>
@@ -142,21 +142,21 @@ export const MaturityWindowSection: React.FC<MaturityWindowSectionProps> = ({
                 const trust = trustBadges[item.trust_level] || { label: item.trust_level, variant: 'default' };
                 const isOverdue = item.days_to_maturity < 0;
                 return (
-                  <tr key={item.id} className="hover:bg-slate-50/80 transition-colors">
-                    <td className="px-4 py-2.5 font-mono font-medium text-slate-900">
+                  <tr key={item.id} className="hover:bg-[#F5F4EF]/80 transition-colors">
+                    <td className="px-4 py-2.5 font-mono font-medium text-[#0D2538]">
                       {item.reference_number}
                     </td>
-                    <td className="px-4 py-2.5 text-slate-700 max-w-48 truncate">
+                    <td className="px-4 py-2.5 text-[#253746] max-w-48 truncate">
                       {item.institution_name || item.institution_id}
                     </td>
-                    <td className="px-4 py-2.5 text-slate-600">
+                    <td className="px-4 py-2.5 text-[#5D6A75]">
                       <div>{item.bank_name}</div>
                       {item.branch && <div className="text-[10px] text-slate-400">{item.branch}</div>}
                     </td>
-                    <td className="px-4 py-2.5 font-semibold text-slate-900">
+                    <td className="px-4 py-2.5 font-semibold text-[#0D2538]">
                       {formatINR(item.amount)}
                     </td>
-                    <td className="px-4 py-2.5 font-mono text-slate-700">
+                    <td className="px-4 py-2.5 font-mono text-[#253746]">
                       {item.maturity_date}
                     </td>
                     <td className="px-4 py-2.5">
@@ -176,7 +176,7 @@ export const MaturityWindowSection: React.FC<MaturityWindowSectionProps> = ({
                     <td className="px-4 py-2.5 text-right">
                       <Link
                         to={`/instruments/${item.id}`}
-                        className="inline-flex items-center gap-1 text-sentinel-600 hover:text-sentinel-800 font-medium"
+                        className="inline-flex items-center gap-1 text-[#123B5D] hover:text-[#0D2538] font-medium"
                       >
                         Inspect <ExternalLink className="w-3 h-3" />
                       </Link>

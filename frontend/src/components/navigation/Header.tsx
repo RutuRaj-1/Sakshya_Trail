@@ -1,3 +1,4 @@
+import React from 'react';
 import { Database, RefreshCw, LogOut, KeyRound } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useHealth } from '@/hooks/useHealth';
@@ -29,7 +30,7 @@ export const Header: React.FC = () => {
         return 'purple';
       case 'SCRUTINY_OFFICER':
       case 'FINANCE_OFFICER':
-        return 'info';
+        return 'teal';
       case 'INSTITUTION_USER':
         return 'default';
       case 'AUDITOR':
@@ -40,7 +41,7 @@ export const Header: React.FC = () => {
   };
 
   return (
-    <header className="h-16 bg-white border-b border-slate-200 sticky top-0 z-30 px-4 sm:px-6 flex items-center justify-between shadow-xs">
+    <header className="h-16 bg-white border-b border-[#C9D3DB] sticky top-0 z-30 px-4 sm:px-6 flex items-center justify-between shadow-[0_1px_2px_rgba(13,37,56,0.03)] font-sans">
       {/* Title & Official Subtitle */}
       <Link to="/dashboard" className="flex items-center gap-3 hover:opacity-95 transition-opacity">
         <img
@@ -50,14 +51,14 @@ export const Header: React.FC = () => {
         />
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-base font-bold tracking-tight text-slate-900">
-              Sakshya<span className="text-teal-600">Trail</span>
+            <h1 className="text-base font-bold tracking-tight text-[#0D2538]">
+              Sakshya<span className="text-[#0F766E]">Trail</span>
             </h1>
-            <Badge variant="info" className="text-[10px] py-0 px-1.5 font-semibold">
+            <Badge variant="teal" className="text-[10px] py-0 px-1.5 font-semibold">
               v0.7.0 Integrity Platform
             </Badge>
           </div>
-          <p className="text-xs text-slate-500 hidden sm:block">
+          <p className="text-xs text-[#5D6A75] hidden sm:block font-medium">
             Security Deposit & FDR Lifecycle Integrity Platform
           </p>
         </div>
@@ -65,8 +66,8 @@ export const Header: React.FC = () => {
 
       {/* Real-time Diagnostics Bar & Authenticated User Section */}
       <div className="flex items-center gap-3 sm:gap-4">
-        {/* Backend & DB Health Indicator */}
-        <div className="hidden lg:flex items-center gap-2.5 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs">
+        {/* Backend & DB Health Indicator - Structured Brutalism Container */}
+        <div className="hidden lg:flex items-center gap-2.5 px-3 py-1 bg-[#F5F4EF] border border-[#C9D3DB] rounded-[6px] text-xs">
           <div className="flex items-center gap-1.5" title="FastAPI Backend Liveness">
             <StatusIndicator
               status={liveness ? 'online' : 'offline'}
@@ -74,22 +75,22 @@ export const Header: React.FC = () => {
             />
           </div>
 
-          <span className="text-slate-300">|</span>
+          <span className="text-[#8799A9]">|</span>
 
           <div
             className="flex items-center gap-1.5"
             title={`Database: ${dbDialect} (${readiness?.components?.database?.status || 'Unknown'})`}
           >
-            <Database className="w-3.5 h-3.5 text-slate-400" />
-            <span className="font-mono text-[11px] text-slate-600">
+            <Database className="w-3.5 h-3.5 text-[#5D6A75]" />
+            <span className="font-mono text-[11px] text-[#253746] font-semibold">
               {dbDialect}
             </span>
             {isDbReady ? (
-              <Badge variant="success" className="text-[10px] py-0 px-1">
+              <Badge variant="success" className="text-[10px] py-0 px-1 font-mono">
                 {dbLatency ? `${dbLatency}ms` : 'Ready'}
               </Badge>
             ) : (
-              <Badge variant="warning" className="text-[10px] py-0 px-1">
+              <Badge variant="warning" className="text-[10px] py-0 px-1 font-mono">
                 Not Connected
               </Badge>
             )}
@@ -98,7 +99,7 @@ export const Header: React.FC = () => {
           <button
             onClick={() => refresh()}
             disabled={isLoading}
-            className="text-slate-400 hover:text-slate-700 transition-colors ml-1 p-0.5 rounded cursor-pointer"
+            className="text-[#5D6A75] hover:text-[#0D2538] transition-colors ml-1 p-0.5 rounded-[4px] cursor-pointer"
             title="Refresh connectivity probes"
             aria-label="Refresh health checks"
           >
@@ -108,9 +109,9 @@ export const Header: React.FC = () => {
 
         {/* Authenticated User Identity */}
         {user ? (
-          <div className="flex items-center gap-3 pl-2 sm:border-l sm:border-slate-200">
+          <div className="flex items-center gap-3 pl-2 sm:border-l sm:border-[#C9D3DB]">
             <div className="text-right hidden sm:block">
-              <div className="text-xs font-semibold text-slate-800 leading-tight">
+              <div className="text-xs font-semibold text-[#0D2538] leading-tight">
                 {user.full_name}
               </div>
               <div className="flex items-center justify-end gap-1.5 mt-0.5">
@@ -121,7 +122,7 @@ export const Header: React.FC = () => {
             </div>
 
             <div
-              className="w-8 h-8 rounded-full bg-sentinel-50 border border-sentinel-200 flex items-center justify-center font-bold text-sentinel-800 text-xs shadow-xs"
+              className="w-8 h-8 rounded-full bg-[#123B5D] text-white flex items-center justify-center font-bold text-xs shadow-2xs"
               title={`${user.full_name} (${user.email})`}
             >
               {getInitials(user.full_name)}
@@ -129,7 +130,7 @@ export const Header: React.FC = () => {
 
             <Link
               to="/change-password"
-              className="p-1.5 text-slate-400 hover:text-sentinel-700 hover:bg-sentinel-50 rounded-lg transition-colors cursor-pointer"
+              className="p-1.5 text-[#5D6A75] hover:text-[#123B5D] hover:bg-[#EDF1F3] rounded-[6px] transition-colors cursor-pointer"
               title="Change account password"
               aria-label="Change password"
             >
@@ -141,7 +142,7 @@ export const Header: React.FC = () => {
                 await logout();
                 navigate('/', { replace: true });
               }}
-              className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+              className="p-1.5 text-[#5D6A75] hover:text-[#B42318] hover:bg-[#FDF2F1] rounded-[6px] transition-colors cursor-pointer"
               title="Sign out of regulatory session"
               aria-label="Log out"
             >
@@ -153,3 +154,4 @@ export const Header: React.FC = () => {
     </header>
   );
 };
+

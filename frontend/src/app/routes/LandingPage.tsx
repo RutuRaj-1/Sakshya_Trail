@@ -44,14 +44,14 @@ export const LandingPage: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#F4F7FA] text-[#243447] font-sans selection:bg-teal-500 selection:text-white flex flex-col">
+    <div className="min-h-screen bg-[#F5F4EF] text-[#253746] font-sans selection:bg-teal-500 selection:text-white flex flex-col">
       {/* =========================================================================
           SECTION A: TOP NAVIGATION BAR
          ========================================================================= */}
-      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-[#DCE4EB] shadow-xs">
+      <header className="sticky top-0 z-50 st-glass-panel border-b border-[#C9D3DB] shadow-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           {/* Logo & Brand Wordmark */}
-          <Link to="/" className="flex items-center gap-3 group focus:outline-none focus:ring-2 focus:ring-[#0D9488] rounded-xl p-1">
+          <Link to="/" className="flex items-center gap-3 group focus:outline-none focus:ring-2 focus:ring-[#0F766E] rounded-xl p-1">
             <img
               src="/logo.png"
               alt="SakshyaTrail Logo"
@@ -59,26 +59,26 @@ export const LandingPage: React.FC = () => {
             />
             <div className="hidden sm:block">
               <div className="flex items-center gap-1.5">
-                <span className="text-xl font-extrabold tracking-tight text-[#0B253A]">
-                  Sakshya<span className="text-[#0D9488]">Trail</span>
+                <span className="text-xl font-extrabold tracking-tight text-[#0D2538]">
+                  Sakshya<span className="text-[#0F766E]">Trail</span>
                 </span>
-                <span className="text-[10px] font-mono font-semibold uppercase bg-teal-50 text-[#0D9488] border border-teal-200 px-1.5 py-0.5 rounded">
+                <span className="text-[10px] font-mono font-semibold uppercase bg-teal-50 text-[#0F766E] border border-teal-200 px-1.5 py-0.5 rounded">
                   SIH 26265
                 </span>
               </div>
-              <p className="text-[11px] font-medium text-[#607080] leading-tight">
+              <p className="text-[11px] font-medium text-[#5D6A75] leading-tight">
                 Security Deposit & FDR Lifecycle Integrity Platform
               </p>
             </div>
           </Link>
 
           {/* Center Navigation Links (Desktop) */}
-          <nav className="hidden lg:flex items-center gap-1 text-sm font-medium text-[#607080]">
+          <nav className="hidden lg:flex items-center gap-1 text-sm font-medium text-[#5D6A75]">
             {navLinks.map((link) => (
               <a
                 key={link.name}
                 href={link.href}
-                className="px-3 py-1.5 rounded-lg hover:text-[#0B253A] hover:bg-slate-100/80 transition-colors"
+                className="px-3 py-1.5 rounded-lg hover:text-[#0D2538] hover:bg-slate-100/80 transition-colors"
               >
                 {link.name}
               </a>
@@ -89,13 +89,13 @@ export const LandingPage: React.FC = () => {
           <div className="hidden sm:flex items-center gap-3">
             {isAuthenticated ? (
               <div className="flex items-center gap-3">
-                <span className="text-xs text-[#607080] hidden md:inline">
-                  Signed in as <strong className="text-[#0B253A] font-mono">{user?.role}</strong>
+                <span className="text-xs text-[#5D6A75] hidden md:inline">
+                  Signed in as <strong className="text-[#0D2538] font-mono">{user?.role}</strong>
                 </span>
                 <Link to="/dashboard">
                   <Button
                     size="sm"
-                    className="bg-[#123C5A] hover:bg-[#0B253A] text-white font-semibold shadow-sm"
+                    className="bg-[#123B5D] hover:bg-[#0D2538] text-white font-semibold shadow-sm"
                   >
                     <SlidersHorizontal className="w-3.5 h-3.5 mr-1.5" /> Access Dashboard
                   </Button>
@@ -107,7 +107,7 @@ export const LandingPage: React.FC = () => {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="border-[#DCE4EB] text-[#123C5A] hover:bg-slate-100 font-medium"
+                    className="border-[#C9D3DB] text-[#123B5D] hover:bg-slate-100 font-medium"
                   >
                     Sign In
                   </Button>
@@ -115,7 +115,7 @@ export const LandingPage: React.FC = () => {
                 <Link to="/login">
                   <Button
                     size="sm"
-                    className="bg-[#0D9488] hover:bg-teal-700 text-white font-semibold shadow-xs"
+                    className="bg-[#0F766E] hover:bg-teal-700 text-white font-semibold shadow-xs"
                   >
                     Access Portal <ArrowRight className="w-3.5 h-3.5 ml-1" />
                   </Button>
@@ -127,7 +127,7 @@ export const LandingPage: React.FC = () => {
           {/* Mobile Menu Hamburger Toggle */}
           <div className="flex lg:hidden items-center gap-2">
             <Link to="/login" className="sm:hidden">
-              <Button size="sm" className="bg-[#123C5A] text-white text-xs px-2.5 py-1">
+              <Button size="sm" className="bg-[#123B5D] text-white text-xs px-2.5 py-1">
                 Sign In
               </Button>
             </Link>
@@ -143,14 +143,14 @@ export const LandingPage: React.FC = () => {
 
         {/* Mobile Dropdown Menu */}
         {mobileMenuOpen && (
-          <div className="lg:hidden border-t border-[#DCE4EB] bg-white px-4 pt-3 pb-6 space-y-3 shadow-lg">
+          <div className="lg:hidden border-t border-[#C9D3DB] bg-white px-4 pt-3 pb-6 space-y-3 shadow-lg">
             <div className="grid grid-cols-2 gap-2 text-sm font-medium">
               {navLinks.map((link) => (
                 <a
                   key={link.name}
                   href={link.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="px-3 py-2 rounded-lg text-[#607080] hover:text-[#0B253A] hover:bg-slate-100 transition-colors"
+                  className="px-3 py-2 rounded-lg text-[#5D6A75] hover:text-[#0D2538] hover:bg-slate-100 transition-colors"
                 >
                   {link.name}
                 </a>
@@ -158,7 +158,7 @@ export const LandingPage: React.FC = () => {
             </div>
             <div className="pt-3 border-t border-slate-100 flex flex-col gap-2">
               <Link to="/login" onClick={() => setMobileMenuOpen(false)}>
-                <Button className="w-full bg-[#123C5A] hover:bg-[#0B253A] text-white font-semibold">
+                <Button className="w-full bg-[#123B5D] hover:bg-[#0D2538] text-white font-semibold">
                   Sign In to SakshyaTrail
                 </Button>
               </Link>
@@ -170,25 +170,25 @@ export const LandingPage: React.FC = () => {
       {/* =========================================================================
           SECTION B: HERO SECTION & SYNTHETIC APPLICATION PREVIEW
          ========================================================================= */}
-      <section id="overview" className="relative pt-12 pb-20 md:pt-16 md:pb-28 overflow-hidden bg-linear-to-b from-white to-[#F4F7FA]">
+      <section id="overview" className="relative pt-12 pb-20 md:pt-16 md:pb-28 overflow-hidden bg-linear-to-b from-white to-[#F5F4EF]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center max-w-4xl mx-auto space-y-5">
             {/* Eyebrow Badge */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-50 border border-teal-200 text-[#0D9488] text-xs font-semibold uppercase tracking-wider shadow-2xs">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-50 border border-teal-200 text-[#0F766E] text-xs font-semibold uppercase tracking-wider shadow-2xs">
               <Sparkles className="w-3.5 h-3.5" />
               SMART AUTOMATION · EVIDENCE-FIRST GOVERNANCE
             </div>
 
             {/* Headline */}
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-[#0B253A] tracking-tight leading-[1.15]">
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-[#0D2538] tracking-tight leading-[1.15]">
               From FDR Submission to Release —{' '}
-              <span className="text-[#0D9488] underline decoration-teal-300 decoration-wavy underline-offset-8">
+              <span className="text-[#0F766E] underline decoration-teal-300 decoration-wavy underline-offset-8">
                 Every Step Accountable.
               </span>
             </h1>
 
             {/* Supporting Paragraph */}
-            <p className="text-base sm:text-lg text-[#607080] max-w-3xl mx-auto leading-relaxed">
+            <p className="text-base sm:text-lg text-[#5D6A75] max-w-3xl mx-auto leading-relaxed">
               SakshyaTrail brings security deposit and FDR records, evidence provenance, verification workflows,
               maturity monitoring and authorized release tracking into one traceable lifecycle.
             </p>
@@ -198,7 +198,7 @@ export const LandingPage: React.FC = () => {
               <Link to="/login" className="w-full sm:w-auto">
                 <Button
                   size="lg"
-                  className="w-full sm:w-auto bg-[#123C5A] hover:bg-[#0B253A] text-white font-bold px-8 shadow-md shadow-[#123C5A]/25 gap-2"
+                  className="w-full sm:w-auto bg-[#123B5D] hover:bg-[#0D2538] text-white font-bold px-8 shadow-md shadow-[#123B5D]/25 gap-2"
                 >
                   Access SakshyaTrail <ArrowRight className="w-4 h-4" />
                 </Button>
@@ -207,7 +207,7 @@ export const LandingPage: React.FC = () => {
                 <Button
                   variant="outline"
                   size="lg"
-                  className="w-full sm:w-auto border-[#DCE4EB] bg-white hover:bg-slate-50 text-[#243447] font-semibold px-6"
+                  className="w-full sm:w-auto border-[#C9D3DB] bg-white hover:bg-slate-50 text-[#253746] font-semibold px-6"
                 >
                   Explore How It Works
                 </Button>
@@ -217,7 +217,7 @@ export const LandingPage: React.FC = () => {
 
           {/* Interactive Synthetic Application Visual Preview */}
           <div className="mt-14 max-w-5xl mx-auto">
-            <div className="bg-[#0B253A] rounded-2xl p-2 sm:p-3 shadow-2xl border border-slate-700/60 ring-1 ring-slate-800">
+            <div className="bg-[#0D2538] rounded-[10px] p-2 sm:p-3 shadow-2xl border border-slate-700/60 ring-1 ring-slate-800">
               {/* Window Bar Header */}
               <div className="flex items-center justify-between px-3 py-2 bg-slate-900/80 rounded-xl mb-3 text-xs text-slate-400 font-mono">
                 <div className="flex items-center gap-2">
@@ -240,7 +240,7 @@ export const LandingPage: React.FC = () => {
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
                     <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider block">Active Deposit Value</span>
-                    <span className="text-lg font-bold text-[#0B253A] font-mono">₹ 37,50,00,000</span>
+                    <span className="text-lg font-bold text-[#0D2538] font-mono">₹ 37,50,00,000</span>
                     <span className="text-[10px] text-emerald-700 block mt-0.5">37 Validated FDRs</span>
                   </div>
                   <div className="bg-amber-50/60 p-3 rounded-xl border border-amber-200">
@@ -290,7 +290,7 @@ export const LandingPage: React.FC = () => {
             </div>
 
             {/* Illustrative Notice Disclaimer */}
-            <p className="text-center text-xs text-[#607080] mt-3 font-medium">
+            <p className="text-center text-xs text-[#5D6A75] mt-3 font-medium">
               * Illustrative preview — synthetic regulatory data. Not connected to external live bank servers.
             </p>
           </div>
@@ -300,52 +300,52 @@ export const LandingPage: React.FC = () => {
       {/* =========================================================================
           SECTION C: TRUST PRINCIPLES STRIP
          ========================================================================= */}
-      <section className="bg-white border-y border-[#DCE4EB] py-8">
+      <section className="bg-white border-y border-[#C9D3DB] py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-200 text-[#0D9488] flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center shrink-0">
                 <Scale className="w-5 h-5" />
               </div>
               <div>
-                <h2 className="text-sm font-bold text-[#0B253A]">Declared ≠ Confirmed</h2>
-                <p className="text-xs text-[#607080] mt-0.5">
+                <h2 className="text-sm font-bold text-[#0D2538]">Declared ≠ Confirmed</h2>
+                <p className="text-xs text-[#5D6A75] mt-0.5">
                   Self-reported institution metadata remains strictly unverified until backed by reviewed evidence.
                 </p>
               </div>
             </div>
 
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-200 text-[#0D9488] flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center shrink-0">
                 <FileCheck2 className="w-5 h-5" />
               </div>
               <div>
-                <h2 className="text-sm font-bold text-[#0B253A]">Evidence Before Trust</h2>
-                <p className="text-xs text-[#607080] mt-0.5">
+                <h2 className="text-sm font-bold text-[#0D2538]">Evidence Before Trust</h2>
+                <p className="text-xs text-[#5D6A75] mt-0.5">
                   Tiered progression (L0 to L3) ensures trust elevations require qualifying certificates and audits.
                 </p>
               </div>
             </div>
 
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-200 text-[#0D9488] flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center shrink-0">
                 <Users className="w-5 h-5" />
               </div>
               <div>
-                <h2 className="text-sm font-bold text-[#0B253A]">Human-Authorized Decisions</h2>
-                <p className="text-xs text-[#607080] mt-0.5">
+                <h2 className="text-sm font-bold text-[#0D2538]">Human-Authorized Decisions</h2>
+                <p className="text-xs text-[#5D6A75] mt-0.5">
                   Automated heuristics advise; designated statutory authorities make all binding release decisions.
                 </p>
               </div>
             </div>
 
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-200 text-[#0D9488] flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center shrink-0">
                 <History className="w-5 h-5" />
               </div>
               <div>
-                <h2 className="text-sm font-bold text-[#0B253A]">Traceable Lifecycle Events</h2>
-                <p className="text-xs text-[#607080] mt-0.5">
+                <h2 className="text-sm font-bold text-[#0D2538]">Traceable Lifecycle Events</h2>
+                <p className="text-xs text-[#5D6A75] mt-0.5">
                   Every status shift, document revision, and release approval writes to an append-only hash chain.
                 </p>
               </div>
@@ -359,13 +359,13 @@ export const LandingPage: React.FC = () => {
          ========================================================================= */}
       <section className="py-16 md:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-12">
-          <span className="text-xs font-bold text-[#0D9488] uppercase tracking-wider block mb-2">
+          <span className="text-xs font-bold text-[#0F766E] uppercase tracking-wider block mb-2">
             Institutional Governance Gap
           </span>
-          <h2 className="text-2xl sm:text-4xl font-extrabold text-[#0B253A] tracking-tight">
+          <h2 className="text-2xl sm:text-4xl font-extrabold text-[#0D2538] tracking-tight">
             Why Security Deposit & FDR Portals Require Lifecycle Integrity
           </h2>
-          <p className="text-sm sm:text-base text-[#607080] mt-3">
+          <p className="text-sm sm:text-base text-[#5D6A75] mt-3">
             Statutory Fixed Deposit Receipts represent substantial financial commitments guaranteeing regulatory compliance.
             Fragmented records and manual oversight introduce significant operational vulnerabilities.
           </p>
@@ -373,11 +373,11 @@ export const LandingPage: React.FC = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
           {/* Column 1: Conventional Vulnerabilities */}
-          <div className="bg-white rounded-2xl p-6 sm:p-8 border border-rose-200/80 shadow-xs space-y-4">
+          <div className="bg-white rounded-[10px] p-6 sm:p-8 border border-rose-200/80 shadow-xs space-y-4">
             <div className="flex items-center gap-2 text-[#C62828] font-bold text-base">
               <AlertTriangle className="w-5 h-5" /> Conventional Record Vulnerabilities
             </div>
-            <ul className="space-y-3.5 text-sm text-[#607080]">
+            <ul className="space-y-3.5 text-sm text-[#5D6A75]">
               <li className="flex items-start gap-2.5">
                 <span className="w-2 h-2 rounded-full bg-rose-500 mt-1.5 shrink-0" />
                 <span><strong>Fragmented Silos:</strong> FDR receipts, bank confirmations, and renewal drafts scattered across paper files and disconnected spreadsheets.</span>
@@ -402,29 +402,29 @@ export const LandingPage: React.FC = () => {
           </div>
 
           {/* Column 2: The SakshyaTrail Advantage */}
-          <div className="bg-white rounded-2xl p-6 sm:p-8 border border-teal-200 shadow-xs space-y-4">
-            <div className="flex items-center gap-2 text-[#0D9488] font-bold text-base">
+          <div className="bg-white rounded-[10px] p-6 sm:p-8 border border-teal-200 shadow-xs space-y-4">
+            <div className="flex items-center gap-2 text-[#0F766E] font-bold text-base">
               <ShieldCheck className="w-5 h-5" /> The SakshyaTrail Architecture
             </div>
-            <ul className="space-y-3.5 text-sm text-[#243447]">
+            <ul className="space-y-3.5 text-sm text-[#253746]">
               <li className="flex items-start gap-2.5">
-                <CheckCircle2 className="w-4 h-4 text-[#0D9488] mt-0.5 shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-[#0F766E] mt-0.5 shrink-0" />
                 <span><strong>Centralized Registry:</strong> Single authoritative database binding institutions, bank references, precise decimal sums, and document versions.</span>
               </li>
               <li className="flex items-start gap-2.5">
-                <CheckCircle2 className="w-4 h-4 text-[#0D9488] mt-0.5 shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-[#0F766E] mt-0.5 shrink-0" />
                 <span><strong>Automated Maturity Engine:</strong> Deterministic calendar evaluations with regional workload distribution and automated reminder tracking.</span>
               </li>
               <li className="flex items-start gap-2.5">
-                <CheckCircle2 className="w-4 h-4 text-[#0D9488] mt-0.5 shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-[#0F766E] mt-0.5 shrink-0" />
                 <span><strong>Explainable Validation:</strong> Rule-based discrepancy detection providing specific error codes, severity flags, and audit reconciliation.</span>
               </li>
               <li className="flex items-start gap-2.5">
-                <CheckCircle2 className="w-4 h-4 text-[#0D9488] mt-0.5 shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-[#0F766E] mt-0.5 shrink-0" />
                 <span><strong>Release Gate Enforcement:</strong> Automated blocker evaluations that strictly forbid refund routing without full checklist satisfaction.</span>
               </li>
               <li className="flex items-start gap-2.5">
-                <CheckCircle2 className="w-4 h-4 text-[#0D9488] mt-0.5 shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-[#0F766E] mt-0.5 shrink-0" />
                 <span><strong>Tamper-Evident Hash Chains:</strong> SHA-256 cryptographic sequence storage with database triggers preventing deletion or in-place alterations.</span>
               </li>
             </ul>
@@ -432,24 +432,24 @@ export const LandingPage: React.FC = () => {
         </div>
 
         {/* Position Statement Banner */}
-        <div className="mt-8 p-4 rounded-xl bg-slate-100/80 border border-[#DCE4EB] text-center text-xs text-[#607080] max-w-3xl mx-auto">
-          <strong className="text-[#0B253A]">Architectural Position:</strong> SakshyaTrail is designed as a specialized <strong>complementary lifecycle-integrity layer</strong> to operate alongside existing regulatory frameworks and portal architectures.
+        <div className="mt-8 p-4 rounded-xl bg-slate-100/80 border border-[#C9D3DB] text-center text-xs text-[#5D6A75] max-w-3xl mx-auto">
+          <strong className="text-[#0D2538]">Architectural Position:</strong> SakshyaTrail is designed as a specialized <strong>complementary lifecycle-integrity layer</strong> to operate alongside existing regulatory frameworks and portal architectures.
         </div>
       </section>
 
       {/* =========================================================================
           SECTION E: HOW IT WORKS — END-TO-END LIFECYCLE (9 STAGES)
          ========================================================================= */}
-      <section id="how-it-works" className="py-16 md:py-24 bg-white border-y border-[#DCE4EB]">
+      <section id="how-it-works" className="py-16 md:py-24 bg-white border-y border-[#C9D3DB]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="text-xs font-bold text-[#0D9488] uppercase tracking-wider block mb-2">
+            <span className="text-xs font-bold text-[#0F766E] uppercase tracking-wider block mb-2">
               End-to-End Workflow
             </span>
-            <h2 className="text-2xl sm:text-4xl font-extrabold text-[#0B253A] tracking-tight">
+            <h2 className="text-2xl sm:text-4xl font-extrabold text-[#0D2538] tracking-tight">
               Nine Stages of Accountable FDR Governance
             </h2>
-            <p className="text-sm sm:text-base text-[#607080] mt-3">
+            <p className="text-sm sm:text-base text-[#5D6A75] mt-3">
               From the moment an institution submits an instrument through to authorized closure,
               every state transition is structured, verified, and preserved.
             </p>
@@ -457,106 +457,106 @@ export const LandingPage: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Stage 1 */}
-            <div className="bg-[#F4F7FA] rounded-2xl p-6 border border-[#DCE4EB] hover:border-teal-300 transition-colors space-y-3 relative">
+            <div className="bg-[#F5F4EF] rounded-[10px] p-6 border border-[#C9D3DB] hover:border-teal-300 transition-colors space-y-3 relative">
               <span className="text-2xl font-black text-teal-600/40 font-mono block">01</span>
-              <div className="flex items-center gap-2 font-bold text-[#0B253A] text-base">
-                <Building2 className="w-5 h-5 text-[#0D9488]" /> 1. Submit
+              <div className="flex items-center gap-2 font-bold text-[#0D2538] text-base">
+                <Building2 className="w-5 h-5 text-[#0F766E]" /> 1. Submit
               </div>
-              <p className="text-xs text-[#607080] leading-relaxed">
+              <p className="text-xs text-[#5D6A75] leading-relaxed">
                 Institution registers deposit details, certificate reference numbers, issuing bank branch, and term dates.
               </p>
             </div>
 
             {/* Stage 2 */}
-            <div className="bg-[#F4F7FA] rounded-2xl p-6 border border-[#DCE4EB] hover:border-teal-300 transition-colors space-y-3 relative">
+            <div className="bg-[#F5F4EF] rounded-[10px] p-6 border border-[#C9D3DB] hover:border-teal-300 transition-colors space-y-3 relative">
               <span className="text-2xl font-black text-teal-600/40 font-mono block">02</span>
-              <div className="flex items-center gap-2 font-bold text-[#0B253A] text-base">
-                <FileText className="w-5 h-5 text-[#0D9488]" /> 2. Upload
+              <div className="flex items-center gap-2 font-bold text-[#0D2538] text-base">
+                <FileText className="w-5 h-5 text-[#0F766E]" /> 2. Upload
               </div>
-              <p className="text-xs text-[#607080] leading-relaxed">
+              <p className="text-xs text-[#5D6A75] leading-relaxed">
                 Secure document intake computes deterministic SHA-256 file digests, creates immutable version history, and blocks unverified files.
               </p>
             </div>
 
             {/* Stage 3 */}
-            <div className="bg-[#F4F7FA] rounded-2xl p-6 border border-[#DCE4EB] hover:border-teal-300 transition-colors space-y-3 relative">
+            <div className="bg-[#F5F4EF] rounded-[10px] p-6 border border-[#C9D3DB] hover:border-teal-300 transition-colors space-y-3 relative">
               <span className="text-2xl font-black text-teal-600/40 font-mono block">03</span>
-              <div className="flex items-center gap-2 font-bold text-[#0B253A] text-base">
-                <FileCheck2 className="w-5 h-5 text-[#0D9488]" /> 3. Validate
+              <div className="flex items-center gap-2 font-bold text-[#0D2538] text-base">
+                <FileCheck2 className="w-5 h-5 text-[#0F766E]" /> 3. Validate
               </div>
-              <p className="text-xs text-[#607080] leading-relaxed">
+              <p className="text-xs text-[#5D6A75] leading-relaxed">
                 Deterministic rule engine verifies minimum deposit thresholds, valid date order, and flags mismatches with explainable findings.
               </p>
             </div>
 
             {/* Stage 4 */}
-            <div className="bg-[#F4F7FA] rounded-2xl p-6 border border-[#DCE4EB] hover:border-teal-300 transition-colors space-y-3 relative">
+            <div className="bg-[#F5F4EF] rounded-[10px] p-6 border border-[#C9D3DB] hover:border-teal-300 transition-colors space-y-3 relative">
               <span className="text-2xl font-black text-teal-600/40 font-mono block">04</span>
-              <div className="flex items-center gap-2 font-bold text-[#0B253A] text-base">
-                <ShieldCheck className="w-5 h-5 text-[#0D9488]" /> 4. Verify
+              <div className="flex items-center gap-2 font-bold text-[#0D2538] text-base">
+                <ShieldCheck className="w-5 h-5 text-[#0F766E]" /> 4. Verify
               </div>
-              <p className="text-xs text-[#607080] leading-relaxed">
+              <p className="text-xs text-[#5D6A75] leading-relaxed">
                 Authorized officers inspect evidence; bank verification requests tracked across simulated or authenticated API channels.
               </p>
             </div>
 
             {/* Stage 5 */}
-            <div className="bg-[#F4F7FA] rounded-2xl p-6 border border-[#DCE4EB] hover:border-teal-300 transition-colors space-y-3 relative">
+            <div className="bg-[#F5F4EF] rounded-[10px] p-6 border border-[#C9D3DB] hover:border-teal-300 transition-colors space-y-3 relative">
               <span className="text-2xl font-black text-teal-600/40 font-mono block">05</span>
-              <div className="flex items-center gap-2 font-bold text-[#0B253A] text-base">
-                <Clock className="w-5 h-5 text-[#0D9488]" /> 5. Monitor
+              <div className="flex items-center gap-2 font-bold text-[#0D2538] text-base">
+                <Clock className="w-5 h-5 text-[#0F766E]" /> 5. Monitor
               </div>
-              <p className="text-xs text-[#607080] leading-relaxed">
+              <p className="text-xs text-[#5D6A75] leading-relaxed">
                 Automated scheduler evaluates daily calendar maturity windows (30/60/90 days), triggering reminders and supervisor escalations.
               </p>
             </div>
 
             {/* Stage 6 */}
-            <div className="bg-[#F4F7FA] rounded-2xl p-6 border border-[#DCE4EB] hover:border-teal-300 transition-colors space-y-3 relative">
+            <div className="bg-[#F5F4EF] rounded-[10px] p-6 border border-[#C9D3DB] hover:border-teal-300 transition-colors space-y-3 relative">
               <span className="text-2xl font-black text-teal-600/40 font-mono block">06</span>
-              <div className="flex items-center gap-2 font-bold text-[#0B253A] text-base">
-                <RefreshCw className="w-5 h-5 text-[#0D9488]" /> 6. Renew
+              <div className="flex items-center gap-2 font-bold text-[#0D2538] text-base">
+                <RefreshCw className="w-5 h-5 text-[#0F766E]" /> 6. Renew
               </div>
-              <p className="text-xs text-[#607080] leading-relaxed">
+              <p className="text-xs text-[#5D6A75] leading-relaxed">
                 Renewal successor instruments are linked to predecessor records without mutating or overwriting historical provenance.
               </p>
             </div>
 
             {/* Stage 7 */}
-            <div className="bg-[#F4F7FA] rounded-2xl p-6 border border-[#DCE4EB] hover:border-teal-300 transition-colors space-y-3 relative">
+            <div className="bg-[#F5F4EF] rounded-[10px] p-6 border border-[#C9D3DB] hover:border-teal-300 transition-colors space-y-3 relative">
               <span className="text-2xl font-black text-teal-600/40 font-mono block">07</span>
-              <div className="flex items-center gap-2 font-bold text-[#0B253A] text-base">
-                <Lock className="w-5 h-5 text-[#0D9488]" /> 7. Release Gate
+              <div className="flex items-center gap-2 font-bold text-[#0D2538] text-base">
+                <Lock className="w-5 h-5 text-[#0F766E]" /> 7. Release Gate
               </div>
-              <p className="text-xs text-[#607080] leading-relaxed">
+              <p className="text-xs text-[#5D6A75] leading-relaxed">
                 Release Gate evaluates mandatory checklist criteria; active blockers forbid routing to Competent Authority for approval.
               </p>
             </div>
 
             {/* Stage 8 */}
-            <div className="bg-[#F4F7FA] rounded-2xl p-6 border border-[#DCE4EB] hover:border-teal-300 transition-colors space-y-3 relative">
+            <div className="bg-[#F5F4EF] rounded-[10px] p-6 border border-[#C9D3DB] hover:border-teal-300 transition-colors space-y-3 relative">
               <span className="text-2xl font-black text-teal-600/40 font-mono block">08</span>
-              <div className="flex items-center gap-2 font-bold text-[#0B253A] text-base">
-                <Scale className="w-5 h-5 text-[#0D9488]" /> 8. Approve
+              <div className="flex items-center gap-2 font-bold text-[#0D2538] text-base">
+                <Scale className="w-5 h-5 text-[#0F766E]" /> 8. Approve
               </div>
-              <p className="text-xs text-[#607080] leading-relaxed">
+              <p className="text-xs text-[#5D6A75] leading-relaxed">
                 Strict maker-checker segregation: reviewers cannot approve; release approval strictly reserved for Competent Authority.
               </p>
             </div>
 
             {/* Stage 9 */}
-            <div className="bg-[#F4F7FA] rounded-2xl p-6 border border-[#DCE4EB] hover:border-teal-300 transition-colors space-y-3 relative">
+            <div className="bg-[#F5F4EF] rounded-[10px] p-6 border border-[#C9D3DB] hover:border-teal-300 transition-colors space-y-3 relative">
               <span className="text-2xl font-black text-teal-600/40 font-mono block">09</span>
-              <div className="flex items-center gap-2 font-bold text-[#0B253A] text-base">
-                <History className="w-5 h-5 text-[#0D9488]" /> 9. Audit & Report
+              <div className="flex items-center gap-2 font-bold text-[#0D2538] text-base">
+                <History className="w-5 h-5 text-[#0F766E]" /> 9. Audit & Report
               </div>
-              <p className="text-xs text-[#607080] leading-relaxed">
+              <p className="text-xs text-[#5D6A75] leading-relaxed">
                 Append-only SHA-256 hash-chaining records every action; authorized officers generate streaming CSV and tamper-evident PDF reports.
               </p>
             </div>
           </div>
 
-          <p className="text-center text-xs text-[#607080] mt-8">
+          <p className="text-center text-xs text-[#5D6A75] mt-8">
             * Bank verification can be pending, simulated, or unavailable depending on participating bank support. Live automated confirmation is not assumed for every record.
           </p>
         </div>
@@ -567,13 +567,13 @@ export const LandingPage: React.FC = () => {
          ========================================================================= */}
       <section id="trust-ledger" className="py-16 md:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-14">
-          <span className="text-xs font-bold text-[#0D9488] uppercase tracking-wider block mb-2">
+          <span className="text-xs font-bold text-[#0F766E] uppercase tracking-wider block mb-2">
             Evidentiary Trust Hierarchy
           </span>
-          <h2 className="text-2xl sm:text-4xl font-extrabold text-[#0B253A] tracking-tight">
+          <h2 className="text-2xl sm:text-4xl font-extrabold text-[#0D2538] tracking-tight">
             The 4-Tier Trust Ledger (L0 – L3)
           </h2>
-          <p className="text-sm sm:text-base text-[#607080] mt-3">
+          <p className="text-sm sm:text-base text-[#5D6A75] mt-3">
             SakshyaTrail maintains strict separation between what has merely been entered and what has been verified.
             Trust is earned through evidence, never assumed by declaration.
           </p>
@@ -581,7 +581,7 @@ export const LandingPage: React.FC = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {/* L0 Card */}
-          <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs space-y-3">
+          <div className="bg-white rounded-[10px] p-6 border border-slate-200 shadow-xs space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold font-mono px-2 py-0.5 rounded bg-slate-100 text-slate-700">
                 LEVEL 0
@@ -589,7 +589,7 @@ export const LandingPage: React.FC = () => {
               <span className="text-[11px] text-slate-400 font-mono">Baseline</span>
             </div>
             <h3 className="text-base font-bold text-slate-900">L0 — Declared</h3>
-            <p className="text-xs text-[#607080] leading-relaxed">
+            <p className="text-xs text-[#5D6A75] leading-relaxed">
               Information entered or uploaded by the institution. No formal officer scrutiny or document cross-check has been completed.
             </p>
             <div className="pt-2 text-[11px] text-slate-400 font-mono">
@@ -598,7 +598,7 @@ export const LandingPage: React.FC = () => {
           </div>
 
           {/* L1 Card */}
-          <div className="bg-white rounded-2xl p-6 border border-blue-200 shadow-xs space-y-3">
+          <div className="bg-white rounded-[10px] p-6 border border-blue-200 shadow-xs space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold font-mono px-2 py-0.5 rounded bg-blue-50 text-blue-700">
                 LEVEL 1
@@ -606,7 +606,7 @@ export const LandingPage: React.FC = () => {
               <span className="text-[11px] text-blue-500 font-mono">Documented</span>
             </div>
             <h3 className="text-base font-bold text-slate-900">L1 — Document-Consistent</h3>
-            <p className="text-xs text-[#607080] leading-relaxed">
+            <p className="text-xs text-[#5D6A75] leading-relaxed">
               Information is consistent with scanned receipts and certified uploads. Authenticity of the underlying bank deposit is not yet established.
             </p>
             <div className="pt-2 text-[11px] text-blue-600 font-mono">
@@ -615,7 +615,7 @@ export const LandingPage: React.FC = () => {
           </div>
 
           {/* L2 Card */}
-          <div className="bg-white rounded-2xl p-6 border border-teal-200 shadow-xs space-y-3 ring-1 ring-teal-300/50">
+          <div className="bg-white rounded-[10px] p-6 border border-teal-200 shadow-xs space-y-3 ring-1 ring-teal-300/50">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold font-mono px-2 py-0.5 rounded bg-teal-50 text-teal-800">
                 LEVEL 2
@@ -623,7 +623,7 @@ export const LandingPage: React.FC = () => {
               <span className="text-[11px] text-teal-600 font-mono font-semibold">Recommended</span>
             </div>
             <h3 className="text-base font-bold text-slate-900">L2 — Officer-Verified</h3>
-            <p className="text-xs text-[#607080] leading-relaxed">
+            <p className="text-xs text-[#5D6A75] leading-relaxed">
               An authorized scrutiny officer has formally evaluated the supporting evidence, confirmed validity parameters, and signed off observations.
             </p>
             <div className="pt-2 text-[11px] text-teal-700 font-mono font-semibold">
@@ -632,7 +632,7 @@ export const LandingPage: React.FC = () => {
           </div>
 
           {/* L3 Card */}
-          <div className="bg-white rounded-2xl p-6 border border-emerald-200 shadow-xs space-y-3">
+          <div className="bg-white rounded-[10px] p-6 border border-emerald-200 shadow-xs space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold font-mono px-2 py-0.5 rounded bg-emerald-50 text-emerald-800">
                 LEVEL 3
@@ -640,7 +640,7 @@ export const LandingPage: React.FC = () => {
               <span className="text-[11px] text-emerald-600 font-mono">Confirmed</span>
             </div>
             <h3 className="text-base font-bold text-slate-900">L3 — Bank-Confirmed</h3>
-            <p className="text-xs text-[#607080] leading-relaxed">
+            <p className="text-xs text-[#5D6A75] leading-relaxed">
               Supported by a qualifying official verification response from the issuing commercial bank confirming active deposit holding and lien status.
             </p>
             <div className="pt-2 text-[11px] text-emerald-700 font-mono">
@@ -661,94 +661,94 @@ export const LandingPage: React.FC = () => {
       {/* =========================================================================
           SECTION G: CORE CAPABILITIES GRID (7 MODULES)
          ========================================================================= */}
-      <section id="capabilities" className="py-16 md:py-24 bg-white border-y border-[#DCE4EB]">
+      <section id="capabilities" className="py-16 md:py-24 bg-white border-y border-[#C9D3DB]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="text-xs font-bold text-[#0D9488] uppercase tracking-wider block mb-2">
+            <span className="text-xs font-bold text-[#0F766E] uppercase tracking-wider block mb-2">
               Platform Modules
             </span>
-            <h2 className="text-2xl sm:text-4xl font-extrabold text-[#0B253A] tracking-tight">
+            <h2 className="text-2xl sm:text-4xl font-extrabold text-[#0D2538] tracking-tight">
               Seven Integrated Regulatory Capabilities
             </h2>
-            <p className="text-sm sm:text-base text-[#607080] mt-3">
+            <p className="text-sm sm:text-base text-[#5D6A75] mt-3">
               A comprehensive architecture built to handle statutory security deposit governance from intake to closure.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Capability 1 */}
-            <div className="bg-[#F4F7FA] p-6 rounded-2xl border border-[#DCE4EB] space-y-3">
-              <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-200 text-[#0D9488] flex items-center justify-center">
+            <div className="bg-[#F5F4EF] p-6 rounded-[10px] border border-[#C9D3DB] space-y-3">
+              <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
                 <Building2 className="w-5 h-5" />
               </div>
-              <h3 className="text-base font-bold text-[#0B253A]">1. Institution & Instrument Registry</h3>
-              <p className="text-xs text-[#607080] leading-relaxed">
+              <h3 className="text-base font-bold text-[#0D2538]">1. Institution & Instrument Registry</h3>
+              <p className="text-xs text-[#5D6A75] leading-relaxed">
                 Centralized registry capturing FDR reference numbers, precise decimal amounts, branch codes, and institutional ownership with multi-tenant row-level security.
               </p>
             </div>
 
             {/* Capability 2 */}
-            <div className="bg-[#F4F7FA] p-6 rounded-2xl border border-[#DCE4EB] space-y-3">
-              <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-200 text-[#0D9488] flex items-center justify-center">
+            <div className="bg-[#F5F4EF] p-6 rounded-[10px] border border-[#C9D3DB] space-y-3">
+              <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
                 <FileText className="w-5 h-5" />
               </div>
-              <h3 className="text-base font-bold text-[#0B253A]">2. Document Intake & Evidence Vault</h3>
-              <p className="text-xs text-[#607080] leading-relaxed">
+              <h3 className="text-base font-bold text-[#0D2538]">2. Document Intake & Evidence Vault</h3>
+              <p className="text-xs text-[#5D6A75] leading-relaxed">
                 Multi-version document management with cryptographic SHA-256 digests, MIME verification, and tamper-resistant storage for certified deposit receipts.
               </p>
             </div>
 
             {/* Capability 3 */}
-            <div className="bg-[#F4F7FA] p-6 rounded-2xl border border-[#DCE4EB] space-y-3">
-              <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-200 text-[#0D9488] flex items-center justify-center">
+            <div className="bg-[#F5F4EF] p-6 rounded-[10px] border border-[#C9D3DB] space-y-3">
+              <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
                 <FileCheck2 className="w-5 h-5" />
               </div>
-              <h3 className="text-base font-bold text-[#0B253A]">3. Validation & Discrepancy Detection</h3>
-              <p className="text-xs text-[#607080] leading-relaxed">
+              <h3 className="text-base font-bold text-[#0D2538]">3. Validation & Discrepancy Detection</h3>
+              <p className="text-xs text-[#5D6A75] leading-relaxed">
                 Deterministic rule catalog evaluating date chronologies, minimum regulatory sums, and generating explainable finding codes with severity classifications.
               </p>
             </div>
 
             {/* Capability 4 */}
-            <div className="bg-[#F4F7FA] p-6 rounded-2xl border border-[#DCE4EB] space-y-3">
-              <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-200 text-[#0D9488] flex items-center justify-center">
+            <div className="bg-[#F5F4EF] p-6 rounded-[10px] border border-[#C9D3DB] space-y-3">
+              <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
                 <ShieldCheck className="w-5 h-5" />
               </div>
-              <h3 className="text-base font-bold text-[#0B253A]">4. Trust Ledger & Verification Desk</h3>
-              <p className="text-xs text-[#607080] leading-relaxed">
+              <h3 className="text-base font-bold text-[#0D2538]">4. Trust Ledger & Verification Desk</h3>
+              <p className="text-xs text-[#5D6A75] leading-relaxed">
                 4-tier evidentiary provenance tracking with electronic verification dispatch, response logging, and officer certification sign-off.
               </p>
             </div>
 
             {/* Capability 5 */}
-            <div className="bg-[#F4F7FA] p-6 rounded-2xl border border-[#DCE4EB] space-y-3">
-              <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-200 text-[#0D9488] flex items-center justify-center">
+            <div className="bg-[#F5F4EF] p-6 rounded-[10px] border border-[#C9D3DB] space-y-3">
+              <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
                 <RefreshCw className="w-5 h-5" />
               </div>
-              <h3 className="text-base font-bold text-[#0B253A]">5. Lifecycle Monitoring & Lineage</h3>
-              <p className="text-xs text-[#607080] leading-relaxed">
+              <h3 className="text-base font-bold text-[#0D2538]">5. Lifecycle Monitoring & Lineage</h3>
+              <p className="text-xs text-[#5D6A75] leading-relaxed">
                 Automated 30/60/90-day maturity evaluations, reminder dispatches, and predecessor-successor renewal linkage without historical mutation.
               </p>
             </div>
 
             {/* Capability 6 */}
-            <div className="bg-[#F4F7FA] p-6 rounded-2xl border border-[#DCE4EB] space-y-3">
-              <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-200 text-[#0D9488] flex items-center justify-center">
+            <div className="bg-[#F5F4EF] p-6 rounded-[10px] border border-[#C9D3DB] space-y-3">
+              <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
                 <Lock className="w-5 h-5" />
               </div>
-              <h3 className="text-base font-bold text-[#0B253A]">6. Release Gate & Case Management</h3>
-              <p className="text-xs text-[#607080] leading-relaxed">
+              <h3 className="text-base font-bold text-[#0D2538]">6. Release Gate & Case Management</h3>
+              <p className="text-xs text-[#5D6A75] leading-relaxed">
                 Enforces comprehensive checklist evaluations and maker-checker segregation. Blocks release requests from routing to authority while mandatory conditions remain unmet.
               </p>
             </div>
 
             {/* Capability 7 */}
-            <div className="bg-[#F4F7FA] p-6 rounded-2xl border border-[#DCE4EB] space-y-3 md:col-span-2 lg:col-span-3">
-              <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-200 text-[#0D9488] flex items-center justify-center">
+            <div className="bg-[#F5F4EF] p-6 rounded-[10px] border border-[#C9D3DB] space-y-3 md:col-span-2 lg:col-span-3">
+              <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
                 <SlidersHorizontal className="w-5 h-5" />
               </div>
-              <h3 className="text-base font-bold text-[#0B253A]">7. Command Center, Search, Reporting & Verifiable Audit</h3>
-              <p className="text-xs text-[#607080] leading-relaxed">
+              <h3 className="text-base font-bold text-[#0D2538]">7. Command Center, Search, Reporting & Verifiable Audit</h3>
+              <p className="text-xs text-[#5D6A75] leading-relaxed">
                 Central administrative cockpit featuring status distributions, an explainable 0–100 triage queue, unified multi-attribute search, operational CSV/PDF exports, and cryptographic SHA-256 hash-chain verification with tamper detection.
               </p>
             </div>
@@ -761,68 +761,68 @@ export const LandingPage: React.FC = () => {
          ========================================================================= */}
       <section id="security" className="py-16 md:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-14">
-          <span className="text-xs font-bold text-[#0D9488] uppercase tracking-wider block mb-2">
+          <span className="text-xs font-bold text-[#0F766E] uppercase tracking-wider block mb-2">
             Institutional Trust Architecture
           </span>
-          <h2 className="text-2xl sm:text-4xl font-extrabold text-[#0B253A] tracking-tight">
+          <h2 className="text-2xl sm:text-4xl font-extrabold text-[#0D2538] tracking-tight">
             Security, Governance & Responsible Automation
           </h2>
-          <p className="text-sm sm:text-base text-[#607080] mt-3">
+          <p className="text-sm sm:text-base text-[#5D6A75] mt-3">
             Designed for high-assurance public compliance workflows with defense-in-depth principles.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white p-6 rounded-2xl border border-[#DCE4EB] shadow-xs space-y-2">
-            <div className="text-[#123C5A] font-bold text-sm flex items-center gap-2">
-              <Lock className="w-4 h-4 text-[#0D9488]" /> Role-Based Access & Tenant Isolation
+          <div className="bg-white p-6 rounded-[10px] border border-[#C9D3DB] shadow-xs space-y-2">
+            <div className="text-[#123B5D] font-bold text-sm flex items-center gap-2">
+              <Lock className="w-4 h-4 text-[#0F766E]" /> Role-Based Access & Tenant Isolation
             </div>
-            <p className="text-xs text-[#607080] leading-relaxed">
+            <p className="text-xs text-[#5D6A75] leading-relaxed">
               Strict isolation ensures institution users only access their own deposits. Officers, Branch Heads, Authorities, and Auditors operate within mathematically defined permission bounds.
             </p>
           </div>
 
-          <div className="bg-white p-6 rounded-2xl border border-[#DCE4EB] shadow-xs space-y-2">
-            <div className="text-[#123C5A] font-bold text-sm flex items-center gap-2">
-              <History className="w-4 h-4 text-[#0D9488]" /> Append-Only Tamper-Evident Ledger
+          <div className="bg-white p-6 rounded-[10px] border border-[#C9D3DB] shadow-xs space-y-2">
+            <div className="text-[#123B5D] font-bold text-sm flex items-center gap-2">
+              <History className="w-4 h-4 text-[#0F766E]" /> Append-Only Tamper-Evident Ledger
             </div>
-            <p className="text-xs text-[#607080] leading-relaxed">
+            <p className="text-xs text-[#5D6A75] leading-relaxed">
               Every material event incorporates the parent block's SHA-256 digest. Database triggers reject direct SQL UPDATE or DELETE commands, making unauthorized tampering immediately detectable.
             </p>
           </div>
 
-          <div className="bg-white p-6 rounded-2xl border border-[#DCE4EB] shadow-xs space-y-2">
-            <div className="text-[#123C5A] font-bold text-sm flex items-center gap-2">
-              <Scale className="w-4 h-4 text-[#0D9488]" /> Maker-Checker Segregation
+          <div className="bg-white p-6 rounded-[10px] border border-[#C9D3DB] shadow-xs space-y-2">
+            <div className="text-[#123B5D] font-bold text-sm flex items-center gap-2">
+              <Scale className="w-4 h-4 text-[#0F766E]" /> Maker-Checker Segregation
             </div>
-            <p className="text-xs text-[#607080] leading-relaxed">
+            <p className="text-xs text-[#5D6A75] leading-relaxed">
               The officer recommending a release cannot approve it. System Administrators cannot authorize releases. Approval authority is strictly reserved for the Competent Authority.
             </p>
           </div>
 
-          <div className="bg-white p-6 rounded-2xl border border-[#DCE4EB] shadow-xs space-y-2">
-            <div className="text-[#123C5A] font-bold text-sm flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-[#0D9488]" /> Release Gate Lock
+          <div className="bg-white p-6 rounded-[10px] border border-[#C9D3DB] shadow-xs space-y-2">
+            <div className="text-[#123B5D] font-bold text-sm flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-[#0F766E]" /> Release Gate Lock
             </div>
-            <p className="text-xs text-[#607080] leading-relaxed">
+            <p className="text-xs text-[#5D6A75] leading-relaxed">
               Refunds and encashments cannot be advanced while mandatory checklist criteria—such as uncertified renewals or open discrepancies—remain unsatisfied.
             </p>
           </div>
 
-          <div className="bg-white p-6 rounded-2xl border border-[#DCE4EB] shadow-xs space-y-2">
-            <div className="text-[#123C5A] font-bold text-sm flex items-center gap-2">
-              <Users className="w-4 h-4 text-[#0D9488]" /> Read-Only Compliance Auditor
+          <div className="bg-white p-6 rounded-[10px] border border-[#C9D3DB] shadow-xs space-y-2">
+            <div className="text-[#123B5D] font-bold text-sm flex items-center gap-2">
+              <Users className="w-4 h-4 text-[#0F766E]" /> Read-Only Compliance Auditor
             </div>
-            <p className="text-xs text-[#607080] leading-relaxed">
+            <p className="text-xs text-[#5D6A75] leading-relaxed">
               Dedicated Auditor role has broad inspection rights and chain verification powers, but is strictly prohibited from mutating business records or approving transactions.
             </p>
           </div>
 
-          <div className="bg-white p-6 rounded-2xl border border-[#DCE4EB] shadow-xs space-y-2">
-            <div className="text-[#123C5A] font-bold text-sm flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-[#0D9488]" /> Advisory AI Boundaries
+          <div className="bg-white p-6 rounded-[10px] border border-[#C9D3DB] shadow-xs space-y-2">
+            <div className="text-[#123B5D] font-bold text-sm flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-[#0F766E]" /> Advisory AI Boundaries
             </div>
-            <p className="text-xs text-[#607080] leading-relaxed">
+            <p className="text-xs text-[#5D6A75] leading-relaxed">
               AI text and document heuristics serve solely as advisory aids for triage. Machine learning models cannot approve releases, alter trust levels, or execute money transfers.
             </p>
           </div>
@@ -832,21 +832,21 @@ export const LandingPage: React.FC = () => {
       {/* =========================================================================
           SECTION I: COMMAND CENTER PREVIEW
          ========================================================================= */}
-      <section id="command-center-preview" className="py-16 md:py-24 bg-white border-y border-[#DCE4EB]">
+      <section id="command-center-preview" className="py-16 md:py-24 bg-white border-y border-[#C9D3DB]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-14">
-            <span className="text-xs font-bold text-[#0D9488] uppercase tracking-wider block mb-2">
+            <span className="text-xs font-bold text-[#0F766E] uppercase tracking-wider block mb-2">
               Administrative Command Center
             </span>
-            <h2 className="text-2xl sm:text-4xl font-extrabold text-[#0B253A] tracking-tight">
+            <h2 className="text-2xl sm:text-4xl font-extrabold text-[#0D2538] tracking-tight">
               Real-Time Operational Visibility
             </h2>
-            <p className="text-sm sm:text-base text-[#607080] mt-3">
+            <p className="text-sm sm:text-base text-[#5D6A75] mt-3">
               Explore the administrative interface powering regulatory oversight, operational triage, and audit verification.
             </p>
           </div>
 
-          <div className="bg-slate-900 rounded-2xl p-4 sm:p-8 text-white space-y-6 border border-slate-800 shadow-xl">
+          <div className="bg-slate-900 rounded-[10px] p-4 sm:p-8 text-white space-y-6 border border-slate-800 shadow-xl">
             {/* Top Bar */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
               <div>
@@ -909,7 +909,7 @@ export const LandingPage: React.FC = () => {
             {/* Footer action to sign in */}
             <div className="text-center pt-2">
               <Link to="/login">
-                <Button className="bg-[#0D9488] hover:bg-teal-700 text-white font-semibold text-xs px-5 py-2">
+                <Button className="bg-[#0F766E] hover:bg-teal-700 text-white font-semibold text-xs px-5 py-2">
                   Sign In to Access Real Command Center <ArrowRight className="w-3.5 h-3.5 ml-1" />
                 </Button>
               </Link>
@@ -923,68 +923,68 @@ export const LandingPage: React.FC = () => {
          ========================================================================= */}
       <section className="py-16 md:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-14">
-          <span className="text-xs font-bold text-[#0D9488] uppercase tracking-wider block mb-2">
+          <span className="text-xs font-bold text-[#0F766E] uppercase tracking-wider block mb-2">
             Multi-Stakeholder Value
           </span>
-          <h2 className="text-2xl sm:text-4xl font-extrabold text-[#0B253A] tracking-tight">
+          <h2 className="text-2xl sm:text-4xl font-extrabold text-[#0D2538] tracking-tight">
             Designed for Every Governance Participant
           </h2>
-          <p className="text-sm sm:text-base text-[#607080] mt-3">
+          <p className="text-sm sm:text-base text-[#5D6A75] mt-3">
             Streamlining communication and eliminating ambiguity across regulatory desks.
           </p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div className="bg-white p-6 rounded-2xl border border-[#DCE4EB] space-y-2">
-            <h3 className="font-bold text-[#0B253A] text-sm flex items-center gap-2">
-              <Building2 className="w-4 h-4 text-[#0D9488]" /> Submitting Institutions
+          <div className="bg-white p-6 rounded-[10px] border border-[#C9D3DB] space-y-2">
+            <h3 className="font-bold text-[#0D2538] text-sm flex items-center gap-2">
+              <Building2 className="w-4 h-4 text-[#0F766E]" /> Submitting Institutions
             </h3>
-            <p className="text-xs text-[#607080] leading-relaxed">
+            <p className="text-xs text-[#5D6A75] leading-relaxed">
               Real-time submission status, clear discrepancy feedback, automated renewal alerts, and self-service document intake.
             </p>
           </div>
 
-          <div className="bg-white p-6 rounded-2xl border border-[#DCE4EB] space-y-2">
-            <h3 className="font-bold text-[#0B253A] text-sm flex items-center gap-2">
-              <FileCheck2 className="w-4 h-4 text-[#0D9488]" /> Scrutiny Officers
+          <div className="bg-white p-6 rounded-[10px] border border-[#C9D3DB] space-y-2">
+            <h3 className="font-bold text-[#0D2538] text-sm flex items-center gap-2">
+              <FileCheck2 className="w-4 h-4 text-[#0F766E]" /> Scrutiny Officers
             </h3>
-            <p className="text-xs text-[#607080] leading-relaxed">
+            <p className="text-xs text-[#5D6A75] leading-relaxed">
               Prioritized triage queue, deterministic rule findings, evidence reconciliation desk, and structured observation logging.
             </p>
           </div>
 
-          <div className="bg-white p-6 rounded-2xl border border-[#DCE4EB] space-y-2">
-            <h3 className="font-bold text-[#0B253A] text-sm flex items-center gap-2">
-              <SlidersHorizontal className="w-4 h-4 text-[#0D9488]" /> Regional Branch Heads
+          <div className="bg-white p-6 rounded-[10px] border border-[#C9D3DB] space-y-2">
+            <h3 className="font-bold text-[#0D2538] text-sm flex items-center gap-2">
+              <SlidersHorizontal className="w-4 h-4 text-[#0F766E]" /> Regional Branch Heads
             </h3>
-            <p className="text-xs text-[#607080] leading-relaxed">
+            <p className="text-xs text-[#5D6A75] leading-relaxed">
               Workload distribution across officers, SLA escalation monitoring, and regional maturity exposure aggregation.
             </p>
           </div>
 
-          <div className="bg-white p-6 rounded-2xl border border-[#DCE4EB] space-y-2">
-            <h3 className="font-bold text-[#0B253A] text-sm flex items-center gap-2">
-              <Scale className="w-4 h-4 text-[#0D9488]" /> Competent Authorities
+          <div className="bg-white p-6 rounded-[10px] border border-[#C9D3DB] space-y-2">
+            <h3 className="font-bold text-[#0D2538] text-sm flex items-center gap-2">
+              <Scale className="w-4 h-4 text-[#0F766E]" /> Competent Authorities
             </h3>
-            <p className="text-xs text-[#607080] leading-relaxed">
+            <p className="text-xs text-[#5D6A75] leading-relaxed">
               Objective Release Gate validation, maker-checker enforcement, and legally defensible release order records.
             </p>
           </div>
 
-          <div className="bg-white p-6 rounded-2xl border border-[#DCE4EB] space-y-2">
-            <h3 className="font-bold text-[#0B253A] text-sm flex items-center gap-2">
-              <Database className="w-4 h-4 text-[#0D9488]" /> Finance Officials
+          <div className="bg-white p-6 rounded-[10px] border border-[#C9D3DB] space-y-2">
+            <h3 className="font-bold text-[#0D2538] text-sm flex items-center gap-2">
+              <Database className="w-4 h-4 text-[#0F766E]" /> Finance Officials
             </h3>
-            <p className="text-xs text-[#607080] leading-relaxed">
+            <p className="text-xs text-[#5D6A75] leading-relaxed">
               Deterministic tracking of deposit discharge orders without financial transaction risks or payment liabilities.
             </p>
           </div>
 
-          <div className="bg-white p-6 rounded-2xl border border-[#DCE4EB] space-y-2">
-            <h3 className="font-bold text-[#0B253A] text-sm flex items-center gap-2">
-              <History className="w-4 h-4 text-[#0D9488]" /> Regulatory Auditors
+          <div className="bg-white p-6 rounded-[10px] border border-[#C9D3DB] space-y-2">
+            <h3 className="font-bold text-[#0D2538] text-sm flex items-center gap-2">
+              <History className="w-4 h-4 text-[#0F766E]" /> Regulatory Auditors
             </h3>
-            <p className="text-xs text-[#607080] leading-relaxed">
+            <p className="text-xs text-[#5D6A75] leading-relaxed">
               Cryptographic SHA-256 hash-chain verification, replayable integrity audits, and structured operational exports.
             </p>
           </div>
@@ -994,16 +994,16 @@ export const LandingPage: React.FC = () => {
       {/* =========================================================================
           SECTION K: FAQ ACCORDION
          ========================================================================= */}
-      <section id="faq" className="py-16 md:py-24 bg-white border-y border-[#DCE4EB]">
+      <section id="faq" className="py-16 md:py-24 bg-white border-y border-[#C9D3DB]">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <span className="text-xs font-bold text-[#0D9488] uppercase tracking-wider block mb-2">
+            <span className="text-xs font-bold text-[#0F766E] uppercase tracking-wider block mb-2">
               Frequently Asked Questions
             </span>
-            <h2 className="text-2xl sm:text-4xl font-extrabold text-[#0B253A] tracking-tight">
+            <h2 className="text-2xl sm:text-4xl font-extrabold text-[#0D2538] tracking-tight">
               Clear Answers About SakshyaTrail
             </h2>
-            <p className="text-sm text-[#607080] mt-2">
+            <p className="text-sm text-[#5D6A75] mt-2">
               Honest technical specifications matching the actual prototype architecture.
             </p>
           </div>
@@ -1041,11 +1041,11 @@ export const LandingPage: React.FC = () => {
             ].map((item, index) => (
               <div
                 key={index}
-                className="border border-[#DCE4EB] rounded-xl overflow-hidden transition-all bg-[#F4F7FA]"
+                className="border border-[#C9D3DB] rounded-xl overflow-hidden transition-all bg-[#F5F4EF]"
               >
                 <button
                   onClick={() => toggleFaq(index)}
-                  className="w-full px-5 py-4 text-left flex items-center justify-between text-sm font-bold text-[#0B253A] hover:text-[#0D9488] transition-colors focus:outline-none"
+                  className="w-full px-5 py-4 text-left flex items-center justify-between text-sm font-bold text-[#0D2538] hover:text-[#0F766E] transition-colors focus:outline-none"
                 >
                   <span>{item.q}</span>
                   <ChevronDown
@@ -1055,7 +1055,7 @@ export const LandingPage: React.FC = () => {
                   />
                 </button>
                 {openFaq === index && (
-                  <div className="px-5 pb-4 pt-1 text-xs text-[#607080] leading-relaxed border-t border-slate-200/60 bg-white">
+                  <div className="px-5 pb-4 pt-1 text-xs text-[#5D6A75] leading-relaxed border-t border-slate-200/60 bg-white">
                     {item.a}
                   </div>
                 )}
@@ -1068,7 +1068,7 @@ export const LandingPage: React.FC = () => {
       {/* =========================================================================
           SECTION L: FINAL CTA & COMPREHENSIVE FOOTER
          ========================================================================= */}
-      <section className="py-16 md:py-20 bg-linear-to-br from-[#123C5A] to-[#0B253A] text-white text-center relative overflow-hidden">
+      <section className="py-16 md:py-20 bg-linear-to-br from-[#123B5D] to-[#0D2538] text-white text-center relative overflow-hidden">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 space-y-5">
           <span className="text-xs font-mono font-semibold uppercase tracking-widest text-teal-300 bg-teal-500/10 px-3 py-1 rounded-full border border-teal-400/20">
             INTEGRITY · ACCOUNTABILITY · COMPLIANCE
@@ -1083,7 +1083,7 @@ export const LandingPage: React.FC = () => {
             <Link to="/login">
               <Button
                 size="lg"
-                className="bg-[#0D9488] hover:bg-teal-500 text-white font-bold px-8 shadow-lg shadow-teal-900/30 gap-2"
+                className="bg-[#0F766E] hover:bg-teal-500 text-white font-bold px-8 shadow-lg shadow-teal-900/30 gap-2"
               >
                 Sign In to SakshyaTrail <ArrowRight className="w-4 h-4" />
               </Button>

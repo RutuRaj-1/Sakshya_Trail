@@ -205,11 +205,11 @@ export const UserAdminPage: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
-            <Users className="w-5 h-5 text-sentinel-600" />
+          <h1 className="text-xl font-bold text-[#0D2538] tracking-tight flex items-center gap-2">
+            <Users className="w-5 h-5 text-[#123B5D]" />
             <span>User Administration</span>
           </h1>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-[#5D6A75]">
             Authorized administration and account lifecycle management for AICTE Regulation Bureau personnel
           </p>
         </div>
@@ -220,7 +220,7 @@ export const UserAdminPage: React.FC = () => {
             setProvisionErrors({});
             setIsProvisionOpen(true);
           }}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-sentinel-600 hover:bg-sentinel-700 text-white font-semibold shadow-xs transition-all"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#0F766E] hover:bg-[#09544E] text-white font-semibold shadow-xs transition-all"
         >
           <UserPlus className="w-4 h-4" />
           <span>Provision Account</span>
@@ -228,7 +228,7 @@ export const UserAdminPage: React.FC = () => {
       </div>
 
       {/* Filter Toolbar */}
-      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+      <div className="bg-white p-4 rounded-[10px] border border-[#C9D3DB] shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
         <div className="flex-1 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
           {/* Search */}
           <div className="relative flex-1 max-w-md">
@@ -241,7 +241,7 @@ export const UserAdminPage: React.FC = () => {
                 setPage(1);
               }}
               placeholder="Search by full name or email address..."
-              className="w-full pl-9 pr-3 py-2 border border-slate-300 rounded-lg text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sentinel-500 bg-white"
+              className="w-full pl-9 pr-3 py-2 border border-[#8799A9] rounded-lg text-[#253746] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sentinel-500 bg-white"
             />
           </div>
 
@@ -254,7 +254,7 @@ export const UserAdminPage: React.FC = () => {
                 setRoleFilter(e.target.value);
                 setPage(1);
               }}
-              className="border border-slate-300 rounded-lg px-2.5 py-2 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-sentinel-500"
+              className="border border-[#8799A9] rounded-lg px-2.5 py-2 bg-white text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500"
             >
               <option value="ALL">All Application Roles</option>
               {roles.map((r) => (
@@ -272,7 +272,7 @@ export const UserAdminPage: React.FC = () => {
               setStatusFilter(e.target.value as any);
               setPage(1);
             }}
-            className="border border-slate-300 rounded-lg px-2.5 py-2 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-sentinel-500"
+            className="border border-[#8799A9] rounded-lg px-2.5 py-2 bg-white text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500"
           >
             <option value="ALL">All Statuses</option>
             <option value="ACTIVE">Active Users</option>
@@ -280,24 +280,24 @@ export const UserAdminPage: React.FC = () => {
           </select>
         </div>
 
-        <div className="text-right text-[11px] text-slate-500 self-center">
-          Showing <span className="font-semibold text-slate-800">{users.length}</span> of{' '}
-          <span className="font-semibold text-slate-800">{total}</span> users
+        <div className="text-right text-[11px] text-[#5D6A75] self-center">
+          Showing <span className="font-semibold text-[#253746]">{users.length}</span> of{' '}
+          <span className="font-semibold text-[#253746]">{total}</span> users
         </div>
       </div>
 
       {error && (
-        <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 flex items-center gap-2">
+        <div className="p-4 rounded-[10px] bg-rose-50 border border-rose-200 text-rose-700 flex items-center gap-2">
           <AlertCircle className="w-4 h-4 shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
       {/* Users Table */}
-      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-xs">
+      <div className="bg-white rounded-[10px] border border-[#C9D3DB] overflow-hidden shadow-xs">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs text-slate-700">
-            <thead className="bg-slate-50 border-b border-slate-200 uppercase font-semibold text-slate-500 tracking-wider">
+          <table className="w-full text-left text-xs text-[#253746]">
+            <thead className="bg-[#F5F4EF] border-b border-[#C9D3DB] uppercase font-semibold text-[#5D6A75] tracking-wider">
               <tr>
                 <th className="py-3 px-4">User Identity</th>
                 <th className="py-3 px-4">Assigned Role</th>
@@ -310,8 +310,8 @@ export const UserAdminPage: React.FC = () => {
             <tbody className="divide-y divide-slate-100">
               {isLoading ? (
                 <tr>
-                  <td colSpan={6} className="py-12 text-center text-slate-500">
-                    <div className="inline-block animate-spin rounded-full h-7 w-7 border-4 border-slate-200 border-t-sentinel-600 mb-2" />
+                  <td colSpan={6} className="py-12 text-center text-[#5D6A75]">
+                    <div className="inline-block animate-spin rounded-full h-7 w-7 border-4 border-[#C9D3DB] border-t-sentinel-600 mb-2" />
                     <p>Loading user directories...</p>
                   </td>
                 </tr>
@@ -329,30 +329,30 @@ export const UserAdminPage: React.FC = () => {
                   return (
                     <tr
                       key={u.id}
-                      className={`hover:bg-slate-50/70 transition-colors ${
-                        !u.is_active ? 'bg-slate-50/40 text-slate-400' : ''
+                      className={`hover:bg-[#F5F4EF]/70 transition-colors ${
+                        !u.is_active ? 'bg-[#F5F4EF]/40 text-slate-400' : ''
                       }`}
                     >
                       <td className="py-3.5 px-4">
-                        <div className="font-semibold text-slate-900 flex items-center gap-1.5">
+                        <div className="font-semibold text-[#0D2538] flex items-center gap-1.5">
                           <span>{u.full_name}</span>
                           {isCurrent && (
-                            <span className="text-[10px] px-1.5 py-0.2 rounded bg-sentinel-100 text-sentinel-700 font-mono">
+                            <span className="text-[10px] px-1.5 py-0.2 rounded bg-[#EEF6FA] text-[#123B5D] font-mono">
                               You
                             </span>
                           )}
                         </div>
-                        <div className="text-slate-500 font-mono text-[11px]">{u.email}</div>
+                        <div className="text-[#5D6A75] font-mono text-[11px]">{u.email}</div>
                       </td>
                       <td className="py-3.5 px-4">
-                        <span className="inline-flex items-center gap-1 font-mono font-medium px-2 py-0.5 rounded bg-slate-100 text-slate-700 text-[11px]">
-                          <Shield className="w-3 h-3 text-sentinel-600" />
+                        <span className="inline-flex items-center gap-1 font-mono font-medium px-2 py-0.5 rounded bg-slate-100 text-[#253746] text-[11px]">
+                          <Shield className="w-3 h-3 text-[#123B5D]" />
                           {u.role}
                         </span>
                       </td>
                       <td className="py-3.5 px-4">
                         {u.role === 'INSTITUTION_USER' ? (
-                          <div className="flex items-center gap-1 text-slate-700">
+                          <div className="flex items-center gap-1 text-[#253746]">
                             <Building2 className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                             <span className="truncate max-w-[180px]">
                               {institutionObj
@@ -391,7 +391,7 @@ export const UserAdminPage: React.FC = () => {
                               setTempPasswordResult(null);
                             }}
                             title="Reset Temporary Password"
-                            className="p-1.5 text-slate-600 hover:text-sentinel-700 hover:bg-sentinel-50 rounded-lg transition-colors flex items-center gap-1 font-medium"
+                            className="p-1.5 text-[#5D6A75] hover:text-[#123B5D] hover:bg-[#EEF6FA] rounded-lg transition-colors flex items-center gap-1 font-medium"
                           >
                             <KeyRound className="w-3.5 h-3.5" />
                             <span className="hidden sm:inline">Reset Pwd</span>
@@ -426,23 +426,23 @@ export const UserAdminPage: React.FC = () => {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between bg-white px-4 py-3 rounded-xl border border-slate-200 text-xs">
-          <div className="text-slate-500">
-            Page <span className="font-semibold text-slate-800">{page}</span> of{' '}
-            <span className="font-semibold text-slate-800">{totalPages}</span>
+        <div className="flex items-center justify-between bg-white px-4 py-3 rounded-[10px] border border-[#C9D3DB] text-xs">
+          <div className="text-[#5D6A75]">
+            Page <span className="font-semibold text-[#253746]">{page}</span> of{' '}
+            <span className="font-semibold text-[#253746]">{totalPages}</span>
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1}
-              className="p-1.5 rounded-lg border border-slate-300 hover:bg-slate-50 disabled:opacity-40"
+              className="p-1.5 rounded-lg border border-[#8799A9] hover:bg-[#F5F4EF] disabled:opacity-40"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
             <button
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}
-              className="p-1.5 rounded-lg border border-slate-300 hover:bg-slate-50 disabled:opacity-40"
+              className="p-1.5 rounded-lg border border-[#8799A9] hover:bg-[#F5F4EF] disabled:opacity-40"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
@@ -453,22 +453,22 @@ export const UserAdminPage: React.FC = () => {
       {/* Provision User Modal */}
       {isProvisionOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-lg overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-            <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+          <div className="bg-white rounded-[10px] shadow-2xl border border-[#C9D3DB] w-full max-w-lg overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+            <div className="px-6 py-4 border-b border-[#C9D3DB] flex items-center justify-between bg-[#F5F4EF]">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-sentinel-100 text-sentinel-700 flex items-center justify-center font-bold">
+                <div className="w-8 h-8 rounded-lg bg-[#EEF6FA] text-[#123B5D] flex items-center justify-center font-bold">
                   <UserPlus className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-semibold text-slate-900">Provision User Account</h3>
-                  <p className="text-[11px] text-slate-500">
+                  <h3 className="text-sm font-semibold text-[#0D2538]">Provision User Account</h3>
+                  <p className="text-[11px] text-[#5D6A75]">
                     Create authorized personnel credentials with role & institutional boundaries
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setIsProvisionOpen(false)}
-                className="text-slate-400 hover:text-slate-600 p-1 rounded-lg"
+                className="text-slate-400 hover:text-[#5D6A75] p-1 rounded-lg"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -483,7 +483,7 @@ export const UserAdminPage: React.FC = () => {
               )}
 
               <div>
-                <label className="block font-medium text-slate-700 mb-1">
+                <label className="block font-medium text-[#253746] mb-1">
                   Full Name <span className="text-rose-500">*</span>
                 </label>
                 <input
@@ -494,7 +494,7 @@ export const UserAdminPage: React.FC = () => {
                   }
                   placeholder="e.g. Dr. Rajesh Kumar"
                   className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-sentinel-500 bg-white ${
-                    provisionErrors.full_name ? 'border-rose-400' : 'border-slate-300'
+                    provisionErrors.full_name ? 'border-rose-400' : 'border-[#8799A9]'
                   }`}
                 />
                 {provisionErrors.full_name && (
@@ -503,7 +503,7 @@ export const UserAdminPage: React.FC = () => {
               </div>
 
               <div>
-                <label className="block font-medium text-slate-700 mb-1">
+                <label className="block font-medium text-[#253746] mb-1">
                   Official Email Address <span className="text-rose-500">*</span>
                 </label>
                 <input
@@ -512,7 +512,7 @@ export const UserAdminPage: React.FC = () => {
                   onChange={(e) => setProvisionForm({ ...provisionForm, email: e.target.value })}
                   placeholder="rajesh.kumar@aicte-india.org"
                   className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-sentinel-500 bg-white ${
-                    provisionErrors.email ? 'border-rose-400' : 'border-slate-300'
+                    provisionErrors.email ? 'border-rose-400' : 'border-[#8799A9]'
                   }`}
                 />
                 {provisionErrors.email && (
@@ -521,7 +521,7 @@ export const UserAdminPage: React.FC = () => {
               </div>
 
               <div>
-                <label className="block font-medium text-slate-700 mb-1">
+                <label className="block font-medium text-[#253746] mb-1">
                   Initial Account Password <span className="text-rose-500">*</span>
                 </label>
                 <input
@@ -530,7 +530,7 @@ export const UserAdminPage: React.FC = () => {
                   onChange={(e) => setProvisionForm({ ...provisionForm, password: e.target.value })}
                   placeholder="Minimum 8 characters (Argon2id hashed)"
                   className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-sentinel-500 bg-white ${
-                    provisionErrors.password ? 'border-rose-400' : 'border-slate-300'
+                    provisionErrors.password ? 'border-rose-400' : 'border-[#8799A9]'
                   }`}
                 />
                 {provisionErrors.password && (
@@ -539,7 +539,7 @@ export const UserAdminPage: React.FC = () => {
               </div>
 
               <div>
-                <label className="block font-medium text-slate-700 mb-1">
+                <label className="block font-medium text-[#253746] mb-1">
                   Assigned Application Role <span className="text-rose-500">*</span>
                 </label>
                 <select
@@ -547,7 +547,7 @@ export const UserAdminPage: React.FC = () => {
                   onChange={(e) =>
                     setProvisionForm({ ...provisionForm, role: e.target.value, institution_id: '' })
                   }
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sentinel-500 bg-white"
+                  className="w-full px-3 py-2 border border-[#8799A9] rounded-lg focus:outline-none focus:ring-2 focus:ring-sentinel-500 bg-white"
                 >
                   {roles.map((r) => (
                     <option key={r.name} value={r.name}>
@@ -559,7 +559,7 @@ export const UserAdminPage: React.FC = () => {
 
               {provisionForm.role === 'INSTITUTION_USER' && (
                 <div>
-                  <label className="block font-medium text-slate-700 mb-1">
+                  <label className="block font-medium text-[#253746] mb-1">
                     Institution Association <span className="text-rose-500">*</span>
                   </label>
                   <select
@@ -568,7 +568,7 @@ export const UserAdminPage: React.FC = () => {
                       setProvisionForm({ ...provisionForm, institution_id: e.target.value })
                     }
                     className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-sentinel-500 bg-white ${
-                      provisionErrors.institution_id ? 'border-rose-400' : 'border-slate-300'
+                      provisionErrors.institution_id ? 'border-rose-400' : 'border-[#8799A9]'
                     }`}
                   >
                     <option value="">Select registered institution...</option>
@@ -595,26 +595,26 @@ export const UserAdminPage: React.FC = () => {
                       must_change_password: e.target.checked,
                     })
                   }
-                  className="rounded text-sentinel-600 focus:ring-sentinel-500"
+                  className="rounded text-[#123B5D] focus:ring-sentinel-500"
                 />
-                <label htmlFor="must_change" className="text-slate-700 cursor-pointer">
+                <label htmlFor="must_change" className="text-[#253746] cursor-pointer">
                   Require password change on first application login (Recommended)
                 </label>
               </div>
 
-              <div className="pt-4 border-t border-slate-200 flex items-center justify-end gap-2">
+              <div className="pt-4 border-t border-[#C9D3DB] flex items-center justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setIsProvisionOpen(false)}
                   disabled={isProvisioning}
-                  className="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-100 font-medium"
+                  className="px-4 py-2 rounded-lg border border-[#8799A9] text-[#253746] hover:bg-slate-100 font-medium"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isProvisioning}
-                  className="px-5 py-2 rounded-lg bg-sentinel-600 hover:bg-sentinel-700 text-white font-medium shadow-sm flex items-center gap-1.5"
+                  className="px-5 py-2 rounded-lg bg-[#0F766E] hover:bg-[#09544E] text-white font-medium shadow-sm flex items-center gap-1.5"
                 >
                   {isProvisioning && (
                     <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -630,24 +630,24 @@ export const UserAdminPage: React.FC = () => {
       {/* Reset Password Modal */}
       {resetTargetUser && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md p-6 space-y-4 animate-in fade-in zoom-in-95 duration-150">
+          <div className="bg-white rounded-[10px] shadow-2xl border border-[#C9D3DB] w-full max-w-md p-6 space-y-4 animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-sentinel-100 text-sentinel-700">
+              <div className="p-2.5 rounded-[10px] bg-[#EEF6FA] text-[#123B5D]">
                 <KeyRound className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-sm font-semibold text-slate-900">
+                <h3 className="text-sm font-semibold text-[#0D2538]">
                   Administrative Password Reset
                 </h3>
-                <p className="text-[11px] text-slate-500">
-                  Target user: <span className="font-mono text-slate-800">{resetTargetUser.email}</span>
+                <p className="text-[11px] text-[#5D6A75]">
+                  Target user: <span className="font-mono text-[#253746]">{resetTargetUser.email}</span>
                 </p>
               </div>
             </div>
 
             {!tempPasswordResult ? (
               <div className="space-y-3">
-                <p className="text-slate-600 text-xs">
+                <p className="text-[#5D6A75] text-xs">
                   This procedure generates a high-entropy temporary password and sets the{' '}
                   <span className="font-semibold text-amber-700">must_change_password</span> flag.
                   The user will be strictly forced to rotate this password upon their next login.
@@ -662,7 +662,7 @@ export const UserAdminPage: React.FC = () => {
                     type="button"
                     onClick={() => setResetTargetUser(null)}
                     disabled={isResetting}
-                    className="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-100 font-medium"
+                    className="px-4 py-2 rounded-lg border border-[#8799A9] text-[#253746] hover:bg-slate-100 font-medium"
                   >
                     Cancel
                   </button>
@@ -670,7 +670,7 @@ export const UserAdminPage: React.FC = () => {
                     type="button"
                     onClick={handleResetPassword}
                     disabled={isResetting}
-                    className="px-4 py-2 rounded-lg bg-sentinel-600 hover:bg-sentinel-700 text-white font-medium shadow-sm flex items-center gap-1.5"
+                    className="px-4 py-2 rounded-lg bg-[#0F766E] hover:bg-[#09544E] text-white font-medium shadow-sm flex items-center gap-1.5"
                   >
                     {isResetting && (
                       <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -681,7 +681,7 @@ export const UserAdminPage: React.FC = () => {
               </div>
             ) : (
               <div className="space-y-4">
-                <div className="p-4 rounded-xl bg-slate-900 text-white space-y-2">
+                <div className="p-4 rounded-[10px] bg-slate-900 text-white space-y-2">
                   <span className="text-[10px] uppercase tracking-wider text-slate-400">
                     Temporary Administrative Password
                   </span>
@@ -699,7 +699,7 @@ export const UserAdminPage: React.FC = () => {
                   </div>
                 </div>
 
-                <p className="text-[11px] text-slate-500">
+                <p className="text-[11px] text-[#5D6A75]">
                   Copy and securely communicate this temporary secret to the user. It will not be
                   displayed again or stored in plaintext.
                 </p>
@@ -721,10 +721,10 @@ export const UserAdminPage: React.FC = () => {
       {/* Status Toggle Modal */}
       {statusToggleTarget && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md p-6 space-y-4 animate-in fade-in zoom-in-95 duration-150">
+          <div className="bg-white rounded-[10px] shadow-2xl border border-[#C9D3DB] w-full max-w-md p-6 space-y-4 animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-start gap-3">
               <div
-                className={`p-2.5 rounded-xl ${
+                className={`p-2.5 rounded-[10px] ${
                   statusToggleTarget.is_active
                     ? 'bg-amber-100 text-amber-700'
                     : 'bg-emerald-100 text-emerald-700'
@@ -737,10 +737,10 @@ export const UserAdminPage: React.FC = () => {
                 )}
               </div>
               <div>
-                <h3 className="text-sm font-semibold text-slate-900">
+                <h3 className="text-sm font-semibold text-[#0D2538]">
                   {statusToggleTarget.is_active ? 'Deactivate User Account' : 'Reactivate User Account'}
                 </h3>
-                <p className="text-[11px] text-slate-500 mt-1">
+                <p className="text-[11px] text-[#5D6A75] mt-1">
                   {statusToggleTarget.is_active
                     ? 'Deactivating this user revokes login access immediately. The account cannot be used until reactivated.'
                     : 'Reactivating this user restores authorized access to the application.'}
@@ -748,10 +748,10 @@ export const UserAdminPage: React.FC = () => {
               </div>
             </div>
 
-            <div className="p-3 bg-slate-50 rounded-lg border border-slate-200 text-xs">
-              <span className="font-semibold text-slate-700">Account:</span>{' '}
-              <span className="text-slate-900">{statusToggleTarget.full_name}</span> (
-              <span className="font-mono text-sentinel-700">{statusToggleTarget.email}</span>)
+            <div className="p-3 bg-[#F5F4EF] rounded-lg border border-[#C9D3DB] text-xs">
+              <span className="font-semibold text-[#253746]">Account:</span>{' '}
+              <span className="text-[#0D2538]">{statusToggleTarget.full_name}</span> (
+              <span className="font-mono text-[#123B5D]">{statusToggleTarget.email}</span>)
             </div>
 
             <div className="flex items-center justify-end gap-2 pt-2">
@@ -759,7 +759,7 @@ export const UserAdminPage: React.FC = () => {
                 type="button"
                 onClick={() => setStatusToggleTarget(null)}
                 disabled={isTogglingStatus}
-                className="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-100 font-medium"
+                className="px-4 py-2 rounded-lg border border-[#8799A9] text-[#253746] hover:bg-slate-100 font-medium"
               >
                 Cancel
               </button>

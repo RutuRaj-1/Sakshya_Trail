@@ -99,11 +99,11 @@ export const InstrumentsPage: React.FC = () => {
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
-            <FileSpreadsheet className="w-5 h-5 text-sentinel-600" />
+          <h1 className="text-xl font-bold text-[#0D2538] tracking-tight flex items-center gap-2">
+            <FileSpreadsheet className="w-5 h-5 text-[#123B5D]" />
             <span>Statutory FDR / Instrument Registry</span>
           </h1>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-[#5D6A75]">
             {isInstitutionUser
               ? 'Institutional security deposit FDR certificates pledged under AICTE regulatory terms'
               : 'Regulatory bureau registry of all pledged bank fixed deposit receipts and guarantees'}
@@ -113,7 +113,7 @@ export const InstrumentsPage: React.FC = () => {
         {canRecord && (
           <button
             onClick={() => setIsModalOpen(true)}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-sentinel-600 hover:bg-sentinel-700 text-white font-semibold shadow-xs transition-all"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#0F766E] hover:bg-[#09544E] text-white font-semibold shadow-xs transition-all"
           >
             <Plus className="w-4 h-4" />
             <span>Record FDR Instrument</span>
@@ -124,19 +124,19 @@ export const InstrumentsPage: React.FC = () => {
       {/* KPI Overview Strip */}
       {summary && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs">
-            <span className="text-slate-500 text-[11px]">Total Deposit Portfolio</span>
-            <div className="text-base font-bold text-slate-900 font-mono mt-0.5">
+          <div className="bg-white p-3.5 rounded-[10px] border border-[#C9D3DB] shadow-2xs">
+            <span className="text-[#5D6A75] text-[11px]">Total Deposit Portfolio</span>
+            <div className="text-base font-bold text-[#0D2538] font-mono mt-0.5">
               {formatINR(Number(summary.total_deposit_value))}
             </div>
             <div className="text-[10px] text-slate-400 mt-1 flex items-center gap-1">
-              <TrendingUp className="w-3 h-3 text-sentinel-600" />
+              <TrendingUp className="w-3 h-3 text-[#123B5D]" />
               <span>{summary.total_instruments} registered certificates</span>
             </div>
           </div>
 
-          <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs">
-            <span className="text-slate-500 text-[11px]">Active Compliance</span>
+          <div className="bg-white p-3.5 rounded-[10px] border border-[#C9D3DB] shadow-2xs">
+            <span className="text-[#5D6A75] text-[11px]">Active Compliance</span>
             <div className="text-base font-bold text-emerald-700 font-mono mt-0.5">
               {summary.active_count}
             </div>
@@ -146,8 +146,8 @@ export const InstrumentsPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs">
-            <span className="text-slate-500 text-[11px]">Expiring Within 90 Days</span>
+          <div className="bg-white p-3.5 rounded-[10px] border border-[#C9D3DB] shadow-2xs">
+            <span className="text-[#5D6A75] text-[11px]">Expiring Within 90 Days</span>
             <div className="text-base font-bold text-amber-600 font-mono mt-0.5">
               {summary.expiring_soon_count}
             </div>
@@ -157,8 +157,8 @@ export const InstrumentsPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs">
-            <span className="text-slate-500 text-[11px]">Under Initial Scrutiny</span>
+          <div className="bg-white p-3.5 rounded-[10px] border border-[#C9D3DB] shadow-2xs">
+            <span className="text-[#5D6A75] text-[11px]">Under Initial Scrutiny</span>
             <div className="text-base font-bold text-blue-700 font-mono mt-0.5">
               {summary.under_scrutiny_count}
             </div>
@@ -171,7 +171,7 @@ export const InstrumentsPage: React.FC = () => {
       )}
 
       {/* Filter Toolbar */}
-      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+      <div className="bg-white p-4 rounded-[10px] border border-[#C9D3DB] shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
         <div className="flex-1 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
           {/* Search */}
           <div className="relative flex-1 max-w-md">
@@ -184,7 +184,7 @@ export const InstrumentsPage: React.FC = () => {
                 setPage(1);
               }}
               placeholder="Search by FDR reference, bank, or institute name/code..."
-              className="w-full pl-9 pr-3 py-2 border border-slate-300 rounded-lg text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sentinel-500 bg-white"
+              className="w-full pl-9 pr-3 py-2 border border-[#8799A9] rounded-lg text-[#253746] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sentinel-500 bg-white"
             />
           </div>
 
@@ -197,7 +197,7 @@ export const InstrumentsPage: React.FC = () => {
                 setStatusFilter(e.target.value);
                 setPage(1);
               }}
-              className="border border-slate-300 rounded-lg px-2.5 py-2 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-sentinel-500"
+              className="border border-[#8799A9] rounded-lg px-2.5 py-2 bg-white text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500"
             >
               <option value="ALL">All Workflow Statuses</option>
               <option value="REGISTERED">REGISTERED</option>
@@ -212,7 +212,7 @@ export const InstrumentsPage: React.FC = () => {
               setTrustFilter(e.target.value);
               setPage(1);
             }}
-            className="border border-slate-300 rounded-lg px-2.5 py-2 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-sentinel-500"
+            className="border border-[#8799A9] rounded-lg px-2.5 py-2 bg-white text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500"
           >
             <option value="ALL">All Trust Levels</option>
             <option value="L0_DECLARED">L0 — DECLARED</option>
@@ -229,7 +229,7 @@ export const InstrumentsPage: React.FC = () => {
                 setSelectedInstFilter(e.target.value);
                 setPage(1);
               }}
-              className="border border-slate-300 rounded-lg px-2.5 py-2 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-sentinel-500 max-w-[200px] truncate"
+              className="border border-[#8799A9] rounded-lg px-2.5 py-2 bg-white text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500 max-w-[200px] truncate"
             >
               <option value="">All Institutions</option>
               {institutions.map((i) => (
@@ -241,14 +241,14 @@ export const InstrumentsPage: React.FC = () => {
           )}
         </div>
 
-        <div className="text-right text-[11px] text-slate-500 self-center">
-          Showing <span className="font-semibold text-slate-800">{instruments.length}</span> of{' '}
-          <span className="font-semibold text-slate-800">{total}</span> records
+        <div className="text-right text-[11px] text-[#5D6A75] self-center">
+          Showing <span className="font-semibold text-[#253746]">{instruments.length}</span> of{' '}
+          <span className="font-semibold text-[#253746]">{total}</span> records
         </div>
       </div>
 
       {error && (
-        <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 flex items-center gap-2">
+        <div className="p-4 rounded-[10px] bg-rose-50 border border-rose-200 text-rose-700 flex items-center gap-2">
           <AlertTriangle className="w-4 h-4 shrink-0" />
           <span>{error}</span>
         </div>
@@ -259,23 +259,23 @@ export const InstrumentsPage: React.FC = () => {
 
       {/* Pagination Bar */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between bg-white px-4 py-3 rounded-xl border border-slate-200 text-xs">
-          <div className="text-slate-500">
-            Page <span className="font-semibold text-slate-800">{page}</span> of{' '}
-            <span className="font-semibold text-slate-800">{totalPages}</span>
+        <div className="flex items-center justify-between bg-white px-4 py-3 rounded-[10px] border border-[#C9D3DB] text-xs">
+          <div className="text-[#5D6A75]">
+            Page <span className="font-semibold text-[#253746]">{page}</span> of{' '}
+            <span className="font-semibold text-[#253746]">{totalPages}</span>
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1}
-              className="p-1.5 rounded-lg border border-slate-300 hover:bg-slate-50 disabled:opacity-40"
+              className="p-1.5 rounded-lg border border-[#8799A9] hover:bg-[#F5F4EF] disabled:opacity-40"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
             <button
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}
-              className="p-1.5 rounded-lg border border-slate-300 hover:bg-slate-50 disabled:opacity-40"
+              className="p-1.5 rounded-lg border border-[#8799A9] hover:bg-[#F5F4EF] disabled:opacity-40"
             >
               <ChevronRight className="w-4 h-4" />
             </button>

@@ -14,7 +14,7 @@ export const Button: React.FC<ButtonProps> = ({
   ...props
 }) => {
   const baseStyles =
-    'inline-flex items-center justify-center font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none';
+    'inline-flex items-center justify-center font-medium rounded-[8px] transition-colors focus:outline-none focus:ring-2 focus:ring-[#145DA0] focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none cursor-pointer';
 
   const sizeStyles = {
     sm: 'text-xs px-2.5 py-1.5 gap-1.5',
@@ -24,15 +24,15 @@ export const Button: React.FC<ButtonProps> = ({
 
   const variantStyles = {
     primary:
-      'bg-sentinel-700 text-white hover:bg-sentinel-800 focus:ring-sentinel-600 shadow-sm shadow-sentinel-900/10',
+      'bg-[#123B5D] text-white hover:bg-[#0D2538] focus:ring-[#145DA0] shadow-xs active:bg-[#071724]',
     secondary:
-      'bg-slate-100 text-slate-800 hover:bg-slate-200 focus:ring-slate-400',
+      'bg-white text-[#253746] border border-[#8799A9] hover:bg-[#EDF1F3] hover:text-[#0D2538] focus:ring-[#145DA0] shadow-2xs',
     outline:
-      'border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 focus:ring-sentinel-500',
+      'border border-[#8799A9] bg-white text-[#253746] hover:bg-[#EDF1F3] hover:border-[#253746] focus:ring-[#145DA0]',
     ghost:
-      'bg-transparent text-slate-600 hover:bg-slate-100 hover:text-slate-900',
+      'bg-transparent text-[#253746] hover:bg-[#EDF1F3] hover:text-[#0D2538]',
     danger:
-      'bg-rose-600 text-white hover:bg-rose-700 focus:ring-rose-500 shadow-sm shadow-rose-900/10',
+      'bg-[#B42318] text-white hover:bg-[#8E1B13] focus:ring-[#B42318] shadow-xs',
   };
 
   return (
@@ -44,3 +44,4 @@ export const Button: React.FC<ButtonProps> = ({
     </button>
   );
 };
+

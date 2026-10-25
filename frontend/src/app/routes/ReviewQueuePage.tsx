@@ -263,7 +263,7 @@ export const ReviewQueuePage: React.FC = () => {
       case 'RESOLVED':
         return <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200"><CheckCircle2 className="w-3 h-3" /> RESOLVED</span>;
       case 'DISMISSED':
-        return <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200"><XCircle className="w-3 h-3" /> DISMISSED</span>;
+        return <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#5D6A75] bg-slate-100 px-2 py-0.5 rounded-full border border-[#C9D3DB]"><XCircle className="w-3 h-3" /> DISMISSED</span>;
       case 'SUPERSEDED':
         return <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-200"><RefreshCw className="w-3 h-3" /> SUPERSEDED</span>;
       default:
@@ -272,7 +272,7 @@ export const ReviewQueuePage: React.FC = () => {
   };
 
   const renderPriorityBadge = (score: number, details: PriorityScoreDetails) => {
-    let colorClass = 'bg-slate-100 text-slate-700 border-slate-300';
+    let colorClass = 'bg-slate-100 text-[#253746] border-[#8799A9]';
     if (score >= 70) {
       colorClass = 'bg-rose-100 text-rose-800 border-rose-300 font-bold';
     } else if (score >= 40) {
@@ -305,17 +305,17 @@ export const ReviewQueuePage: React.FC = () => {
   return (
     <div className="space-y-6 max-w-7xl mx-auto text-xs pb-12">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#C9D3DB] pb-4">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold text-slate-900 tracking-tight">
+            <h1 className="text-xl font-bold text-[#0D2538] tracking-tight">
               Discrepancy Review Queue
             </h1>
-            <span className="text-[10px] bg-sentinel-100 text-sentinel-800 font-semibold px-2 py-0.5 rounded-full border border-sentinel-200">
+            <span className="text-[10px] bg-[#EEF6FA] text-[#0D2538] font-semibold px-2 py-0.5 rounded-full border border-[#C4DEED]">
               Module 3 — Audit & Governance
             </span>
           </div>
-          <p className="text-slate-500 mt-1 text-xs">
+          <p className="text-[#5D6A75] mt-1 text-xs">
             {isInstitutionUser
               ? 'Actionable deficiencies and validation findings identified for your institution’s FDR submissions.'
               : 'Deterministic validation findings, cross-source discrepancies, and transparent priority queue for scrutiny officers.'}
@@ -326,7 +326,7 @@ export const ReviewQueuePage: React.FC = () => {
           <button
             onClick={() => loadQueue()}
             disabled={isLoading}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 font-medium text-xs transition-colors shadow-sm disabled:opacity-50"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#8799A9] bg-white hover:bg-[#F5F4EF] text-[#253746] font-medium text-xs transition-colors shadow-sm disabled:opacity-50"
           >
             <RefreshCw className={cn('w-3.5 h-3.5', isLoading && 'animate-spin')} />
             Refresh
@@ -360,7 +360,7 @@ export const ReviewQueuePage: React.FC = () => {
       )}
 
       {/* Filter Toolbar */}
-      <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-3">
+      <div className="bg-white border border-[#C9D3DB] rounded-[10px] p-4 shadow-sm space-y-3">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
           {/* Search */}
           <div className="relative">
@@ -370,20 +370,20 @@ export const ReviewQueuePage: React.FC = () => {
               placeholder="Search reference, bank, rule code, title..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:ring-1 focus:ring-sentinel-500 focus:bg-white outline-none transition-all"
+              className="w-full pl-9 pr-3 py-1.5 bg-[#F5F4EF] border border-[#C9D3DB] rounded-lg text-xs focus:ring-1 focus:ring-sentinel-500 focus:bg-white outline-none transition-all"
             />
           </div>
 
           {/* Status Filter */}
           <div className="flex items-center gap-2">
-            <label className="text-slate-500 font-medium shrink-0">Status:</label>
+            <label className="text-[#5D6A75] font-medium shrink-0">Status:</label>
             <select
               value={statusFilter}
               onChange={(e) => {
                 setStatusFilter(e.target.value);
                 setPage(1);
               }}
-              className="w-full bg-slate-50 border border-slate-200 rounded-lg py-1.5 px-2.5 text-xs focus:ring-1 focus:ring-sentinel-500 outline-none"
+              className="w-full bg-[#F5F4EF] border border-[#C9D3DB] rounded-lg py-1.5 px-2.5 text-xs focus:ring-1 focus:ring-sentinel-500 outline-none"
             >
               <option value="ACTIVE">Active (Open & In Review)</option>
               <option value="OPEN">Open Only</option>
@@ -396,14 +396,14 @@ export const ReviewQueuePage: React.FC = () => {
 
           {/* Severity Filter */}
           <div className="flex items-center gap-2">
-            <label className="text-slate-500 font-medium shrink-0">Severity:</label>
+            <label className="text-[#5D6A75] font-medium shrink-0">Severity:</label>
             <select
               value={severityFilter}
               onChange={(e) => {
                 setSeverityFilter(e.target.value);
                 setPage(1);
               }}
-              className="w-full bg-slate-50 border border-slate-200 rounded-lg py-1.5 px-2.5 text-xs focus:ring-1 focus:ring-sentinel-500 outline-none"
+              className="w-full bg-[#F5F4EF] border border-[#C9D3DB] rounded-lg py-1.5 px-2.5 text-xs focus:ring-1 focus:ring-sentinel-500 outline-none"
             >
               <option value="">All Severities</option>
               <option value="CRITICAL">Critical</option>
@@ -416,14 +416,14 @@ export const ReviewQueuePage: React.FC = () => {
 
           {/* Category Filter */}
           <div className="flex items-center gap-2">
-            <label className="text-slate-500 font-medium shrink-0">Category:</label>
+            <label className="text-[#5D6A75] font-medium shrink-0">Category:</label>
             <select
               value={categoryFilter}
               onChange={(e) => {
                 setCategoryFilter(e.target.value);
                 setPage(1);
               }}
-              className="w-full bg-slate-50 border border-slate-200 rounded-lg py-1.5 px-2.5 text-xs focus:ring-1 focus:ring-sentinel-500 outline-none"
+              className="w-full bg-[#F5F4EF] border border-[#C9D3DB] rounded-lg py-1.5 px-2.5 text-xs focus:ring-1 focus:ring-sentinel-500 outline-none"
             >
               <option value="">All Categories</option>
               <option value="REQUIRED_FIELD">Required Fields</option>
@@ -441,14 +441,14 @@ export const ReviewQueuePage: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-3 pt-1 border-t border-slate-100">
           {!isInstitutionUser && (
             <div className="flex items-center gap-2 col-span-2">
-              <label className="text-slate-500 font-medium shrink-0">Institution:</label>
+              <label className="text-[#5D6A75] font-medium shrink-0">Institution:</label>
               <select
                 value={selectedInstFilter}
                 onChange={(e) => {
                   setSelectedInstFilter(e.target.value);
                   setPage(1);
                 }}
-                className="w-full bg-slate-50 border border-slate-200 rounded-lg py-1.5 px-2.5 text-xs focus:ring-1 focus:ring-sentinel-500 outline-none"
+                className="w-full bg-[#F5F4EF] border border-[#C9D3DB] rounded-lg py-1.5 px-2.5 text-xs focus:ring-1 focus:ring-sentinel-500 outline-none"
               >
                 <option value="">All Institutions</option>
                 {institutions.map((i) => (
@@ -461,11 +461,11 @@ export const ReviewQueuePage: React.FC = () => {
           )}
 
           <div className="flex items-center gap-2">
-            <label className="text-slate-500 font-medium shrink-0">Sort By:</label>
+            <label className="text-[#5D6A75] font-medium shrink-0">Sort By:</label>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-lg py-1.5 px-2.5 text-xs focus:ring-1 focus:ring-sentinel-500 outline-none"
+              className="w-full bg-[#F5F4EF] border border-[#C9D3DB] rounded-lg py-1.5 px-2.5 text-xs focus:ring-1 focus:ring-sentinel-500 outline-none"
             >
               <option value="priority">Priority Score (0–100)</option>
               <option value="detected_at">First Detected Date</option>
@@ -475,11 +475,11 @@ export const ReviewQueuePage: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-2">
-            <label className="text-slate-500 font-medium shrink-0">Order:</label>
+            <label className="text-[#5D6A75] font-medium shrink-0">Order:</label>
             <select
               value={sortOrder}
               onChange={(e) => setSortOrder(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-lg py-1.5 px-2.5 text-xs focus:ring-1 focus:ring-sentinel-500 outline-none"
+              className="w-full bg-[#F5F4EF] border border-[#C9D3DB] rounded-lg py-1.5 px-2.5 text-xs focus:ring-1 focus:ring-sentinel-500 outline-none"
             >
               <option value="desc">Descending</option>
               <option value="asc">Ascending</option>
@@ -489,11 +489,11 @@ export const ReviewQueuePage: React.FC = () => {
       </div>
 
       {/* Review Queue Findings Table */}
-      <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
-        <div className="px-4 py-3 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+      <div className="bg-white border border-[#C9D3DB] rounded-[10px] overflow-hidden shadow-sm">
+        <div className="px-4 py-3 border-b border-[#C9D3DB] flex items-center justify-between bg-[#F5F4EF]">
           <div className="flex items-center gap-2">
-            <span className="font-semibold text-slate-800">Review Queue Discrepancies</span>
-            <span className="bg-slate-200 text-slate-700 text-[10px] font-bold px-2 py-0.5 rounded-full">
+            <span className="font-semibold text-[#253746]">Review Queue Discrepancies</span>
+            <span className="bg-slate-200 text-[#253746] text-[10px] font-bold px-2 py-0.5 rounded-full">
               {total} items
             </span>
           </div>
@@ -505,7 +505,7 @@ export const ReviewQueuePage: React.FC = () => {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-slate-100/70 border-b border-slate-200 text-slate-600 font-semibold text-[11px]">
+              <tr className="bg-slate-100/70 border-b border-[#C9D3DB] text-[#5D6A75] font-semibold text-[11px]">
                 <th className="py-2.5 px-3">Priority</th>
                 <th className="py-2.5 px-3">Severity</th>
                 <th className="py-2.5 px-3">Instrument / Bank</th>
@@ -520,7 +520,7 @@ export const ReviewQueuePage: React.FC = () => {
               {isLoading ? (
                 <tr>
                   <td colSpan={8} className="py-12 text-center text-slate-400">
-                    <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 text-sentinel-600" />
+                    <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 text-[#123B5D]" />
                     Loading review queue items...
                   </td>
                 </tr>
@@ -539,7 +539,7 @@ export const ReviewQueuePage: React.FC = () => {
                       setActiveFinding(item);
                       setIsDetailOpen(true);
                     }}
-                    className="hover:bg-slate-50 transition-colors cursor-pointer group"
+                    className="hover:bg-[#F5F4EF] transition-colors cursor-pointer group"
                   >
                     {/* Priority Score */}
                     <td className="py-2.5 px-3 whitespace-nowrap">
@@ -553,21 +553,21 @@ export const ReviewQueuePage: React.FC = () => {
 
                     {/* Instrument / Bank */}
                     <td className="py-2.5 px-3 whitespace-nowrap">
-                      <div className="font-medium text-slate-800">
+                      <div className="font-medium text-[#253746]">
                         {item.instrument_summary?.reference_number || item.instrument_id.substring(0, 8)}
                       </div>
-                      <div className="text-[10px] text-slate-500">
+                      <div className="text-[10px] text-[#5D6A75]">
                         {item.instrument_summary?.bank_name || 'Bank Unspecified'}
                       </div>
                     </td>
 
                     {/* Title */}
                     <td className="py-2.5 px-3 max-w-xs">
-                      <div className="font-medium text-slate-800 truncate" title={item.title}>
+                      <div className="font-medium text-[#253746] truncate" title={item.title}>
                         {item.title}
                       </div>
                       {item.suggested_action && (
-                        <div className="text-[10px] text-slate-500 truncate" title={item.suggested_action}>
+                        <div className="text-[10px] text-[#5D6A75] truncate" title={item.suggested_action}>
                           Action: {item.suggested_action}
                         </div>
                       )}
@@ -575,12 +575,12 @@ export const ReviewQueuePage: React.FC = () => {
 
                     {/* Rule / Type */}
                     <td className="py-2.5 px-3 whitespace-nowrap">
-                      <div className="font-mono text-[10px] text-slate-700">{item.rule_id}</div>
-                      <div className="text-[10px] text-slate-500">
+                      <div className="font-mono text-[10px] text-[#253746]">{item.rule_id}</div>
+                      <div className="text-[10px] text-[#5D6A75]">
                         {item.rule_type === 'HEURISTIC' ? (
                           <span className="text-amber-600 font-semibold">Advisory Heuristic</span>
                         ) : (
-                          <span className="text-slate-500">Deterministic</span>
+                          <span className="text-[#5D6A75]">Deterministic</span>
                         )}
                       </div>
                     </td>
@@ -591,7 +591,7 @@ export const ReviewQueuePage: React.FC = () => {
                     </td>
 
                     {/* Detected At */}
-                    <td className="py-2.5 px-3 whitespace-nowrap text-slate-500 text-[11px]">
+                    <td className="py-2.5 px-3 whitespace-nowrap text-[#5D6A75] text-[11px]">
                       {item.first_detected_at ? new Date(item.first_detected_at).toLocaleDateString() : '—'}
                     </td>
 
@@ -603,7 +603,7 @@ export const ReviewQueuePage: React.FC = () => {
                           setActiveFinding(item);
                           setIsDetailOpen(true);
                         }}
-                        className="inline-flex items-center gap-1 px-2 py-1 rounded bg-slate-100 group-hover:bg-sentinel-50 text-slate-600 group-hover:text-sentinel-700 font-medium text-[11px] transition-colors"
+                        className="inline-flex items-center gap-1 px-2 py-1 rounded bg-slate-100 group-hover:bg-[#EEF6FA] text-[#5D6A75] group-hover:text-[#123B5D] font-medium text-[11px] transition-colors"
                       >
                         <Eye className="w-3.5 h-3.5" />
                         Review
@@ -617,23 +617,23 @@ export const ReviewQueuePage: React.FC = () => {
         </div>
 
         {/* Pagination Footer */}
-        <div className="px-4 py-3 border-t border-slate-200 flex items-center justify-between bg-slate-50">
-          <span className="text-slate-500 text-[11px]">
+        <div className="px-4 py-3 border-t border-[#C9D3DB] flex items-center justify-between bg-[#F5F4EF]">
+          <span className="text-[#5D6A75] text-[11px]">
             Showing {(page - 1) * pageSize + 1}–{Math.min(page * pageSize, total)} of {total} findings
           </span>
           <div className="flex items-center gap-1">
             <button
               onClick={() => setPage((p) => Math.max(p - 1, 1))}
               disabled={page <= 1}
-              className="p-1 rounded border border-slate-300 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed text-slate-600"
+              className="p-1 rounded border border-[#8799A9] bg-white hover:bg-[#F5F4EF] disabled:opacity-40 disabled:cursor-not-allowed text-[#5D6A75]"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
-            <span className="px-2 text-slate-600 font-semibold">{page}</span>
+            <span className="px-2 text-[#5D6A75] font-semibold">{page}</span>
             <button
               onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
               disabled={page >= totalPages}
-              className="p-1 rounded border border-slate-300 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed text-slate-600"
+              className="p-1 rounded border border-[#8799A9] bg-white hover:bg-[#F5F4EF] disabled:opacity-40 disabled:cursor-not-allowed text-[#5D6A75]"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
@@ -648,21 +648,21 @@ export const ReviewQueuePage: React.FC = () => {
         <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex justify-end transition-opacity">
           <div className="bg-white w-full max-w-2xl h-full shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-right duration-200">
             {/* Modal Header */}
-            <div className="p-4 border-b border-slate-200 flex items-start justify-between bg-slate-50">
+            <div className="p-4 border-b border-[#C9D3DB] flex items-start justify-between bg-[#F5F4EF]">
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   {renderSeverityBadge(activeFinding.severity)}
                   {renderStatusBadge(activeFinding.status)}
-                  <span className="text-[10px] font-mono text-slate-500 bg-slate-200 px-2 py-0.5 rounded">
+                  <span className="text-[10px] font-mono text-[#5D6A75] bg-slate-200 px-2 py-0.5 rounded">
                     v{activeFinding.concurrency_version}
                   </span>
                 </div>
-                <h2 className="text-base font-bold text-slate-900 leading-snug">
+                <h2 className="text-base font-bold text-[#0D2538] leading-snug">
                   {activeFinding.title}
                 </h2>
-                <div className="flex items-center gap-3 text-slate-500 text-[11px]">
-                  <span>Rule: <strong className="font-mono text-slate-700">{activeFinding.rule_id}</strong> (v{activeFinding.rule_version})</span>
-                  <span>Category: <strong className="text-slate-700">{activeFinding.category}</strong></span>
+                <div className="flex items-center gap-3 text-[#5D6A75] text-[11px]">
+                  <span>Rule: <strong className="font-mono text-[#253746]">{activeFinding.rule_id}</strong> (v{activeFinding.rule_version})</span>
+                  <span>Category: <strong className="text-[#253746]">{activeFinding.category}</strong></span>
                 </div>
               </div>
               <button
@@ -671,7 +671,7 @@ export const ReviewQueuePage: React.FC = () => {
                   setActionType(null);
                   setActionError(null);
                 }}
-                className="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100"
+                className="text-slate-400 hover:text-[#5D6A75] p-1 rounded-lg hover:bg-slate-100"
               >
                 &times;
               </button>
@@ -680,27 +680,27 @@ export const ReviewQueuePage: React.FC = () => {
             {/* Modal Content Scrollable Area */}
             <div className="flex-1 overflow-y-auto p-5 space-y-5">
               {/* Plain-Language Explanation */}
-              <div className="bg-slate-50 border border-slate-200 rounded-lg p-3.5 space-y-2">
-                <div className="flex items-center gap-2 text-slate-700 font-semibold text-xs">
-                  <Info className="w-4 h-4 text-sentinel-600" />
+              <div className="bg-[#F5F4EF] border border-[#C9D3DB] rounded-lg p-3.5 space-y-2">
+                <div className="flex items-center gap-2 text-[#253746] font-semibold text-xs">
+                  <Info className="w-4 h-4 text-[#123B5D]" />
                   <span>Explainable Finding Details</span>
                 </div>
-                <p className="text-slate-700 text-xs leading-relaxed">
+                <p className="text-[#253746] text-xs leading-relaxed">
                   {activeFinding.explanation || 'No detailed explanation provided for this finding.'}
                 </p>
 
                 {/* Values comparison */}
                 {(activeFinding.observed_value || activeFinding.expected_value) && (
-                  <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-200 text-xs">
+                  <div className="grid grid-cols-2 gap-2 pt-2 border-t border-[#C9D3DB] text-xs">
                     <div className="bg-rose-50 border border-rose-100 rounded p-2">
                       <span className="text-[10px] font-semibold text-rose-800 block">Observed Value</span>
-                      <span className="font-mono text-slate-800 break-words">
+                      <span className="font-mono text-[#253746] break-words">
                         {activeFinding.observed_value || 'None'}
                       </span>
                     </div>
                     <div className="bg-emerald-50 border border-emerald-100 rounded p-2">
                       <span className="text-[10px] font-semibold text-emerald-800 block">Expected / Baseline</span>
-                      <span className="font-mono text-slate-800 break-words">
+                      <span className="font-mono text-[#253746] break-words">
                         {activeFinding.expected_value || 'None'}
                       </span>
                     </div>
@@ -708,52 +708,52 @@ export const ReviewQueuePage: React.FC = () => {
                 )}
 
                 {activeFinding.suggested_action && (
-                  <div className="text-[11px] text-sentinel-800 bg-sentinel-50 border border-sentinel-100 rounded p-2">
+                  <div className="text-[11px] text-[#0D2538] bg-[#EEF6FA] border border-sentinel-100 rounded p-2">
                     <strong>Recommended Next Action:</strong> {activeFinding.suggested_action}
                   </div>
                 )}
               </div>
 
               {/* Priority Score Breakdown Card */}
-              <div className="border border-slate-200 rounded-lg p-3.5 space-y-2 bg-white">
+              <div className="border border-[#C9D3DB] rounded-lg p-3.5 space-y-2 bg-white">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-slate-800 font-semibold text-xs">
+                  <div className="flex items-center gap-2 text-[#253746] font-semibold text-xs">
                     <ShieldAlert className="w-4 h-4 text-amber-500" />
                     <span>Review Priority Ordering Score: <strong>{activeFinding.priority_score} / 100</strong></span>
                   </div>
                   <button
                     onClick={() => setActiveScoreDetails(activeFinding.priority_score_details)}
-                    className="text-sentinel-600 hover:text-sentinel-800 font-medium text-[11px] underline"
+                    className="text-[#123B5D] hover:text-[#0D2538] font-medium text-[11px] underline"
                   >
                     View Formula & Basis
                   </button>
                 </div>
-                <p className="text-[11px] text-slate-500 leading-normal">
+                <p className="text-[11px] text-[#5D6A75] leading-normal">
                   {activeFinding.priority_score_details?.summary_explanation}
                 </p>
               </div>
 
               {/* Classification & Evidence References */}
               <div className="grid grid-cols-2 gap-3 text-xs">
-                <div className="border border-slate-200 rounded-lg p-3 space-y-1">
+                <div className="border border-[#C9D3DB] rounded-lg p-3 space-y-1">
                   <span className="text-[10px] text-slate-400 font-semibold uppercase">Rule Classification</span>
-                  <div className="font-medium text-slate-800">
+                  <div className="font-medium text-[#253746]">
                     {activeFinding.rule_type === 'HEURISTIC' ? 'Heuristic Advisory Indicator' : 'Deterministic Rule'}
                   </div>
-                  <div className="text-[10px] text-slate-500">
+                  <div className="text-[10px] text-[#5D6A75]">
                     {activeFinding.rule_type === 'HEURISTIC'
                       ? 'Advisory guidance only. Requires officer review; does not block automatically.'
                       : 'Deterministic hard rule enforced by configured policy specification.'}
                   </div>
                 </div>
 
-                <div className="border border-slate-200 rounded-lg p-3 space-y-1">
+                <div className="border border-[#C9D3DB] rounded-lg p-3 space-y-1">
                   <span className="text-[10px] text-slate-400 font-semibold uppercase">Policy Version Ref</span>
-                  <div className="font-mono text-slate-800 text-[11px]">
+                  <div className="font-mono text-[#253746] text-[11px]">
                     {activeFinding.policy_version_ref || 'global-default'}
                   </div>
                   <span className="text-[10px] text-slate-400 font-semibold uppercase block pt-1">Evidence References</span>
-                  <div className="text-[10px] text-slate-600 font-mono truncate">
+                  <div className="text-[10px] text-[#5D6A75] font-mono truncate">
                     {activeFinding.evidence_refs?.length
                       ? activeFinding.evidence_refs.join(', ')
                       : 'Instrument submission metadata'}
@@ -763,31 +763,31 @@ export const ReviewQueuePage: React.FC = () => {
 
               {/* Review History / Audit Timeline */}
               <div className="space-y-2">
-                <div className="flex items-center gap-2 text-slate-800 font-semibold text-xs">
-                  <MessageSquare className="w-4 h-4 text-slate-500" />
+                <div className="flex items-center gap-2 text-[#253746] font-semibold text-xs">
+                  <MessageSquare className="w-4 h-4 text-[#5D6A75]" />
                   <span>Review Observations & Action History</span>
                 </div>
 
-                <div className="border border-slate-200 rounded-lg divide-y divide-slate-100 bg-white max-h-48 overflow-y-auto">
+                <div className="border border-[#C9D3DB] rounded-lg divide-y divide-slate-100 bg-white max-h-48 overflow-y-auto">
                   {activeFinding.review_notes && activeFinding.review_notes.length > 0 ? (
                     activeFinding.review_notes.map((note, idx) => (
                       <div key={note.id || idx} className="p-3 text-xs space-y-1">
-                        <div className="flex items-center justify-between text-[10px] text-slate-500">
-                          <span className="font-semibold text-slate-700">
+                        <div className="flex items-center justify-between text-[10px] text-[#5D6A75]">
+                          <span className="font-semibold text-[#253746]">
                             {note.actor_email} ({note.actor_role})
                           </span>
                           <span>{new Date(note.timestamp).toLocaleString()}</span>
                         </div>
-                        <div className="font-mono text-[11px] font-bold text-sentinel-800">
+                        <div className="font-mono text-[11px] font-bold text-[#0D2538]">
                           {note.action}
                         </div>
                         {note.reason && (
-                          <div className="text-slate-600 bg-slate-50 border border-slate-100 rounded p-1.5 text-[11px]">
+                          <div className="text-[#5D6A75] bg-[#F5F4EF] border border-slate-100 rounded p-1.5 text-[11px]">
                             <strong>Reason:</strong> {note.reason}
                           </div>
                         )}
                         {note.note && (
-                          <div className="text-slate-600 bg-slate-50 border border-slate-100 rounded p-1.5 text-[11px]">
+                          <div className="text-[#5D6A75] bg-[#F5F4EF] border border-slate-100 rounded p-1.5 text-[11px]">
                             {note.note}
                           </div>
                         )}
@@ -808,8 +808,8 @@ export const ReviewQueuePage: React.FC = () => {
 
               {/* Officer Action Panel (if authorized) */}
               {canPerformActions && (
-                <div className="border-t border-slate-200 pt-4 space-y-3">
-                  <h3 className="font-semibold text-slate-800 text-xs">Officer Workflow Actions</h3>
+                <div className="border-t border-[#C9D3DB] pt-4 space-y-3">
+                  <h3 className="font-semibold text-[#253746] text-xs">Officer Workflow Actions</h3>
 
                   {actionError && (
                     <div className="bg-rose-50 border border-rose-200 text-rose-800 p-2.5 rounded text-xs">
@@ -859,7 +859,7 @@ export const ReviewQueuePage: React.FC = () => {
                           setActionType('OBSERVE');
                           setActionReason('');
                         }}
-                        className="px-3 py-1.5 border border-slate-300 hover:bg-slate-50 text-slate-700 rounded text-xs font-medium transition-colors shadow-sm"
+                        className="px-3 py-1.5 border border-[#8799A9] hover:bg-[#F5F4EF] text-[#253746] rounded text-xs font-medium transition-colors shadow-sm"
                       >
                         Add Observation
                       </button>
@@ -868,7 +868,7 @@ export const ReviewQueuePage: React.FC = () => {
                         onClick={() => {
                           setActionType('ASSIGN');
                         }}
-                        className="px-3 py-1.5 border border-slate-300 hover:bg-slate-50 text-slate-700 rounded text-xs font-medium transition-colors shadow-sm"
+                        className="px-3 py-1.5 border border-[#8799A9] hover:bg-[#F5F4EF] text-[#253746] rounded text-xs font-medium transition-colors shadow-sm"
                       >
                         Assign Officer...
                       </button>
@@ -886,7 +886,7 @@ export const ReviewQueuePage: React.FC = () => {
                       <button
                         onClick={handleReevaluate}
                         disabled={isLoading}
-                        className="px-3 py-1.5 border border-slate-300 hover:bg-slate-50 text-slate-700 rounded text-xs font-medium transition-colors shadow-sm inline-flex items-center gap-1"
+                        className="px-3 py-1.5 border border-[#8799A9] hover:bg-[#F5F4EF] text-[#253746] rounded text-xs font-medium transition-colors shadow-sm inline-flex items-center gap-1"
                       >
                         <RefreshCw className={cn('w-3 h-3', isLoading && 'animate-spin')} />
                         Re-evaluate Finding
@@ -894,8 +894,8 @@ export const ReviewQueuePage: React.FC = () => {
                     </div>
                   ) : (
                     /* Inline Action Confirmation Form */
-                    <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 space-y-3">
-                      <div className="flex items-center justify-between font-semibold text-slate-800 text-xs">
+                    <div className="bg-[#F5F4EF] border border-[#C9D3DB] rounded-lg p-3 space-y-3">
+                      <div className="flex items-center justify-between font-semibold text-[#253746] text-xs">
                         <span>
                           {actionType === 'RESOLVE' && 'Resolve Finding (Mandatory Reason Required)'}
                           {actionType === 'DISMISS' && 'Dismiss Finding (Mandatory Reason Required)'}
@@ -908,7 +908,7 @@ export const ReviewQueuePage: React.FC = () => {
                             setActionType(null);
                             setActionError(null);
                           }}
-                          className="text-slate-400 hover:text-slate-600 text-xs"
+                          className="text-slate-400 hover:text-[#5D6A75] text-xs"
                         >
                           Cancel
                         </button>
@@ -916,11 +916,11 @@ export const ReviewQueuePage: React.FC = () => {
 
                       {actionType === 'ASSIGN' ? (
                         <div className="space-y-2">
-                          <label className="text-[11px] text-slate-600">Select Authorized Officer:</label>
+                          <label className="text-[11px] text-[#5D6A75]">Select Authorized Officer:</label>
                           <select
                             value={selectedOfficerId}
                             onChange={(e) => setSelectedOfficerId(e.target.value)}
-                            className="w-full bg-white border border-slate-200 rounded p-2 text-xs outline-none"
+                            className="w-full bg-white border border-[#C9D3DB] rounded p-2 text-xs outline-none"
                           >
                             <option value="">-- Choose Officer --</option>
                             {officers.map((o) => (
@@ -932,7 +932,7 @@ export const ReviewQueuePage: React.FC = () => {
                           <button
                             onClick={handleAssign}
                             disabled={!selectedOfficerId || isSubmittingAction}
-                            className="px-3 py-1.5 bg-sentinel-700 hover:bg-sentinel-800 text-white rounded text-xs font-semibold disabled:opacity-50"
+                            className="px-3 py-1.5 bg-[#123B5D] hover:bg-[#0D2538] text-white rounded text-xs font-semibold disabled:opacity-50"
                           >
                             Confirm Assignment
                           </button>
@@ -948,7 +948,7 @@ export const ReviewQueuePage: React.FC = () => {
                             value={actionReason}
                             onChange={(e) => setActionReason(e.target.value)}
                             rows={3}
-                            className="w-full bg-white border border-slate-200 rounded p-2 text-xs outline-none focus:ring-1 focus:ring-sentinel-500"
+                            className="w-full bg-white border border-[#C9D3DB] rounded p-2 text-xs outline-none focus:ring-1 focus:ring-sentinel-500"
                           />
                           <div className="flex items-center justify-between">
                             <span className="text-[10px] text-slate-400">
@@ -965,7 +965,7 @@ export const ReviewQueuePage: React.FC = () => {
                                 actionReason.trim().length < (actionType === 'OBSERVE' ? 3 : 10) ||
                                 isSubmittingAction
                               }
-                              className="px-3 py-1.5 bg-sentinel-700 hover:bg-sentinel-800 text-white rounded text-xs font-semibold disabled:opacity-50"
+                              className="px-3 py-1.5 bg-[#123B5D] hover:bg-[#0D2538] text-white rounded text-xs font-semibold disabled:opacity-50"
                             >
                               {isSubmittingAction ? 'Submitting...' : 'Confirm Action'}
                             </button>
@@ -979,7 +979,7 @@ export const ReviewQueuePage: React.FC = () => {
             </div>
 
             {/* Modal Footer */}
-            <div className="p-3 border-t border-slate-200 bg-slate-50 flex items-center justify-between text-slate-500 text-[11px]">
+            <div className="p-3 border-t border-[#C9D3DB] bg-[#F5F4EF] flex items-center justify-between text-[#5D6A75] text-[11px]">
               <span>First detected: {activeFinding.first_detected_at ? new Date(activeFinding.first_detected_at).toLocaleString() : '—'}</span>
               <span>Last evaluated: {activeFinding.last_evaluated_at ? new Date(activeFinding.last_evaluated_at).toLocaleString() : '—'}</span>
             </div>
@@ -992,18 +992,18 @@ export const ReviewQueuePage: React.FC = () => {
       {/* ========================================================================= */}
       {activeScoreDetails && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-2xl max-w-xl w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+          <div className="bg-white rounded-[10px] shadow-2xl max-w-xl w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             {/* Header */}
-            <div className="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+            <div className="p-4 border-b border-[#C9D3DB] flex items-center justify-between bg-[#F5F4EF]">
               <div className="flex items-center gap-2">
                 <ShieldAlert className="w-5 h-5 text-amber-500" />
-                <h3 className="font-bold text-slate-900 text-sm">
+                <h3 className="font-bold text-[#0D2538] text-sm">
                   Review Priority Score Breakdown ({activeScoreDetails.total_score} / 100)
                 </h3>
               </div>
               <button
                 onClick={() => setActiveScoreDetails(null)}
-                className="text-slate-400 hover:text-slate-600 font-bold text-lg"
+                className="text-slate-400 hover:text-[#5D6A75] font-bold text-lg"
               >
                 &times;
               </button>
@@ -1018,27 +1018,27 @@ export const ReviewQueuePage: React.FC = () => {
 
               {/* Factor Contribution Table */}
               <div className="space-y-2">
-                <span className="font-semibold text-slate-800 text-xs">Deterministic Factor Breakdown</span>
-                <div className="border border-slate-200 rounded-lg divide-y divide-slate-100 overflow-hidden">
+                <span className="font-semibold text-[#253746] text-xs">Deterministic Factor Breakdown</span>
+                <div className="border border-[#C9D3DB] rounded-lg divide-y divide-slate-100 overflow-hidden">
                   {activeScoreDetails.factor_breakdown.map((f, i) => (
                     <div key={i} className="p-3 text-xs space-y-1 bg-white">
                       <div className="flex items-center justify-between font-medium">
-                        <span className="text-slate-800 capitalize">
+                        <span className="text-[#253746] capitalize">
                           {f.factor_name.replace(/_/g, ' ')}
                         </span>
                         <div className="flex items-center gap-1.5">
                           {f.is_missing ? (
-                            <span className="text-[10px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded border border-slate-200">
+                            <span className="text-[10px] bg-slate-100 text-[#5D6A75] px-1.5 py-0.5 rounded border border-[#C9D3DB]">
                               Unknown/Missing
                             </span>
                           ) : (
-                            <span className="font-bold text-slate-800">
+                            <span className="font-bold text-[#253746]">
                               {f.points} <span className="text-slate-400 font-normal">/ {f.max_points} pts</span>
                             </span>
                           )}
                         </div>
                       </div>
-                      <p className="text-[11px] text-slate-500 leading-normal">{f.basis}</p>
+                      <p className="text-[11px] text-[#5D6A75] leading-normal">{f.basis}</p>
                     </div>
                   ))}
                 </div>
@@ -1046,7 +1046,7 @@ export const ReviewQueuePage: React.FC = () => {
 
               {/* Missing Fields Note */}
               {activeScoreDetails.missing_fields && activeScoreDetails.missing_fields.length > 0 && (
-                <div className="text-[11px] text-slate-500 bg-slate-50 border border-slate-200 rounded p-2.5">
+                <div className="text-[11px] text-[#5D6A75] bg-[#F5F4EF] border border-[#C9D3DB] rounded p-2.5">
                   <strong>Missing / Non-penalized Inputs:</strong>{' '}
                   {activeScoreDetails.missing_fields.join(', ')}
                   <p className="text-[10px] text-slate-400 mt-0.5">
@@ -1057,7 +1057,7 @@ export const ReviewQueuePage: React.FC = () => {
             </div>
 
             {/* Footer */}
-            <div className="p-3 border-t border-slate-200 bg-slate-50 flex justify-end">
+            <div className="p-3 border-t border-[#C9D3DB] bg-[#F5F4EF] flex justify-end">
               <button
                 onClick={() => setActiveScoreDetails(null)}
                 className="px-4 py-1.5 bg-slate-700 hover:bg-slate-800 text-white rounded text-xs font-semibold"

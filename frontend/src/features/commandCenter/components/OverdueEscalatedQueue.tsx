@@ -16,15 +16,15 @@ export const OverdueEscalatedQueue: React.FC<OverdueEscalatedQueueProps> = ({
   isInstitutionUser = false,
 }) => {
   return (
-    <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+    <div className="bg-white rounded-[8px] border border-[#C9D3DB] shadow-xs overflow-hidden">
       {/* Header */}
-      <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+      <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-[#F5F4EF]/50">
         <div className="flex items-center gap-2">
           <Flame className="w-4 h-4 text-rose-600" />
-          <h3 className="font-semibold text-slate-900 text-sm">
+          <h3 className="font-semibold text-[#0D2538] text-sm">
             Overdue & Escalated Work Items
           </h3>
-          <span className="text-[10px] font-mono text-slate-500 bg-slate-200/80 px-1.5 py-0.5 rounded">
+          <span className="text-[10px] font-mono text-[#5D6A75] bg-slate-200/80 px-1.5 py-0.5 rounded">
             PRD-FR-070c
           </span>
         </div>
@@ -36,12 +36,12 @@ export const OverdueEscalatedQueue: React.FC<OverdueEscalatedQueueProps> = ({
 
       {/* Office Workload Distribution (when authorized) */}
       {!isInstitutionUser && data && Object.keys(data.by_office).length > 0 && (
-        <div className="px-4 py-2.5 bg-slate-50 border-b border-slate-100 flex flex-wrap items-center gap-2 text-xs">
-          <span className="text-slate-500 font-medium">Office Breakdown:</span>
+        <div className="px-4 py-2.5 bg-[#F5F4EF] border-b border-slate-100 flex flex-wrap items-center gap-2 text-xs">
+          <span className="text-[#5D6A75] font-medium">Office Breakdown:</span>
           {Object.entries(data.by_office).map(([office, count]) => (
             <span
               key={office}
-              className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-white border border-slate-200 text-slate-700 font-mono text-[11px]"
+              className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-white border border-[#C9D3DB] text-[#253746] font-mono text-[11px]"
             >
               <Building className="w-3 h-3 text-slate-400" />
               {office}: <strong>{count}</strong>
@@ -53,7 +53,7 @@ export const OverdueEscalatedQueue: React.FC<OverdueEscalatedQueueProps> = ({
       {/* Table */}
       <div className="overflow-x-auto max-h-80">
         <table className="w-full text-left text-xs">
-          <thead className="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200 sticky top-0">
+          <thead className="bg-[#F5F4EF] text-[#5D6A75] font-semibold border-b border-[#C9D3DB] sticky top-0">
             <tr>
               <th className="px-4 py-2.5">Record Type</th>
               <th className="px-4 py-2.5">Identifier / Reference</th>
@@ -87,19 +87,19 @@ export const OverdueEscalatedQueue: React.FC<OverdueEscalatedQueueProps> = ({
                     : `/instruments/${item.record_id}`;
 
                 return (
-                  <tr key={`${item.record_type}-${item.record_id}`} className="hover:bg-slate-50/80 transition-colors">
+                  <tr key={`${item.record_type}-${item.record_id}`} className="hover:bg-[#F5F4EF]/80 transition-colors">
                     <td className="px-4 py-2.5">
-                      <span className="font-mono text-[10px] uppercase font-bold text-slate-700 bg-slate-100 px-1.5 py-0.5 rounded">
+                      <span className="font-mono text-[10px] uppercase font-bold text-[#253746] bg-slate-100 px-1.5 py-0.5 rounded">
                         {item.record_type}
                       </span>
                     </td>
-                    <td className="px-4 py-2.5 font-mono font-medium text-slate-900">
+                    <td className="px-4 py-2.5 font-mono font-medium text-[#0D2538]">
                       {item.reference_number}
                     </td>
-                    <td className="px-4 py-2.5 text-slate-700 max-w-40 truncate">
+                    <td className="px-4 py-2.5 text-[#253746] max-w-40 truncate">
                       {item.institution_name || item.institution_id}
                     </td>
-                    <td className="px-4 py-2.5 text-slate-600">
+                    <td className="px-4 py-2.5 text-[#5D6A75]">
                       {item.assigned_office ? (
                         <span className="font-mono text-[11px]">{item.assigned_office}</span>
                       ) : (
@@ -107,7 +107,7 @@ export const OverdueEscalatedQueue: React.FC<OverdueEscalatedQueueProps> = ({
                       )}
                     </td>
                     {!isInstitutionUser && (
-                      <td className="px-4 py-2.5 text-slate-600">
+                      <td className="px-4 py-2.5 text-[#5D6A75]">
                         {item.assignee_name ? (
                           <div className="flex items-center gap-1 text-[11px]">
                             <UserCheck className="w-3 h-3 text-slate-400" />
@@ -118,7 +118,7 @@ export const OverdueEscalatedQueue: React.FC<OverdueEscalatedQueueProps> = ({
                         )}
                       </td>
                     )}
-                    <td className="px-4 py-2.5 font-mono text-slate-600">
+                    <td className="px-4 py-2.5 font-mono text-[#5D6A75]">
                       {item.due_date || 'N/A'}
                     </td>
                     <td className="px-4 py-2.5">
@@ -133,13 +133,13 @@ export const OverdueEscalatedQueue: React.FC<OverdueEscalatedQueueProps> = ({
                           Escalated ({item.escalation_role || 'Higher Office'})
                         </span>
                       ) : (
-                        <span className="text-slate-600 text-xs">{item.due_condition}</span>
+                        <span className="text-[#5D6A75] text-xs">{item.due_condition}</span>
                       )}
                     </td>
                     <td className="px-4 py-2.5 text-right">
                       <Link
                         to={routeUrl}
-                        className="inline-flex items-center gap-1 text-sentinel-600 hover:text-sentinel-800 font-medium"
+                        className="inline-flex items-center gap-1 text-[#123B5D] hover:text-[#0D2538] font-medium"
                       >
                         Open <ArrowUpRight className="w-3 h-3" />
                       </Link>

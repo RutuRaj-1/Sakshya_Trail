@@ -22,7 +22,7 @@ export const InstrumentSummaryCards: React.FC<Props> = ({ summary, isLoading }) 
       value: summary ? formatINR(summary.total_deposit_value) : '₹0',
       subtitle: `${summary?.total_instruments || 0} Total Instruments`,
       icon: Coins,
-      color: 'text-sentinel-700 bg-sentinel-50 border-sentinel-200',
+      color: 'text-[#123B5D] bg-[#EEF6FA] border-[#C4DEED]',
     },
     {
       title: 'Active Deposits',
@@ -50,7 +50,7 @@ export const InstrumentSummaryCards: React.FC<Props> = ({ summary, isLoading }) 
       value: summary ? summary.released_count.toString() : '0',
       subtitle: 'Authorized refunds completed',
       icon: CheckCircle,
-      color: 'text-slate-700 bg-slate-50 border-slate-200',
+      color: 'text-[#253746] bg-[#F5F4EF] border-[#C9D3DB]',
     },
   ];
 
@@ -59,20 +59,20 @@ export const InstrumentSummaryCards: React.FC<Props> = ({ summary, isLoading }) 
       {cards.map((c, i) => (
         <Card key={i} className="flex flex-col justify-between p-4">
           <div className="flex items-start justify-between">
-            <span className="text-xs font-medium text-slate-500">{c.title}</span>
+            <span className="text-xs font-medium text-[#5D6A75]">{c.title}</span>
             <div className={`p-2 rounded-lg border ${c.color}`}>
               <c.icon className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-3">
-            <div className="text-xl font-bold tracking-tight text-slate-900">
+            <div className="text-xl font-bold tracking-tight text-[#0D2538]">
               {isLoading ? (
                 <div className="h-6 w-20 bg-slate-200 rounded animate-pulse" />
               ) : (
                 c.value
               )}
             </div>
-            <div className="text-[11px] text-slate-500 mt-0.5">{c.subtitle}</div>
+            <div className="text-[11px] text-[#5D6A75] mt-0.5">{c.subtitle}</div>
           </div>
         </Card>
       ))}

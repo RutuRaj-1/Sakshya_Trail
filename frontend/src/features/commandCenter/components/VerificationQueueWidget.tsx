@@ -14,20 +14,20 @@ export const VerificationQueueWidget: React.FC<VerificationQueueWidgetProps> = (
   isLoading,
 }) => {
   return (
-    <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+    <div className="bg-white rounded-[8px] border border-[#C9D3DB] shadow-xs overflow-hidden">
       {/* Header */}
-      <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+      <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-[#F5F4EF]/50">
         <div>
           <div className="flex items-center gap-2">
             <ShieldAlert className="w-4 h-4 text-purple-600" />
-            <h3 className="font-semibold text-slate-900 text-sm">
+            <h3 className="font-semibold text-[#0D2538] text-sm">
               Bank Verification Desk & Telemetry
             </h3>
-            <span className="text-[10px] font-mono text-slate-500 bg-slate-200/80 px-1.5 py-0.5 rounded">
+            <span className="text-[10px] font-mono text-[#5D6A75] bg-slate-200/80 px-1.5 py-0.5 rounded">
               PRD-FR-070d
             </span>
           </div>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-[#5D6A75] mt-0.5">
             Real-time tracking of in-flight requests, adapter health, and aging distribution.
           </p>
         </div>
@@ -41,9 +41,9 @@ export const VerificationQueueWidget: React.FC<VerificationQueueWidgetProps> = (
 
       {/* Age Distribution Strips */}
       {data && (
-        <div className="px-4 py-2.5 bg-slate-50 border-b border-slate-100 flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div className="px-4 py-2.5 bg-[#F5F4EF] border-b border-slate-100 flex flex-wrap items-center justify-between gap-3 text-xs">
           <div className="flex items-center gap-3">
-            <span className="text-slate-500 font-medium">Aging Distribution:</span>
+            <span className="text-[#5D6A75] font-medium">Aging Distribution:</span>
             <span className="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-mono text-[11px]">
               &lt;7d: <strong>{data.age_distribution['<7d'] ?? 0}</strong>
             </span>
@@ -57,8 +57,8 @@ export const VerificationQueueWidget: React.FC<VerificationQueueWidgetProps> = (
               &gt;30d: <strong>{data.age_distribution['>30d'] ?? 0}</strong>
             </span>
           </div>
-          <div className="text-slate-500 text-xs">
-            Average Aging: <strong className="text-slate-800">{data.average_age_days} days</strong>
+          <div className="text-[#5D6A75] text-xs">
+            Average Aging: <strong className="text-[#253746]">{data.average_age_days} days</strong>
           </div>
         </div>
       )}
@@ -66,7 +66,7 @@ export const VerificationQueueWidget: React.FC<VerificationQueueWidgetProps> = (
       {/* Table */}
       <div className="overflow-x-auto max-h-72">
         <table className="w-full text-left text-xs">
-          <thead className="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200 sticky top-0">
+          <thead className="bg-[#F5F4EF] text-[#5D6A75] font-semibold border-b border-[#C9D3DB] sticky top-0">
             <tr>
               <th className="px-4 py-2.5">Reference Code</th>
               <th className="px-4 py-2.5">FDR Reference</th>
@@ -97,19 +97,19 @@ export const VerificationQueueWidget: React.FC<VerificationQueueWidgetProps> = (
                   item.channel === 'SIMULATED';
 
                 return (
-                  <tr key={item.request_id} className="hover:bg-slate-50/80 transition-colors">
-                    <td className="px-4 py-2.5 font-mono font-medium text-slate-900">
+                  <tr key={item.request_id} className="hover:bg-[#F5F4EF]/80 transition-colors">
+                    <td className="px-4 py-2.5 font-mono font-medium text-[#0D2538]">
                       {item.reference_code}
                     </td>
-                    <td className="px-4 py-2.5 font-mono text-slate-700">
+                    <td className="px-4 py-2.5 font-mono text-[#253746]">
                       {item.instrument_reference}
                     </td>
-                    <td className="px-4 py-2.5 text-slate-700">
+                    <td className="px-4 py-2.5 text-[#253746]">
                       {item.bank_name}
                     </td>
                     <td className="px-4 py-2.5">
                       <div className="flex items-center gap-1.5">
-                        <span className="font-mono text-[11px] text-slate-700">{item.channel}</span>
+                        <span className="font-mono text-[11px] text-[#253746]">{item.channel}</span>
                         {isSimulated && (
                           <span
                             className="bg-amber-100 text-amber-800 border border-amber-300 text-[10px] font-bold px-1.5 py-0.2 rounded inline-flex items-center gap-0.5"
@@ -121,7 +121,7 @@ export const VerificationQueueWidget: React.FC<VerificationQueueWidgetProps> = (
                       </div>
                     </td>
                     <td className="px-4 py-2.5">
-                      <span className="inline-flex items-center gap-1 font-mono text-slate-700">
+                      <span className="inline-flex items-center gap-1 font-mono text-[#253746]">
                         <Clock className="w-3 h-3 text-slate-400" />
                         {item.age_days}d
                       </span>
@@ -133,7 +133,7 @@ export const VerificationQueueWidget: React.FC<VerificationQueueWidgetProps> = (
                           Source Unavailable
                         </span>
                       ) : (
-                        <span className="text-[11px] font-semibold text-slate-700 bg-slate-100 px-1.5 py-0.5 rounded">
+                        <span className="text-[11px] font-semibold text-[#253746] bg-slate-100 px-1.5 py-0.5 rounded">
                           {item.status}
                         </span>
                       )}
@@ -141,7 +141,7 @@ export const VerificationQueueWidget: React.FC<VerificationQueueWidgetProps> = (
                     <td className="px-4 py-2.5 text-right">
                       <Link
                         to={`/verification/${item.instrument_id}`}
-                        className="inline-flex items-center gap-1 text-sentinel-600 hover:text-sentinel-800 font-medium"
+                        className="inline-flex items-center gap-1 text-[#123B5D] hover:text-[#0D2538] font-medium"
                       >
                         Verify Desk <ExternalLink className="w-3 h-3" />
                       </Link>

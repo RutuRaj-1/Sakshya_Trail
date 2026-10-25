@@ -214,40 +214,40 @@ export const UnifiedSearchPage: React.FC = () => {
   return (
     <div className="space-y-6 max-w-7xl mx-auto text-xs pb-16">
       {/* Page Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 pb-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#C9D3DB] pb-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="font-mono text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-sentinel-100 text-sentinel-800">
+            <span className="font-mono text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-[#EEF6FA] text-[#0D2538]">
               Module 7 Search Desk
             </span>
             <span className="text-slate-400">•</span>
-            <span className="text-slate-500 font-medium">Server-Backed Query Engine</span>
+            <span className="text-[#5D6A75] font-medium">Server-Backed Query Engine</span>
           </div>
-          <h1 className="text-2xl font-bold text-slate-900 mt-1">Unified Record Search & History Drill-Down</h1>
-          <p className="text-slate-500 text-xs mt-0.5">
+          <h1 className="text-2xl font-bold text-[#0D2538] mt-1">Unified Record Search & History Drill-Down</h1>
+          <p className="text-[#5D6A75] text-xs mt-0.5">
             Locate FDR deposit instruments and release cases across authorized scopes with parameterized multi-attribute filtering.
           </p>
         </div>
 
         {/* Domain Switcher */}
-        <div className="inline-flex items-center p-1 bg-slate-100 rounded-xl border border-slate-200">
+        <div className="inline-flex items-center p-1 bg-slate-100 rounded-[8px] border border-[#C9D3DB]">
           <button
             onClick={() => updateParams({ domain: 'instruments', page: '1' })}
             className={`flex items-center gap-2 px-4 py-1.5 rounded-lg font-semibold transition-all ${
               domain === 'instruments'
-                ? 'bg-white text-slate-900 shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-white text-[#0D2538] shadow-xs'
+                : 'text-[#5D6A75] hover:text-[#0D2538]'
             }`}
           >
-            <FileSpreadsheet className="w-3.5 h-3.5 text-sentinel-600" />
+            <FileSpreadsheet className="w-3.5 h-3.5 text-[#0F766E]" />
             <span>FDR Instruments</span>
           </button>
           <button
             onClick={() => updateParams({ domain: 'cases', page: '1' })}
             className={`flex items-center gap-2 px-4 py-1.5 rounded-lg font-semibold transition-all ${
               domain === 'cases'
-                ? 'bg-white text-slate-900 shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-white text-[#0D2538] shadow-xs'
+                : 'text-[#5D6A75] hover:text-[#0D2538]'
             }`}
           >
             <FileCheck2 className="w-3.5 h-3.5 text-purple-600" />
@@ -257,7 +257,7 @@ export const UnifiedSearchPage: React.FC = () => {
       </div>
 
       {/* Main Search Bar & Quick Filters */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-4 space-y-4">
+      <div className="bg-white rounded-[10px] border border-[#C9D3DB] shadow-xs p-4 space-y-4">
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -276,14 +276,14 @@ export const UnifiedSearchPage: React.FC = () => {
                   ? 'Search by instrument reference, institution name, or issuing bank...'
                   : 'Search by case reference number, institution, or instrument ID...'
               }
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-sentinel-500 focus:border-sentinel-500 text-xs text-slate-800 placeholder-slate-400"
+              className="w-full pl-10 pr-4 py-2.5 rounded-[8px] border border-slate-300 focus:outline-none focus:ring-2 focus:ring-sentinel-500 focus:border-sentinel-500 text-xs text-[#253746] placeholder-slate-400"
             />
           </div>
 
           <div className="flex items-center gap-2 w-full sm:w-auto">
             <button
               type="submit"
-              className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-sentinel-600 hover:bg-sentinel-700 text-white font-semibold transition-colors flex items-center justify-center gap-1.5"
+              className="w-full sm:w-auto px-4 py-2.5 rounded-[8px] bg-[#0F766E] hover:bg-[#09544E] text-white font-semibold transition-colors flex items-center justify-center gap-1.5"
             >
               <Search className="w-3.5 h-3.5" />
               <span>Search</span>
@@ -291,10 +291,10 @@ export const UnifiedSearchPage: React.FC = () => {
             <button
               type="button"
               onClick={() => setShowAdvanced(!showAdvanced)}
-              className={`px-3 py-2.5 rounded-xl border font-semibold flex items-center gap-1.5 transition-colors ${
+              className={`px-3 py-2.5 rounded-[8px] border font-semibold flex items-center gap-1.5 transition-colors ${
                 showAdvanced || activeFilters.length > 0
-                  ? 'bg-sentinel-50 border-sentinel-300 text-sentinel-700'
-                  : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-50'
+                  ? 'bg-[#EEF6FA] border-sentinel-300 text-[#123B5D]'
+                  : 'bg-white border-slate-300 text-[#253746] hover:bg-[#F5F4EF]'
               }`}
             >
               <SlidersHorizontal className="w-3.5 h-3.5" />
@@ -305,7 +305,7 @@ export const UnifiedSearchPage: React.FC = () => {
                 type="button"
                 onClick={handleResetFilters}
                 title="Reset all filters"
-                className="p-2.5 rounded-xl border border-slate-300 hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition-colors"
+                className="p-2.5 rounded-[8px] border border-slate-300 hover:bg-slate-100 text-[#5D6A75] hover:text-[#253746] transition-colors"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
               </button>
@@ -319,13 +319,13 @@ export const UnifiedSearchPage: React.FC = () => {
             {domain === 'instruments' && (
               <>
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                  <label className="block text-[11px] font-semibold text-[#253746] mb-1">
                     Administrative Status
                   </label>
                   <select
                     value={status}
                     onChange={(e) => updateParams({ status: e.target.value })}
-                    className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white text-slate-800 focus:ring-1 focus:ring-sentinel-500"
+                    className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white text-[#253746] focus:ring-1 focus:ring-sentinel-500"
                   >
                     <option value="">All Statuses</option>
                     <option value="REGISTERED">REGISTERED</option>
@@ -340,13 +340,13 @@ export const UnifiedSearchPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                  <label className="block text-[11px] font-semibold text-[#253746] mb-1">
                     Trust Provenance Level
                   </label>
                   <select
                     value={trustLevel}
                     onChange={(e) => updateParams({ trust: e.target.value })}
-                    className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white text-slate-800 focus:ring-1 focus:ring-sentinel-500"
+                    className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white text-[#253746] focus:ring-1 focus:ring-sentinel-500"
                   >
                     <option value="">All Trust Levels</option>
                     <option value="L0_DECLARED">L0 — Declared</option>
@@ -357,13 +357,13 @@ export const UnifiedSearchPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                  <label className="block text-[11px] font-semibold text-[#253746] mb-1">
                     Priority Queue Category
                   </label>
                   <select
                     value={priorityCategory}
                     onChange={(e) => updateParams({ priority: e.target.value })}
-                    className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white text-slate-800 focus:ring-1 focus:ring-sentinel-500"
+                    className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white text-[#253746] focus:ring-1 focus:ring-sentinel-500"
                   >
                     <option value="">All Categories</option>
                     <option value="CRITICAL_OVERDUE">Critical Overdue (&gt;30d)</option>
@@ -374,7 +374,7 @@ export const UnifiedSearchPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                  <label className="block text-[11px] font-semibold text-[#253746] mb-1">
                     Discrepancy Flag
                   </label>
                   <label className="flex items-center gap-2 mt-2 cursor-pointer">
@@ -384,14 +384,14 @@ export const UnifiedSearchPage: React.FC = () => {
                       onChange={(e) =>
                         updateParams({ discrepancies: e.target.checked ? 'true' : null })
                       }
-                      className="rounded border-slate-300 text-sentinel-600 focus:ring-sentinel-500 w-4 h-4"
+                      className="rounded border-slate-300 text-[#0F766E] focus:ring-sentinel-500 w-4 h-4"
                     />
-                    <span className="text-slate-700 font-medium">Active Discrepancies Only</span>
+                    <span className="text-[#253746] font-medium">Active Discrepancies Only</span>
                   </label>
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                  <label className="block text-[11px] font-semibold text-[#253746] mb-1">
                     Issuing Bank Name
                   </label>
                   <input
@@ -399,12 +399,12 @@ export const UnifiedSearchPage: React.FC = () => {
                     value={bank}
                     onChange={(e) => updateParams({ bank: e.target.value })}
                     placeholder="e.g. State Bank of India"
-                    className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white text-slate-800"
+                    className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white text-[#253746]"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                  <label className="block text-[11px] font-semibold text-[#253746] mb-1">
                     Assigned Office / Region
                   </label>
                   <input
@@ -412,31 +412,31 @@ export const UnifiedSearchPage: React.FC = () => {
                     value={assignedOffice}
                     onChange={(e) => updateParams({ office: e.target.value })}
                     placeholder="e.g. Northern Regional Office"
-                    className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white text-slate-800"
+                    className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white text-[#253746]"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                  <label className="block text-[11px] font-semibold text-[#253746] mb-1">
                     Matures Before
                   </label>
                   <input
                     type="date"
                     value={maturityTo}
                     onChange={(e) => updateParams({ mat_to: e.target.value })}
-                    className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white text-slate-800"
+                    className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white text-[#253746]"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                  <label className="block text-[11px] font-semibold text-[#253746] mb-1">
                     Issued After
                   </label>
                   <input
                     type="date"
                     value={issueFrom}
                     onChange={(e) => updateParams({ issue_from: e.target.value })}
-                    className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white text-slate-800"
+                    className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white text-[#253746]"
                   />
                 </div>
               </>
@@ -445,13 +445,13 @@ export const UnifiedSearchPage: React.FC = () => {
             {domain === 'cases' && (
               <>
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                  <label className="block text-[11px] font-semibold text-[#253746] mb-1">
                     Workflow Status
                   </label>
                   <select
                     value={status}
                     onChange={(e) => updateParams({ status: e.target.value })}
-                    className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white text-slate-800"
+                    className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white text-[#253746]"
                   >
                     <option value="">All Statuses</option>
                     <option value="DRAFT">DRAFT</option>
@@ -466,7 +466,7 @@ export const UnifiedSearchPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                  <label className="block text-[11px] font-semibold text-[#253746] mb-1">
                     Assigned Office
                   </label>
                   <input
@@ -474,19 +474,19 @@ export const UnifiedSearchPage: React.FC = () => {
                     value={assignedOffice}
                     onChange={(e) => updateParams({ office: e.target.value })}
                     placeholder="e.g. Headquarters"
-                    className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white text-slate-800"
+                    className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white text-[#253746]"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                  <label className="block text-[11px] font-semibold text-[#253746] mb-1">
                     Created After
                   </label>
                   <input
                     type="date"
                     value={issueFrom}
                     onChange={(e) => updateParams({ issue_from: e.target.value })}
-                    className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white text-slate-800"
+                    className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white text-[#253746]"
                   />
                 </div>
               </>
@@ -497,14 +497,14 @@ export const UnifiedSearchPage: React.FC = () => {
         {/* Active Filter Badges */}
         {activeFilters.length > 0 && (
           <div className="flex flex-wrap items-center gap-1.5 pt-2 border-t border-slate-100">
-            <span className="text-[11px] font-semibold text-slate-500 mr-1">Active Filters:</span>
+            <span className="text-[11px] font-semibold text-[#5D6A75] mr-1">Active Filters:</span>
             {activeFilters.map((f) => (
               <span
                 key={f.key}
-                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 border border-slate-200 text-[11px] font-medium"
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-100 text-[#253746] border border-[#C9D3DB] text-[11px] font-medium"
               >
                 <span>
-                  {f.label}: <strong className="text-slate-900">{f.value}</strong>
+                  {f.label}: <strong className="text-[#0D2538]">{f.value}</strong>
                 </span>
                 <button
                   type="button"
@@ -518,7 +518,7 @@ export const UnifiedSearchPage: React.FC = () => {
             <button
               type="button"
               onClick={handleResetFilters}
-              className="text-[11px] text-sentinel-600 hover:text-sentinel-800 font-semibold underline ml-2"
+              className="text-[11px] text-[#0F766E] hover:text-[#0D2538] font-semibold underline ml-2"
             >
               Clear All
             </button>
@@ -528,7 +528,7 @@ export const UnifiedSearchPage: React.FC = () => {
 
       {/* Error Banner */}
       {error && (
-        <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 flex items-start gap-3">
+        <div className="p-4 rounded-[8px] bg-rose-50 border border-rose-200 text-rose-800 flex items-start gap-3">
           <AlertCircle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
           <div className="flex-1">
             <h4 className="font-semibold text-xs">Search Request Failed</h4>
@@ -544,14 +544,14 @@ export const UnifiedSearchPage: React.FC = () => {
       )}
 
       {/* Results Section */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+      <div className="bg-white rounded-[10px] border border-[#C9D3DB] shadow-xs overflow-hidden">
         {/* Results Header */}
         <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <h2 className="font-bold text-slate-800 text-sm">
+            <h2 className="font-bold text-[#253746] text-sm">
               {domain === 'instruments' ? 'FDR Instrument Records' : 'Release & Refund Case Records'}
             </h2>
-            <span className="font-mono text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 font-semibold">
+            <span className="font-mono text-xs px-2 py-0.5 rounded-full bg-slate-100 text-[#253746] font-semibold">
               {totalCount.toLocaleString()} {totalCount === 1 ? 'result' : 'results'}
             </span>
           </div>
@@ -562,23 +562,23 @@ export const UnifiedSearchPage: React.FC = () => {
 
         {/* Loading Spinner */}
         {isLoading ? (
-          <div className="py-20 text-center text-slate-500">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-slate-200 border-t-sentinel-600 mb-3" />
+          <div className="py-20 text-center text-[#5D6A75]">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-[#C9D3DB] border-t-sentinel-600 mb-3" />
             <p className="font-medium text-xs">Querying database with authorized filters...</p>
           </div>
         ) : domain === 'instruments' ? (
           /* Instruments Table */
           instruments.length === 0 ? (
-            <div className="py-16 text-center text-slate-500">
+            <div className="py-16 text-center text-[#5D6A75]">
               <FileSpreadsheet className="w-10 h-10 text-slate-300 mx-auto mb-2" />
-              <p className="font-semibold text-slate-700">No FDR instruments match criteria</p>
+              <p className="font-semibold text-[#253746]">No FDR instruments match criteria</p>
               <p className="text-slate-400 text-[11px] max-w-sm mx-auto mt-1">
                 Try widening date ranges, clearing specific bank filters, or resetting search keywords.
               </p>
               {activeFilters.length > 0 && (
                 <button
                   onClick={handleResetFilters}
-                  className="mt-4 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-semibold text-xs transition-colors"
+                  className="mt-4 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-[#253746] rounded-lg font-semibold text-xs transition-colors"
                 >
                   Reset Active Filters
                 </button>
@@ -588,7 +588,7 @@ export const UnifiedSearchPage: React.FC = () => {
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="bg-slate-50 text-slate-500 uppercase text-[10px] tracking-wider font-semibold border-b border-slate-200">
+                  <tr className="bg-[#F5F4EF] text-[#5D6A75] uppercase text-[10px] tracking-wider font-semibold border-b border-[#C9D3DB]">
                     <th
                       onClick={() => handleSort('reference_number')}
                       className="px-6 py-3 cursor-pointer hover:bg-slate-100 transition-colors"
@@ -636,11 +636,11 @@ export const UnifiedSearchPage: React.FC = () => {
                   {instruments.map((item) => (
                     <tr
                       key={item.id}
-                      className="hover:bg-slate-50/70 transition-colors group cursor-pointer"
+                      className="hover:bg-[#F5F4EF]/70 transition-colors group cursor-pointer"
                       onClick={() => navigate(`/instruments/${item.id}`)}
                     >
                       <td className="px-6 py-3.5">
-                        <span className="font-mono font-bold text-slate-900 group-hover:text-sentinel-700 transition-colors">
+                        <span className="font-mono font-bold text-[#0D2538] group-hover:text-[#123B5D] transition-colors">
                           {item.reference_number}
                         </span>
                         {item.assigned_office && (
@@ -650,20 +650,20 @@ export const UnifiedSearchPage: React.FC = () => {
                         )}
                       </td>
                       <td className="px-6 py-3.5 max-w-xs">
-                        <span className="font-medium text-slate-800 line-clamp-1">
+                        <span className="font-medium text-[#253746] line-clamp-1">
                           {item.institution_name || item.institution_id}
                         </span>
                       </td>
                       <td className="px-6 py-3.5">
-                        <span className="text-slate-800 font-medium">{item.bank_name}</span>
+                        <span className="text-[#253746] font-medium">{item.bank_name}</span>
                         {item.branch && (
                           <span className="block text-[10px] text-slate-400">{item.branch}</span>
                         )}
                       </td>
-                      <td className="px-6 py-3.5 text-right font-mono font-bold text-slate-900">
+                      <td className="px-6 py-3.5 text-right font-mono font-bold text-[#0D2538]">
                         {formatINR(Number(item.amount))}
                       </td>
-                      <td className="px-6 py-3.5 font-mono text-slate-700">
+                      <td className="px-6 py-3.5 font-mono text-[#253746]">
                         {formatDate(item.maturity_date)}
                       </td>
                       <td className="px-6 py-3.5">
@@ -699,7 +699,7 @@ export const UnifiedSearchPage: React.FC = () => {
                         <Link
                           to={`/instruments/${item.id}`}
                           onClick={(e) => e.stopPropagation()}
-                          className="inline-flex items-center gap-1 text-sentinel-600 hover:text-sentinel-800 font-semibold group-hover:underline"
+                          className="inline-flex items-center gap-1 text-[#0F766E] hover:text-[#0D2538] font-semibold group-hover:underline"
                         >
                           <span>Inspect</span>
                           <ExternalLink className="w-3 h-3" />
@@ -714,9 +714,9 @@ export const UnifiedSearchPage: React.FC = () => {
         ) : (
           /* Release Cases Table */
           releaseCases.length === 0 ? (
-            <div className="py-16 text-center text-slate-500">
+            <div className="py-16 text-center text-[#5D6A75]">
               <FileCheck2 className="w-10 h-10 text-slate-300 mx-auto mb-2" />
-              <p className="font-semibold text-slate-700">No release/refund cases match criteria</p>
+              <p className="font-semibold text-[#253746]">No release/refund cases match criteria</p>
               <p className="text-slate-400 text-[11px] max-w-sm mx-auto mt-1">
                 Verify case status, assigned office, or search keywords.
               </p>
@@ -725,7 +725,7 @@ export const UnifiedSearchPage: React.FC = () => {
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="bg-slate-50 text-slate-500 uppercase text-[10px] tracking-wider font-semibold border-b border-slate-200">
+                  <tr className="bg-[#F5F4EF] text-[#5D6A75] uppercase text-[10px] tracking-wider font-semibold border-b border-[#C9D3DB]">
                     <th
                       onClick={() => handleSort('case_number')}
                       className="px-6 py-3 cursor-pointer hover:bg-slate-100 transition-colors"
@@ -757,26 +757,26 @@ export const UnifiedSearchPage: React.FC = () => {
                   {releaseCases.map((c) => (
                     <tr
                       key={c.id}
-                      className="hover:bg-slate-50/70 transition-colors group cursor-pointer"
+                      className="hover:bg-[#F5F4EF]/70 transition-colors group cursor-pointer"
                       onClick={() => navigate(`/release/${c.id}`)}
                     >
                       <td className="px-6 py-3.5">
-                        <span className="font-mono font-bold text-slate-900 group-hover:text-purple-700 transition-colors">
+                        <span className="font-mono font-bold text-[#0D2538] group-hover:text-purple-700 transition-colors">
                           {c.case_number}
                         </span>
                       </td>
                       <td className="px-6 py-3.5">
-                        <span className="font-mono text-slate-700">
+                        <span className="font-mono text-[#253746]">
                           {c.instrument_reference || c.instrument_id}
                         </span>
                       </td>
                       <td className="px-6 py-3.5 max-w-xs">
-                        <span className="font-medium text-slate-800 line-clamp-1">
+                        <span className="font-medium text-[#253746] line-clamp-1">
                           {c.institution_name || c.institution_id}
                         </span>
                       </td>
                       <td className="px-6 py-3.5">
-                        <span className="text-slate-700 font-medium">{c.case_type}</span>
+                        <span className="text-[#253746] font-medium">{c.case_type}</span>
                         <span className="block text-[10px] text-slate-400">{c.request_type}</span>
                       </td>
                       <td className="px-6 py-3.5">
@@ -799,7 +799,7 @@ export const UnifiedSearchPage: React.FC = () => {
                               ? 'bg-emerald-100 text-emerald-800'
                               : c.readiness_outcome === 'BLOCKED'
                               ? 'bg-rose-100 text-rose-800'
-                              : 'bg-slate-100 text-slate-600'
+                              : 'bg-slate-100 text-[#5D6A75]'
                           }`}
                         >
                           {c.readiness_outcome || 'UNASSESSED'}
@@ -812,7 +812,7 @@ export const UnifiedSearchPage: React.FC = () => {
                           <span className="text-emerald-600 font-bold">0</span>
                         )}
                       </td>
-                      <td className="px-6 py-3.5 font-mono text-slate-700">
+                      <td className="px-6 py-3.5 font-mono text-[#253746]">
                         {formatDate(c.created_at)}
                       </td>
                       <td className="px-6 py-3.5 text-right">
@@ -835,8 +835,8 @@ export const UnifiedSearchPage: React.FC = () => {
 
         {/* Pagination Bar */}
         {totalCount > pageSize && (
-          <div className="px-6 py-3 bg-slate-50/70 border-t border-slate-200 flex items-center justify-between">
-            <span className="text-slate-500 text-[11px]">
+          <div className="px-6 py-3 bg-[#F5F4EF]/70 border-t border-[#C9D3DB] flex items-center justify-between">
+            <span className="text-[#5D6A75] text-[11px]">
               Showing {(page - 1) * pageSize + 1} to{' '}
               {Math.min(page * pageSize, totalCount)} of {totalCount} records
             </span>
@@ -844,17 +844,17 @@ export const UnifiedSearchPage: React.FC = () => {
               <button
                 disabled={page <= 1 || isLoading}
                 onClick={() => updateParams({ page: (page - 1).toString() })}
-                className="p-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed text-slate-700 transition-colors"
+                className="p-1.5 rounded-lg border border-slate-300 bg-white hover:bg-[#F5F4EF] disabled:opacity-40 disabled:cursor-not-allowed text-[#253746] transition-colors"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
-              <span className="px-2 font-mono text-slate-700 font-semibold">
+              <span className="px-2 font-mono text-[#253746] font-semibold">
                 {page} / {totalPages}
               </span>
               <button
                 disabled={page >= totalPages || isLoading}
                 onClick={() => updateParams({ page: (page + 1).toString() })}
-                className="p-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed text-slate-700 transition-colors"
+                className="p-1.5 rounded-lg border border-slate-300 bg-white hover:bg-[#F5F4EF] disabled:opacity-40 disabled:cursor-not-allowed text-[#253746] transition-colors"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>

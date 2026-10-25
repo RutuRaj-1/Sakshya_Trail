@@ -92,10 +92,10 @@ export const StatusOverviewCards: React.FC<StatusOverviewCardsProps> = ({
       count: data?.pending_count ?? 0,
       description: 'Intake or deficiency review',
       icon: FileClock,
-      borderClass: 'border-slate-300 hover:border-slate-400',
-      bgClass: 'bg-slate-500/5',
-      badgeClass: 'bg-slate-200 text-slate-800',
-      iconClass: 'text-slate-600',
+      borderClass: 'border-[#8799A9] hover:border-slate-400',
+      bgClass: 'bg-[#F5F4EF]0/5',
+      badgeClass: 'bg-slate-200 text-[#253746]',
+      iconClass: 'text-[#5D6A75]',
       navFilter: 'UNDER_SCRUTINY',
     },
   ];
@@ -104,24 +104,24 @@ export const StatusOverviewCards: React.FC<StatusOverviewCardsProps> = ({
     <section aria-labelledby="status-overview-heading" className="space-y-3">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div>
-          <h2 id="status-overview-heading" className="text-base font-semibold text-slate-900 flex items-center gap-2">
+          <h2 id="status-overview-heading" className="text-base font-semibold text-[#0D2538] flex items-center gap-2">
             <span>Administrative Status Overview</span>
-            <span className="text-xs font-mono font-normal text-slate-500 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+            <span className="text-xs font-mono font-normal text-[#5D6A75] bg-slate-100 px-2 py-0.5 rounded border border-[#C9D3DB]">
               PRD-FR-070a
             </span>
           </h2>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-[#5D6A75]">
             Strict separation between administrative state, trust level, and release eligibility.
           </p>
         </div>
         {data && (
-          <div className="text-xs text-slate-600 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200 flex items-center gap-3">
+          <div className="text-xs text-[#5D6A75] bg-slate-100 px-3 py-1.5 rounded-lg border border-[#C9D3DB] flex items-center gap-3">
             <span>
-              Total Scope: <strong className="text-slate-900">{data.total_instruments}</strong> FDRs
+              Total Scope: <strong className="text-[#0D2538]">{data.total_instruments}</strong> FDRs
             </span>
             <span className="text-slate-300">|</span>
             <span>
-              Total Value: <strong className="text-slate-900">{formatINR(data.total_deposit_value)}</strong>
+              Total Value: <strong className="text-[#0D2538]">{formatINR(data.total_deposit_value)}</strong>
             </span>
           </div>
         )}
@@ -134,7 +134,7 @@ export const StatusOverviewCards: React.FC<StatusOverviewCardsProps> = ({
             <div
               key={card.metricId}
               onClick={() => navigate(`/instruments?status=${encodeURIComponent(card.navFilter)}`)}
-              className={`rounded-xl border p-4 bg-white shadow-xs cursor-pointer transition-all duration-150 relative overflow-hidden group select-none ${card.borderClass} ${card.bgClass}`}
+              className={`rounded-[8px] border p-4 bg-white shadow-xs cursor-pointer transition-all duration-150 relative overflow-hidden group select-none ${card.borderClass} ${card.bgClass}`}
               role="button"
               tabIndex={0}
               onKeyDown={(e) => {
@@ -156,29 +156,29 @@ export const StatusOverviewCards: React.FC<StatusOverviewCardsProps> = ({
                         e.stopPropagation();
                         onOpenDictionary(card.metricId);
                       }}
-                      className="text-[10px] text-slate-400 hover:text-slate-700 p-0.5"
+                      className="text-[10px] text-slate-400 hover:text-[#253746] p-0.5"
                       title="Inspect Metric Definition (PRD-FR-077)"
                       aria-label={`Inspect ${card.title} definition`}
                     >
                       ℹ️
                     </button>
                   )}
-                  <ArrowUpRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-700 transition-colors" />
+                  <ArrowUpRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#253746] transition-colors" />
                 </div>
               </div>
 
               <div className="mt-3">
-                <div className="text-2xl font-bold text-slate-900 tracking-tight">
+                <div className="text-2xl font-bold text-[#0D2538] tracking-tight">
                   {isLoading ? (
                     <div className="h-7 w-12 bg-slate-200 animate-pulse rounded" />
                   ) : (
                     card.count
                   )}
                 </div>
-                <div className="text-xs font-semibold text-slate-700 mt-1 line-clamp-1">
+                <div className="text-xs font-semibold text-[#253746] mt-1 line-clamp-1">
                   {card.title}
                 </div>
-                <div className="text-[11px] text-slate-500 mt-0.5 line-clamp-1">
+                <div className="text-[11px] text-[#5D6A75] mt-0.5 line-clamp-1">
                   {card.description}
                 </div>
               </div>

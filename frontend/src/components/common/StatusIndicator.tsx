@@ -13,16 +13,17 @@ export const StatusIndicator: React.FC<StatusIndicatorProps> = ({
   className,
 }) => {
   const dotStyles = {
-    online: 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]',
-    offline: 'bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.5)]',
-    degraded: 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]',
-    pending: 'bg-blue-400 animate-pulse',
+    online: 'bg-[#18794E] shadow-[0_0_6px_rgba(24,121,78,0.4)]',
+    offline: 'bg-[#B42318] shadow-[0_0_6px_rgba(180,35,24,0.4)]',
+    degraded: 'bg-[#8A5A00] shadow-[0_0_6px_rgba(138,90,0,0.4)]',
+    pending: 'bg-[#245B7A] animate-pulse',
   };
 
   return (
     <div className={cn('inline-flex items-center gap-2 text-xs font-medium', className)}>
-      <span className={cn('w-2 h-2 rounded-full', dotStyles[status])} />
-      {label && <span className="text-slate-600 font-mono text-[11px]">{label}</span>}
+      <span className={cn('w-2 h-2 rounded-full shrink-0', dotStyles[status])} />
+      {label && <span className="text-[#253746] font-mono text-[11px]">{label}</span>}
     </div>
   );
 };
+

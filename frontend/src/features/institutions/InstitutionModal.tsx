@@ -205,22 +205,22 @@ export const InstitutionModal: React.FC<Props> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-      <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+      <div className="bg-white rounded-[10px] shadow-2xl border border-[#C9D3DB] w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50/80">
+        <div className="px-6 py-4 border-b border-[#C9D3DB] flex items-center justify-between bg-[#F5F4EF]/80">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-sentinel-100 text-sentinel-700 flex items-center justify-center font-bold">
+            <div className="w-9 h-9 rounded-[8px] bg-[#EEF6FA] text-[#123B5D] flex items-center justify-center font-bold">
               <Building2 className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-base font-semibold text-slate-900">
+              <h2 className="text-base font-semibold text-[#0D2538]">
                 {isEditing
                   ? isInstitutionUser
                     ? 'Update Contact & Nodal Details'
                     : 'Edit Registered Institution'
                   : 'Register New Institution'}
               </h2>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-[#5D6A75]">
                 {isInstitutionUser
                   ? 'Update verified administrative and contact addresses for regulatory notices'
                   : 'Establish a new institutional entity under AICTE Regulation Bureau oversight'}
@@ -229,7 +229,7 @@ export const InstitutionModal: React.FC<Props> = ({
           </div>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-100 transition-colors"
+            className="text-slate-400 hover:text-[#5D6A75] p-1.5 rounded-lg hover:bg-slate-100 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -249,12 +249,12 @@ export const InstitutionModal: React.FC<Props> = ({
 
           {/* Section: Identifiers */}
           <div>
-            <h3 className="font-semibold text-slate-800 text-[11px] uppercase tracking-wider mb-2">
+            <h3 className="font-semibold text-[#253746] text-[11px] uppercase tracking-wider mb-2">
               Entity Identity & Taxonomy
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="block font-medium text-slate-700 mb-1">
+                <label className="block font-medium text-[#253746] mb-1">
                   Institution Code / Permanent ID <span className="text-rose-500">*</span>
                 </label>
                 <input
@@ -263,9 +263,9 @@ export const InstitutionModal: React.FC<Props> = ({
                   value={formData.code}
                   onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
                   placeholder="e.g. 1-10924811"
-                  className={`w-full px-3 py-2 border rounded-lg bg-white text-slate-800 font-mono focus:outline-none focus:ring-2 focus:ring-sentinel-500 ${
-                    errors.code ? 'border-rose-400 bg-rose-50/20' : 'border-slate-300'
-                  } ${isEditing ? 'bg-slate-100 text-slate-500 cursor-not-allowed' : ''}`}
+                  className={`w-full px-3 py-2 border rounded-lg bg-white text-[#253746] font-mono focus:outline-none focus:ring-2 focus:ring-sentinel-500 ${
+                    errors.code ? 'border-rose-400 bg-rose-50/20' : 'border-[#8799A9]'
+                  } ${isEditing ? 'bg-slate-100 text-[#5D6A75] cursor-not-allowed' : ''}`}
                 />
                 {errors.code && <p className="text-rose-600 mt-1">{errors.code}</p>}
                 {isEditing && (
@@ -274,15 +274,15 @@ export const InstitutionModal: React.FC<Props> = ({
               </div>
 
               <div>
-                <label className="block font-medium text-slate-700 mb-1">
+                <label className="block font-medium text-[#253746] mb-1">
                   Institution Classification <span className="text-rose-500">*</span>
                 </label>
                 <select
                   disabled={isInstitutionUser}
                   value={formData.institution_type}
                   onChange={(e) => setFormData({ ...formData, institution_type: e.target.value })}
-                  className={`w-full px-3 py-2 border rounded-lg bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-sentinel-500 border-slate-300 ${
-                    isInstitutionUser ? 'bg-slate-100 text-slate-500 cursor-not-allowed' : ''
+                  className={`w-full px-3 py-2 border rounded-lg bg-white text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500 border-[#8799A9] ${
+                    isInstitutionUser ? 'bg-slate-100 text-[#5D6A75] cursor-not-allowed' : ''
                   }`}
                 >
                   {INSTITUTION_TYPES.map((t) => (
@@ -294,7 +294,7 @@ export const InstitutionModal: React.FC<Props> = ({
               </div>
 
               <div className="sm:col-span-2">
-                <label className="block font-medium text-slate-700 mb-1">
+                <label className="block font-medium text-[#253746] mb-1">
                   Registered Legal Entity Name <span className="text-rose-500">*</span>
                 </label>
                 <input
@@ -303,15 +303,15 @@ export const InstitutionModal: React.FC<Props> = ({
                   value={formData.legal_name}
                   onChange={(e) => setFormData({ ...formData, legal_name: e.target.value })}
                   placeholder="e.g. Delhi Technological University"
-                  className={`w-full px-3 py-2 border rounded-lg bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-sentinel-500 ${
-                    errors.legal_name ? 'border-rose-400' : 'border-slate-300'
-                  } ${isInstitutionUser ? 'bg-slate-100 text-slate-500 cursor-not-allowed' : ''}`}
+                  className={`w-full px-3 py-2 border rounded-lg bg-white text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500 ${
+                    errors.legal_name ? 'border-rose-400' : 'border-[#8799A9]'
+                  } ${isInstitutionUser ? 'bg-slate-100 text-[#5D6A75] cursor-not-allowed' : ''}`}
                 />
                 {errors.legal_name && <p className="text-rose-600 mt-1">{errors.legal_name}</p>}
               </div>
 
               <div className="sm:col-span-2">
-                <label className="block font-medium text-slate-700 mb-1">
+                <label className="block font-medium text-[#253746] mb-1">
                   Common Display / Operating Name (Optional)
                 </label>
                 <input
@@ -320,8 +320,8 @@ export const InstitutionModal: React.FC<Props> = ({
                   value={formData.display_name}
                   onChange={(e) => setFormData({ ...formData, display_name: e.target.value })}
                   placeholder="e.g. DTU Delhi"
-                  className={`w-full px-3 py-2 border rounded-lg bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-sentinel-500 border-slate-300 ${
-                    isInstitutionUser ? 'bg-slate-100 text-slate-500 cursor-not-allowed' : ''
+                  className={`w-full px-3 py-2 border rounded-lg bg-white text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500 border-[#8799A9] ${
+                    isInstitutionUser ? 'bg-slate-100 text-[#5D6A75] cursor-not-allowed' : ''
                   }`}
                 />
               </div>
@@ -329,13 +329,13 @@ export const InstitutionModal: React.FC<Props> = ({
           </div>
 
           {/* Section: Contact & Nodal */}
-          <div className="pt-2 border-t border-slate-200">
-            <h3 className="font-semibold text-slate-800 text-[11px] uppercase tracking-wider mb-2">
+          <div className="pt-2 border-t border-[#C9D3DB]">
+            <h3 className="font-semibold text-[#253746] text-[11px] uppercase tracking-wider mb-2">
               Nodal Contact & Official Communication
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
-                <label className="block font-medium text-slate-700 mb-1">
+                <label className="block font-medium text-[#253746] mb-1">
                   Nodal Officer / Registrar <span className="text-rose-500">*</span>
                 </label>
                 <input
@@ -343,15 +343,15 @@ export const InstitutionModal: React.FC<Props> = ({
                   value={formData.contact_name}
                   onChange={(e) => setFormData({ ...formData, contact_name: e.target.value })}
                   placeholder="e.g. Dr. Rajesh Sharma"
-                  className={`w-full px-3 py-2 border rounded-lg bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-sentinel-500 ${
-                    errors.contact_name ? 'border-rose-400' : 'border-slate-300'
+                  className={`w-full px-3 py-2 border rounded-lg bg-white text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500 ${
+                    errors.contact_name ? 'border-rose-400' : 'border-[#8799A9]'
                   }`}
                 />
                 {errors.contact_name && <p className="text-rose-600 mt-1">{errors.contact_name}</p>}
               </div>
 
               <div>
-                <label className="block font-medium text-slate-700 mb-1">
+                <label className="block font-medium text-[#253746] mb-1">
                   Official Contact Email <span className="text-rose-500">*</span>
                 </label>
                 <input
@@ -359,15 +359,15 @@ export const InstitutionModal: React.FC<Props> = ({
                   value={formData.contact_email}
                   onChange={(e) => setFormData({ ...formData, contact_email: e.target.value })}
                   placeholder="registrar@dtu.ac.in"
-                  className={`w-full px-3 py-2 border rounded-lg bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-sentinel-500 ${
-                    errors.contact_email ? 'border-rose-400' : 'border-slate-300'
+                  className={`w-full px-3 py-2 border rounded-lg bg-white text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500 ${
+                    errors.contact_email ? 'border-rose-400' : 'border-[#8799A9]'
                   }`}
                 />
                 {errors.contact_email && <p className="text-rose-600 mt-1">{errors.contact_email}</p>}
               </div>
 
               <div>
-                <label className="block font-medium text-slate-700 mb-1">
+                <label className="block font-medium text-[#253746] mb-1">
                   Official Contact Phone <span className="text-rose-500">*</span>
                 </label>
                 <input
@@ -375,20 +375,20 @@ export const InstitutionModal: React.FC<Props> = ({
                   value={formData.contact_phone}
                   onChange={(e) => setFormData({ ...formData, contact_phone: e.target.value })}
                   placeholder="+91-11-27871018"
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-sentinel-500"
+                  className="w-full px-3 py-2 border border-[#8799A9] rounded-lg bg-white text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500"
                 />
               </div>
             </div>
           </div>
 
           {/* Section: Physical Address & Jurisdiction */}
-          <div className="pt-2 border-t border-slate-200">
-            <h3 className="font-semibold text-slate-800 text-[11px] uppercase tracking-wider mb-2">
+          <div className="pt-2 border-t border-[#C9D3DB]">
+            <h3 className="font-semibold text-[#253746] text-[11px] uppercase tracking-wider mb-2">
               Registered Address & Jurisdiction
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="sm:col-span-2">
-                <label className="block font-medium text-slate-700 mb-1">
+                <label className="block font-medium text-[#253746] mb-1">
                   Address Line 1 <span className="text-rose-500">*</span>
                 </label>
                 <input
@@ -396,12 +396,12 @@ export const InstitutionModal: React.FC<Props> = ({
                   value={formData.address_line1}
                   onChange={(e) => setFormData({ ...formData, address_line1: e.target.value })}
                   placeholder="Shahbad Daulatpur, Main Bawana Road"
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-sentinel-500"
+                  className="w-full px-3 py-2 border border-[#8799A9] rounded-lg bg-white text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500"
                 />
               </div>
 
               <div>
-                <label className="block font-medium text-slate-700 mb-1">
+                <label className="block font-medium text-[#253746] mb-1">
                   City <span className="text-rose-500">*</span>
                 </label>
                 <input
@@ -409,18 +409,18 @@ export const InstitutionModal: React.FC<Props> = ({
                   value={formData.city}
                   onChange={(e) => setFormData({ ...formData, city: e.target.value })}
                   placeholder="New Delhi"
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-sentinel-500"
+                  className="w-full px-3 py-2 border border-[#8799A9] rounded-lg bg-white text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500"
                 />
               </div>
 
               <div>
-                <label className="block font-medium text-slate-700 mb-1">
+                <label className="block font-medium text-[#253746] mb-1">
                   State / Territory <span className="text-rose-500">*</span>
                 </label>
                 <select
                   value={formData.state}
                   onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-sentinel-500"
+                  className="w-full px-3 py-2 border border-[#8799A9] rounded-lg bg-white text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500"
                 >
                   {INDIAN_STATES.map((st) => (
                     <option key={st} value={st}>
@@ -431,7 +431,7 @@ export const InstitutionModal: React.FC<Props> = ({
               </div>
 
               <div>
-                <label className="block font-medium text-slate-700 mb-1">
+                <label className="block font-medium text-[#253746] mb-1">
                   Postal PIN Code <span className="text-rose-500">*</span>
                 </label>
                 <input
@@ -439,12 +439,12 @@ export const InstitutionModal: React.FC<Props> = ({
                   value={formData.postal_code}
                   onChange={(e) => setFormData({ ...formData, postal_code: e.target.value })}
                   placeholder="110042"
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-sentinel-500"
+                  className="w-full px-3 py-2 border border-[#8799A9] rounded-lg bg-white text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500"
                 />
               </div>
 
               <div>
-                <label className="block font-medium text-slate-700 mb-1">
+                <label className="block font-medium text-[#253746] mb-1">
                   Assigned Regional AICTE Office
                 </label>
                 <input
@@ -453,8 +453,8 @@ export const InstitutionModal: React.FC<Props> = ({
                   value={formData.assigned_office}
                   onChange={(e) => setFormData({ ...formData, assigned_office: e.target.value })}
                   placeholder="Northern Regional Office (NRO)"
-                  className={`w-full px-3 py-2 border border-slate-300 rounded-lg bg-white text-slate-800 focus:outline-none focus:ring-2 focus:ring-sentinel-500 ${
-                    isInstitutionUser ? 'bg-slate-100 text-slate-500 cursor-not-allowed' : ''
+                  className={`w-full px-3 py-2 border border-[#8799A9] rounded-lg bg-white text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500 ${
+                    isInstitutionUser ? 'bg-slate-100 text-[#5D6A75] cursor-not-allowed' : ''
                   }`}
                 />
               </div>
@@ -462,19 +462,19 @@ export const InstitutionModal: React.FC<Props> = ({
           </div>
 
           {/* Footer buttons */}
-          <div className="pt-4 border-t border-slate-200 flex items-center justify-end gap-2">
+          <div className="pt-4 border-t border-[#C9D3DB] flex items-center justify-end gap-2">
             <button
               type="button"
               onClick={onClose}
               disabled={isSubmitting}
-              className="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-100 font-medium transition-colors"
+              className="px-4 py-2 rounded-lg border border-[#8799A9] text-[#253746] hover:bg-slate-100 font-medium transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-5 py-2 rounded-lg bg-sentinel-600 hover:bg-sentinel-700 text-white font-medium shadow-sm transition-all flex items-center gap-2 disabled:opacity-50"
+              className="px-5 py-2 rounded-lg bg-[#0F766E] hover:bg-[#09544E] text-white font-medium shadow-sm transition-all flex items-center gap-2 disabled:opacity-50"
             >
               {isSubmitting ? (
                 <>
