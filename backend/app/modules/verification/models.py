@@ -329,6 +329,17 @@ class TrustAssessment(Base):
         String(36), ForeignKey("trust_assessments.id", ondelete="SET NULL"), nullable=True
     )
 
+    # Explicit backward link to the assessment this one supersedes (complements superseded_by_id)
+    prior_assessment_id: Mapped[Optional[str]] = mapped_column(
+        String(36), ForeignKey("trust_assessments.id", ondelete="SET NULL"), nullable=True
+    )
+
+    # Optimistic-locking counter — must match when attempting a supersession
+    concurrency_version: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
+
+    # Source authorization config key that qualified this assessment (for L3 policy gate)
+    source_authorization_config: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=get_utc_now, nullable=False
     )
@@ -393,6 +404,13 @@ class TrustTransitionHistory(Base):
     outcome: Mapped[str] = mapped_column(String(20), default="APPLIED", nullable=False)
 
     is_downgrade: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+
+    # Explicit links to the before/after assessment records for full audit trail
+    previous_assessment_id: Mapped[Optional[str]] = mapped_column(String(36), nullable=True)
+    new_assessment_id: Mapped[Optional[str]] = mapped_column(String(36), nullable=True)
+
+    # Concurrency version of the prior assessment at the moment of transition
+    concurrency_version_before: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=get_utc_now, nullable=False

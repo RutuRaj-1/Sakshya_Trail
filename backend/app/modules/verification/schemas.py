@@ -53,16 +53,104 @@ class TrustAssessmentResponse(BaseModel):
     trust_rule_version: int
     status: str
     is_downgrade: bool
+    concurrency_version: int = 1
+    prior_assessment_id: Optional[str] = None
+    source_authorization_config: Optional[str] = None
     created_at: datetime
 
 
 class TrustTransitionRequest(BaseModel):
+    """Generic trust transition — all fields as applicable."""
     target_trust_level: str
     reason: str
     field_name: Optional[str] = None
     supporting_document_version_id: Optional[str] = None
     related_verification_response_id: Optional[str] = None
     evidence_references: Optional[List[str]] = None
+    source_authorization_config: Optional[str] = Field(
+        None,
+        description="Required for L3: the source authorization config key that qualifies this transition.",
+    )
+    expected_concurrency_version: Optional[int] = Field(
+        None,
+        description="If provided, the transition will fail if the current assessment's concurrency_version differs.",
+    )
+
+
+class L1ReassessmentRequest(BaseModel):
+    """Request an L1 (Document-Consistent) trust reassessment."""
+    document_version_id: str = Field(
+        ..., description="ID of the document version that serves as evidence."
+    )
+    reason: str = Field(
+        ..., description="Reason for the L1 reassessment."
+    )
+    validation_run_id: Optional[str] = Field(
+        None, description="Optional: ID of the validation run that produced the consistency result."
+    )
+    evidence_references: Optional[List[str]] = None
+    expected_concurrency_version: Optional[int] = None
+
+
+class L2OfficerDecisionRequest(BaseModel):
+    """Record an authorized officer L2 verification decision."""
+    reason: str = Field(
+        ...,
+        description="Mandatory meaningful reason for the officer's verification decision.",
+    )
+    field_name: Optional[str] = Field(
+        None, description="If set, applies to a specific tracked field; None applies to the aggregate."
+    )
+    supporting_document_version_id: Optional[str] = None
+    evidence_references: Optional[List[str]] = None
+    expected_concurrency_version: Optional[int] = None
+
+
+class L3BankConfirmationRequest(BaseModel):
+    """Apply an eligible bank verification response as L3 confirmation."""
+    verification_response_id: str = Field(
+        ..., description="ID of the qualifying AUTHORIZED_BANK_RESPONSE verification response."
+    )
+    reason: str = Field(
+        ..., description="Reason/basis for the L3 confirmation."
+    )
+    source_authorization_config: str = Field(
+        ...,
+        description=(
+            "Authorization config key identifying the approved bank-confirmation mechanism. "
+            "Required policy gate — no transition without an explicit configured value."
+        ),
+    )
+    field_name: Optional[str] = Field(
+        None, description="If set, applies to a specific tracked field; None applies to the aggregate."
+    )
+    evidence_references: Optional[List[str]] = None
+    requested_fields: Optional[List[str]] = Field(
+        None, description="Subset of fields to check for field-level correspondence."
+    )
+    expected_concurrency_version: Optional[int] = None
+
+
+class TrustDowngradeRequest(BaseModel):
+    """Perform an authorized trust downgrade or reassessment."""
+    target_trust_level: str = Field(
+        ..., description="The new (lower) trust level to downgrade to."
+    )
+    reason: str = Field(
+        ..., description="Mandatory reason — describes the event that triggered reassessment."
+    )
+    field_name: Optional[str] = Field(
+        None, description="If set, applies to a specific tracked field."
+    )
+    evidence_references: Optional[List[str]] = None
+    triggering_event: Optional[str] = Field(
+        None,
+        description=(
+            "Identifier of the event that triggered the downgrade, e.g. "
+            "'document_withdrawn:DOC-123' or 'response_ineligible:RESP-456'."
+        ),
+    )
+    expected_concurrency_version: Optional[int] = None
 
 
 class TrustTransitionHistoryResponse(BaseModel):
@@ -81,6 +169,18 @@ class TrustTransitionHistoryResponse(BaseModel):
     trigger_type: str
     outcome: str
     is_downgrade: bool
+    previous_assessment_id: Optional[str] = None
+    new_assessment_id: Optional[str] = None
+    concurrency_version_before: Optional[int] = None
+
+
+class AggregateTrustSummaryResponse(BaseModel):
+    """Computed aggregate trust summary for an instrument."""
+    instrument_id: str
+    aggregate_trust_level: str
+    fields_by_level: Dict[str, List[str]]
+    uncovered_fields: List[str]
+    note: str
 
 
 class VerificationResponseOut(BaseModel):
@@ -105,8 +205,13 @@ class VerificationResponseOut(BaseModel):
 
 
 class VerificationRequestCreate(BaseModel):
-    channel: str = Field("SIMULATED", description="Verification channel: SIMULATED, MANUAL, LIVE_BANK_API, SFTP_BATCH")
-    requested_fields: Optional[List[str]] = Field(None, description="Subset of fields to verify; defaults to all tracked")
+    channel: str = Field(
+        "SIMULATED",
+        description="Verification channel: SIMULATED, MANUAL, LIVE_BANK_API, SFTP_BATCH",
+    )
+    requested_fields: Optional[List[str]] = Field(
+        None, description="Subset of fields to verify; defaults to all tracked"
+    )
     correlation_id: Optional[str] = None
     notes: Optional[str] = None
 
@@ -131,21 +236,36 @@ class VerificationRequestResponse(BaseModel):
 
 
 class VerificationDispatchAction(BaseModel):
-    scenario: Optional[str] = Field("MATCH", description="Optional simulation scenario: MATCH, MISMATCH, TIMEOUT, SOURCE_UNAVAILABLE, INCONCLUSIVE")
+    scenario: Optional[str] = Field(
+        "MATCH",
+        description="Optional simulation scenario: MATCH, MISMATCH, TIMEOUT, SOURCE_UNAVAILABLE, INCONCLUSIVE",
+    )
 
 
 class ManualVerificationRecordRequest(BaseModel):
-    external_reference: str = Field(..., description="External bank correspondence/letter reference number")
-    communication_date: datetime = Field(..., description="Date and time of external communication")
+    external_reference: str = Field(
+        ..., description="External bank correspondence/letter reference number"
+    )
+    communication_date: datetime = Field(
+        ..., description="Date and time of external communication"
+    )
     result: str = Field("MATCH", description="Outcome: MATCH, MISMATCH, INCONCLUSIVE")
     reason: str = Field(..., description="Mandatory officer review reason and justification")
-    evidence_document_version_id: Optional[str] = Field(None, description="Module 2 document version reference")
-    bank_values: Optional[Dict[str, Any]] = Field(None, description="Values confirmed by the bank")
+    evidence_document_version_id: Optional[str] = Field(
+        None, description="Module 2 document version reference"
+    )
+    bank_values: Optional[Dict[str, Any]] = Field(
+        None, description="Values confirmed by the bank"
+    )
 
 
 class VerificationRetryRequest(BaseModel):
-    scenario: Optional[str] = Field(None, description="Optional retry scenario for simulated adapter")
+    scenario: Optional[str] = Field(
+        None, description="Optional retry scenario for simulated adapter"
+    )
 
 
 class VerificationCancelRequest(BaseModel):
-    reason: str = Field(..., description="Mandatory reason for cancelling or closing the verification request")
+    reason: str = Field(
+        ..., description="Mandatory reason for cancelling or closing the verification request"
+    )

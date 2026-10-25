@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { instrumentsApi } from '@/api/endpoints';
 import type { Instrument } from '@/types';
 import { Badge } from '@/components/common/Badge';
@@ -13,6 +13,7 @@ import {
   ArrowLeft,
   Edit2,
   Shield,
+  ShieldCheck,
   FileCheck2,
   FileText,
   AlertTriangle,
@@ -289,23 +290,43 @@ export const InstrumentDetailPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Module 4 Bank Confirmation Pipeline Placeholder */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-5 space-y-3 shadow-2xs">
+        {/* Module 4 Bank Confirmation & Trust Desk */}
+        <div className="bg-white rounded-2xl border border-purple-200 p-5 space-y-3 shadow-2xs">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Building className="w-4 h-4 text-slate-500" />
-              <h4 className="font-bold text-slate-800 text-xs">Direct Bank Confirmation Channel</h4>
+              <ShieldCheck className="w-4 h-4 text-purple-600" />
+              <h4 className="font-bold text-slate-800 text-xs">Trust & Bank Verification Desk</h4>
             </div>
-            <span className="font-mono text-[9px] uppercase bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded font-semibold">
-              Future Module 4
+            <span className="font-mono text-[9px] uppercase bg-purple-100 text-purple-800 px-1.5 py-0.5 rounded font-semibold border border-purple-200">
+              Module 4 Active
             </span>
           </div>
-          <div className="p-5 border-2 border-dashed border-slate-200 rounded-xl text-center bg-slate-50/50">
-            <Building className="w-7 h-7 text-slate-300 mx-auto mb-1.5" />
-            <p className="text-[11px] font-semibold text-slate-700">Direct Bank Confirmation Pending</p>
-            <p className="text-[10px] text-slate-500 max-w-xs mx-auto mt-0.5">
-              Electronic bank reconciliation via secure SFTP / host-to-host API confirmation for Level 3 trust belongs to Module 4.
+
+          <div className="p-4 border border-purple-100 rounded-xl bg-purple-50/30 space-y-2.5">
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-slate-500 font-medium">Assessed Trust Level:</span>
+              <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-white text-purple-800 border border-purple-200 shadow-2xs">
+                {instrument.trust_level}
+              </span>
+            </div>
+            <p className="text-[11px] text-slate-600">
+              {instrument.trust_level === 'L3_BANK_CONFIRMED'
+                ? 'Authoritative host-to-host bank confirmation verified. Statutory deposit guaranteed.'
+                : instrument.trust_level === 'L2_OFFICER_VERIFIED'
+                ? 'Scrutiny officer reviewed and attested. Ready for direct electronic bank confirmation.'
+                : instrument.trust_level === 'L1_DOCUMENT_CONSISTENT'
+                ? 'Document OCR validation passed. Pending officer attestation and bank reconciliation.'
+                : 'Declared FDR record. Electronic bank confirmation and provenance tracking available.'}
             </p>
+            <div className="pt-2">
+              <Link
+                to={`/verification/${instrument.id}`}
+                className="w-full inline-flex items-center justify-center gap-1.5 py-2 px-3 text-xs font-semibold rounded-lg bg-purple-700 text-white hover:bg-purple-800 transition-colors shadow-2xs"
+              >
+                <ShieldCheck className="w-3.5 h-3.5" />
+                <span>Open Trust & Verification Desk</span>
+              </Link>
+            </div>
           </div>
         </div>
 

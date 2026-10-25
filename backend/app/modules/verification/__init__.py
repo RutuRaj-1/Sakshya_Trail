@@ -29,8 +29,13 @@ from app.modules.verification.provenance_service import (
 )
 from app.modules.verification.trust_service import (
     transition_trust_level,
+    request_l1_reassessment,
+    record_l2_officer_decision,
+    apply_l3_bank_confirmation,
+    perform_trust_downgrade,
     get_active_trust_assessments,
     get_trust_transition_history,
+    compute_aggregate_trust_summary,
 )
 from app.modules.verification.verification_service import (
     create_verification_request,
@@ -72,8 +77,13 @@ __all__ = [
     "get_field_provenance_history",
     "initialize_instrument_provenance",
     "transition_trust_level",
+    "request_l1_reassessment",
+    "record_l2_officer_decision",
+    "apply_l3_bank_confirmation",
+    "perform_trust_downgrade",
     "get_active_trust_assessments",
     "get_trust_transition_history",
+    "compute_aggregate_trust_summary",
     "create_verification_request",
     "list_instrument_verification_requests",
     "get_verification_request_by_id",

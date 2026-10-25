@@ -14,6 +14,21 @@ import type {
   ReviewQueueListResponse,
   ValidationFindingItem,
 } from '@/types';
+import type {
+  FieldProvenanceItem,
+  TrustAssessmentItem,
+  TrustTransitionHistoryItem,
+  AggregateTrustSummary,
+  VerificationRequestItem,
+  VerificationResponseItem,
+  CreateVerificationRequestPayload,
+  DispatchVerificationPayload,
+  ManualVerificationRecordPayload,
+  L2OfficerDecisionPayload,
+  TrustDowngradePayload,
+  CancelVerificationPayload,
+  RetryVerificationPayload,
+} from '@/types/verification';
 
 export const healthApi = {
   getLiveness: () => apiClient.get<SystemHealth>('/health/live'),
@@ -197,4 +212,84 @@ export const findingsApi = {
       `/instruments/${instrument_id}/return-for-correction`,
       data
     ),
+};
+
+// ─── Module 4 — Trust, Provenance & Verification Desk ─────────────────────────
+
+export const verificationApi = {
+  // Provenance
+  getProvenance: (instrumentId: string) =>
+    apiClient.get<FieldProvenanceItem[]>(`/verification/instruments/${instrumentId}/provenance`),
+  getFieldProvenanceHistory: (instrumentId: string, fieldName: string) =>
+    apiClient.get<FieldProvenanceItem[]>(
+      `/verification/instruments/${instrumentId}/provenance/${encodeURIComponent(fieldName)}/history`
+    ),
+
+  // Trust assessments
+  getTrustAssessments: (instrumentId: string) =>
+    apiClient.get<TrustAssessmentItem[]>(`/verification/instruments/${instrumentId}/trust`),
+  getTrustSummary: (instrumentId: string) =>
+    apiClient.get<AggregateTrustSummary>(`/verification/instruments/${instrumentId}/trust/summary`),
+  getTrustHistory: (instrumentId: string) =>
+    apiClient.get<TrustTransitionHistoryItem[]>(
+      `/verification/instruments/${instrumentId}/trust/history`
+    ),
+
+  // Dedicated trust operations
+  recordL2Decision: (instrumentId: string, payload: L2OfficerDecisionPayload) =>
+    apiClient.post<TrustAssessmentItem>(
+      `/verification/instruments/${instrumentId}/trust/l2-officer-decision`,
+      payload
+    ),
+  applyL3Confirmation: (
+    instrumentId: string,
+    payload: {
+      verification_response_id: string;
+      reason: string;
+      source_authorization_config: string;
+      field_name?: string | null;
+      evidence_references?: string[] | null;
+      requested_fields?: string[] | null;
+      expected_concurrency_version?: number | null;
+    }
+  ) =>
+    apiClient.post<TrustAssessmentItem>(
+      `/verification/instruments/${instrumentId}/trust/l3-bank-confirmation`,
+      payload
+    ),
+  performTrustDowngrade: (instrumentId: string, payload: TrustDowngradePayload) =>
+    apiClient.post<TrustAssessmentItem>(
+      `/verification/instruments/${instrumentId}/trust/downgrade`,
+      payload
+    ),
+
+  // Verification requests
+  listRequests: (instrumentId: string) =>
+    apiClient.get<VerificationRequestItem[]>(
+      `/verification/instruments/${instrumentId}/requests`
+    ),
+  createRequest: (instrumentId: string, payload: CreateVerificationRequestPayload) =>
+    apiClient.post<VerificationRequestItem>(
+      `/verification/instruments/${instrumentId}/requests`,
+      payload
+    ),
+  getRequest: (requestId: string) =>
+    apiClient.get<VerificationRequestItem>(`/verification/requests/${requestId}`),
+
+  // Request actions
+  dispatchRequest: (requestId: string, payload: DispatchVerificationPayload) =>
+    apiClient.post<VerificationResponseItem>(`/verification/requests/${requestId}/dispatch`, payload),
+  recordManualEvidence: (requestId: string, payload: ManualVerificationRecordPayload) =>
+    apiClient.post<VerificationResponseItem>(
+      `/verification/requests/${requestId}/manual-record`,
+      payload
+    ),
+  retryRequest: (requestId: string, payload: RetryVerificationPayload) =>
+    apiClient.post<VerificationResponseItem>(`/verification/requests/${requestId}/retry`, payload),
+  cancelRequest: (requestId: string, payload: CancelVerificationPayload) =>
+    apiClient.post<VerificationRequestItem>(`/verification/requests/${requestId}/cancel`, payload),
+
+  // Responses
+  getResponse: (responseId: string) =>
+    apiClient.get<VerificationResponseItem>(`/verification/responses/${responseId}`),
 };
