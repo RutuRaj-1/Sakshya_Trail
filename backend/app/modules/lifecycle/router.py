@@ -37,6 +37,11 @@ from app.modules.lifecycle.schemas import (
     DemoClockStatusResponse,
     DemoClockAdvanceRequest,
     MonitoringListResponse,
+    NotificationResponse,
+    NotificationListResponse,
+    RetryNotificationRequest,
+    DispatchRemindersRequest,
+    DispatchRemindersResponse,
 )
 from app.modules.lifecycle.policy_service import (
     create_policy,
@@ -521,4 +526,184 @@ def reset_demo_clock_endpoint(
     )
 
     return get_clock_status()
+
+
+# --- Notification & Escalation Endpoints ----------------------------------------
+
+@router.get(
+    "/instruments/{instrument_id}/notifications",
+    response_model=NotificationListResponse,
+    summary="Get tenancy-scoped notification history for an instrument",
+)
+@instruments_lifecycle_router.get(
+    "/{instrument_id}/notifications",
+    response_model=NotificationListResponse,
+    summary="Get tenancy-scoped notification history for an instrument",
+)
+def get_instrument_notifications_endpoint(
+    instrument_id: str = Path(...),
+    page: int = Query(1, ge=1),
+    limit: int = Query(50, ge=1, le=100),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    from app.modules.lifecycle.notification_service import get_instrument_notifications
+    total, records = get_instrument_notifications(
+        db=db,
+        instrument_id=instrument_id,
+        current_user=current_user,
+        page=page,
+        limit=limit,
+    )
+    return NotificationListResponse(
+        total_count=total,
+        page=page,
+        limit=limit,
+        items=records,  # type: ignore[arg-type]
+    )
+
+
+@router.get(
+    "/notifications/inbox",
+    response_model=NotificationListResponse,
+    summary="Get in-app notification inbox for the current user",
+)
+def get_user_inbox_endpoint(
+    unread_only: bool = Query(False),
+    page: int = Query(1, ge=1),
+    limit: int = Query(50, ge=1, le=100),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    from app.modules.lifecycle.notification_service import get_user_inbox_notifications
+    total, records = get_user_inbox_notifications(
+        db=db,
+        current_user=current_user,
+        unread_only=unread_only,
+        page=page,
+        limit=limit,
+    )
+    return NotificationListResponse(
+        total_count=total,
+        page=page,
+        limit=limit,
+        items=records,  # type: ignore[arg-type]
+    )
+
+
+@router.post(
+    "/notifications/{id}/read",
+    response_model=NotificationResponse,
+    summary="Mark an in-app notification as read",
+)
+def mark_notification_read_endpoint(
+    id: str = Path(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    from app.modules.lifecycle.notification_service import mark_notification_as_read
+    return mark_notification_as_read(db=db, notification_id=id, current_user=current_user)
+
+
+@router.get(
+    "/notifications/failed",
+    response_model=NotificationListResponse,
+    summary="List failed or pending delivery attempts (Admin/Officer audit view)",
+)
+def list_failed_notifications_endpoint(
+    page: int = Query(1, ge=1),
+    limit: int = Query(50, ge=1, le=100),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_roles([ROLE_SYSTEM_ADMIN, ROLE_SCRUTINY_OFFICER, ROLE_BRANCH_HEAD])),
+):
+    from app.modules.lifecycle.notification_service import list_failed_notifications
+    total, records = list_failed_notifications(
+        db=db,
+        current_user=current_user,
+        page=page,
+        limit=limit,
+    )
+    return NotificationListResponse(
+        total_count=total,
+        page=page,
+        limit=limit,
+        items=records,  # type: ignore[arg-type]
+    )
+
+
+@router.post(
+    "/notifications/{id}/retry",
+    response_model=NotificationResponse,
+    summary="Controlled administrative manual retry of a notification",
+)
+def retry_notification_endpoint(
+    id: str = Path(...),
+    payload: RetryNotificationRequest = RetryNotificationRequest(),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_roles([ROLE_SYSTEM_ADMIN, ROLE_SCRUTINY_OFFICER])),
+):
+    from app.modules.lifecycle.notification_service import retry_notification
+    return retry_notification(
+        db=db,
+        notification_id=id,
+        current_user=current_user,
+        force=payload.force,
+    )
+
+
+@router.post(
+    "/notifications/dispatch-due",
+    response_model=DispatchRemindersResponse,
+    summary="Trigger reminder dispatch for evaluated instruments",
+)
+def dispatch_due_reminders_endpoint(
+    payload: DispatchRemindersRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_roles([ROLE_SYSTEM_ADMIN, ROLE_SCRUTINY_OFFICER, ROLE_BRANCH_HEAD])),
+):
+    from sqlalchemy import select
+    from app.modules.instruments.models import Instrument
+    from app.modules.lifecycle.evaluation_service import get_latest_evaluation_for_instrument, evaluate_instrument_lifecycle
+    from app.modules.lifecycle.notification_service import generate_and_dispatch_reminders_for_instrument
+
+    query = select(Instrument.id).where(Instrument.status.in_(["REGISTERED", "DRAFT", "UNDER_REVIEW"]))
+    if payload.instrument_ids:
+        query = query.where(Instrument.id.in_(payload.instrument_ids))
+    inst_ids = list(db.scalars(query.limit(payload.batch_size)).all())
+
+    processed = 0
+    dispatched_all = []
+    failed_count = 0
+
+    for i_id in inst_ids:
+        processed += 1
+        eval_rec = get_latest_evaluation_for_instrument(db, i_id)
+        if not eval_rec or payload.simulated_date:
+            eval_rec = evaluate_instrument_lifecycle(
+                db=db,
+                instrument_id=i_id,
+                simulated_date=payload.simulated_date,
+                actor_user_id=current_user.id,
+                actor_email=current_user.email,
+            )
+        try:
+            notifs = generate_and_dispatch_reminders_for_instrument(
+                db=db,
+                instrument_id=i_id,
+                eval_record=eval_rec,
+                simulated_date=payload.simulated_date,
+                actor_user_id=current_user.id,
+                actor_email=current_user.email,
+            )
+            dispatched_all.extend(notifs)
+        except Exception as e:
+            failed_count += 1
+
+    return DispatchRemindersResponse(
+        processed_count=processed,
+        dispatched_count=len(dispatched_all),
+        failed_count=failed_count,
+        notifications=dispatched_all,  # type: ignore[arg-type]
+    )
+
 

@@ -44,6 +44,11 @@ class LifecyclePolicyBase(BaseModel):
     escalation_interval_days: int = Field(default=7, ge=1, le=180)
     escalation_target_role: str = "BRANCH_HEAD"
     maturity_critical_lead_days: int = Field(default=15, ge=1, le=180)
+    permitted_channels: List[str] = Field(default_factory=lambda: ["IN_APP", "EMAIL"])
+    max_retry_limit: int = Field(default=3, ge=1, le=10)
+    retry_interval_minutes: int = Field(default=60, ge=5, le=1440)
+    template_id: str = "DEFAULT_REGULATORY_REMINDER"
+    template_version: int = 1
     renewal_comparison_method: RenewalComparisonMethod = RenewalComparisonMethod.ISSUE_DATE_TO_MATURITY_DATE
     max_allowed_gap_days: int = Field(default=0, ge=0, le=180)
     max_allowed_overlap_days: int = Field(default=30, ge=0, le=365)
@@ -284,4 +289,91 @@ class MonitoringListResponse(BaseModel):
     page: int
     limit: int
     items: List[MonitoringInstrumentItem]
+
+
+# --- Notification & Delivery Schemas --------------------------------------------
+
+class NotificationDeliveryAttemptResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    notification_id: str
+    attempt_number: int
+    attempted_at: datetime
+    channel: str
+    status: str
+    provider_response_code: Optional[str] = None
+    provider_reference_id: Optional[str] = None
+    error_category: Optional[str] = None
+    error_message: Optional[str] = None
+    duration_ms: Optional[int] = None
+    created_at: datetime
+
+
+class NotificationResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    idempotency_key: str
+    instrument_id: str
+    institution_id: str
+    policy_id: Optional[str] = None
+    policy_version: Optional[int] = None
+    event_type: str
+    reminder_milestone_days: Optional[int] = None
+    trigger_date: date
+    recipient_user_id: Optional[str] = None
+    recipient_role: str
+    recipient_email: Optional[str] = None
+    recipient_name: Optional[str] = None
+    channel: str
+    template_id: str
+    template_version: int
+    title: str
+    message: str
+    payload_metadata_json: Optional[str] = None
+    status: str
+    is_read: bool
+    read_at: Optional[datetime] = None
+    scheduled_at: datetime
+    first_attempted_at: Optional[datetime] = None
+    last_attempted_at: Optional[datetime] = None
+    delivered_at: Optional[datetime] = None
+    failed_at: Optional[datetime] = None
+    retry_count: int
+    max_retries: int
+    next_retry_at: Optional[datetime] = None
+    provider_message_id: Optional[str] = None
+    failure_category: Optional[str] = None
+    failure_reason: Optional[str] = None
+    is_mock: bool
+    mock_disclaimer: Optional[str] = None
+    created_at: datetime
+    updated_at: datetime
+    attempts: List[NotificationDeliveryAttemptResponse] = Field(default_factory=list)
+
+
+class NotificationListResponse(BaseModel):
+    total_count: int
+    page: int
+    limit: int
+    items: List[NotificationResponse]
+
+
+class RetryNotificationRequest(BaseModel):
+    force: bool = False
+
+
+class DispatchRemindersRequest(BaseModel):
+    instrument_ids: Optional[List[str]] = None
+    batch_size: int = Field(default=50, ge=1, le=500)
+    simulated_date: Optional[date] = None
+
+
+class DispatchRemindersResponse(BaseModel):
+    processed_count: int
+    dispatched_count: int
+    failed_count: int
+    notifications: List[NotificationResponse] = Field(default_factory=list)
+
 

@@ -5,6 +5,7 @@ import type { Instrument } from '@/types';
 import { Badge } from '@/components/common/Badge';
 import { formatINR, formatDate } from '@/lib/utils';
 import { InstrumentModal } from '@/features/instruments/InstrumentModal';
+import { LifecycleNotificationHistory } from '@/features/lifecycle/LifecycleNotificationHistory';
 import { useAuth } from '@/features/auth/AuthContext';
 import {
   FileSpreadsheet,
@@ -329,26 +330,37 @@ export const InstrumentDetailPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Module 5 Renewal & Release Lifecycle Placeholder */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-5 space-y-3 shadow-2xs">
+        {/* Module 5 Renewal & Release Lifecycle Summary Card */}
+        <div className="bg-white rounded-2xl border border-emerald-200 p-5 space-y-3 shadow-2xs">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Send className="w-4 h-4 text-slate-500" />
+              <Send className="w-4 h-4 text-emerald-600" />
               <h4 className="font-bold text-slate-800 text-xs">Renewal & Release Lifecycle</h4>
             </div>
-            <span className="font-mono text-[9px] uppercase bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded font-semibold">
-              Future Module 5
+            <span className="font-mono text-[9px] uppercase bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-semibold border border-emerald-200">
+              Module 5 Active
             </span>
           </div>
-          <div className="p-5 border-2 border-dashed border-slate-200 rounded-xl text-center bg-slate-50/50">
-            <Send className="w-7 h-7 text-slate-300 mx-auto mb-1.5" />
-            <p className="text-[11px] font-semibold text-slate-700">Release Approvals Not Initiated</p>
-            <p className="text-[10px] text-slate-500 max-w-xs mx-auto mt-0.5">
-              Competent Authority release orders, renewal lineage preservation, and encashment directives belong to Module 5.
+
+          <div className="p-4 border border-emerald-100 rounded-xl bg-emerald-50/30 space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-slate-500 font-medium">Lifecycle Monitoring:</span>
+              <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-white text-emerald-800 border border-emerald-200 shadow-2xs">
+                {instrument.maturity_indicator || 'ACTIVE'}
+              </span>
+            </div>
+            <p className="text-[11px] text-slate-600">
+              Statutory renewal tracking, policy-governed milestones, escalation triggers, and auditable delivery receipts active.
             </p>
           </div>
         </div>
       </div>
+
+      {/* Module 5 Policy-Driven Notification History & Escalation View */}
+      <LifecycleNotificationHistory
+        instrumentId={instrument.id}
+        isOfficerOrAdmin={isSystemAdmin || isScrutinyOfficer}
+      />
 
       {/* Edit Modal */}
       <InstrumentModal

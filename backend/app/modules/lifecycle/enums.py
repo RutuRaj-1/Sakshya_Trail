@@ -77,3 +77,26 @@ class ContinuityIndicator(str, Enum):
     GAP_DETECTED = "GAP_DETECTED"
     OVERLAP_DETECTED = "OVERLAP_DETECTED"
     UNKNOWN = "UNKNOWN"
+
+
+class NotificationDeliveryStatus(str, Enum):
+    """
+    Strict delivery statuses for lifecycle notifications.
+    EMAIL is ACCEPTED or MOCKED unless confirmed via webhook.
+    """
+    CREATED = "CREATED"
+    ATTEMPTED = "ATTEMPTED"
+    ACCEPTED = "ACCEPTED"
+    DELIVERED = "DELIVERED"
+    FAILED = "FAILED"
+    MOCKED = "MOCKED"
+
+
+class NotificationChannel(str, Enum):
+    """
+    Permitted transmission channels for lifecycle reminders and alerts.
+    """
+    IN_APP = "IN_APP"
+    EMAIL = "EMAIL"
+    MOCK_SMS = "MOCK_SMS"
+

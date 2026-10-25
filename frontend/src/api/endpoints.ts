@@ -293,3 +293,42 @@ export const verificationApi = {
   getResponse: (responseId: string) =>
     apiClient.get<VerificationResponseItem>(`/verification/responses/${responseId}`),
 };
+
+export const lifecycleApi = {
+  getEvaluation: (instrumentId: string) =>
+    apiClient.get<import('@/types/lifecycle').LifecycleEvaluation>(
+      `/lifecycle/instruments/${instrumentId}/evaluation`
+    ),
+  evaluateInstrument: (instrumentId: string, forceRecord: boolean = false) =>
+    apiClient.post<import('@/types/lifecycle').LifecycleEvaluation>(
+      `/lifecycle/instruments/${instrumentId}/evaluate`,
+      { force_record: forceRecord }
+    ),
+  listNotifications: (instrumentId: string) =>
+    apiClient.get<import('@/types/lifecycle').NotificationListResponse>(
+      `/lifecycle/instruments/${instrumentId}/notifications`
+    ),
+  retryNotification: (notificationId: string, reason?: string) =>
+    apiClient.post<import('@/types/lifecycle').LifecycleNotification>(
+      `/lifecycle/notifications/${notificationId}/retry`,
+      { reason }
+    ),
+  dispatchDueReminders: (instrumentId?: string) =>
+    apiClient.post<{ dispatched_count: number; message: string }>(
+      '/lifecycle/notifications/dispatch-due',
+      { instrument_id: instrumentId }
+    ),
+  listFailedNotifications: () =>
+    apiClient.get<import('@/types/lifecycle').LifecycleNotification[]>(
+      '/lifecycle/notifications/failed'
+    ),
+  getUserInbox: (unreadOnly: boolean = false) =>
+    apiClient.get<import('@/types/lifecycle').NotificationListResponse>(
+      `/lifecycle/notifications/inbox?unread_only=${unreadOnly}`
+    ),
+  markNotificationRead: (notificationId: string) =>
+    apiClient.post<{ success: boolean; message: string }>(
+      `/lifecycle/notifications/${notificationId}/read`
+    ),
+};
+

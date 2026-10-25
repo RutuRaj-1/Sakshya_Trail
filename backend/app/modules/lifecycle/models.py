@@ -103,6 +103,17 @@ class LifecyclePolicy(Base, TimestampMixin):
     escalation_target_role: Mapped[str] = mapped_column(String(50), default="BRANCH_HEAD", nullable=False)
     maturity_critical_lead_days: Mapped[int] = mapped_column(Integer, default=15, nullable=False)
 
+    # Permitted notification channels, retry limits & templates
+    permitted_channels_json: Mapped[str] = mapped_column(
+        Text, default='["IN_APP", "EMAIL"]', nullable=False
+    )
+    max_retry_limit: Mapped[int] = mapped_column(Integer, default=3, nullable=False)
+    retry_interval_minutes: Mapped[int] = mapped_column(Integer, default=60, nullable=False)
+    template_id: Mapped[str] = mapped_column(
+        String(100), default="DEFAULT_REGULATORY_REMINDER", nullable=False
+    )
+    template_version: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
+
     # Renewal continuity comparison rules
     renewal_comparison_method: Mapped[str] = mapped_column(
         String(50), default=RenewalComparisonMethod.ISSUE_DATE_TO_MATURITY_DATE.value, nullable=False
@@ -134,12 +145,55 @@ class LifecyclePolicy(Base, TimestampMixin):
         except Exception:
             return [90, 60, 30, 15, 7]
 
+    @reminder_intervals_days.setter
+    def reminder_intervals_days(self, val: List[int]) -> None:
+        self.reminder_intervals_days_json = json.dumps(val or [])
+
+    @property
+    def reminder_milestones_days(self) -> List[int]:
+        return self.reminder_intervals_days
+
+    @reminder_milestones_days.setter
+    def reminder_milestones_days(self, val: List[int]) -> None:
+        self.reminder_intervals_days = val
+
     @property
     def recipient_roles_by_interval(self) -> Dict[str, List[str]]:
         try:
             return json.loads(self.recipient_roles_by_interval_json)
         except Exception:
             return {}
+
+    @recipient_roles_by_interval.setter
+    def recipient_roles_by_interval(self, val: Dict[str, List[str]]) -> None:
+        self.recipient_roles_by_interval_json = json.dumps(val or {})
+
+    @property
+    def permitted_channels(self) -> List[str]:
+        try:
+            return json.loads(self.permitted_channels_json)
+        except Exception:
+            return ["IN_APP", "EMAIL"]
+
+    @permitted_channels.setter
+    def permitted_channels(self, val: List[str]) -> None:
+        self.permitted_channels_json = json.dumps(val or [])
+
+    @property
+    def escalation_delay_days(self) -> int:
+        return self.escalation_interval_days
+
+    @escalation_delay_days.setter
+    def escalation_delay_days(self, val: int) -> None:
+        self.escalation_interval_days = val
+
+    @property
+    def escalation_destination_role(self) -> str:
+        return self.escalation_target_role
+
+    @escalation_destination_role.setter
+    def escalation_destination_role(self, val: str) -> None:
+        self.escalation_target_role = val
 
 
 class InstrumentLineage(Base, TimestampMixin):
@@ -363,3 +417,209 @@ class LifecycleJobRun(Base, TimestampMixin):
         Index("ix_job_status_started", "status", "started_at"),
         Index("ix_job_type_date", "job_type", "evaluation_date"),
     )
+
+
+class LifecycleNotification(Base, TimestampMixin):
+    """
+    Time-sensitive reminder, due-date alert, and escalation notification record.
+    Tracks granular lifecycle state, delivery attempts, and idempotency guarantees.
+    """
+    __tablename__ = "lifecycle_notifications"
+
+    id: Mapped[str] = mapped_column(
+        String(36), primary_key=True, default=lambda: str(uuid.uuid4())
+    )
+    idempotency_key: Mapped[str] = mapped_column(
+        String(255), unique=True, index=True, nullable=False
+    )
+    instrument_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("instruments.id", ondelete="CASCADE"), index=True, nullable=False
+    )
+    institution_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("institutions.id", ondelete="RESTRICT"), index=True, nullable=False
+    )
+    policy_id: Mapped[Optional[str]] = mapped_column(
+        String(36), ForeignKey("lifecycle_policies.id", ondelete="SET NULL"), nullable=True
+    )
+    policy_version: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+
+    event_type: Mapped[str] = mapped_column(String(50), nullable=False)
+    reminder_milestone_days: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    trigger_date: Mapped[date] = mapped_column(Date, nullable=False)
+
+    recipient_user_id: Mapped[Optional[str]] = mapped_column(
+        String(36), ForeignKey("users.id", ondelete="SET NULL"), index=True, nullable=True
+    )
+    recipient_role: Mapped[str] = mapped_column(String(50), nullable=False)
+    recipient_email: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    recipient_name: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+
+    channel: Mapped[str] = mapped_column(String(50), default="IN_APP", nullable=False)
+    template_id: Mapped[str] = mapped_column(
+        String(100), default="DEFAULT_REGULATORY_REMINDER", nullable=False
+    )
+    template_version: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
+
+    title: Mapped[str] = mapped_column(String(255), nullable=False)
+    message: Mapped[str] = mapped_column(Text, nullable=False)
+    payload_metadata_json: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
+    status: Mapped[str] = mapped_column(
+        String(50), default="CREATED", index=True, nullable=False
+    )
+    is_read: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    read_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+
+    scheduled_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=get_utc_now, nullable=False
+    )
+    first_attempted_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    last_attempted_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    delivered_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    failed_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+
+    retry_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    max_retries: Mapped[int] = mapped_column(Integer, default=3, nullable=False)
+    next_retry_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+
+    provider_message_id: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    failure_category: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
+    failure_reason: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
+    is_mock: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    mock_disclaimer: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+
+    __table_args__ = (
+        Index("ix_notif_event_date", "event_type", "trigger_date"),
+    )
+
+    # Relationships
+    attempts: Mapped[List["NotificationDeliveryAttempt"]] = relationship(
+        "NotificationDeliveryAttempt",
+        back_populates="notification",
+        cascade="all, delete-orphan",
+        order_by="NotificationDeliveryAttempt.attempt_number",
+    )
+    instrument: Mapped["Instrument"] = relationship("Instrument", foreign_keys=[instrument_id])
+    institution: Mapped["Institution"] = relationship("Institution", foreign_keys=[institution_id])
+
+    # Compatibility properties for tests and view layer
+    @property
+    def rendered_title(self) -> str:
+        return self.title
+
+    @rendered_title.setter
+    def rendered_title(self, val: str) -> None:
+        self.title = val
+
+    @property
+    def rendered_message(self) -> str:
+        return self.message
+
+    @rendered_message.setter
+    def rendered_message(self, val: str) -> None:
+        self.message = val
+
+    @property
+    def failure_details(self) -> Optional[str]:
+        return self.failure_reason
+
+    @failure_details.setter
+    def failure_details(self, val: Optional[str]) -> None:
+        self.failure_reason = val
+
+    @property
+    def milestone_days(self) -> Optional[int]:
+        return self.reminder_milestone_days
+
+    @milestone_days.setter
+    def milestone_days(self, val: Optional[int]) -> None:
+        self.reminder_milestone_days = val
+
+
+class NotificationDeliveryAttempt(Base):
+    """
+    Granular attempt tracking per notification for retries and delivery audits.
+    """
+    __tablename__ = "notification_delivery_attempts"
+
+    id: Mapped[str] = mapped_column(
+        String(36), primary_key=True, default=lambda: str(uuid.uuid4())
+    )
+    notification_id: Mapped[str] = mapped_column(
+        String(36),
+        ForeignKey("lifecycle_notifications.id", ondelete="CASCADE"),
+        index=True,
+        nullable=False,
+    )
+    attempt_number: Mapped[int] = mapped_column(Integer, nullable=False)
+    attempted_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=get_utc_now, nullable=False
+    )
+    channel: Mapped[str] = mapped_column(String(50), nullable=False)
+    status: Mapped[str] = mapped_column(String(50), index=True, nullable=False)
+
+    provider_response_code: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    provider_reference_id: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    error_category: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
+    error_message: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    duration_ms: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=get_utc_now, nullable=False
+    )
+
+    notification: Mapped["LifecycleNotification"] = relationship(
+        "LifecycleNotification", back_populates="attempts"
+    )
+
+    @property
+    def provider_name(self) -> Optional[str]:
+        return self.provider_response_code
+
+    @provider_name.setter
+    def provider_name(self, val: Optional[str]) -> None:
+        self.provider_response_code = val
+
+    @property
+    def provider_reference(self) -> Optional[str]:
+        return self.provider_reference_id
+
+    @provider_reference.setter
+    def provider_reference(self, val: Optional[str]) -> None:
+        self.provider_reference_id = val
+
+    @property
+    def failure_category(self) -> Optional[str]:
+        return self.error_category
+
+    @failure_category.setter
+    def failure_category(self, val: Optional[str]) -> None:
+        self.error_category = val
+
+    @property
+    def failure_details(self) -> Optional[str]:
+        return self.error_message
+
+    @failure_details.setter
+    def failure_details(self, val: Optional[str]) -> None:
+        self.error_message = val
+
+    @property
+    def is_mock(self) -> bool:
+        return self.status == "MOCKED" or (self.notification.is_mock if self.notification else False)
+
+    @is_mock.setter
+    def is_mock(self, val: bool) -> None:
+        pass
+
+

@@ -211,6 +211,23 @@ def execute_lifecycle_scan_job(
                 if eval_record.is_overdue:
                     overdue_count += 1
 
+                # Module 5 Prompt 3: Policy-driven reminder dispatch
+                try:
+                    from app.modules.lifecycle.notification_service import (
+                        generate_and_dispatch_reminders_for_instrument,
+                    )
+                    generate_and_dispatch_reminders_for_instrument(
+                        db=db,
+                        instrument_id=inst_id,
+                        simulated_date=simulated_date,
+                        actor_user_id=actor_user_id,
+                        actor_email=actor_email,
+                    )
+                except Exception as notif_err:
+                    logger.warning(
+                        f"[Scheduler Notification] Reminder dispatch failed for '{inst_id}': {notif_err}"
+                    )
+
             except Exception as exc:
                 error_count += 1
                 logger.error(f"[Scheduler Error] Instrument '{inst_id}' evaluation failed: {exc}")

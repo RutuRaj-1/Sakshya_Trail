@@ -439,10 +439,145 @@ python -c "from app.db.session import SessionLocal; from app.modules.lifecycle.s
 
 ---
 
-## 15. Next Steps for Prompt 3
+---
 
-With the maturity evaluation engine, concurrency-protected batch scheduler, tenancy-scoped monitoring APIs, and demo simulation clock verified, development proceeds to **Prompt 3: Multi-Channel Reminder & Escalation Notification Engine**:
-1. Implement template-driven reminder dispatching for institution and officer roles.
-2. Build delivery tracking and retry mechanics.
-3. Implement escalation alerts for persistent compliance delinquency.
+## 15. Policy-Driven Reminders, Delivery History, Escalation and Failure Recovery (Prompt 3 Architecture)
+
+Prompt 3 builds an auditable, multi-channel reminder and escalation engine integrated directly with the maturity monitoring engine from Prompt 2.
+
+### 15.1 Core Architecture Principles
+1. **Separation of Policy Configuration from Regulatory Reality:** Reminder milestones (e.g., 90, 60, 30, 15, 7 days) and escalation delays are stored in versioned policies (`LifecyclePolicy`). If a policy is unconfigured, intervals are not invented.
+2. **Honest Delivery Attribution:**
+   - `IN_APP` notifications are immediately marked `DELIVERED` upon database persistence into the recipient's inbox.
+   - `EMAIL` notifications without delivery-receipt webhooks are marked `ACCEPTED` when handed to the SMTP server, or `MOCKED` (`QUEUED_FOR_LOCAL_MAIL_CATCHER`) when in development/mock mode. They are **never** falsely claimed as `DELIVERED` merely because a request was constructed.
+   - External mock channels (SMS / WhatsApp) are explicitly marked `MOCKED` with disclaimer metadata.
+3. **Strict Tenancy and Recipient Resolution:**
+   - Institution reminders strictly resolve to active users of that specific institution (`INSTITUTION_USER`).
+   - If an institution or regional office has no active user, the system records an audited `CONFIGURATION_ERROR` with status `FAILED` rather than silently routing the notice to an arbitrary administrator.
+4. **Idempotency & Concurrent Dispatch Safety:** Stable composite idempotency key prevents duplicate communications across scheduler reruns, worker restarts, or concurrent dispatches.
+5. **No Side-Effect State Alterations:** The notification engine never alters an instrument's trust level (L0–L3), never authorizes release, and never marks a renewal complete.
+
+---
+
+## 16. Multi-Channel Notification Providers
+
+The channel subsystem implements a pluggable provider interface in `app/modules/lifecycle/channels/`:
+
+```
+backend/app/modules/lifecycle/channels/
+├── base.py         # Abstract NotificationChannelProvider & DeliveryResult
+├── in_app.py       # InAppNotificationProvider (in-app inbox, status=DELIVERED)
+├── email.py        # EmailNotificationProvider (SMTP/local catcher, status=ACCEPTED/MOCKED)
+├── mock_sms.py     # MockSmsProvider (explicitly simulated, status=MOCKED)
+├── registry.py     # Provider factory registry with custom provider support
+└── __init__.py     # Package exports
+```
+
+### Channel Delivery Semantics
+
+| Channel | Provider Class | Development Status | Production Status | Delivery Receipt Attribution |
+|:---:|:---:|:---:|:---:|:---|
+| `IN_APP` | `InAppNotificationProvider` | `DELIVERED` | `DELIVERED` | Immediate database persistence into user notification inbox. |
+| `EMAIL` | `EmailNotificationProvider` | `MOCKED` / `ACCEPTED` | `ACCEPTED` | Handshake confirmed with MTA. Labeled `QUEUED_FOR_LOCAL_MAIL_CATCHER` in dev. |
+| `MOCK_SMS` | `MockSmsProvider` | `MOCKED` | Disabled / Mock | Explicitly simulated with label `MOCKED — LOCAL DEMO ENVIRONMENT`. |
+
+---
+
+## 17. Notification Data Models & Migration
+
+Applied migration `2026_10_25_0900-d4e5f6a7b8c9_add_lifecycle_notifications.py` introducing two primary tables:
+
+### 17.1 `lifecycle_notifications`
+- **Identity & Idempotency:** `id` (UUID), `idempotency_key` (Unique composite string).
+- **Relationships:** `instrument_id`, `institution_id`, `policy_id`, `policy_version`.
+- **Event Metadata:** `event_type` (`MATURITY_MILESTONE_REMINDER`, `INSTITUTION_ACTION_DUE`, `OFFICER_ACTION_DUE`, `ACTION_OVERDUE`, `ACTION_ESCALATED`), `reminder_milestone_days`, `trigger_date`.
+- **Recipient Identity:** `recipient_role`, `recipient_user_id`, `recipient_email`, `recipient_name`.
+- **Delivery State:** `channel`, `status` (`CREATED`, `ATTEMPTED`, `ACCEPTED`, `DELIVERED`, `FAILED`, `MOCKED`).
+- **Audit & Timestamps:** `scheduled_at`, `first_attempted_at`, `last_attempted_at`, `delivered_at`, `failed_at`.
+- **Retry Mechanics:** `retry_count`, `max_retries`, `next_retry_at`, `failure_category`, `failure_reason`.
+- **Simulation Disclaimer:** `is_mock` (Boolean), `mock_disclaimer` (Text).
+
+### 17.2 `notification_delivery_attempts`
+- **Attempt Tracking:** `id`, `notification_id` (Foreign Key), `attempt_number`.
+- **Execution Log:** `attempted_at`, `channel`, `status`, `duration_ms`.
+- **Provider Feedback:** `provider_response_code`, `provider_reference_id`.
+- **Failure Diagnostics:** `error_category` (`INVALID_RECIPIENT`, `PROVIDER_UNAVAILABLE`, `AUTHENTICATION_ERROR`, `CONFIGURATION_ERROR`, `RETRY_EXHAUSTED`), `error_message`.
+
+---
+
+## 18. Deduplication & Idempotency Key Semantics
+
+The composite idempotency key is deterministically generated via:
+```python
+idempotency_key = f"notif:{instrument_id}:{event_type}:{milestone_days}:{trigger_date.isoformat()}:{recipient_identifier}:{channel}"
+```
+- **Rerun Invariance:** Rerunning daily batch scans on the same calendar date for the same milestone produces zero duplicate database rows.
+- **Worker Concurrency:** Enforced via `UNIQUE CONSTRAINT (idempotency_key)` on the database table.
+- **Retry Distinction:** Retries reuse the exact same `LifecycleNotification` record, appending a new row to `notification_delivery_attempts` and incrementing `retry_count`.
+
+---
+
+## 19. Bounded Retry & Failure Recovery
+
+The recovery engine handles external failure modes without infinite retry loops:
+- **Missing Recipient:** Instantly fails with `failure_category="CONFIGURATION_ERROR"`, `status="FAILED"`. Does not route to random admin.
+- **Provider Outage:** Increments `retry_count`, logs `PROVIDER_UNAVAILABLE`, calculates `next_retry_at`.
+- **Retry Exhaustion:** When `retry_count >= max_retries`, transitions permanently to `RETRY_EXHAUSTED` with `status="FAILED"`.
+- **Manual Administrative Retry:** Privileged operators (`SYSTEM_ADMIN`, `SCRUTINY_OFFICER`) can trigger controlled retries via `POST /api/v1/lifecycle/notifications/{id}/retry`.
+
+---
+
+## 20. Module 5 Prompt 3 REST APIs
+
+| Method | Endpoint | Authorized Roles | Purpose |
+|:---:|:---|:---:|:---|
+| `GET` | `/api/v1/lifecycle/instruments/{id}/notifications` | Tenancy Scoped | List complete notification history and attempt logs for an instrument. |
+| `GET` | `/api/v1/instruments/{id}/notifications` | Tenancy Scoped | Direct alias for instrument notification history. |
+| `GET` | `/api/v1/lifecycle/notifications/inbox` | Authenticated | List current user's in-app inbox notifications. |
+| `POST` | `/api/v1/lifecycle/notifications/{id}/read` | Notification Recipient | Mark in-app notification as read. |
+| `GET` | `/api/v1/lifecycle/notifications/failed` | Admin / Officer / Branch Head | Audit queue of failed deliveries requiring operator intervention. |
+| `POST` | `/api/v1/lifecycle/notifications/{id}/retry` | Admin / Scrutiny Officer | Controlled manual retry of a failed notification. |
+| `POST` | `/api/v1/lifecycle/notifications/dispatch-due` | Admin / Scrutiny Officer | On-demand batch evaluation and reminder dispatch. |
+
+---
+
+## 21. Frontend UI Integration
+
+### 21.1 Lifecycle Notification History Component
+Implemented in `frontend/src/features/lifecycle/LifecycleNotificationHistory.tsx` and embedded directly in `InstrumentDetailPage.tsx`:
+- **Real-Time Lifecycle Health Bar:** Displays current maturity stage, days remaining, statutory validity, action due dates, and escalation condition.
+- **Audited Reminder Timeline:** Visual cards for each dispatched reminder showing event type badge, T-Minus milestone badge, channel badge (`IN_APP`, `EMAIL`, `MOCK_SMS`), and delivery status badge.
+- **Delivery Receipt Transparency:** Clearly displays `CONFIRMED DELIVERED` (green) for in-app, `PROVIDER ACCEPTED` (blue) for SMTP relay, `MOCKED` (amber) with local mail catcher notice, or `DELIVERY FAILED` (red).
+- **Expandable Attempt Logs:** Drill-down view of each transmission attempt with attempt numbers, provider reference IDs, timestamps, and failure explanations.
+- **Administrative Action:** Controlled manual retry button on failed deliveries, and batch due-reminder dispatch trigger for officers.
+
+---
+
+## 22. Acceptance Verification Matrix
+
+### Prompt 3: Reminders, Delivery History & Escalation ([`backend/tests/test_module5_prompt3_reminders.py`](file:///c:/Users/bhome/OneDrive/Desktop/VIT/SIH/SIH%202026/TOP%2075/FDR_Sentinel/backend/tests/test_module5_prompt3_reminders.py))
+
+| Specification | Test Function | Result | Verification Notes |
+|:---:|:---|:---:|:---|
+| 1 | `test_01_reminders_generated_at_configured_milestones` | **PASSED** | Generates `MATURITY_MILESTONE_REMINDER` records at T-30d with `IN_APP` and `EMAIL` channels. |
+| 2 | `test_02_unconfigured_policy_does_not_produce_invented_intervals` | **PASSED** | Sparse policy with empty milestones generates 0 invented reminder notices. |
+| 3 | `test_03_correct_institution_recipient_resolution` | **PASSED** | `INSTITUTION_USER` recipient strictly matches institution; never leaks to other colleges. |
+| 4 | `test_04_role_based_escalation` | **PASSED** | Overdue actions exceeding escalation delay generate `ACTION_ESCALATED` to `BRANCH_HEAD`. |
+| 5 | `test_05_idempotency_under_rerun_and_restart` | **PASSED** | Rerunning dispatch on same day creates 0 duplicate notifications; IDs and counts identical. |
+| 6 | `test_06_concurrent_dispatch_protection` | **PASSED** | Database unique constraint on composite idempotency key blocks concurrent duplication. |
+| 7 | `test_07_failed_provider_retry` | **PASSED** | Manual retry increments `retry_count`, creates audited attempt, updates delivery state. |
+| 8 | `test_08_permanent_failure_and_retry_exhaustion` | **PASSED** | Notifications reaching `max_retries` are rejected with `RETRY_EXHAUSTED` (HTTP 400). |
+| 9 | `test_09_accurate_notification_history` | **PASSED** | Full attempt history preserved with attempt numbers, provider response codes, and errors. |
+| 10 | `test_10_no_false_delivered_state` | **PASSED** | Email marked `ACCEPTED`/`MOCKED`, never falsely claimed `DELIVERED`. In-app is `DELIVERED`. |
+| 11 | `test_11_missing_recipient_handling` | **PASSED** | Empty institution records `CONFIGURATION_ERROR` (status `FAILED`); no arbitrary admin routing. |
+| 12 | `test_12_resolved_actions_stop_escalating_appropriately` | **PASSED** | Closed/resolved instruments produce 0 reminders and 0 escalation notices. |
+| 13 | `test_13_cross_tenant_notification_privacy` | **PASSED** | College A user cannot access College B notification history (HTTP 403) or inbox items. |
+| 14 | `test_14_demo_and_mock_labels` | **PASSED** | Unconfigured/mock providers set `is_mock=True` and clear disclaimer notices. |
+| 15 | `test_15_no_trust_or_release_changes_as_reminder_side_effect` | **PASSED** | Reminders and escalations leave `trust_level` and instrument status strictly unaltered. |
+
+### Global Quality Check Status
+- **Backend Test Suite:** **335 passed** across all modules (Modules 1–4 and Module 5 Prompts 1, 2, and 3).
+- **Frontend Production Bundle:** **Compiled cleanly** with `tsc -b && vite build` in 455ms.
+- **Database Schema:** Alembic migration `d4e5f6a7b8c9` applied and verified.
+
 

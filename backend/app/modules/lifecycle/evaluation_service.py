@@ -139,6 +139,11 @@ def evaluate_instrument_lifecycle(
         else:
             maturity_stage = MaturityStage.ACTIVE.value
 
+        # Check for discrete reminder intervals if configured
+        configured_intervals = policy.reminder_intervals_days
+        if configured_intervals and days_to_maturity in configured_intervals:
+            matched_interval = days_to_maturity
+
         # Overdue / Escalation logic (only if not already renewed)
         if not active_lineage:
             if inst_due_date and eval_date > inst_due_date:
@@ -154,14 +159,10 @@ def evaluate_instrument_lifecycle(
                 due_condition = DueCondition.OFFICER_ACTION_DUE.value
             elif inst_due_date and eval_date >= inst_due_date:
                 due_condition = DueCondition.INSTITUTION_ACTION_DUE.value
+            elif matched_interval is not None:
+                due_condition = DueCondition.REMINDER_DUE.value
             else:
-                # Check for discrete reminder intervals if configured
-                configured_intervals = policy.reminder_intervals_days
-                if configured_intervals and days_to_maturity in configured_intervals:
-                    matched_interval = days_to_maturity
-                    due_condition = DueCondition.REMINDER_DUE.value
-                else:
-                    due_condition = DueCondition.NORMAL.value
+                due_condition = DueCondition.NORMAL.value
         else:
             # Renewed predecessor is covered by its successor
             due_condition = DueCondition.NORMAL.value
@@ -323,3 +324,17 @@ def evaluate_batch_instruments(
             material_count += 1
 
     return len(evaluations), material_count, evaluations
+
+
+def get_latest_evaluation_for_instrument(
+    db: Session, instrument_id: str
+) -> Optional[LifecycleEvaluation]:
+    """
+    Retrieves the most recent lifecycle evaluation record for an instrument.
+    """
+    return db.scalar(
+        select(LifecycleEvaluation)
+        .where(LifecycleEvaluation.instrument_id == instrument_id)
+        .order_by(desc(LifecycleEvaluation.created_at))
+    )
+

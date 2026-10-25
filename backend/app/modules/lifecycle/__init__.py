@@ -6,6 +6,8 @@ from app.modules.lifecycle.models import (
     InstrumentLineage,
     LifecycleEvaluation,
     LifecycleJobRun,
+    LifecycleNotification,
+    NotificationDeliveryAttempt,
 )
 from app.modules.lifecycle.enums import (
     PolicyStatus,
@@ -22,6 +24,8 @@ __all__ = [
     "InstrumentLineage",
     "LifecycleEvaluation",
     "LifecycleJobRun",
+    "LifecycleNotification",
+    "NotificationDeliveryAttempt",
     "PolicyStatus",
     "MaturityStage",
     "DueCondition",
@@ -30,3 +34,4 @@ __all__ = [
     "LineageRelationshipStatus",
     "ContinuityIndicator",
 ]
+
