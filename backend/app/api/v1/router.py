@@ -38,4 +38,8 @@ api_v1_router.include_router(verification_router)
 api_v1_router.include_router(lifecycle_router)
 api_v1_router.include_router(instruments_lifecycle_router)
 
+# Module 6: Release / Refund Case Management
+from app.modules.release.router import router as release_router
+api_v1_router.include_router(release_router)
+
 

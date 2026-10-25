@@ -20,6 +20,7 @@ import app.modules.validation.models
 import app.modules.validation.extracted_fields_model
 import app.modules.verification.models
 import app.modules.lifecycle.models
+import app.modules.release.models
 
 from app.api.v1.router import api_v1_router
 from app.api.v1.endpoints.health import liveness_check, readiness_check
