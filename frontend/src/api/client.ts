@@ -34,18 +34,28 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
       headers,
     });
 
-    if (!res.ok) {
-      let errorBody: any = null;
+    const rawText = await res.text();
+    let parsed: any = null;
+    if (rawText) {
       try {
-        errorBody = await res.json();
+        parsed = JSON.parse(rawText);
       } catch {
-        errorBody = await res.text();
+        parsed = rawText;
       }
-      const message = errorBody?.error || errorBody?.detail || res.statusText || 'API Request failed';
-      throw new ApiError(res.status, message, errorBody);
     }
 
-    return await res.json();
+    if (!res.ok) {
+      const message =
+        (typeof parsed === 'object' && parsed !== null
+          ? parsed.error || parsed.detail || parsed.message
+          : null) ||
+        (typeof parsed === 'string' ? parsed : null) ||
+        res.statusText ||
+        'API Request failed';
+      throw new ApiError(res.status, message, parsed);
+    }
+
+    return (parsed ?? ({} as T)) as T;
   } catch (err: any) {
     if (err instanceof ApiError) throw err;
     throw new ApiError(0, err.message || 'Network unreachable');
