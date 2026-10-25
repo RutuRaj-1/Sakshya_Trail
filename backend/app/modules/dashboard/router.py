@@ -52,6 +52,13 @@ from app.modules.dashboard.schemas import (
     MonthWiseMaturityLoadResponse,
     PriorityQueueResponse,
     CommandCenterOverviewResponse,
+    InstrumentSearchResponse,
+    ReleaseCaseSearchResponse,
+    InstrumentDetailSnapshotResponse,
+    ScrutinyObservationItem,
+    ScrutinyObservationCreateRequest,
+    ScrutinyObservationAmendRequest,
+    ScrutinyObservationResolveRequest,
 )
 from app.modules.dashboard.dashboard_service import DashboardService
 from app.modules.dashboard.priority_service import PriorityService
@@ -59,6 +66,7 @@ from app.modules.dashboard.search_service import SearchService
 from app.modules.dashboard.report_service import ReportService
 from app.modules.dashboard.history_service import HistoryService
 from app.modules.dashboard.audit_query_service import AuditQueryService
+from app.modules.dashboard.observation_service import ScrutinyObservationService
 
 router = APIRouter(prefix="/dashboard", tags=["Module 7 Command Center"])
 
@@ -401,9 +409,10 @@ def get_priority_queue(
 
 
 # ------------------------------------------------------------------------------
-# Reusable Search & Filter Endpoint (PRD-FR-071)
+# Reusable Search & Filter Endpoints (PRD-FR-071)
 # ------------------------------------------------------------------------------
-@router.get("/search")
+@router.get("/search", response_model=InstrumentSearchResponse)
+@router.get("/search/instruments", response_model=InstrumentSearchResponse)
 def search_instruments(
     q: Optional[str] = Query(None, description="Keyword search in reference, bank, branch, institution"),
     institution_id: Optional[str] = Query(None, description="Filter by institution ID"),
@@ -417,6 +426,8 @@ def search_instruments(
     issue_to: Optional[date] = Query(None, description="Issue date end"),
     min_amount: Optional[Decimal] = Query(None, ge=0, description="Minimum deposit amount"),
     max_amount: Optional[Decimal] = Query(None, ge=0, description="Maximum deposit amount"),
+    has_discrepancies: Optional[bool] = Query(None, description="Filter by unresolved discrepancy presence"),
+    priority_category: Optional[str] = Query(None, description="Filter by category: EXPIRING_SOON, MATURED, ACTIVE"),
     sort_by: str = Query("maturity_date", description="Allowlisted sort column"),
     sort_order: str = Query("asc", pattern="^(asc|desc)$", description="Sort direction"),
     skip: int = Query(0, ge=0, description="Pagination offset"),
@@ -425,7 +436,7 @@ def search_instruments(
     db: Session = Depends(get_db),
 ) -> Dict[str, Any]:
     """
-    Common role-scoped search with sorting and pagination (PRD-FR-071).
+    Common role-scoped search for FDR instruments with sorting and pagination (PRD-FR-071).
     """
     return SearchService.search_instruments(
         db=db,
@@ -442,6 +453,44 @@ def search_instruments(
         issue_to=issue_to,
         min_amount=min_amount,
         max_amount=max_amount,
+        has_discrepancies=has_discrepancies,
+        priority_category=priority_category,
+        sort_by=sort_by,
+        sort_order=sort_order,
+        skip=skip,
+        limit=limit,
+    )
+
+
+@router.get("/search/release-cases", response_model=ReleaseCaseSearchResponse)
+def search_release_cases(
+    q: Optional[str] = Query(None, description="Keyword search in case reference, instrument, bank"),
+    institution_id: Optional[str] = Query(None, description="Filter by institution ID"),
+    request_type: Optional[str] = Query(None, description="Filter by request type (RELEASE, DISCHARGE, REFUND)"),
+    workflow_status: Optional[str] = Query(None, description="Filter by workflow status"),
+    readiness_outcome: Optional[str] = Query(None, description="Filter by assessment outcome (READY, BLOCKED, INCOMPLETE)"),
+    created_from: Optional[date] = Query(None, description="Created date start"),
+    created_to: Optional[date] = Query(None, description="Created date end"),
+    sort_by: str = Query("created_at", description="Allowlisted sort column"),
+    sort_order: str = Query("desc", pattern="^(asc|desc)$", description="Sort direction"),
+    skip: int = Query(0, ge=0, description="Pagination offset"),
+    limit: int = Query(50, ge=1, le=100, description="Page limit"),
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db),
+) -> Dict[str, Any]:
+    """
+    Role-scoped search for Release & Refund cases with sorting and pagination.
+    """
+    return SearchService.search_release_cases(
+        db=db,
+        current_user=current_user,
+        q=q,
+        institution_id=institution_id,
+        request_type=request_type,
+        workflow_status=workflow_status,
+        readiness_outcome=readiness_outcome,
+        created_from=created_from,
+        created_to=created_to,
         sort_by=sort_by,
         sort_order=sort_order,
         skip=skip,
@@ -507,6 +556,112 @@ def get_report_dataset(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Unknown report type '{report_type}'. Supported: PENDING_VERIFICATION, UPCOMING_MATURITIES, MISSING_DOCUMENTS, INTERVENTIONS",
         )
+
+
+# ------------------------------------------------------------------------------
+# Instrument Detail & Comprehensive History Snapshot (Prompt 3)
+# ------------------------------------------------------------------------------
+@router.get("/instruments/{instrument_id}/detail", response_model=InstrumentDetailSnapshotResponse)
+def get_instrument_detail_snapshot(
+    instrument_id: str = Path(..., description="Target instrument UUID"),
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db),
+) -> Dict[str, Any]:
+    """
+    Returns complete multi-dimensional snapshot of an instrument:
+    current snapshot, document history, field provenance, lifecycle/lineage,
+    audit timeline, and append-only scrutiny observations.
+    """
+    return HistoryService.get_instrument_detail_snapshot(
+        db=db, current_user=current_user, instrument_id=instrument_id
+    )
+
+
+# ------------------------------------------------------------------------------
+# Append-Only Scrutiny Observations (PRD-FR-072 / FR-073)
+# ------------------------------------------------------------------------------
+@router.get("/instruments/{instrument_id}/observations", response_model=List[ScrutinyObservationItem])
+def list_instrument_observations(
+    instrument_id: str = Path(..., description="Target instrument UUID"),
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db),
+) -> List[Dict[str, Any]]:
+    """
+    Lists all observations recorded for an instrument (redacting internal-only notes for institutions).
+    """
+    return ScrutinyObservationService.get_observations(
+        db=db, current_user=current_user, instrument_id=instrument_id
+    )
+
+
+@router.post("/instruments/{instrument_id}/observations", response_model=ScrutinyObservationItem, status_code=status.HTTP_201_CREATED)
+def create_instrument_observation(
+    instrument_id: str = Path(..., description="Target instrument UUID"),
+    payload: ScrutinyObservationCreateRequest = ...,
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db),
+) -> Dict[str, Any]:
+    """
+    Creates an append-only scrutiny observation note attached to the instrument.
+    Auditors are strictly read-only.
+    """
+    obs = ScrutinyObservationService.create_observation(
+        db=db,
+        current_user=current_user,
+        instrument_id=instrument_id,
+        observation_text=payload.observation_text,
+        observation_category=payload.observation_category,
+        finding_id=payload.finding_id,
+        supporting_document_id=payload.supporting_document_id,
+        supporting_version_number=payload.supporting_version_number,
+        is_internal_only=payload.is_internal_only,
+    )
+    items = ScrutinyObservationService.get_observations(db=db, current_user=current_user, instrument_id=instrument_id)
+    return next(item for item in items if item["id"] == obs.id)
+
+
+@router.post("/observations/{observation_id}/amend", response_model=ScrutinyObservationItem)
+def amend_scrutiny_observation(
+    observation_id: str = Path(..., description="Prior observation UUID to supersede"),
+    payload: ScrutinyObservationAmendRequest = ...,
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db),
+) -> Dict[str, Any]:
+    """
+    Amends an observation by creating a superseding observation.
+    The prior note is marked SUPERSEDED but remains intact and auditable.
+    """
+    amended = ScrutinyObservationService.amend_observation(
+        db=db,
+        current_user=current_user,
+        observation_id=observation_id,
+        observation_text=payload.observation_text,
+        amendment_reason=payload.amendment_reason,
+        is_internal_only=payload.is_internal_only,
+    )
+    items = ScrutinyObservationService.get_observations(db=db, current_user=current_user, instrument_id=amended.instrument_id)
+    return next(item for item in items if item["id"] == amended.id)
+
+
+@router.post("/observations/{observation_id}/resolve", response_model=ScrutinyObservationItem)
+def resolve_scrutiny_observation(
+    observation_id: str = Path(..., description="Observation UUID to resolve"),
+    payload: ScrutinyObservationResolveRequest = ...,
+    current_user: User = Depends(require_roles([ROLE_SCRUTINY_OFFICER, ROLE_BRANCH_HEAD, ROLE_COMPETENT_AUTHORITY, ROLE_SYSTEM_ADMIN])),
+    db: Session = Depends(get_db),
+) -> Dict[str, Any]:
+    """
+    Resolves an observation with mandatory rationale.
+    Requires officer or elevated authority.
+    """
+    resolved = ScrutinyObservationService.resolve_observation(
+        db=db,
+        current_user=current_user,
+        observation_id=observation_id,
+        resolution_reason=payload.resolution_reason,
+    )
+    items = ScrutinyObservationService.get_observations(db=db, current_user=current_user, instrument_id=resolved.instrument_id)
+    return next(item for item in items if item["id"] == resolved.id)
 
 
 # ------------------------------------------------------------------------------

@@ -14,6 +14,13 @@ import type {
   PriorityQueueResponse,
   CommandCenterOverviewResponse,
   MetricDictionaryResponse,
+  InstrumentSearchResponse,
+  ReleaseCaseSearchResponse,
+  InstrumentDetailSnapshotResponse,
+  ScrutinyObservationItem,
+  ScrutinyObservationCreateRequest,
+  ScrutinyObservationAmendRequest,
+  ScrutinyObservationResolveRequest,
 } from '@/types/commandCenter';
 
 export interface StatusCountsParams {
@@ -153,5 +160,54 @@ export const commandCenterApi = {
       }
     });
     return apiClient.get<{ total_count: number; records: any[] }>(`/dashboard/search?${sp.toString()}`);
+  },
+
+  /** Unified Instrument Search */
+  searchInstruments: (params: Record<string, any>) => {
+    const sp = new URLSearchParams();
+    Object.entries(params).forEach(([k, v]) => {
+      if (v !== undefined && v !== null && v !== '') {
+        sp.append(k, String(v));
+      }
+    });
+    const qs = sp.toString();
+    return apiClient.get<InstrumentSearchResponse>(`/dashboard/search/instruments${qs ? `?${qs}` : ''}`);
+  },
+
+  /** Unified Release Case Search */
+  searchReleaseCases: (params: Record<string, any>) => {
+    const sp = new URLSearchParams();
+    Object.entries(params).forEach(([k, v]) => {
+      if (v !== undefined && v !== null && v !== '') {
+        sp.append(k, String(v));
+      }
+    });
+    const qs = sp.toString();
+    return apiClient.get<ReleaseCaseSearchResponse>(`/dashboard/search/release-cases${qs ? `?${qs}` : ''}`);
+  },
+
+  /** Comprehensive Instrument Detail & History Snapshot */
+  getInstrumentDetailSnapshot: (instrumentId: string) => {
+    return apiClient.get<InstrumentDetailSnapshotResponse>(`/dashboard/instruments/${instrumentId}/detail`);
+  },
+
+  /** Scrutiny Observations list */
+  getObservations: (instrumentId: string) => {
+    return apiClient.get<ScrutinyObservationItem[]>(`/dashboard/instruments/${instrumentId}/observations`);
+  },
+
+  /** Create an append-only scrutiny observation */
+  createObservation: (instrumentId: string, data: ScrutinyObservationCreateRequest) => {
+    return apiClient.post<ScrutinyObservationItem>(`/dashboard/instruments/${instrumentId}/observations`, data);
+  },
+
+  /** Amend / supersede an existing scrutiny observation */
+  amendObservation: (observationId: string, data: ScrutinyObservationAmendRequest) => {
+    return apiClient.post<ScrutinyObservationItem>(`/dashboard/observations/${observationId}/amend`, data);
+  },
+
+  /** Resolve an observation note */
+  resolveObservation: (observationId: string, data: ScrutinyObservationResolveRequest) => {
+    return apiClient.post<ScrutinyObservationItem>(`/dashboard/observations/${observationId}/resolve`, data);
   },
 };

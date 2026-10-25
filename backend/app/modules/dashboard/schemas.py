@@ -278,3 +278,171 @@ class CommandCenterOverviewResponse(BaseModel):
     document_completeness: DocumentCompletenessResponse
     release_blockers: ReleaseBlockersResponse
     maturity_load: MonthWiseMaturityLoadResponse
+
+
+# ------------------------------------------------------------------------------
+# Prompt 3: Unified Search, History & Scrutiny Observation Schemas
+# ------------------------------------------------------------------------------
+
+class InstrumentSearchItem(BaseModel):
+    """Concise instrument search hit with role-masked attributes."""
+    id: str
+    reference_number: str
+    institution_id: str
+    institution_name: Optional[str] = None
+    bank_name: str
+    branch: Optional[str] = None
+    amount: str
+    currency: str = "INR"
+    issue_date: str
+    maturity_date: str
+    status: str
+    trust_level: str
+    assigned_office: Optional[str] = None
+    created_at: Optional[str] = None
+    has_active_discrepancies: bool = False
+    pending_verification: bool = False
+
+
+class InstrumentSearchResponse(BaseModel):
+    """Server-backed search results for FDR instruments."""
+    total_count: int
+    skip: int
+    limit: int
+    sort_by: str
+    sort_order: str
+    records: List[InstrumentSearchItem]
+
+
+class ReleaseCaseSearchItem(BaseModel):
+    """Concise release/refund case search hit."""
+    id: str
+    case_number: str
+    case_reference: Optional[str] = None
+    instrument_id: str
+    instrument_reference: Optional[str] = None
+    institution_id: str
+    institution_name: Optional[str] = None
+    request_type: str
+    case_type: str
+    workflow_status: str
+    readiness_outcome: Optional[str] = None
+    blockers_count: int = 0
+    created_at: str
+
+
+class ReleaseCaseSearchResponse(BaseModel):
+    """Server-backed search results for Release & Refund cases."""
+    total_count: int
+    skip: int
+    limit: int
+    sort_by: str
+    sort_order: str
+    records: List[ReleaseCaseSearchItem]
+
+
+class DocumentHistoryItem(BaseModel):
+    """Versioned document metadata and secure download access."""
+    id: str
+    document_id: str
+    version_number: int
+    category: str
+    uploader_user_id: Optional[str] = None
+    uploader_name: Optional[str] = None
+    uploaded_at: str
+    sha256_hash: str
+    file_name: Optional[str] = None
+    file_size_bytes: Optional[int] = None
+    is_verified: bool = False
+    download_url: str
+
+
+class FieldProvenanceHistoryItem(BaseModel):
+    """Field-level value change and evidentiary source provenance."""
+    id: str
+    field_name: str
+    recorded_value: str
+    previous_value: Optional[str] = None
+    source_type: str
+    source_actor_id: Optional[str] = None
+    actor_name: Optional[str] = None
+    evidence_reference: Optional[str] = None
+    reason: Optional[str] = None
+    created_at: str
+
+
+class LifecycleLineageItem(BaseModel):
+    """Lifecycle event or lineage edge."""
+    event_type: str
+    timestamp: str
+    actor_id: Optional[str] = None
+    summary: str
+    details: Dict[str, Any] = Field(default_factory=dict)
+    is_simulated: bool = False
+
+
+class TimelineEventItem(BaseModel):
+    """Chronological material event for audit trail."""
+    event_type: str
+    timestamp: str
+    actor_id: Optional[str] = None
+    summary: str
+    details: Dict[str, Any] = Field(default_factory=dict)
+
+
+class ScrutinyObservationItem(BaseModel):
+    """Append-only scrutiny observation with supersession lineage."""
+    id: str
+    instrument_id: Optional[str] = None
+    release_request_id: Optional[str] = None
+    finding_id: Optional[str] = None
+    supporting_document_id: Optional[str] = None
+    supporting_version_number: Optional[int] = None
+    observation_category: str
+    observation_text: str
+    author_user_id: str
+    author_name: Optional[str] = None
+    author_role: str
+    status: str
+    resolution_reason: Optional[str] = None
+    resolved_at: Optional[str] = None
+    resolved_by_user_id: Optional[str] = None
+    resolved_by_name: Optional[str] = None
+    supersedes_id: Optional[str] = None
+    superseded_by_id: Optional[str] = None
+    is_internal_only: bool = False
+    created_at: str
+    updated_at: str
+
+
+class InstrumentDetailSnapshotResponse(BaseModel):
+    """Complete multi-dimensional snapshot of an instrument and its full historical record."""
+    instrument: Dict[str, Any]
+    documents: List[DocumentHistoryItem]
+    field_history: List[FieldProvenanceHistoryItem]
+    lifecycle_lineage: List[LifecycleLineageItem]
+    timeline: List[TimelineEventItem]
+    observations: List[ScrutinyObservationItem]
+
+
+class ScrutinyObservationCreateRequest(BaseModel):
+    """Creation of a new append-only observation note."""
+    observation_text: str = Field(..., min_length=3, max_length=2000, description="Mandatory observation content")
+    observation_category: str = Field("GENERAL", description="GENERAL, DISCREPANCY, DOCUMENT, MANDATE, COMPLIANCE")
+    finding_id: Optional[str] = None
+    supporting_document_id: Optional[str] = None
+    supporting_version_number: Optional[int] = None
+    is_internal_only: bool = False
+
+
+class ScrutinyObservationAmendRequest(BaseModel):
+    """Amendment or correction creating a superseding observation."""
+    observation_text: str = Field(..., min_length=3, max_length=2000, description="Updated observation content")
+    amendment_reason: str = Field(..., min_length=3, max_length=500, description="Reason for amendment/correction")
+    is_internal_only: bool = False
+
+
+class ScrutinyObservationResolveRequest(BaseModel):
+    """Reasoned resolution of an observation note."""
+    resolution_reason: str = Field(..., min_length=3, max_length=1000, description="Reason for resolving/dismissing")
+

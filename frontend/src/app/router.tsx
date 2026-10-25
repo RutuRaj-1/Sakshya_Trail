@@ -15,6 +15,7 @@ import { LoginPage } from '@/app/routes/LoginPage';
 import { ChangePasswordPage } from '@/app/routes/ChangePasswordPage';
 import { ReleaseCasesPage } from '@/app/routes/ReleaseCasesPage';
 import { ReleaseDetailPage } from '@/app/routes/ReleaseDetailPage';
+import { UnifiedSearchPage } from '@/app/routes/UnifiedSearchPage';
 import { ProtectedRoute } from '@/features/auth/ProtectedRoute';
 
 export const router = createBrowserRouter([
@@ -45,6 +46,10 @@ export const router = createBrowserRouter([
       {
         path: 'command-center',
         element: <CommandCenterPage />,
+      },
+      {
+        path: 'search',
+        element: <UnifiedSearchPage />,
       },
       {
         path: 'instruments',

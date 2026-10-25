@@ -216,3 +216,192 @@ export interface CommandCenterOverviewResponse {
   release_blockers: ReleaseBlockersResponse;
   maturity_load: MonthWiseMaturityLoadResponse;
 }
+
+// =============================================================================
+// Module 7 — Prompt 3: Unified Search, History & Observations
+// =============================================================================
+
+export interface InstrumentSearchItem {
+  id: string;
+  reference_number: string;
+  institution_id: string;
+  institution_name?: string | null;
+  bank_name: string;
+  branch?: string | null;
+  amount: string;
+  currency: string;
+  issue_date: string;
+  maturity_date: string;
+  status: string;
+  trust_level: string;
+  assigned_office?: string | null;
+  has_active_discrepancies: boolean;
+  priority_category?: string | null;
+  created_at: string;
+}
+
+export interface InstrumentSearchResponse {
+  total_count: number;
+  skip: number;
+  limit: number;
+  sort_by: string;
+  sort_order: string;
+  records: InstrumentSearchItem[];
+}
+
+export interface ReleaseCaseSearchItem {
+  id: string;
+  case_number: string;
+  case_reference?: string | null;
+  instrument_id: string;
+  instrument_reference?: string | null;
+  institution_id: string;
+  institution_name?: string | null;
+  request_type: string;
+  case_type: string;
+  workflow_status: string;
+  readiness_outcome?: string | null;
+  blockers_count: number;
+  created_at: string;
+}
+
+export interface ReleaseCaseSearchResponse {
+  total_count: number;
+  skip: number;
+  limit: number;
+  sort_by: string;
+  sort_order: string;
+  records: ReleaseCaseSearchItem[];
+}
+
+export interface DocumentHistoryItem {
+  id: string;
+  document_id: string;
+  version_number: number;
+  category: string;
+  uploader_user_id?: string | null;
+  uploader_name?: string | null;
+  uploaded_at: string;
+  sha256_hash: string;
+  file_name?: string | null;
+  file_size_bytes?: number | null;
+  is_verified: boolean;
+  download_url: string;
+}
+
+export interface FieldProvenanceHistoryItem {
+  id: string;
+  field_name: string;
+  recorded_value: string;
+  previous_value?: string | null;
+  source_type: string;
+  source_actor_id?: string | null;
+  actor_name?: string | null;
+  evidence_reference?: string | null;
+  reason?: string | null;
+  created_at: string;
+}
+
+export interface LifecycleLineageItem {
+  event_type: string;
+  timestamp: string;
+  actor_id?: string | null;
+  summary: string;
+  details: Record<string, any>;
+  is_simulated: boolean;
+}
+
+export interface TimelineEventItem {
+  event_type: string;
+  timestamp: string;
+  actor_id?: string | null;
+  summary: string;
+  details: Record<string, any>;
+}
+
+export interface ScrutinyObservationItem {
+  id: string;
+  instrument_id?: string | null;
+  release_request_id?: string | null;
+  finding_id?: string | null;
+  supporting_document_id?: string | null;
+  supporting_version_number?: number | null;
+  observation_category: string;
+  observation_text: string;
+  author_user_id: string;
+  author_name?: string | null;
+  author_role: string;
+  status: string;
+  resolution_reason?: string | null;
+  resolved_at?: string | null;
+  resolved_by_user_id?: string | null;
+  resolved_by_name?: string | null;
+  supersedes_id?: string | null;
+  superseded_by_id?: string | null;
+  is_internal_only: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ActiveFindingSummary {
+  id: string;
+  rule_code: string;
+  severity: string;
+  message: string;
+  field_name?: string | null;
+  review_status: string;
+  created_at?: string | null;
+}
+
+export interface InstrumentSnapshotData {
+  id: string;
+  reference_number: string;
+  institution_id: string;
+  institution_name?: string | null;
+  bank_name: string;
+  branch?: string | null;
+  amount: string;
+  currency: string;
+  issue_date: string;
+  maturity_date: string;
+  status: string;
+  trust_level: string;
+  assigned_office?: string | null;
+  lien_holder?: string | null;
+  joint_with_aicte?: boolean;
+  created_at: string;
+  updated_at: string;
+  active_discrepancy_count: number;
+  pending_verification_count: number;
+  active_findings: ActiveFindingSummary[];
+  lineage_predecessors: Array<{ id: string; predecessor_id: string; status: string }>;
+  lineage_successors: Array<{ id: string; successor_id: string; status: string }>;
+}
+
+export interface InstrumentDetailSnapshotResponse {
+  instrument: InstrumentSnapshotData;
+  documents: DocumentHistoryItem[];
+  field_history: FieldProvenanceHistoryItem[];
+  lifecycle_lineage: LifecycleLineageItem[];
+  timeline: TimelineEventItem[];
+  observations: ScrutinyObservationItem[];
+}
+
+export interface ScrutinyObservationCreateRequest {
+  observation_text: string;
+  observation_category?: string;
+  finding_id?: string;
+  supporting_document_id?: string;
+  supporting_version_number?: number;
+  is_internal_only?: boolean;
+}
+
+export interface ScrutinyObservationAmendRequest {
+  observation_text: string;
+  amendment_reason: string;
+  is_internal_only?: boolean;
+}
+
+export interface ScrutinyObservationResolveRequest {
+  resolution_reason: string;
+}

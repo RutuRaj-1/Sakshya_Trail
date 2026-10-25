@@ -2,7 +2,7 @@
 
 **Project:** FDR Sentinel (SIH 2026 Problem Statement ID 26265: “Streamline of Security Deposit/FDR Portal”)  
 **Module:** Module 7 — Command Center, Search, Reporting & Audit  
-**Status:** In Progress (Prompt 2 of 5 Complete)  
+**Status:** In Progress (Prompt 3 of 5 Complete)  
 
 ---
 
@@ -200,4 +200,55 @@ The frontend test suite in `frontend/src/features/commandCenter/__tests__/Comman
 - **Frontend Test Suite:** `12 passed in 1.67s` (`vitest run`)
 - **TypeScript & Vite Build:** `tsc -b && vite build` completed cleanly with **0 errors**.
 - **Backend Test Suite:** `pytest tests/test_module7_prompt1_foundation.py` → `14 passed in 0.46s` (0 regressions).
+
+---
+
+## Prompt 3: Unified Search, Record Drill-Down, Historical Timelines & Append-Only Scrutiny Observations
+
+### 1. Implemented Files
+
+| File Path | Description |
+|:---|:---|
+| `backend/app/modules/dashboard/models.py` | Additive domain model `ScrutinyObservation` with immutable note text, category, authorship, bidirectional revision links (`supersedes_id`, `superseded_by_id`), reasoned resolution fields, and internal-only visibility flags. |
+| `backend/alembic/versions/2026_10_25_1200-a8b9c0d1e2f3_add_module_7_scrutiny_observations.py` | Database migration adding the `scrutiny_observations` table and indexes. |
+| `backend/app/modules/dashboard/schemas.py` | Pydantic response and request models for instrument search, release case search, document history, field provenance, lifecycle events, scrutiny observations, and snapshot aggregations. |
+| `backend/app/modules/dashboard/search_service.py` | Parameterized SQL search queries for instruments and release cases supporting status, bank, reference, trust level, date ranges, assigned office, discrepancy flags, and priority queue categories. |
+| `backend/app/modules/dashboard/observation_service.py` | Business logic for append-only scrutiny notes. Disallows silent overwrites, enforces mandatory amendment rationales, links superseding notes, logs audit trail, and prevents unauthorized auditor modifications. |
+| `backend/app/modules/dashboard/history_service.py` | Complete multi-dimensional history builder unifying current snapshot, versioned documents with SHA-256 hashes, field provenance with policy masking, lifecycle evaluations with `SIMULATED` verification tags, and chronological audit trail. |
+| `backend/app/modules/dashboard/router.py` | Endpoints on `/api/v1/dashboard/search/instruments`, `/api/v1/dashboard/search/release-cases`, `/api/v1/dashboard/instruments/{id}/detail`, and observation create/amend/resolve operations. |
+| `frontend/src/types/commandCenter.ts` | TypeScript interfaces for all Prompt 3 search, observation, and history models. |
+| `frontend/src/api/commandCenter.ts` | Client API methods for unified instrument search, release case search, detail snapshots, and observation actions. |
+| `frontend/src/app/routes/UnifiedSearchPage.tsx` | Full-featured unified search page mounted at `/search`. Dual tabs for Instruments and Release Cases, filter drawer, URL synchronization, sortable allowlisted headers, active filter pills, reset button, and pagination. |
+| `frontend/src/app/routes/InstrumentDetailPage.tsx` | Enriched detail view with 6 dedicated tabs: Current Snapshot (with conceptual clarity notice), Documents & SHA-256 Hashes, Field Provenance, Lifecycle & Lineage (with `SIMULATED ADAPTER` tags), Scrutiny Observations (with Add/Amend/Resolve modals), and Audit Timeline. |
+| `frontend/src/app/router.tsx` | Registered `/search` route in the application router. |
+| `frontend/src/components/navigation/Sidebar.tsx` | Added Unified Search navigation entry with search icon. |
+| `docs/module-7-search-and-history.md` | Formal handover guide detailing supported filters, scope enforcement, timeline sources, observation revision semantics, and security rules. |
+| `backend/tests/test_module7_prompt3_search_history.py` | 7 automated backend tests verifying filters, tenant isolation, SHA-256 ordering, simulation labelling, append-only supersession, and auditor read-only enforcement. |
+| `frontend/src/features/commandCenter/__tests__/UnifiedSearchAndHistory.test.tsx` | 9 automated frontend Vitest tests validating search interactions, tab switching, and observation management. |
+
+---
+
+### 2. Implemented Endpoints
+
+| HTTP Method | Endpoint Path | Function & PRD Mapping | Authorized Roles |
+|:---|:---|:---|:---|
+| `GET` | `/api/v1/dashboard/search/instruments` | Parameterized search for FDR instruments with multi-attribute filters, sorting, and pagination. | Authenticated (scoped) |
+| `GET` | `/api/v1/dashboard/search/release-cases` | Parameterized search for Release & Refund cases with workflow status and readiness outcome filters. | Authenticated (scoped) |
+| `GET` | `/api/v1/dashboard/instruments/{id}/detail` | Multi-dimensional snapshot unifying snapshot, documents, field provenance, lifecycle lineage, observations, and audit events. | Authorized users (scoped) |
+| `GET` | `/api/v1/dashboard/instruments/{id}/observations` | Retrieves append-only scrutiny observation thread with supersession lineage. | Authorized users (scoped) |
+| `POST` | `/api/v1/dashboard/instruments/{id}/observations` | Creates a new immutable scrutiny observation. | `SYSTEM_ADMIN`, `SCRUTINY_OFFICER`, `AUDIT_EXAMINER` |
+| `POST` | `/api/v1/dashboard/observations/{id}/amend` | Amends an existing observation by creating a superseding note and updating pointers. | `SYSTEM_ADMIN`, `SCRUTINY_OFFICER`, `AUDIT_EXAMINER` |
+| `POST` | `/api/v1/dashboard/observations/{id}/resolve` | Resolves an observation with mandatory documented justification. | `SYSTEM_ADMIN`, `SCRUTINY_OFFICER`, `AUDIT_EXAMINER` |
+
+---
+
+### 3. Automated Tests & Build Verification
+
+- **Backend Pytest Suite:** `pytest tests/test_module7_prompt3_search_history.py` → **7 passed** in 0.80s.
+- **Backend Non-Regression Suite:** `pytest tests/test_module7_prompt1_foundation.py` → **14 passed** in 0.50s.
+- **Combined Backend:** `21 passed` with 0 failures.
+- **Frontend Vitest Suite:** `npx vitest run src/features/commandCenter/__tests__/UnifiedSearchAndHistory.test.tsx` → **9 passed** in 0.58s.
+- **Full Frontend Suite:** `npx vitest run` → **21 passed** across 3 test files in 2.09s.
+- **Production Build:** `npm run build` (`tsc -b && vite build`) completed cleanly with **0 errors**.
+
 
