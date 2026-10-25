@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '@/features/auth/AuthContext';
 import { Button } from '@/components/common/Button';
 import { ShieldCheck, Lock, Mail, AlertCircle } from 'lucide-react';
@@ -14,7 +14,8 @@ export const LoginPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const from = (location.state as any)?.from?.pathname || '/';
+  const rawFrom = (location.state as any)?.from?.pathname;
+  const from = (!rawFrom || rawFrom === '/') ? '/dashboard' : rawFrom;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,10 +53,10 @@ export const LoginPage: React.FC = () => {
           <ShieldCheck className="w-7 h-7 text-sentinel-200" />
         </div>
         <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-          FDR Sentinel
+          Sakshya<span className="text-teal-600">Trail</span>
         </h2>
         <p className="text-xs text-slate-500 mt-1">
-          AICTE Regulation Bureau · Security Deposit & FDR Lifecycle Portal
+          Security Deposit & FDR Lifecycle Integrity Platform
         </p>
       </div>
 
@@ -117,10 +118,16 @@ export const LoginPage: React.FC = () => {
                   <span>Verifying Session...</span>
                 </div>
               ) : (
-                'Sign In to FDR Sentinel'
+                'Sign In to SakshyaTrail'
               )}
             </Button>
           </form>
+
+          <div className="text-center mt-4">
+            <Link to="/" className="text-xs text-slate-500 hover:text-teal-700 transition-colors font-medium">
+              ← Return to Public Landing Page
+            </Link>
+          </div>
 
           {/* Quick Demo Credentials Panel */}
           <div className="mt-8 pt-6 border-t border-slate-100">

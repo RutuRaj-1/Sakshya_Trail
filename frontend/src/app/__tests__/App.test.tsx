@@ -34,9 +34,9 @@ describe('Authentication Views', () => {
       </AuthProvider>
     );
 
-    expect(screen.getByRole('heading', { name: /FDR Sentinel/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /SakshyaTrail/i })).toBeInTheDocument();
     expect(screen.getByLabelText(/Official Email Address/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/^Password$/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Sign In to FDR Sentinel/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Sign In to SakshyaTrail/i })).toBeInTheDocument();
   });
 });

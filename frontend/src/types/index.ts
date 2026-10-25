@@ -1,5 +1,5 @@
 /**
- * Core Domain Types for FDR Sentinel
+ * Core Domain Types for SakshyaTrail
  */
 
 export interface SystemHealth {

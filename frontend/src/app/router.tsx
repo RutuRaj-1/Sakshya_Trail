@@ -1,5 +1,6 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { MainLayout } from '@/layouts/MainLayout';
+import { LandingPage } from '@/app/routes/LandingPage';
 import { DashboardPage } from '@/app/routes/DashboardPage';
 import { CommandCenterPage } from '@/app/routes/CommandCenterPage';
 import { InstrumentsPage } from '@/app/routes/InstrumentsPage';
@@ -21,6 +22,10 @@ import { ProtectedRoute } from '@/features/auth/ProtectedRoute';
 
 export const router = createBrowserRouter([
   {
+    path: '/',
+    element: <LandingPage />,
+  },
+  {
     path: '/login',
     element: <LoginPage />,
   },
@@ -33,7 +38,6 @@ export const router = createBrowserRouter([
     ),
   },
   {
-    path: '/',
     element: (
       <ProtectedRoute>
         <MainLayout />
@@ -41,8 +45,12 @@ export const router = createBrowserRouter([
     ),
     children: [
       {
-        index: true,
+        path: 'dashboard',
         element: <DashboardPage />,
+      },
+      {
+        path: 'app',
+        element: <Navigate to="/dashboard" replace />,
       },
       {
         path: 'command-center',

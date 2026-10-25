@@ -70,7 +70,7 @@ export const ChangePasswordPage: React.FC = () => {
         <p className="text-xs text-slate-500 mt-1">
           {user?.must_change_password
             ? 'Your account was provisioned with a temporary password. You must set a permanent secure password to continue.'
-            : 'Update your security credentials for FDR Sentinel regulatory access.'}
+            : 'Update your security credentials for SakshyaTrail regulatory access.'}
         </p>
       </div>
 

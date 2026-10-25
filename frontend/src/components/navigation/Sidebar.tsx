@@ -28,7 +28,7 @@ interface NavItem {
 }
 
 const baseNavItems: NavItem[] = [
-  { name: 'Dashboard', to: '/', icon: LayoutDashboard },
+  { name: 'Dashboard', to: '/dashboard', icon: LayoutDashboard },
   { name: 'Command Center', to: '/command-center', icon: SlidersHorizontal, badge: 'Module 7' },
   { name: 'Unified Search', to: '/search', icon: Search, badge: 'Search' },
   { name: 'Operational Reports', to: '/reports', icon: FileSpreadsheet, badge: 'Reports' },

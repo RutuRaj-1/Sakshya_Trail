@@ -58,7 +58,7 @@ export const DashboardPage: React.FC = () => {
             <span className="text-slate-400 text-xs font-mono">Module 1 Baseline</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white mb-2">
-            {isInstitutionUser ? 'Security Deposit Management Vault' : 'FDR Sentinel — Security Deposit & FDR Governance'}
+            {isInstitutionUser ? 'Security Deposit Management Vault' : 'SakshyaTrail — Security Deposit & FDR Governance'}
           </h1>
           <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
             Authoritative registry for statutory Fixed Deposit Receipts (FDRs) and institutional security deposits.

@@ -55,7 +55,7 @@ export const HealthPage: React.FC = () => {
           <div className="space-y-2 text-xs font-mono bg-slate-50 p-3 rounded-lg border border-slate-200">
             <div className="flex justify-between">
               <span className="text-slate-500">Service:</span>
-              <span className="text-slate-800 font-semibold">{liveness?.service || 'FDR Sentinel'}</span>
+              <span className="text-slate-800 font-semibold">{liveness?.service || 'SakshyaTrail'}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-slate-500">Version:</span>

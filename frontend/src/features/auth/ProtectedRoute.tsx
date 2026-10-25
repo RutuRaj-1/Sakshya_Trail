@@ -46,7 +46,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowe
             Your current assigned regulatory role <span className="font-mono font-semibold text-rose-700">[{user.role}]</span> is not authorized to access this module.
           </p>
           <div className="mt-6">
-            <Link to="/">
+            <Link to="/dashboard">
               <Button size="sm" variant="outline">
                 <ArrowLeft className="w-4 h-4 mr-2" /> Return to Authorized Dashboard
               </Button>
