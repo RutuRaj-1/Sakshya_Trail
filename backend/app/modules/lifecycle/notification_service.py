@@ -433,46 +433,49 @@ def generate_and_dispatch_reminders_for_instrument(
                         LifecycleNotification.idempotency_key == idempotency_key
                     )
                 )
-                if not existing:
-                    title, msg, meta = _render_notification_template(
-                        event_type=evt_type,
-                        instrument=instrument,
-                        institution=institution,
-                        milestone_days=milestone,
-                        policy=policy,
-                        due_date=event.get("due_date"),
-                        escalation_role=event.get("escalation_role"),
-                    )
-                    meta["error"] = f"No active user resolved for role '{target_role}'"
-                    unresolved_notif = LifecycleNotification(
-                        idempotency_key=idempotency_key,
-                        instrument_id=instrument.id,
-                        institution_id=instrument.institution_id,
-                        policy_id=policy.id,
-                        policy_version=policy.version,
-                        event_type=evt_type,
-                        reminder_milestone_days=milestone,
-                        trigger_date=eval_date,
-                        recipient_user_id=None,
-                        recipient_role=target_role,
-                        recipient_email=None,
-                        recipient_name=None,
-                        channel=channel,
-                        template_id=policy.template_id,
-                        template_version=policy.template_version,
-                        title=title,
-                        message=msg,
-                        payload_metadata_json=json.dumps(meta),
-                        status="FAILED",
-                        failure_category="CONFIGURATION_ERROR",
-                        failure_reason=f"No active registered user resolved for role '{target_role}'.",
-                        failed_at=now_ts,
-                        scheduled_at=now_ts,
-                    )
-                    db.add(unresolved_notif)
-                    db.commit()
-                    db.refresh(unresolved_notif)
-                    dispatched_notifications.append(unresolved_notif)
+                if existing:
+                    dispatched_notifications.append(existing)
+                    continue
+
+                title, msg, meta = _render_notification_template(
+                    event_type=evt_type,
+                    instrument=instrument,
+                    institution=institution,
+                    milestone_days=milestone,
+                    policy=policy,
+                    due_date=event.get("due_date"),
+                    escalation_role=event.get("escalation_role"),
+                )
+                meta["error"] = f"No active user resolved for role '{target_role}'"
+                unresolved_notif = LifecycleNotification(
+                    idempotency_key=idempotency_key,
+                    instrument_id=instrument.id,
+                    institution_id=instrument.institution_id,
+                    policy_id=policy.id,
+                    policy_version=policy.version,
+                    event_type=evt_type,
+                    reminder_milestone_days=milestone,
+                    trigger_date=eval_date,
+                    recipient_user_id=None,
+                    recipient_role=target_role,
+                    recipient_email=None,
+                    recipient_name=None,
+                    channel=channel,
+                    template_id=policy.template_id,
+                    template_version=policy.template_version,
+                    title=title,
+                    message=msg,
+                    payload_metadata_json=json.dumps(meta),
+                    status="FAILED",
+                    failure_category="CONFIGURATION_ERROR",
+                    failure_reason=f"No active registered user resolved for role '{target_role}'.",
+                    failed_at=now_ts,
+                    scheduled_at=now_ts,
+                )
+                db.add(unresolved_notif)
+                db.commit()
+                db.refresh(unresolved_notif)
+                dispatched_notifications.append(unresolved_notif)
             continue
 
         # For each resolved recipient and permitted channel

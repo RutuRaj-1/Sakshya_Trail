@@ -304,6 +304,7 @@ def activate_policy(
     )
     for p in existing_actives:
         p.status = PolicyStatus.SUPERSEDED.value
+        p.is_active = False
 
     policy.status = PolicyStatus.ACTIVE.value
     policy.activated_at = get_utc_now()

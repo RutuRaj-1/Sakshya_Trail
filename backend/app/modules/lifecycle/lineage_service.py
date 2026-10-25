@@ -212,6 +212,7 @@ def create_renewal_lineage(
     payload: LineageCreateRequest,
     created_by_user_id: Optional[str] = None,
     actor_email: Optional[str] = None,
+    current_user: Optional[User] = None,
 ) -> InstrumentLineage:
     """
     Creates an explicit predecessor-successor renewal relationship.
@@ -274,6 +275,27 @@ def create_renewal_lineage(
             message=f"Successor instrument '{succ_id}' not found.",
             code="SUCCESSOR_NOT_FOUND",
         )
+
+    # 2.5 Institution tenancy validation
+    if current_user and current_user.role == "INSTITUTION_USER":
+        if pred.institution_id != current_user.institution_id:
+            raise AppException(
+                status_code=403,
+                message="Access denied: Predecessor belongs to another institution.",
+                code="FORBIDDEN",
+            )
+        if succ.institution_id != current_user.institution_id:
+            raise AppException(
+                status_code=403,
+                message="Access denied: Successor belongs to another institution.",
+                code="FORBIDDEN",
+            )
+        if payload.allow_authorized_transfer:
+            raise AppException(
+                status_code=403,
+                message="Access denied: Institution users cannot authorize cross-institution transfers.",
+                code="FORBIDDEN",
+            )
 
     # 3. Institution boundary validation
     if pred.institution_id != succ.institution_id and not payload.allow_authorized_transfer:
@@ -706,9 +728,11 @@ def get_lineage_by_id(db: Session, lineage_id: str) -> Optional[InstrumentLineag
 def get_lineage_continuity_assessment(
     db: Session,
     lineage_id_or_instrument_id: str,
+    current_user: Optional[User] = None,
 ) -> ContinuityAssessmentResponse:
     """
     Returns the granular continuity and gap/overlap assessment for a lineage ID or instrument.
+    Enforces tenancy scoping when called by an INSTITUTION_USER.
     """
     lineage = db.scalar(
         select(InstrumentLineage).where(
@@ -729,6 +753,27 @@ def get_lineage_continuity_assessment(
 
     pred = db.scalar(select(Instrument).where(Instrument.id == lineage.predecessor_instrument_id))
     succ = db.scalar(select(Instrument).where(Instrument.id == lineage.successor_instrument_id))
+
+    if current_user and current_user.role == "INSTITUTION_USER":
+        if lineage.institution_id != current_user.institution_id:
+            raise AppException(
+                status_code=403,
+                message="Access denied: Lineage belongs to another institution.",
+                code="FORBIDDEN",
+            )
+        if pred and pred.institution_id != current_user.institution_id:
+            raise AppException(
+                status_code=403,
+                message="Access denied: Instrument belongs to another institution.",
+                code="FORBIDDEN",
+            )
+        if succ and succ.institution_id != current_user.institution_id:
+            raise AppException(
+                status_code=403,
+                message="Access denied: Instrument belongs to another institution.",
+                code="FORBIDDEN",
+            )
+
     policy = (
         get_policy_by_id(db, lineage.policy_id)
         if lineage.policy_id
@@ -762,10 +807,15 @@ def get_lineage_continuity_assessment(
     )
 
 
-def get_lineage_tree(db: Session, instrument_id: str) -> LineageTreeResponse:
+def get_lineage_tree(
+    db: Session,
+    instrument_id: str,
+    current_user: Optional[User] = None,
+) -> LineageTreeResponse:
     """
     Constructs the complete renewal ancestry and successor chain for an instrument.
     Traverses backward (ancestors) and forward (successors) up to depth 20.
+    Enforces tenancy scoping when called by an INSTITUTION_USER.
     """
     instrument = db.scalar(select(Instrument).where(Instrument.id == instrument_id))
     if not instrument:
@@ -774,6 +824,14 @@ def get_lineage_tree(db: Session, instrument_id: str) -> LineageTreeResponse:
             message=f"Instrument '{instrument_id}' not found",
             code="INSTRUMENT_NOT_FOUND",
         )
+
+    if current_user and current_user.role == "INSTITUTION_USER":
+        if instrument.institution_id != current_user.institution_id:
+            raise AppException(
+                status_code=403,
+                message="Access denied: Instrument belongs to another institution.",
+                code="FORBIDDEN",
+            )
 
     # Direct relationships
     direct_pred_edge = db.scalar(

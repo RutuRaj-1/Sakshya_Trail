@@ -7,6 +7,7 @@ from datetime import date
 from fastapi import APIRouter, Depends, Query, Path
 
 from app.db.session import get_db
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.core.security import (
@@ -208,6 +209,7 @@ def create_renewal_lineage_endpoint(
         payload=payload,
         created_by_user_id=current_user.id,
         actor_email=current_user.email,
+        current_user=current_user,
     )
 
 
@@ -224,6 +226,8 @@ def get_lineage_endpoint(
     lineage = get_lineage_by_id(db, lineage_id)
     if not lineage:
         raise AppException(status_code=404, message=f"Lineage record '{lineage_id}' not found", code="LINEAGE_NOT_FOUND")
+    if current_user.role == "INSTITUTION_USER" and lineage.institution_id != current_user.institution_id:
+        raise AppException(status_code=403, message="Access denied: Lineage record belongs to another institution.", code="FORBIDDEN")
     return lineage
 
 
@@ -237,7 +241,7 @@ def get_lineage_continuity_endpoint(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    return get_lineage_continuity_assessment(db=db, lineage_id_or_instrument_id=lineage_id)
+    return get_lineage_continuity_assessment(db=db, lineage_id_or_instrument_id=lineage_id, current_user=current_user)
 
 
 @router.post(
@@ -328,7 +332,7 @@ def get_instrument_lineage_tree_endpoint(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    return get_lineage_tree(db, instrument_id=id)
+    return get_lineage_tree(db, instrument_id=id, current_user=current_user)
 
 
 @router.get(
@@ -346,7 +350,7 @@ def get_instrument_continuity_endpoint(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    return get_lineage_continuity_assessment(db=db, lineage_id_or_instrument_id=id)
+    return get_lineage_continuity_assessment(db=db, lineage_id_or_instrument_id=id, current_user=current_user)
 
 
 # --- Evaluation Endpoints -------------------------------------------------------
@@ -361,6 +365,13 @@ def evaluate_lifecycle_endpoint(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    from app.modules.instruments.models import Instrument
+    inst = db.scalar(select(Instrument).where(Instrument.id == payload.instrument_id))
+    if not inst:
+        raise AppException(status_code=404, message=f"Instrument '{payload.instrument_id}' not found", code="INSTRUMENT_NOT_FOUND")
+    if current_user.role == "INSTITUTION_USER" and inst.institution_id != current_user.institution_id:
+        raise AppException(status_code=403, message="Access denied: Instrument belongs to another institution.", code="FORBIDDEN")
+
     return evaluate_instrument_lifecycle(
         db=db,
         instrument_id=payload.instrument_id,
@@ -382,6 +393,13 @@ def get_instrument_latest_lifecycle_endpoint(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    from app.modules.instruments.models import Instrument
+    inst = db.scalar(select(Instrument).where(Instrument.id == id))
+    if not inst:
+        raise AppException(status_code=404, message=f"Instrument '{id}' not found", code="INSTRUMENT_NOT_FOUND")
+    if current_user.role == "INSTITUTION_USER" and inst.institution_id != current_user.institution_id:
+        raise AppException(status_code=403, message="Access denied: Instrument belongs to another institution.", code="FORBIDDEN")
+
     ev = get_latest_evaluation_for_instrument(db, instrument_id=id)
     if not ev:
         # Trigger an initial on-demand evaluation if never evaluated
