@@ -4,6 +4,7 @@ Exposes case creation, review observations, authorized decisions, release orders
 """
 from typing import List, Optional
 from fastapi import APIRouter, Depends, Query, Path
+from sqlalchemy import desc, select
 
 from app.db.session import get_db
 from sqlalchemy.orm import Session
@@ -43,6 +44,14 @@ from app.modules.release.service import (
     record_release_order,
     resolve_checklist_profile,
     seed_demo_release_profile,
+)
+from app.modules.release.readiness_service import (
+    evaluate_readiness,
+    check_release_gate,
+    is_assessment_stale,
+)
+from app.modules.release.schemas import (
+    ReadinessAssessmentResponse,
 )
 from app.common.exceptions import NotFoundException
 
@@ -158,3 +167,126 @@ def get_active_checklist_profile_endpoint(
     if not profile:
         profile = seed_demo_release_profile(db)
     return profile
+
+
+@router.post(
+    "/requests/{id}/evaluate-readiness",
+    response_model=ReadinessAssessmentResponse,
+    status_code=200,
+    summary="Evaluate readiness for a release request (creates assessment snapshot)",
+)
+def evaluate_readiness_endpoint(
+    id: str = Path(...),
+    force_reevaluate: bool = Query(False, description="Force reevaluation even if recent assessment exists"),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_roles([ROLE_SYSTEM_ADMIN, ROLE_SCRUTINY_OFFICER, ROLE_COMPETENT_AUTHORITY])),
+):
+    """
+    Evaluates readiness of a release request against the configured checklist profile.
+    Creates a new immutable assessment snapshot. Previous assessments remain intact.
+    
+    Returns detailed per-item evaluation results with evidence references.
+    """
+    request = get_release_request(db=db, request_id=id, current_user=current_user)
+    assessment = evaluate_readiness(db=db, release_request=request, current_user=current_user)
+    return assessment
+
+
+@router.get(
+    "/requests/{id}/readiness",
+    response_model=ReadinessAssessmentResponse,
+    summary="Get latest readiness assessment for a request",
+)
+def get_latest_readiness_endpoint(
+    id: str = Path(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Retrieves the most recent readiness assessment for a release request.
+    """
+    request = get_release_request(db=db, request_id=id, current_user=current_user)
+    
+    from sqlalchemy import desc, select
+    from app.modules.release.models import ReadinessAssessment
+    
+    assessment = db.scalar(
+        select(ReadinessAssessment)
+        .where(ReadinessAssessment.release_request_id == request.id)
+        .order_by(desc(ReadinessAssessment.evaluated_at))
+    )
+    
+    if not assessment:
+        raise NotFoundException("No readiness assessment available for this request.")
+    
+    return assessment
+
+
+@router.get(
+    "/requests/{id}/readiness/history",
+    response_model=List[ReadinessAssessmentResponse],
+    summary="Get assessment history for a request",
+)
+def get_readiness_history_endpoint(
+    id: str = Path(...),
+    limit: int = Query(10, ge=1, le=100),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Retrieves historical readiness assessments for a release request.
+    Assessments are returned in reverse chronological order (newest first).
+    """
+    request = get_release_request(db=db, request_id=id, current_user=current_user)
+    
+    from sqlalchemy import desc, select
+    from app.modules.release.models import ReadinessAssessment
+    
+    assessments = list(
+        db.scalars(
+            select(ReadinessAssessment)
+            .where(ReadinessAssessment.release_request_id == request.id)
+            .order_by(desc(ReadinessAssessment.evaluated_at))
+            .limit(limit)
+        ).all()
+    )
+    
+    return assessments
+
+
+@router.post(
+    "/requests/{id}/check-gate",
+    status_code=200,
+    summary="Check Release Gate before approval or routing",
+)
+def check_release_gate_endpoint(
+    id: str = Path(...),
+    target_status: str = Query("READY_FOR_AUTHORITY", description="Target workflow status"),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_roles([ROLE_SYSTEM_ADMIN, ROLE_SCRUTINY_OFFICER, ROLE_COMPETENT_AUTHORITY])),
+):
+    """
+    Server-side validation before state transitions.
+    Checks readiness, staleness, and mandatory blockers.
+    
+    Returns:
+        {
+            "gate_passes": bool,
+            "denial_reason": Optional[str],
+            "assessment": ReadinessAssessmentResponse
+        }
+    """
+    request = get_release_request(db=db, request_id=id, current_user=current_user)
+    
+    gate_passes, denial_reason, assessment = check_release_gate(
+        db=db,
+        release_request=request,
+        target_status=target_status,
+        current_user=current_user,
+    )
+    
+    return {
+        "gate_passes": gate_passes,
+        "denial_reason": denial_reason,
+        "assessment": assessment,
+    }

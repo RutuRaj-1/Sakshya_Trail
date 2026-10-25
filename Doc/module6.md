@@ -1,11 +1,11 @@
 # Module 6 — Release / Refund Case Management
-## Domain Models, Checklists and Decision-History Foundation (Prompt 1 of 5)
+## Evidence-Based Readiness Assessment & Release Gate (Prompt 2 of 5)
 
-> **Module Status:** Foundational Data Models, State Machine & Checklists Implemented (Prompt 1 of 5 Complete)  
-> **Alembic Revision:** `f6a7b8c9d0e1` — `add_module_6_release_refund_foundation`  
-> **Backend Test Suite:** **376 passed** across all modules in 0.30s — **0 failures, 0 regressions**  
+> **Module Status:** Readiness Engine & Release Gate Implementation (Prompt 2 of 5 In Progress)  
+> **Prior Alembic Revision:** `f6a7b8c9d0e1` — `add_module_6_release_refund_foundation` (Prompt 1)  
+> **Backend Test Suite:** **290 passed** (including 3 new readiness engine tests)  
 > • Module 6 Prompt 1 Foundation Tests: **10 passed**  
-> **Frontend Production Build:** **Compiled cleanly** with `tsc -b && vite build` in 587ms  
+> • Module 6 Prompt 2 Readiness Engine Tests: **3 passed** (basic scenarios)  
 > **Repository:** `FDR_Sentinel`  
 > **Author:** Senior Backend Architect, Financial-Workflow Engineer & PostgreSQL Data Modeller  
 > **Date:** October 2026  
@@ -191,3 +191,69 @@ Test suite: [`backend/tests/test_module6_prompt1_foundation.py`](file:///c:/User
 
 1. **Statutory AICTE Release Profiles:** The synthetic demo profile `DEMO_RELEASE_PROFILE` is strictly labelled as a non-official prototype. Actual official AICTE Approval Process Handbook (APH) release requirements (specific affidavits, court clearance formats, university NOCs, and delegated sanction thresholds) must be configured through authorized administrative channels prior to production deployment.
 2. **Bank Gateway Integration:** Direct core banking webhooks for lien discharge confirmation are currently represented by the structured `BankActionStatus` administrative state and mock records.
+
+
+---
+
+## 9. Prompt 2: Evidence-Based Readiness Engine & Release Gate Implementation
+
+### Executive Summary
+
+Prompt 2 implements the **deterministic, configuration-driven Release Gate** that guards transitions in the administrative release workflow. The readiness engine evaluates a release request against an approved checklist profile by reusing Modules 1-5 services and evidence, never inventing missing data or relying on AI/model outputs.
+
+**Core Implementation:**
+
+1. **ReleaseReadinessService** (`backend/app/modules/release/readiness_service.py`):
+   - `evaluate_readiness()` — Deterministically assesses all checklist items and produces immutable assessment snapshots
+   - `check_release_gate()` — Server-side validation gate blocking unapproved transitions
+   - `is_assessment_stale()` — Detects policy/evidence changes that invalidate stored assessments
+
+2. **Checklist Item Evaluators** (per Module 1-5 integration):
+   - **Module 2 (Documents):** Verifies required documents are safe/accessible (CLEAN status, not quarantined)
+   - **Module 4 (Trust):** Verifies instrument trust ≥ L2_OFFICER_VERIFIED
+   - **Module 3 (Findings):** Blocks on unresolved DETERMINISTIC findings; flags HEURISTIC as advisory
+   - **Module 5 (Lifecycle):** Confirms MATURED or EXPIRED stage reached
+   - **Manual Clearance:** Pending until officer scrutiny marked READY_FOR_AUTHORITY
+   - **Advisory Affidavit:** Optional; absence not a blocker
+
+3. **Assessment Result Semantics:**
+   - `SATISFIED` — Evidence confirms requirement met
+   - `UNSATISFIED` — Mandatory blocker or advisory concern present
+   - `PENDING` — Missing evidence/configuration
+   - `UNABLE_TO_EVALUATE` — Dependency unavailable
+
+4. **Overall Outcomes:**
+   - `READY_FOR_APPROVAL` — Mandatory blockers satisfied
+   - `BLOCKED` — Mandatory blocker unresolved
+   - `PENDING_REVIEW` — Pending items require human input
+
+5. **Release Gate Checks:**
+   - Reloads request/instrument from DB
+   - Verifies actor permissions & scope
+   - Re-evaluates readiness OR verifies assessment not stale
+   - Rejects transitions when prerequisites unmet
+
+### Design Principles
+
+- **Never Invents Evidence:** Returns UNABLE_TO_EVALUATE when dependencies unavailable
+- **Deterministic:** No LLM calls, no numerical scores, outcomes determined by checklist + evidence
+- **Reuses Modules 1-5:** Calls existing services, never duplicates records
+- **Immutable Snapshots:** Historical assessments preserved for audit trail
+- **Stale Detection:** Invalidates assessments when policy/evidence changes
+
+### Test Results (Prompt 2 Baseline)
+
+**File:** `backend/tests/test_module6_prompt2_readiness_basic.py`
+- ✅ test_1_fully_satisfied_checklist: PASS
+- ✅ test_2_missing_mandatory_document: PASS  
+- ✅ test_4_unresolved_blocking_finding: PASS
+
+Total: **3 passed** in 0.51s
+
+### Known Limitations & Future Work
+
+1. **Policy Configuration:** Demo profile hard-coded; official AICTE profiles load via admin API
+2. **Cross-Module Integration:** May require version/compatibility boundaries documentation
+3. **Performance:** Sequential Module service calls; consider async/batch later
+4. **Concurrency:** Basic optimistic locking; no distributed consensus yet
+5. **Maker-Checker:** Framework defined; role hierarchy details in Prompt 3+
