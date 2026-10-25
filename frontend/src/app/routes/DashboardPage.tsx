@@ -16,6 +16,7 @@ import {
   KeyRound,
   Shield,
   Layers,
+  SlidersHorizontal,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -65,8 +66,13 @@ export const DashboardPage: React.FC = () => {
           </p>
 
           <div className="flex flex-wrap items-center gap-3 mt-5">
+            <Link to="/command-center">
+              <Button size="sm" className="bg-sentinel-500 hover:bg-sentinel-600 text-white shadow-sm font-semibold">
+                <SlidersHorizontal className="w-4 h-4 mr-1.5" /> Command Center (Module 7)
+              </Button>
+            </Link>
             <Link to="/instruments">
-              <Button size="sm" className="bg-sentinel-500 hover:bg-sentinel-600 text-white shadow-sm">
+              <Button size="sm" variant="outline" className="border-slate-700 bg-slate-800/80 text-slate-200 hover:bg-slate-700">
                 <FileText className="w-4 h-4 mr-1.5" /> View FDR Registry
               </Button>
             </Link>

@@ -13,6 +13,7 @@ import {
   AlertTriangle,
   ShieldCheck,
   FileText,
+  SlidersHorizontal,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/features/auth/AuthContext';
@@ -27,6 +28,7 @@ interface NavItem {
 
 const baseNavItems: NavItem[] = [
   { name: 'Dashboard', to: '/', icon: LayoutDashboard },
+  { name: 'Command Center', to: '/command-center', icon: SlidersHorizontal, badge: 'Module 7' },
   { name: 'Release / Refund Cases', to: '/release', icon: FileText, badge: 'Module 6' },
   { name: 'Review Queue', to: '/findings/queue', icon: AlertTriangle, badge: 'Scrutiny' },
   { name: 'Trust & Verification', to: '/verification', icon: ShieldCheck, badge: 'Trust' },

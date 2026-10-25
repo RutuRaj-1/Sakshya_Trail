@@ -2,7 +2,7 @@
 
 **Project:** FDR Sentinel (SIH 2026 Problem Statement ID 26265: “Streamline of Security Deposit/FDR Portal”)  
 **Module:** Module 7 — Command Center, Search, Reporting & Audit  
-**Status:** In Progress (Prompt 1 of 5 Complete)  
+**Status:** In Progress (Prompt 2 of 5 Complete)  
 
 ---
 
@@ -122,7 +122,82 @@ The automated test suite in `backend/tests/test_module7_prompt1_foundation.py` v
 
 ### 7. Next Steps for Module 7
 
-- **Prompt 2:** Implement the Operational Queues & Priority Desk (detailed queue actions, triage workflows, bulk assignment, officer queues, and alert escalation rules).
+- **Prompt 2:** Implement the Command Center Frontend Dashboard & Explainable Priority Queue (Completed below).
 - **Prompt 3:** Implement Advanced Multi-Parameter Search, Faceted Navigation, and Drill-Down Views (rich search filters, full-text indexes, document preview links).
 - **Prompt 4:** Implement Reporting & Export Engine (streaming CSV generation, audit evidence packs, PDF formatting with digital hash verifications).
-- **Prompt 5:** Implement Frontend Command Center Dashboard UI, Interactive Metric Cards, Queue Management, and E2E Acceptance Tests.
+- **Prompt 5:** Implement Tamper-Evident Audit Trail UI, Cryptographic Chain Verification, and E2E Acceptance Tests.
+
+---
+
+## Prompt 2: Command Center Frontend Dashboard & Explainable Priority Queue
+
+### 1. Overview & Architectural Principles
+
+Prompt 2 delivers the operational Command Center frontend cockpit located at `/command-center` and integrated with the backend APIs established in Prompt 1. The dashboard adheres strictly to the following principles:
+
+1. **Production-Grade Data Binding:** Zero synthetic fallbacks or hard-coded mock values. Every widget is bound directly to the versioned `/api/v1/dashboard/*` endpoints.
+2. **Transparent Workflow Scoring:** The 0–100 score in the Priority Queue is explicitly identified in the UI as an **operational workflow-priority score to guide scrutiny triage, NOT a fraud probability or authenticity score**.
+3. **Statutory Integrity & Safeguards:**
+   - Prominent statutory guard in the Maturity Window: *"Maturity elapsed or approaching does NOT constitute proof of release or refund eligibility."*
+   - Verifiable distinction between genuinely confirmed bank telemetry and prototype simulators: any simulated adapter response is visibly and indelibly tagged with a prominent `SIMULATED` badge.
+   - Explicit `POLICY_UNCONFIGURED` handling in document completeness to avoid misleading zero counts.
+   - Accounting transparency disclaimer on the month-wise maturity load: labeled as a deterministic calendar aggregation in INR (₹), not an algorithmic forecast or predictive model.
+4. **Role-Aware Scoping:** Automatic adaptation based on the user's role (`ROLE_INSTITUTION_USER`, `ROLE_SCRUTINY_OFFICER`, `ROLE_BRANCH_HEAD`, `ROLE_COMPETENT_AUTHORITY`, `ROLE_AUDITOR`, `ROLE_SYSTEM_ADMIN`). Assignees and internal workloads are redacted for institution users.
+5. **URL-Preserved Query State:** Parameters such as `window_days`, `year`, and `min_priority` are synchronized with URL query params for bookmarking and sharing.
+
+---
+
+### 2. Implemented Frontend Components & Routes
+
+| Component / File Path | Description & Role |
+|:---|:---|
+| `frontend/src/types/commandCenter.ts` | Comprehensive TypeScript interfaces matching backend Pydantic schemas for all 7 metric categories, priority queue items, and dictionary entries. |
+| `frontend/src/api/commandCenter.ts` | Axios API client for all `/api/v1/dashboard/*` endpoints with typed error handling and cancelation. |
+| `frontend/src/app/routes/CommandCenterPage.tsx` | Main cockpit container under `/command-center`. Coordinates parallel API queries, maintains URL query state, handles role-based rendering, empty states, and provides global refresh controls. |
+| `frontend/src/features/commandCenter/components/StatusOverviewCards.tsx` | Category A: 6 interactive metric cards (Active, Expiring Soon, Matured, Renewed, Released, Pending) with direct navigation to pre-filtered search results and metric definition popups. |
+| `frontend/src/features/commandCenter/components/MaturityWindowSection.tsx` | Category B: Maturity window selector (30d, 60d, 90d, 180d, 365d), count, deposit volume, issuing bank breakdown, instrument list with trust badges, and statutory release guard. |
+| `frontend/src/features/commandCenter/components/OverdueEscalatedQueue.tsx` | Category C: Overdue compliance actions and escalation desk. Displays days overdue, escalation targets, and office assignments (redacting internal assignees for institution users). |
+| `frontend/src/features/commandCenter/components/VerificationQueueWidget.tsx` | Category D: Real-time telemetry on in-flight bank verification requests, aging breakdown (`<7d`, `7-14d`, `15-30d`, `>30d`), prominent `SIMULATED` badges, and source-unavailable flags. |
+| `frontend/src/features/commandCenter/components/CompletenessBlockersWidget.tsx` | Categories E & F: Document completeness health (present, missing, unreadable, awaiting), unconfigured policy alerts, and Module 6 release gate blockers with direct links. |
+| `frontend/src/features/commandCenter/components/MaturityLoadChart.tsx` | Category G: Month-wise visual bar chart of maturity load in INR (₹) with toggleable accessible tabular view and accounting transparency notice. |
+| `frontend/src/features/commandCenter/components/PriorityQueueDesk.tsx` | Category H: Explainable operational priority queue (0–100 score) with transparent factor breakdowns (Urgency 35%, Discrepancy 25%, Trust 20%, Overdue 20%), deterministic ordering, and weight disclosure panel. |
+| `frontend/src/features/commandCenter/components/MetricDictionaryModal.tsx` | Searchable modal cataloging all formal metric definitions, formulas, data sources, and PRD requirements directly from the backend. |
+| `frontend/src/components/navigation/Sidebar.tsx` | Navigation entry linking `/command-center` in the main application sidebar. |
+| `frontend/src/app/routes/DashboardPage.tsx` | Added quick-access Command Center banner and launch button on the default dashboard. |
+
+---
+
+### 3. Priority Queue Scoring Architecture
+
+In accordance with PRD-FR-075, the priority score is computed deterministically:
+
+$$\text{Priority Score} = 0.35 \times \text{Urgency} + 0.25 \times \text{Discrepancy} + 0.20 \times \text{Trust} + 0.20 \times \text{Overdue}$$
+
+- **Urgency (35%):** Scales as maturity approaches (100 for $\le 7\text{ days}$, 80 for $\le 30\text{ days}$, 50 for $\le 90\text{ days}$, 20 for $> 90\text{ days}$).
+- **Discrepancy (25%):** Unresolved OCR or validation discrepancies (100 for high severity, 60 for medium, 20 for low, 0 if clean).
+- **Trust Factor (20%):** Higher priority for lower trust states requiring scrutiny (100 for unverified/draft, 70 for physical only, 30 for officer verified, 0 for bank verified).
+- **Overdue Factor (20%):** Active overdue or escalated flags (100 if escalated, 75 if overdue $>14\text{ days}$, 50 if overdue $\le 14\text{ days}$, 0 if on schedule).
+- **Deterministic Tie-Breaking:** If two records have identical priority scores, tie-breaks are ordered by `maturity_date ASC`, then `created_at DESC`, then `id ASC`.
+
+---
+
+### 4. Automated Tests & Build Verification
+
+The frontend test suite in `frontend/src/features/commandCenter/__tests__/CommandCenter.test.tsx` and full suite validate all criteria:
+
+| Test Name | Verification Focus | Result |
+|:---|:---|:---|
+| `renders StatusOverviewCards` | Verifies real counts, active definitions, and pre-filtered search links. | ✅ PASS |
+| `renders MaturityWindowSection` | Verifies statutory warning, window selector, and instrument list with trust badges. | ✅ PASS |
+| `renders OverdueEscalatedQueue` | Verifies days overdue, escalation roles, and role-appropriate office display. | ✅ PASS |
+| `renders VerificationQueueWidget` | Verifies aging brackets, source-unavailable telemetry, and prominent `SIMULATED` badges. | ✅ PASS |
+| `renders CompletenessBlockersWidget`| Verifies `POLICY_UNCONFIGURED` handling and release blocker gate cards. | ✅ PASS |
+| `renders MaturityLoadChart` | Verifies INR labels, chart bars, non-forecast disclaimer, and accessible table toggle. | ✅ PASS |
+| `renders PriorityQueueDesk` | Verifies 0–100 workflow score disclaimer, factor breakdowns, and weight disclosures. | ✅ PASS |
+| `renders full CommandCenterPage` | End-to-end integration with mocked API client, query param parsing, and page rendering. | ✅ PASS |
+
+**Build & Verification Summary:**
+- **Frontend Test Suite:** `12 passed in 1.67s` (`vitest run`)
+- **TypeScript & Vite Build:** `tsc -b && vite build` completed cleanly with **0 errors**.
+- **Backend Test Suite:** `pytest tests/test_module7_prompt1_foundation.py` → `14 passed in 0.46s` (0 regressions).
+

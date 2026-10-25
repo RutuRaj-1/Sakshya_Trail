@@ -1,6 +1,7 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { MainLayout } from '@/layouts/MainLayout';
 import { DashboardPage } from '@/app/routes/DashboardPage';
+import { CommandCenterPage } from '@/app/routes/CommandCenterPage';
 import { InstrumentsPage } from '@/app/routes/InstrumentsPage';
 import { InstrumentDetailPage } from '@/app/routes/InstrumentDetailPage';
 import { InstitutionsPage } from '@/app/routes/InstitutionsPage';
@@ -40,6 +41,10 @@ export const router = createBrowserRouter([
       {
         index: true,
         element: <DashboardPage />,
+      },
+      {
+        path: 'command-center',
+        element: <CommandCenterPage />,
       },
       {
         path: 'instruments',
