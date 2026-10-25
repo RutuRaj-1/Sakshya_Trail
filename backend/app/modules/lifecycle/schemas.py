@@ -3,6 +3,7 @@ Module 5 — Lifecycle Orchestration & Renewal
 Pydantic Schemas for Policies, Lineage, and Evaluations
 """
 from datetime import date, datetime
+from decimal import Decimal
 from typing import Optional, List, Dict, Any
 from pydantic import BaseModel, Field, ConfigDict, field_validator
 
@@ -128,6 +129,8 @@ class LineageResponse(BaseModel):
     validity_gap_days: Optional[int] = None
     validity_overlap_days: Optional[int] = None
     continuity_indicator: str
+    continuity_details_json: Optional[str] = None
+    correction_history_json: Optional[str] = None
     concurrency_version: int
     created_by_user_id: Optional[str] = None
     created_at: datetime
@@ -152,6 +155,84 @@ class LineageTreeResponse(BaseModel):
     successors: List[LineageChainItem]
     direct_predecessor_lineage: Optional[LineageResponse] = None
     direct_successor_lineage: Optional[LineageResponse] = None
+
+
+class RenewalDraftResponse(BaseModel):
+    predecessor_instrument_id: str
+    institution_id: str
+    suggested_fields: Dict[str, Any]
+    predecessor_summary: Dict[str, Any]
+    policy_summary: Dict[str, Any]
+
+
+class RenewalCreateSuccessorRequest(BaseModel):
+    bank_name: str
+    branch: Optional[str] = None
+    reference_number: str
+    amount: Decimal
+    currency: str = "INR"
+    issue_date: date
+    maturity_date: date
+    effective_date: Optional[date] = None
+    lien_holder: Optional[str] = "AICTE Regulation Bureau"
+    lien_details: Optional[str] = None
+    joint_with_aicte: bool = True
+    relationship_type: LineageRelationshipType = LineageRelationshipType.RENEWAL
+    reason_or_reference: Optional[str] = None
+
+
+class RenewalSuccessorCreatedResponse(BaseModel):
+    successor_instrument_id: str
+    predecessor_instrument_id: str
+    lineage_id: str
+    reference_number: str
+    trust_level: str
+    status: str
+    validity_gap_days: Optional[int] = None
+    validity_overlap_days: Optional[int] = None
+    continuity_indicator: str
+    lineage: LineageResponse
+
+
+class LineageValidateRequest(BaseModel):
+    predecessor_instrument_id: str
+    successor_instrument_id: str
+    relationship_type: LineageRelationshipType = LineageRelationshipType.RENEWAL
+    allow_authorized_transfer: bool = False
+
+
+class LineageValidateResponse(BaseModel):
+    is_valid: bool
+    errors: List[str]
+    warnings: List[str]
+    predecessor_summary: Optional[Dict[str, Any]] = None
+    successor_summary: Optional[Dict[str, Any]] = None
+    preliminary_continuity: Optional[Dict[str, Any]] = None
+
+
+class ContinuityAssessmentResponse(BaseModel):
+    lineage_id: Optional[str] = None
+    predecessor_instrument_id: str
+    successor_instrument_id: str
+    dates_compared: Dict[str, Optional[str]]
+    date_source_fields: Dict[str, str]
+    comparison_semantics: str
+    gap_days: Optional[int] = None
+    overlap_days: Optional[int] = None
+    policy_version: Optional[int] = None
+    outcome: str
+    explanation: str
+    is_provisional: bool
+    detector_type: str = "DETERMINISTIC"
+    finding_id: Optional[str] = None
+    evaluated_at: Optional[datetime] = None
+
+
+class LineageCorrectionRequest(BaseModel):
+    action: str = Field(..., description="DEACTIVATE, SUPERSEDE, or UPDATE_REASON")
+    reason: str = Field(..., min_length=5, description="Mandatory audit explanation for line change")
+    expected_concurrency_version: Optional[int] = None
+
 
 
 # --- Evaluation Schemas ---------------------------------------------------------

@@ -253,6 +253,8 @@ class InstrumentLineage(Base, TimestampMixin):
     continuity_indicator: Mapped[str] = mapped_column(
         String(50), default=ContinuityIndicator.CONTINUOUS.value, nullable=False
     )
+    continuity_details_json: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    correction_history_json: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
     # Concurrency control
     concurrency_version: Mapped[int] = mapped_column(Integer, default=1, nullable=False)

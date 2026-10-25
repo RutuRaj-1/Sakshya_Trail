@@ -6,6 +6,7 @@ import { Badge } from '@/components/common/Badge';
 import { formatINR, formatDate } from '@/lib/utils';
 import { InstrumentModal } from '@/features/instruments/InstrumentModal';
 import { LifecycleNotificationHistory } from '@/features/lifecycle/LifecycleNotificationHistory';
+import { RenewalLineageSection } from '@/features/lifecycle/RenewalLineageSection';
 import { useAuth } from '@/features/auth/AuthContext';
 import {
   FileSpreadsheet,
@@ -355,6 +356,27 @@ export const InstrumentDetailPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Module 5 Renewal & Replacement Lineage (Predecessor/Successor Chain & Gap/Overlap) */}
+      <RenewalLineageSection
+        instrumentId={instrument.id}
+        predecessorRecord={{
+          id: instrument.id,
+          reference_number: instrument.reference_number,
+          bank_name: instrument.bank_name,
+          branch: instrument.branch,
+          amount: instrument.amount,
+          currency: instrument.currency,
+          issue_date: instrument.issue_date,
+          maturity_date: instrument.maturity_date,
+          status: instrument.status,
+          trust_level: instrument.trust_level,
+          institution_id: instrument.institution_id,
+        }}
+        canInitiateRenewal={isSystemAdmin || isScrutinyOfficer || (isInstitutionUser && isOwnRecord)}
+        isOfficerOrAdmin={isSystemAdmin || isScrutinyOfficer}
+        onRefreshParent={loadInstrument}
+      />
 
       {/* Module 5 Policy-Driven Notification History & Escalation View */}
       <LifecycleNotificationHistory

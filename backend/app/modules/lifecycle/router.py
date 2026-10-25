@@ -42,6 +42,13 @@ from app.modules.lifecycle.schemas import (
     RetryNotificationRequest,
     DispatchRemindersRequest,
     DispatchRemindersResponse,
+    RenewalDraftResponse,
+    RenewalCreateSuccessorRequest,
+    RenewalSuccessorCreatedResponse,
+    LineageValidateRequest,
+    LineageValidateResponse,
+    ContinuityAssessmentResponse,
+    LineageCorrectionRequest,
 )
 from app.modules.lifecycle.policy_service import (
     create_policy,
@@ -55,6 +62,11 @@ from app.modules.lifecycle.lineage_service import (
     create_renewal_lineage,
     get_lineage_by_id,
     get_lineage_tree,
+    validate_proposed_lineage,
+    initiate_renewal_draft,
+    create_and_link_renewal_successor,
+    correct_renewal_lineage,
+    get_lineage_continuity_assessment,
 )
 from app.modules.lifecycle.evaluation_service import (
     evaluate_instrument_lifecycle,
@@ -164,14 +176,32 @@ def activate_lifecycle_policy_endpoint(
 # --- Lineage Management Endpoints -----------------------------------------------
 
 @router.post(
+    "/lineage/validate",
+    response_model=LineageValidateResponse,
+    summary="Pre-validate proposed predecessor-successor renewal relationship",
+)
+def validate_proposed_lineage_endpoint(
+    payload: LineageValidateRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    return validate_proposed_lineage(db=db, payload=payload, current_user=current_user)
+
+
+@router.post(
     "/lineage/renew",
     response_model=LineageResponse,
     summary="Create predecessor-successor renewal relationship link",
 )
+@router.post(
+    "/lineage/link",
+    response_model=LineageResponse,
+    summary="Link predecessor and successor instruments",
+)
 def create_renewal_lineage_endpoint(
     payload: LineageCreateRequest,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_roles([ROLE_SYSTEM_ADMIN, ROLE_SCRUTINY_OFFICER, ROLE_BRANCH_HEAD])),
+    current_user: User = Depends(get_current_user),
 ):
     return create_renewal_lineage(
         db=db,
@@ -197,6 +227,97 @@ def get_lineage_endpoint(
     return lineage
 
 
+@router.get(
+    "/lineage/{lineage_id}/continuity",
+    response_model=ContinuityAssessmentResponse,
+    summary="Get granular continuity gap/overlap assessment for a lineage edge",
+)
+def get_lineage_continuity_endpoint(
+    lineage_id: str = Path(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    return get_lineage_continuity_assessment(db=db, lineage_id_or_instrument_id=lineage_id)
+
+
+@router.post(
+    "/lineage/{lineage_id}/correct",
+    response_model=LineageResponse,
+    summary="Authorized correction, deactivation, or superseding of a lineage relationship",
+)
+def correct_lineage_endpoint(
+    lineage_id: str = Path(...),
+    payload: LineageCorrectionRequest = ...,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_roles([ROLE_SYSTEM_ADMIN, ROLE_SCRUTINY_OFFICER, ROLE_BRANCH_HEAD])),
+):
+    return correct_renewal_lineage(
+        db=db,
+        lineage_id=lineage_id,
+        payload=payload,
+        current_user=current_user,
+    )
+
+
+@router.get(
+    "/instruments/{id}/renewal-draft",
+    response_model=RenewalDraftResponse,
+    summary="Initiate renewal draft for predecessor instrument",
+)
+@instruments_lifecycle_router.get(
+    "/{id}/renewal-draft",
+    response_model=RenewalDraftResponse,
+    summary="Initiate renewal draft for predecessor instrument",
+)
+def initiate_renewal_draft_endpoint(
+    id: str = Path(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    return initiate_renewal_draft(db=db, predecessor_id=id, current_user=current_user)
+
+
+@router.post(
+    "/instruments/{id}/renew",
+    response_model=RenewalSuccessorCreatedResponse,
+    summary="Create brand new successor instrument and link to predecessor",
+)
+@instruments_lifecycle_router.post(
+    "/{id}/renew",
+    response_model=RenewalSuccessorCreatedResponse,
+    summary="Create brand new successor instrument and link to predecessor",
+)
+def create_renewal_successor_endpoint(
+    id: str = Path(...),
+    payload: RenewalCreateSuccessorRequest = ...,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    successor, lineage = create_and_link_renewal_successor(
+        db=db,
+        predecessor_id=id,
+        payload=payload,
+        current_user=current_user,
+    )
+    return RenewalSuccessorCreatedResponse(
+        successor_instrument_id=successor.id,
+        predecessor_instrument_id=id,
+        lineage_id=lineage.id,
+        reference_number=successor.reference_number,
+        trust_level=successor.trust_level,
+        status=successor.status,
+        validity_gap_days=lineage.validity_gap_days,
+        validity_overlap_days=lineage.validity_overlap_days,
+        continuity_indicator=lineage.continuity_indicator,
+        lineage=lineage,  # type: ignore[arg-type]
+    )
+
+
+@router.get(
+    "/instruments/{id}/lineage",
+    response_model=LineageTreeResponse,
+    summary="Get complete renewal lineage ancestry and successor chain for an instrument",
+)
 @instruments_lifecycle_router.get(
     "/{id}/lineage",
     response_model=LineageTreeResponse,
@@ -208,6 +329,24 @@ def get_instrument_lineage_tree_endpoint(
     current_user: User = Depends(get_current_user),
 ):
     return get_lineage_tree(db, instrument_id=id)
+
+
+@router.get(
+    "/instruments/{id}/continuity",
+    response_model=ContinuityAssessmentResponse,
+    summary="Get continuity gap/overlap assessment for instrument's active lineage link",
+)
+@instruments_lifecycle_router.get(
+    "/{id}/continuity",
+    response_model=ContinuityAssessmentResponse,
+    summary="Get continuity gap/overlap assessment for instrument's active lineage link",
+)
+def get_instrument_continuity_endpoint(
+    id: str = Path(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    return get_lineage_continuity_assessment(db=db, lineage_id_or_instrument_id=id)
 
 
 # --- Evaluation Endpoints -------------------------------------------------------

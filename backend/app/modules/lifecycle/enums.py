@@ -79,6 +79,17 @@ class ContinuityIndicator(str, Enum):
     UNKNOWN = "UNKNOWN"
 
 
+class ContinuityOutcome(str, Enum):
+    """
+    Transparent gap/overlap continuity assessment outcomes (Prompt 4 Section 5).
+    """
+    CONTINUITY_UNDETERMINED = "CONTINUITY_UNDETERMINED"
+    CONTINUITY_WITHIN_CONFIGURED_TOLERANCE = "CONTINUITY_WITHIN_CONFIGURED_TOLERANCE"
+    POTENTIAL_GAP = "POTENTIAL_GAP"
+    POTENTIAL_OVERLAP = "POTENTIAL_OVERLAP"
+    POLICY_UNCONFIGURED = "POLICY_UNCONFIGURED"
+
+
 class NotificationDeliveryStatus(str, Enum):
     """
     Strict delivery statuses for lifecycle notifications.

@@ -330,5 +330,52 @@ export const lifecycleApi = {
     apiClient.post<{ success: boolean; message: string }>(
       `/lifecycle/notifications/${notificationId}/read`
     ),
+  // Lineage & Renewal Methods (Module 5 Prompt 4)
+  getLineage: (instrumentId: string) =>
+    apiClient.get<import('@/types/lifecycle').LineageTreeResponse>(
+      `/lifecycle/instruments/${instrumentId}/lineage`
+    ),
+  getRenewalDraft: (instrumentId: string) =>
+    apiClient.get<import('@/types/lifecycle').RenewalDraftResponse>(
+      `/lifecycle/instruments/${instrumentId}/renewal-draft`
+    ),
+  createSuccessorRenewal: (
+    instrumentId: string,
+    payload: import('@/types/lifecycle').RenewalCreateSuccessorRequest
+  ) =>
+    apiClient.post<import('@/types/lifecycle').RenewalSuccessorCreatedResponse>(
+      `/lifecycle/instruments/${instrumentId}/renew`,
+      payload
+    ),
+  validateLineage: (payload: {
+    predecessor_instrument_id: string;
+    successor_instrument_id: string;
+    relationship_type?: string;
+    allow_authorized_transfer?: boolean;
+  }) => apiClient.post<any>('/lifecycle/lineage/validate', payload),
+  linkLineage: (payload: {
+    predecessor_instrument_id: string;
+    successor_instrument_id: string;
+    relationship_type?: string;
+    reason_or_reference?: string;
+    policy_id?: string;
+    allow_authorized_transfer?: boolean;
+  }) =>
+    apiClient.post<import('@/types/lifecycle').LineageResponse>(
+      '/lifecycle/lineage/link',
+      payload
+    ),
+  getContinuity: (instrumentId: string) =>
+    apiClient.get<import('@/types/lifecycle').ContinuityAssessmentResponse>(
+      `/lifecycle/instruments/${instrumentId}/continuity`
+    ),
+  correctLineage: (
+    lineageId: string,
+    payload: import('@/types/lifecycle').LineageCorrectionRequest
+  ) =>
+    apiClient.post<import('@/types/lifecycle').LineageResponse>(
+      `/lifecycle/lineage/${lineageId}/correct`,
+      payload
+    ),
 };
 

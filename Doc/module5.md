@@ -1,14 +1,18 @@
 # Module 5 — Lifecycle Orchestration, Policy Configuration and Renewal Lineage
-## Comprehensive Architecture, Data Foundation & Technical Specifications Guide (Prompts 1 & 2 of 5)
+## Comprehensive Architecture, Data Foundation & Technical Specifications Guide (Prompts 1–4 of 5)
 
-> **Module Status:** Maturity Monitoring, Scheduler Engine & Demo Clock Implemented (Prompts 1 & 2 of 5 Verified)  
+> **Module Status:** Renewal Lineage, Successor Workflow & Gap/Overlap Assessment Implemented (Prompts 1–4 of 5 Verified)  
 > **Alembic Revisions:**  
 > • `b2c3d4e5f6a7` — Lifecycle Policies, Instrument Lineages & Lifecycle Evaluations  
 > • `c3d4e5f6a7b8` — Lifecycle Job Runs & Idempotent Evaluation Constraint  
-> **Backend Test Suite:** **320 passed** across all modules in 13.71s — **0 failures, 0 regressions**  
-> **Prompt 1 Foundation Tests:** **15 passed** (100% green coverage on foundational criteria)  
-> **Prompt 2 Scheduler & Monitoring Tests:** **15 passed** (100% green coverage on Prompt 2 criteria)  
-> **Frontend Production Build:** **Compiled cleanly** with `tsc -b && vite build` in 449ms  
+> • `d4e5f6a7b8c9` — Policy-Driven Reminders, Delivery Attempts & Notification Inbox  
+> • `e5f6a7b8c9d0` — Lineage Continuity Details, Correction History & Instrument Effective Date  
+> **Backend Test Suite:** **353 passed** across all modules in 19.25s — **0 failures, 0 regressions**  
+> • Prompt 1 Foundation Tests: **15 passed**  
+> • Prompt 2 Scheduler & Monitoring Tests: **15 passed**  
+> • Prompt 3 Policy-Driven Reminder Tests: **15 passed**  
+> • Prompt 4 Renewal Lineage & Gap/Overlap Tests: **18 passed**  
+> **Frontend Production Build:** **Compiled cleanly** with `tsc -b && vite build` in 652ms  
 > **Repository:** `FDR_Sentinel`  
 > **Author:** Senior Backend Architect, Workflow Engineer & PostgreSQL Data Modeller  
 > **Date:** October 2026  
@@ -576,8 +580,138 @@ Implemented in `frontend/src/features/lifecycle/LifecycleNotificationHistory.tsx
 | 15 | `test_15_no_trust_or_release_changes_as_reminder_side_effect` | **PASSED** | Reminders and escalations leave `trust_level` and instrument status strictly unaltered. |
 
 ### Global Quality Check Status
-- **Backend Test Suite:** **335 passed** across all modules (Modules 1–4 and Module 5 Prompts 1, 2, and 3).
-- **Frontend Production Bundle:** **Compiled cleanly** with `tsc -b && vite build` in 455ms.
-- **Database Schema:** Alembic migration `d4e5f6a7b8c9` applied and verified.
+- **Backend Test Suite:** **353 passed** across all modules (Modules 1–4 and Module 5 Prompts 1, 2, 3, and 4).
+- **Frontend Production Bundle:** **Compiled cleanly** with `tsc -b && vite build` in 652ms.
+- **Database Schema:** Alembic migrations `d4e5f6a7b8c9` and `e5f6a7b8c9d0` applied and verified.
+
+---
+
+# Module 5 — Prompt 4 of 5: Renewal and Replacement Workflow, Predecessor/Successor Lineage and Gap/Overlap Detection
+
+## 23. Core Renewal/Replacement Principle
+
+A statutory renewal or replacement is represented in FDR Sentinel by a **new successor instrument linked to its predecessor**, rather than mutating or overwriting the existing instrument record.
+
+```
+┌────────────────────────────────────────┐       Direct Active Edge        ┌────────────────────────────────────────┐
+│         PREDECESSOR INSTRUMENT         │────────────────────────────────►│          SUCCESSOR INSTRUMENT          │
+│ • Retains original instrument ID       │   (Model: InstrumentLineage)    │ • Brand-new instrument ID              │
+│ • Retains original Bank, Amount, Dates │                                 │ • Independent Bank, Amount, Dates      │
+│ • Retains uploaded document versions   │                                 │ • Independent Module 2 file uploads    │
+│ • Retains Module 3 findings & history  │                                 │ • Independent Module 3 OCR validation  │
+│ • Retains Module 4 trust assessment    │                                 │ • Starts at L0_DECLARED (never copied) │
+│ • Status NOT cancelled or released     │                                 │ • Independently monitors lifecycle     │
+└────────────────────────────────────────┘                                 └────────────────────────────────────────┘
+```
+
+### Strict Non-Destructive Invariants
+1. **No Data Overwrite:** Predecessor fields (`amount`, `bank_name`, `reference_number`, `maturity_date`) are strictly immutable during renewal.
+2. **No Automatic Status Degradation:** Uploading or linking a successor does **never** mark the predecessor `RELEASED`, `CANCELLED`, or `ENCASHED`.
+3. **No Trust Inheritance:** The predecessor’s `L2_OFFICER_VERIFIED` or `L3_BANK_CONFIRMED` status is **never** copied to the successor. The successor begins at `L0_DECLARED` and must independently earn evidentiary trust.
+4. **Lifecycle Suppression on Rollover:** Once an active successor is linked, the predecessor's overdue and escalation alarms are safely cleared, but historical notifications remain preserved.
+
+---
+
+## 24. Lineage Graph Constraints & Transaction Invariants
+
+Module 5 enforces strict transactional graph integrity rules across `instrument_lineages`:
+
+1. **Anti-Self-Reference:** An instrument cannot reference itself (`predecessor_id != successor_id`).
+   - Rejection code: `SELF_REFERENTIAL_LINEAGE_PROHIBITED` (HTTP 400).
+2. **Cycle Prevention:** A renewal edge must not introduce a directed cycle into the lineage Directed Acyclic Graph (DAG).
+   - Evaluated using an iterative Breadth-First Search (BFS) ancestor traversal: `detect_cycle_in_lineage`.
+   - Rejection code: `CYCLIC_LINEAGE_DETECTED` (HTTP 400).
+3. **Single Active Renewal Chain:** To prevent ambiguous branching in the primary model, an instrument can only have one active successor and one active predecessor.
+   - Rejection codes: `DUPLICATE_PREDECESSOR_LINEAGE` and `DUPLICATE_SUCCESSOR_LINEAGE` (HTTP 409).
+4. **Institutional Boundary Enforcement:** Cross-institution renewals are prohibited by default unless explicitly flagged as an authorized institutional merger or amalgamation.
+   - Rejection code: `CROSS_INSTITUTION_LINEAGE_PROHIBITED` (HTTP 400).
+5. **Idempotency on Duplicate Links:** Re-submitting an identical link between the same predecessor and successor returns the existing active record without throwing duplicate key errors.
+6. **Optimistic Concurrency Control:** Lineage corrections require an `expected_concurrency_version` matching the database version, preventing race conditions.
+   - Rejection code: `CONCURRENCY_CONFLICT` (HTTP 409).
+
+---
+
+## 25. Transparent Gap/Overlap Continuity Assessment Engine
+
+The continuity engine evaluates the temporal alignment between the predecessor maturity date and the successor start date based on configured policy semantics:
+
+### 25.1 Comparison Semantics (`RenewalComparisonMethod`)
+1. `STRICT_CONTINUOUS_TERM`: Compares predecessor `maturity_date` with successor `effective_date`. If `effective_date` is omitted, the engine returns `CONTINUITY_UNDETERMINED` rather than asserting a false gap.
+2. `PROVISIONAL_ISSUE_DATE` / `ISSUE_DATE_TO_MATURITY_DATE`: Uses the successor's `issue_date` as a provisional proxy for validity start, clearly labeling the result as `is_provisional=True`.
+
+### 25.2 Outcomes (`ContinuityOutcome`)
+- `CONTINUITY_WITHIN_CONFIGURED_TOLERANCE`: Gap or overlap is within policy-allowed thresholds (`max_allowed_gap_days`, `max_allowed_overlap_days`).
+- `POTENTIAL_GAP`: Successor begins after predecessor matures, exceeding policy tolerance.
+- `POTENTIAL_OVERLAP`: Successor validity precedes predecessor maturity beyond allowed overlap window.
+- `CONTINUITY_UNDETERMINED`: Required comparison dates (e.g. `effective_date` under strict continuous policy) are not yet available.
+- `POLICY_UNCONFIGURED`: No active policy configured for the deposit type.
+
+### 25.3 Module 3 Validation Engine Integration
+When an out-of-tolerance gap or overlap is detected during linkage, the engine automatically creates a persistent `ValidationFinding` in Module 3 with `category="POLICY_COMPLIANCE"` and `severity="WARNING"`:
+- Rule ID: `LINEAGE_CONTINUITY_POTENTIAL_GAP` or `LINEAGE_CONTINUITY_POTENTIAL_OVERLAP`.
+- Deduplication: Uses deterministic SHA-256 fingerprinting on `(instrument_id, rule_id, rule_version, fingerprint_inputs)`.
+
+---
+
+## 26. Module 5 Prompt 4 REST APIs
+
+| Method | Endpoint | Authorized Roles | Purpose |
+|:---:|:---|:---:|:---|
+| `GET` | `/api/v1/lifecycle/instruments/{id}/renewal-draft` | Tenancy Scoped | Initiates renewal draft with pre-filled predecessor data & active policy rules. |
+| `POST` | `/api/v1/lifecycle/instruments/{id}/renew` | Tenancy Scoped | Creates brand new successor instrument at `L0_DECLARED` and links it in one transaction. |
+| `POST` | `/api/v1/lifecycle/lineage/validate` | Authenticated | Pre-validates proposed linkage, detecting cycles, tenant mismatches, and provisional continuity. |
+| `POST` | `/api/v1/lifecycle/lineage/link` | Authenticated | Links existing predecessor and successor instruments with cycle & constraint enforcement. |
+| `GET` | `/api/v1/lifecycle/instruments/{id}/lineage` | Tenancy Scoped | Traverses up to 20 levels of ancestors and successors for visual chain construction. |
+| `GET` | `/api/v1/lifecycle/instruments/{id}/continuity` | Tenancy Scoped | Fetches granular gap/overlap evaluation, date sources, and tolerance outcomes. |
+| `POST` | `/api/v1/lifecycle/lineage/{id}/correct` | Admin / Officer / Branch Head | Authorized administrative correction (`DEACTIVATE`, `SUPERSEDE`, `UPDATE_REASON`). |
+
+---
+
+## 27. Frontend UI Integration
+
+### 27.1 Renewal Lineage & Gap/Overlap Section
+Implemented in `frontend/src/features/lifecycle/RenewalLineageSection.tsx` and integrated directly into `InstrumentDetailPage.tsx`:
+- **Read-Only Predecessor Preservation:** Predecessor details are presented in a locked side-by-side card during renewal initiation.
+- **Autonomous Successor Registration Modal:** Form allows authorized college users or officers to register a new successor deposit with custom reference, amount, and dates.
+- **Visual Deposit Progression Timeline:** Node-based timeline showing predecessor depth (-1, -2), current record, and successor deposits (+1, +2) with status and trust badges.
+- **Continuity & Tolerance Badge:** Dynamic colored badges (`Within Tolerance` in green, `Potential Gap` in amber, `Overlap Detected` in blue, `Continuity Undetermined` in gray) with date source field indicators.
+- **Independent Trust Warning Banner:** Explicitly informs officers and colleges that the successor requires independent Module 2/3/4 scrutiny and does not inherit predecessor bank confirmation.
+- **Correction Action Dialog:** Allows scrutiny officers and administrators to correct, supersede, or deactivate links with mandatory regulatory audit reasons.
+
+---
+
+## 28. Acceptance Verification Matrix
+
+### Prompt 4: Renewal Lineage & Gap/Overlap Detection ([`backend/tests/test_module5_prompt4_lineage.py`](file:///c:/Users/bhome/OneDrive/Desktop/VIT/SIH/SIH%202026/TOP%2075/FDR_Sentinel/backend/tests/test_module5_prompt4_lineage.py))
+
+| Specification | Test Function | Result | Verification Notes |
+|:---:|:---|:---:|:---|
+| 1 | `test_1_create_successor_as_new_instrument` | **PASSED** | Successor created with own ID, reference number, and tenancy; predecessor unchanged. |
+| 2 | `test_2_linking_predecessor_to_successor` | **PASSED** | Explicit linking creates active lineage edge with policy version and creator tracking. |
+| 3 | `test_3_cycle_rejection` | **PASSED** | Iterative BFS rejects cyclic linkage (C -> A in A -> B -> C) with `CYCLIC_LINEAGE_DETECTED`. |
+| 4 | `test_4_self_link_rejection` | **PASSED** | Self-referential edge rejected with `SELF_REFERENTIAL_LINEAGE_PROHIBITED` (HTTP 400). |
+| 5 | `test_5_ambiguous_duplicate_link_rejection` | **PASSED** | Attempting to branch predecessor to second successor rejected with `DUPLICATE_PREDECESSOR_LINEAGE`. |
+| 6 | `test_6_cross_institution_restriction` | **PASSED** | Cross-college links blocked by default; allowed only with `allow_authorized_transfer=True`. |
+| 7 | `test_7_concurrent_link_attempts_idempotency` | **PASSED** | Redundant or concurrent identical link attempts return existing link idempotently. |
+| 8 | `test_8_predecessor_data_documents_and_trust_remain_unchanged` | **PASSED** | Predecessor amount, maturity date, trust level, and status remain strictly identical. |
+| 9 | `test_9_successor_does_not_inherit_predecessor_trust` | **PASSED** | Successor starts strictly at `L0_DECLARED`; predecessor's `L3_BANK_CONFIRMED` is not inherited. |
+| 10 | `test_10_gap_overlap_calculated_using_configured_semantics` | **PASSED** | 2-day gap between predecessor maturity and successor issue date correctly calculated. |
+| 11 | `test_11_unknown_effective_date_strict_policy_yields_undetermined` | **PASSED** | Strict continuous policy without effective date returns `CONTINUITY_UNDETERMINED` (no false gap). |
+| 12 | `test_12_missing_unconfigured_continuity_policy` | **PASSED** | Unconfigured policy returns `POLICY_UNCONFIGURED` without asserting violation. |
+| 13 | `test_13_gap_overlap_finding_integrates_with_module_3` | **PASSED** | 15-day gap exceeding 5-day tolerance creates `LINEAGE_CONTINUITY_POTENTIAL_GAP` finding in Module 3. |
+| 14 | `test_14_successor_receives_own_lifecycle_evaluation` | **PASSED** | Successor lifecycle is auto-evaluated upon linkage creation. |
+| 15 | `test_15_reminder_behavior_remains_policy_consistent` | **PASSED** | Predecessor evaluation records remain auditable and active linkage is tracked. |
+| 16 | `test_16_no_predecessor_release_or_refund_status_change` | **PASSED** | Linking successor never mutates predecessor status to `RELEASED` or `CANCELLED`. |
+| 17 | `test_17_institution_scoping_and_tenancy` | **PASSED** | Institution user from College B blocked from initiating renewal for College A's FDR (HTTP 403). |
+| 18 | `test_18_audit_history_for_creation_linking_and_correction` | **PASSED** | Concurrency conflicts blocked; full audit history stored in `correction_history_json`. |
+
+---
+
+## 29. Full Repository Health Summary
+
+- **Total Backend Tests:** **353 passed** in 19.25s across Modules 1–5 (**100% pass rate**).
+- **Alembic Database Head:** `e5f6a7b8c9d0` (Module 5 Prompt 4 Migration applied).
+- **Frontend Production Bundle:** `dist/` built cleanly with zero TypeScript errors.
+
 
 

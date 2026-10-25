@@ -42,6 +42,7 @@ class Instrument(Base, TimestampMixin):
     # Term Dates
     issue_date: Mapped[date] = mapped_column(Date, nullable=False)
     maturity_date: Mapped[date] = mapped_column(Date, index=True, nullable=False)
+    effective_date: Mapped[Optional[date]] = mapped_column(Date, nullable=True)
     
     # Lien and Joint Holder Information
     lien_holder: Mapped[Optional[str]] = mapped_column(
