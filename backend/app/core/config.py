@@ -81,6 +81,10 @@ class Settings(BaseSettings):
     LIVE_BANK_ADAPTER_ENABLED: bool = False     # Unconfigured until live bank partnership is authorized
     MAX_VERIFICATION_RETRY_ATTEMPTS: int = 3
 
+    # Module 5: Lifecycle & Renewal Settings
+    ENABLE_LIFECYCLE_DATE_ADVANCE: bool = True  # Demo-only date advance; disabled in production
+    LIFECYCLE_DEFAULT_TIMEZONE: str = "Asia/Kolkata"
+
 
 settings = Settings()
 
