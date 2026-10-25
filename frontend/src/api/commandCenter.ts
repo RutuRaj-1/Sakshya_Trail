@@ -21,6 +21,11 @@ import type {
   ScrutinyObservationCreateRequest,
   ScrutinyObservationAmendRequest,
   ScrutinyObservationResolveRequest,
+  PendingVerificationReportResponse,
+  UpcomingMaturitiesReportResponse,
+  MissingDocumentsReportResponse,
+  InterventionsReportResponse,
+  AuditEvidencePackResponse,
 } from '@/types/commandCenter';
 
 export interface StatusCountsParams {
@@ -210,4 +215,149 @@ export const commandCenterApi = {
   resolveObservation: (observationId: string, data: ScrutinyObservationResolveRequest) => {
     return apiClient.post<ScrutinyObservationItem>(`/dashboard/observations/${observationId}/resolve`, data);
   },
+
+  // ---------------------------------------------------------------------------
+  // Operational Reports & Exports (PRD-FR-074 & Prompt 4)
+  // ---------------------------------------------------------------------------
+
+  /** Pending Verification Report */
+  getPendingVerificationReport: (params?: ReportQueryParams) => {
+    const sp = new URLSearchParams();
+    if (params) {
+      Object.entries(params).forEach(([k, v]) => {
+        if (v !== undefined && v !== null && v !== '') sp.append(k, String(v));
+      });
+    }
+    const qs = sp.toString();
+    return apiClient.get<PendingVerificationReportResponse>(`/dashboard/reports/pending-verification${qs ? `?${qs}` : ''}`);
+  },
+
+  /** Upcoming Maturities Report */
+  getUpcomingMaturitiesReport: (params?: ReportQueryParams) => {
+    const sp = new URLSearchParams();
+    if (params) {
+      Object.entries(params).forEach(([k, v]) => {
+        if (v !== undefined && v !== null && v !== '') sp.append(k, String(v));
+      });
+    }
+    const qs = sp.toString();
+    return apiClient.get<UpcomingMaturitiesReportResponse>(`/dashboard/reports/upcoming-maturities${qs ? `?${qs}` : ''}`);
+  },
+
+  /** Missing Documents Report */
+  getMissingDocumentsReport: (params?: ReportQueryParams) => {
+    const sp = new URLSearchParams();
+    if (params) {
+      Object.entries(params).forEach(([k, v]) => {
+        if (v !== undefined && v !== null && v !== '') sp.append(k, String(v));
+      });
+    }
+    const qs = sp.toString();
+    return apiClient.get<MissingDocumentsReportResponse>(`/dashboard/reports/missing-documents${qs ? `?${qs}` : ''}`);
+  },
+
+  /** Interventions Required Report */
+  getInterventionsReport: (params?: ReportQueryParams) => {
+    const sp = new URLSearchParams();
+    if (params) {
+      Object.entries(params).forEach(([k, v]) => {
+        if (v !== undefined && v !== null && v !== '') sp.append(k, String(v));
+      });
+    }
+    const qs = sp.toString();
+    return apiClient.get<InterventionsReportResponse>(`/dashboard/reports/interventions${qs ? `?${qs}` : ''}`);
+  },
+
+  /** Audit Evidence Pack per Instrument */
+  getAuditEvidencePack: (instrumentId: string) => {
+    return apiClient.get<AuditEvidencePackResponse>(`/dashboard/reports/evidence-pack/${instrumentId}`);
+  },
+
+  /** Download Report as CSV */
+  downloadReportCsv: async (reportType: string, params?: ReportQueryParams) => {
+    const sp = new URLSearchParams();
+    if (params) {
+      Object.entries(params).forEach(([k, v]) => {
+        if (v !== undefined && v !== null && v !== '') sp.append(k, String(v));
+      });
+    }
+    const qs = sp.toString();
+    const cleanType = reportType.toLowerCase().replace(/_/g, '-');
+    const url = `${apiClient.getBaseUrl()}/dashboard/reports/${cleanType}/export/csv${qs ? `?${qs}` : ''}`;
+    
+    const res = await fetch(url, {
+      method: 'GET',
+      credentials: 'include',
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: 'Export download failed' }));
+      throw new Error(err.detail || err.error || `CSV Export Failed (${res.status})`);
+    }
+    const blob = await res.blob();
+    const disposition = res.headers.get('Content-Disposition') || '';
+    const match = disposition.match(/filename="?([^"]+)"?/);
+    const filename = match ? match[1] : `${cleanType}_export.csv`;
+    
+    const downloadUrl = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = downloadUrl;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(downloadUrl);
+  },
+
+  /** Download Report as PDF */
+  downloadReportPdf: async (reportType: string, params?: ReportQueryParams) => {
+    const sp = new URLSearchParams();
+    if (params) {
+      Object.entries(params).forEach(([k, v]) => {
+        if (v !== undefined && v !== null && v !== '') sp.append(k, String(v));
+      });
+    }
+    const qs = sp.toString();
+    const cleanType = reportType.toLowerCase().replace(/_/g, '-');
+    const url = `${apiClient.getBaseUrl()}/dashboard/reports/${cleanType}/export/pdf${qs ? `?${qs}` : ''}`;
+    
+    const res = await fetch(url, {
+      method: 'GET',
+      credentials: 'include',
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: 'Export download failed' }));
+      throw new Error(err.detail || err.error || `PDF Export Failed (${res.status})`);
+    }
+    const blob = await res.blob();
+    const disposition = res.headers.get('Content-Disposition') || '';
+    const match = disposition.match(/filename="?([^"]+)"?/);
+    const filename = match ? match[1] : `${cleanType}_export.pdf`;
+    
+    const downloadUrl = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = downloadUrl;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(downloadUrl);
+  },
 };
+
+export interface ReportQueryParams {
+  window_days?: number;
+  date_from?: string;
+  date_to?: string;
+  institution_id?: string;
+  bank_name?: string;
+  assigned_office?: string;
+  trust_level?: string;
+  status?: string;
+  verification_status?: string;
+  checklist_outcome?: string;
+  intervention_type?: string;
+  severity?: string;
+  limit?: number;
+  skip?: number;
+}
+

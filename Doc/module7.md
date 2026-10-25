@@ -251,4 +251,53 @@ The frontend test suite in `frontend/src/features/commandCenter/__tests__/Comman
 - **Full Frontend Suite:** `npx vitest run` → **21 passed** across 3 test files in 2.09s.
 - **Production Build:** `npm run build` (`tsc -b && vite build`) completed cleanly with **0 errors**.
 
+---
+
+## Prompt 4: Operational Reports, Consistent Drill-Down and Secure CSV/PDF Exports
+
+### 1. Implemented Files & Architecture
+
+| File Path | Description |
+|:---|:---|
+| `backend/pyproject.toml` | Added `reportlab>=5.0.0` dependency for native high-performance, audit-compliant PDF generation. |
+| `backend/app/modules/dashboard/schemas.py` | Typed Pydantic models for Report Filter Metadata, Pending Verification, Upcoming Maturities, Missing Documents, Interventions, and Audit Evidence Pack extractions. |
+| `backend/app/modules/dashboard/report_service.py` | Query services for the 4 core operational reports and per-instrument audit evidence pack. Reuses underlying lifecycle, instrument, and validation models without duplicating rules. Distinguishes `SIMULATED` verifications from live bank feeds. |
+| `backend/app/modules/dashboard/export_service.py` | Secure export engine: `sanitize_csv_cell` (spreadsheet formula injection defense), `generate_csv` (UTF-8 BOM, metadata header, streaming output), and `generate_pdf` (ReportLab A4 landscape, `NumberedCanvas` two-pass page numbering, sensitivity banner). Emits audit events on every export. |
+| `backend/app/modules/dashboard/router.py` | API endpoints for `/reports/pending-verification`, `/reports/upcoming-maturities`, `/reports/missing-documents`, `/reports/interventions`, `/reports/evidence-pack/{id}`, `/reports/{type}`, and CSV/PDF export endpoints. |
+| `frontend/src/types/commandCenter.ts` | TypeScript interfaces for all operational report response payloads, filters, and audit evidence pack documents. |
+| `frontend/src/api/commandCenter.ts` | API client methods for querying reports, retrieving evidence packs, and triggering browser file downloads for CSV and PDF. |
+| `frontend/src/features/commandCenter/components/OperationalReportsWorkspace.tsx` | Comprehensive reporting workspace featuring tab navigation, dynamic filter drawer, summary counters, record drill-down links to `/instruments/:id`, export buttons with role gating, and an Audit Evidence Pack modal. |
+| `frontend/src/app/routes/ReportsPage.tsx` | Route page wrapper mounted at `/reports`. |
+| `frontend/src/app/router.tsx` | Registered `/reports` route. |
+| `frontend/src/components/navigation/Sidebar.tsx` | Added Operational Reports navigation entry with `FileSpreadsheet` icon. |
+| `docs/module-7-reporting-and-exports.md` | Complete technical documentation covering report specifications, data sources, security boundaries, formula injection mitigation, and audit logging. |
+| `backend/tests/test_module7_prompt4_reports_exports.py` | 8 automated backend acceptance tests covering simulated channel labeling, renewal status, checklist outcomes, neutral intervention states, tenant isolation, formula injection defense, PDF generation, and evidence pack checks. |
+| `frontend/src/features/commandCenter/__tests__/OperationalReports.test.tsx` | 6 automated frontend Vitest tests covering workspace rendering, tab navigation, filter triggers, export actions, and modal extraction. |
+
+---
+
+### 2. Implemented Endpoints
+
+| HTTP Method | Endpoint Path | Function & PRD Mapping | Authorized Roles |
+|:---|:---|:---|:---|
+| `GET` | `/api/v1/dashboard/reports/pending-verification` | Authorized instruments awaiting verification with pending age and explicit `SIMULATED` flagging. | Authenticated (scoped) |
+| `GET` | `/api/v1/dashboard/reports/upcoming-maturities` | Approaching deposit maturities with identical Command Center date basis and renewal linkage. | Authenticated (scoped) |
+| `GET` | `/api/v1/dashboard/reports/missing-documents` | Non-compliant or missing checklist items mapped against versioned policies. | Authenticated (scoped) |
+| `GET` | `/api/v1/dashboard/reports/interventions` | Operational follow-up items (overdue tasks, escalations, failed verifications) in neutral terminology. | Authenticated (scoped) |
+| `GET` | `/api/v1/dashboard/reports/evidence-pack/{instrument_id}` | Structured audit evidence pack with document SHA-256 hashes, uncertified disclaimer, and audit chain verification. | Authenticated (scoped) |
+| `GET` | `/api/v1/dashboard/reports/{report_type}` | Generic parameterized dispatcher for operational report datasets. | Authenticated (scoped) |
+| `GET` | `/api/v1/dashboard/reports/{report_type}/export/csv` | Secure CSV export with formula injection defense and metadata header block. | Dedicated export permission |
+| `GET` | `/api/v1/dashboard/reports/{report_type}/export/pdf` | Official ReportLab PDF export with landscape tabular layout, sensitivity label, and pagination. | Dedicated export permission |
+
+---
+
+### 3. Automated Tests & Build Verification
+
+- **Backend Pytest Suite:** `pytest tests/test_module7_prompt4_reports_exports.py` → **8 passed** in 2.56s.
+- **Full Module 7 Backend Suite:** `pytest tests/test_module7_prompt1_foundation.py tests/test_module7_prompt3_search_history.py tests/test_module7_prompt4_reports_exports.py` → **29 passed** in 3.10s (0 regressions).
+- **Frontend Vitest Suite:** `npx vitest run src/features/commandCenter/__tests__/OperationalReports.test.tsx` → **6 passed** in 0.54s.
+- **Combined Module 7 Frontend Suite:** `npx vitest run src/features/commandCenter/__tests__/` → **23 passed** across 3 test files in 1.89s.
+- **Production Build:** `npm run build` (`tsc -b && vite build`) completed cleanly with **0 errors**.
+
+
 

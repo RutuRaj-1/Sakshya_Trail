@@ -24,6 +24,7 @@ dependencies = [
     "argon2-cffi>=23.1.0",
     "pyjwt>=2.8.0",
     "python-multipart>=0.0.12",
+    "reportlab>=5.0.0",
 ]
 
 [project.optional-dependencies]

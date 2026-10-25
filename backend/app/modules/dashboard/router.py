@@ -18,9 +18,9 @@ Provides typed, authenticated, and role-scoped endpoints for Module 7 Command Ce
 - Preserves legacy Module 1 /summary endpoint
 """
 from typing import Optional, List, Dict, Any
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta, timezone
 from decimal import Decimal
-from fastapi import APIRouter, Depends, Query, Path, HTTPException, status
+from fastapi import APIRouter, Depends, Query, Path, HTTPException, status, Response
 from sqlalchemy.orm import Session
 from sqlalchemy import select, func
 
@@ -59,11 +59,17 @@ from app.modules.dashboard.schemas import (
     ScrutinyObservationCreateRequest,
     ScrutinyObservationAmendRequest,
     ScrutinyObservationResolveRequest,
+    PendingVerificationReportResponse,
+    UpcomingMaturitiesReportResponse,
+    MissingDocumentsReportResponse,
+    InterventionsReportResponse,
+    AuditEvidencePackResponse,
 )
 from app.modules.dashboard.dashboard_service import DashboardService
 from app.modules.dashboard.priority_service import PriorityService
 from app.modules.dashboard.search_service import SearchService
 from app.modules.dashboard.report_service import ReportService
+from app.modules.dashboard.export_service import ExportService
 from app.modules.dashboard.history_service import HistoryService
 from app.modules.dashboard.audit_query_service import AuditQueryService
 from app.modules.dashboard.observation_service import ScrutinyObservationService
@@ -498,64 +504,6 @@ def search_release_cases(
     )
 
 
-# ------------------------------------------------------------------------------
-# Operational Reports Query Endpoint (PRD-FR-074)
-# ------------------------------------------------------------------------------
-@router.get("/reports/{report_type}")
-def get_report_dataset(
-    report_type: str = Path(..., description="Report code: PENDING_VERIFICATION, UPCOMING_MATURITIES, MISSING_DOCUMENTS, INTERVENTIONS"),
-    window_days: int = Query(90, ge=1, le=730, description="Maturity window days"),
-    institution_id: Optional[str] = Query(None, description="Filter by institution"),
-    bank_name: Optional[str] = Query(None, description="Filter by bank"),
-    assigned_office: Optional[str] = Query(None, description="Filter by assigned office"),
-    limit: int = Query(100, ge=1, le=200, description="Max report rows"),
-    current_user: User = Depends(get_current_active_user),
-    db: Session = Depends(get_db),
-) -> Dict[str, Any]:
-    """
-    Constructs report datasets for authorized compliance & audit reviews (PRD-FR-074).
-    Export permission is separate from viewing permission.
-    """
-    rpt = report_type.upper()
-    if rpt == "PENDING_VERIFICATION":
-        return ReportService.get_pending_verification_report(
-            db=db,
-            current_user=current_user,
-            institution_id=institution_id,
-            bank_name=bank_name,
-            assigned_office=assigned_office,
-            limit=limit,
-        )
-    elif rpt == "UPCOMING_MATURITIES":
-        return ReportService.get_upcoming_maturities_report(
-            db=db,
-            current_user=current_user,
-            window_days=window_days,
-            institution_id=institution_id,
-            bank_name=bank_name,
-            assigned_office=assigned_office,
-            limit=limit,
-        )
-    elif rpt == "MISSING_DOCUMENTS":
-        return ReportService.get_missing_documents_report(
-            db=db,
-            current_user=current_user,
-            institution_id=institution_id,
-            limit=limit,
-        )
-    elif rpt == "INTERVENTIONS":
-        return ReportService.get_interventions_report(
-            db=db,
-            current_user=current_user,
-            institution_id=institution_id,
-            assigned_office=assigned_office,
-            limit=limit,
-        )
-    else:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Unknown report type '{report_type}'. Supported: PENDING_VERIFICATION, UPCOMING_MATURITIES, MISSING_DOCUMENTS, INTERVENTIONS",
-        )
 
 
 # ------------------------------------------------------------------------------
@@ -700,3 +648,384 @@ def verify_audit_integrity(
     return AuditQueryService.verify_audit_log_integrity(
         db=db, current_user=current_user, sample_size=sample_size
     )
+
+
+# ------------------------------------------------------------------------------
+# Operational Reports (PRD-FR-074 & Prompt 4)
+# ------------------------------------------------------------------------------
+
+def _fetch_report_data(
+    report_type: str,
+    db: Session,
+    current_user: User,
+    institution_id: Optional[str] = None,
+    bank_name: Optional[str] = None,
+    assigned_office: Optional[str] = None,
+    trust_level: Optional[str] = None,
+    status_filter: Optional[str] = None,
+    verification_status: Optional[str] = None,
+    checklist_outcome: Optional[str] = None,
+    intervention_type: Optional[str] = None,
+    severity: Optional[str] = None,
+    date_from: Optional[str] = None,
+    date_to: Optional[str] = None,
+    window_days: int = 90,
+    limit: int = 500,
+    skip: int = 0,
+) -> Dict[str, Any]:
+    norm_type = report_type.upper().replace("-", "_")
+    if norm_type in ["PENDING_VERIFICATION", "PENDING"]:
+        return ReportService.get_pending_verification_report(
+            db=db,
+            current_user=current_user,
+            institution_id=institution_id,
+            bank_name=bank_name,
+            assigned_office=assigned_office,
+            trust_level=trust_level,
+            verification_status=verification_status,
+            limit=limit,
+            skip=skip,
+        )
+    elif norm_type in ["UPCOMING_MATURITIES", "MATURITIES"]:
+        return ReportService.get_upcoming_maturities_report(
+            db=db,
+            current_user=current_user,
+            window_days=window_days,
+            date_from=date_from,
+            date_to=date_to,
+            institution_id=institution_id,
+            bank_name=bank_name,
+            assigned_office=assigned_office,
+            trust_level=trust_level,
+            status=status_filter,
+            limit=limit,
+            skip=skip,
+        )
+    elif norm_type in ["MISSING_DOCUMENTS", "DOCUMENTS"]:
+        return ReportService.get_missing_documents_report(
+            db=db,
+            current_user=current_user,
+            institution_id=institution_id,
+            bank_name=bank_name,
+            assigned_office=assigned_office,
+            checklist_outcome=checklist_outcome,
+            severity=severity,
+            limit=limit,
+            skip=skip,
+        )
+    elif norm_type in ["INTERVENTIONS", "INTERVENTION"]:
+        return ReportService.get_interventions_report(
+            db=db,
+            current_user=current_user,
+            institution_id=institution_id,
+            assigned_office=assigned_office,
+            intervention_type=intervention_type,
+            severity=severity,
+            limit=limit,
+            skip=skip,
+        )
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Unsupported report type '{report_type}'. Supported: PENDING_VERIFICATION, UPCOMING_MATURITIES, MISSING_DOCUMENTS, INTERVENTIONS.",
+        )
+
+
+@router.get("/reports/pending-verification", response_model=PendingVerificationReportResponse)
+def get_pending_verification_report(
+    institution_id: Optional[str] = Query(None),
+    bank_name: Optional[str] = Query(None),
+    assigned_office: Optional[str] = Query(None),
+    trust_level: Optional[str] = Query(None),
+    verification_status: Optional[str] = Query(None),
+    limit: int = Query(500, ge=1, le=1000),
+    skip: int = Query(0, ge=0),
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db),
+) -> Dict[str, Any]:
+    """Pending Verification Report with source status and simulated indicator."""
+    return ReportService.get_pending_verification_report(
+        db=db,
+        current_user=current_user,
+        institution_id=institution_id,
+        bank_name=bank_name,
+        assigned_office=assigned_office,
+        trust_level=trust_level,
+        verification_status=verification_status,
+        limit=limit,
+        skip=skip,
+    )
+
+
+@router.get("/reports/upcoming-maturities", response_model=UpcomingMaturitiesReportResponse)
+def get_upcoming_maturities_report(
+    window_days: int = Query(90, ge=1, le=730),
+    date_from: Optional[str] = Query(None),
+    date_to: Optional[str] = Query(None),
+    institution_id: Optional[str] = Query(None),
+    bank_name: Optional[str] = Query(None),
+    assigned_office: Optional[str] = Query(None),
+    trust_level: Optional[str] = Query(None),
+    status: Optional[str] = Query(None),
+    limit: int = Query(500, ge=1, le=1000),
+    skip: int = Query(0, ge=0),
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db),
+) -> Dict[str, Any]:
+    """Upcoming Maturities Report with exact Command Center date basis and renewal status."""
+    return ReportService.get_upcoming_maturities_report(
+        db=db,
+        current_user=current_user,
+        window_days=window_days,
+        date_from=date_from,
+        date_to=date_to,
+        institution_id=institution_id,
+        bank_name=bank_name,
+        assigned_office=assigned_office,
+        trust_level=trust_level,
+        status=status,
+        limit=limit,
+        skip=skip,
+    )
+
+
+@router.get("/reports/missing-documents", response_model=MissingDocumentsReportResponse)
+def get_missing_documents_report(
+    institution_id: Optional[str] = Query(None),
+    bank_name: Optional[str] = Query(None),
+    assigned_office: Optional[str] = Query(None),
+    checklist_outcome: Optional[str] = Query(None),
+    severity: Optional[str] = Query(None),
+    limit: int = Query(500, ge=1, le=1000),
+    skip: int = Query(0, ge=0),
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db),
+) -> Dict[str, Any]:
+    """Missing and Non-Compliant Documents Report."""
+    return ReportService.get_missing_documents_report(
+        db=db,
+        current_user=current_user,
+        institution_id=institution_id,
+        bank_name=bank_name,
+        assigned_office=assigned_office,
+        checklist_outcome=checklist_outcome,
+        severity=severity,
+        limit=limit,
+        skip=skip,
+    )
+
+
+@router.get("/reports/interventions", response_model=InterventionsReportResponse)
+def get_interventions_report(
+    institution_id: Optional[str] = Query(None),
+    assigned_office: Optional[str] = Query(None),
+    intervention_type: Optional[str] = Query(None),
+    severity: Optional[str] = Query(None),
+    limit: int = Query(500, ge=1, le=1000),
+    skip: int = Query(0, ge=0),
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db),
+) -> Dict[str, Any]:
+    """Interventions Required Report (overdue, escalated, discrepancy, release blocker)."""
+    return ReportService.get_interventions_report(
+        db=db,
+        current_user=current_user,
+        institution_id=institution_id,
+        assigned_office=assigned_office,
+        intervention_type=intervention_type,
+        severity=severity,
+        limit=limit,
+        skip=skip,
+    )
+
+
+@router.get("/reports/evidence-pack/{instrument_id}", response_model=AuditEvidencePackResponse)
+def get_audit_evidence_pack(
+    instrument_id: str = Path(..., description="Target instrument UUID"),
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db),
+) -> Dict[str, Any]:
+    """
+    Authorized audit evidence pack extract containing document hashes, field provenance,
+    observation lineage, and audit events trail.
+    """
+    return ReportService.get_audit_evidence_pack(
+        db=db,
+        current_user=current_user,
+        instrument_id=instrument_id,
+    )
+
+
+@router.get("/reports/{report_type}")
+def get_operational_report(
+    report_type: str = Path(..., description="Target report identifier"),
+    window_days: int = Query(90, ge=1, le=730),
+    date_from: Optional[str] = Query(None),
+    date_to: Optional[str] = Query(None),
+    institution_id: Optional[str] = Query(None),
+    bank_name: Optional[str] = Query(None),
+    assigned_office: Optional[str] = Query(None),
+    trust_level: Optional[str] = Query(None),
+    status: Optional[str] = Query(None),
+    verification_status: Optional[str] = Query(None),
+    checklist_outcome: Optional[str] = Query(None),
+    intervention_type: Optional[str] = Query(None),
+    severity: Optional[str] = Query(None),
+    limit: int = Query(500, ge=1, le=1000),
+    skip: int = Query(0, ge=0),
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db),
+) -> Dict[str, Any]:
+    """Generic parameterized dispatcher for operational report datasets."""
+    return _fetch_report_data(
+        report_type=report_type,
+        db=db,
+        current_user=current_user,
+        institution_id=institution_id,
+        bank_name=bank_name,
+        assigned_office=assigned_office,
+        trust_level=trust_level,
+        status_filter=status,
+        verification_status=verification_status,
+        checklist_outcome=checklist_outcome,
+        intervention_type=intervention_type,
+        severity=severity,
+        date_from=date_from,
+        date_to=date_to,
+        window_days=window_days,
+        limit=limit,
+        skip=skip,
+    )
+
+
+# ------------------------------------------------------------------------------
+# Secure Report Export Endpoints (PRD-FR-074 CSV & PDF)
+# ------------------------------------------------------------------------------
+
+@router.get("/reports/{report_type}/export/csv")
+def export_report_csv(
+    report_type: str = Path(..., description="Report type to export"),
+    window_days: int = Query(90, ge=1, le=730),
+    date_from: Optional[str] = Query(None),
+    date_to: Optional[str] = Query(None),
+    institution_id: Optional[str] = Query(None),
+    bank_name: Optional[str] = Query(None),
+    assigned_office: Optional[str] = Query(None),
+    trust_level: Optional[str] = Query(None),
+    status: Optional[str] = Query(None),
+    verification_status: Optional[str] = Query(None),
+    checklist_outcome: Optional[str] = Query(None),
+    intervention_type: Optional[str] = Query(None),
+    severity: Optional[str] = Query(None),
+    limit: int = Query(5000, ge=1, le=10000),
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db),
+) -> Response:
+    """
+    Exports operational report as secure CSV with formula injection defense and metadata block.
+    Audited in compliance with regulatory trail requirements.
+    """
+    ExportService.verify_export_permission(current_user)
+    norm_type = report_type.upper().replace("-", "_")
+
+    report_data = _fetch_report_data(
+        report_type=norm_type,
+        db=db,
+        current_user=current_user,
+        institution_id=institution_id,
+        bank_name=bank_name,
+        assigned_office=assigned_office,
+        trust_level=trust_level,
+        status_filter=status,
+        verification_status=verification_status,
+        checklist_outcome=checklist_outcome,
+        intervention_type=intervention_type,
+        severity=severity,
+        date_from=date_from,
+        date_to=date_to,
+        window_days=window_days,
+        limit=limit,
+        skip=0,
+    )
+
+    csv_bytes = ExportService.generate_csv(
+        db=db,
+        current_user=current_user,
+        report_type=norm_type,
+        report_data=report_data,
+    )
+
+    filename = f"{norm_type.lower()}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
+    return Response(
+        content=csv_bytes,
+        media_type="text/csv",
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"',
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+        },
+    )
+
+
+@router.get("/reports/{report_type}/export/pdf")
+def export_report_pdf(
+    report_type: str = Path(..., description="Report type to export"),
+    window_days: int = Query(90, ge=1, le=730),
+    date_from: Optional[str] = Query(None),
+    date_to: Optional[str] = Query(None),
+    institution_id: Optional[str] = Query(None),
+    bank_name: Optional[str] = Query(None),
+    assigned_office: Optional[str] = Query(None),
+    trust_level: Optional[str] = Query(None),
+    status: Optional[str] = Query(None),
+    verification_status: Optional[str] = Query(None),
+    checklist_outcome: Optional[str] = Query(None),
+    intervention_type: Optional[str] = Query(None),
+    severity: Optional[str] = Query(None),
+    limit: int = Query(1000, ge=1, le=2000),
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db),
+) -> Response:
+    """
+    Exports operational report as official PDF with ReportLab tabular layout and sensitivity label.
+    Audited in compliance with regulatory trail requirements.
+    """
+    ExportService.verify_export_permission(current_user)
+    norm_type = report_type.upper().replace("-", "_")
+
+    report_data = _fetch_report_data(
+        report_type=norm_type,
+        db=db,
+        current_user=current_user,
+        institution_id=institution_id,
+        bank_name=bank_name,
+        assigned_office=assigned_office,
+        trust_level=trust_level,
+        status_filter=status,
+        verification_status=verification_status,
+        checklist_outcome=checklist_outcome,
+        intervention_type=intervention_type,
+        severity=severity,
+        date_from=date_from,
+        date_to=date_to,
+        window_days=window_days,
+        limit=limit,
+        skip=0,
+    )
+
+    pdf_bytes = ExportService.generate_pdf(
+        db=db,
+        current_user=current_user,
+        report_type=norm_type,
+        report_data=report_data,
+    )
+
+    filename = f"{norm_type.lower()}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"',
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+        },
+    )
+

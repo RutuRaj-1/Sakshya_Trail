@@ -446,3 +446,180 @@ class ScrutinyObservationResolveRequest(BaseModel):
     """Reasoned resolution of an observation note."""
     resolution_reason: str = Field(..., min_length=3, max_length=1000, description="Reason for resolving/dismissing")
 
+
+# =============================================================================
+# Module 7 — Prompt 4: Operational Reports & Secure Exports
+# =============================================================================
+
+class ReportFilterMeta(BaseModel):
+    """Metadata describing the active filters applied to the report query."""
+    institution_id: Optional[str] = None
+    bank_name: Optional[str] = None
+    assigned_office: Optional[str] = None
+    trust_level: Optional[str] = None
+    status: Optional[str] = None
+    verification_status: Optional[str] = None
+    date_from: Optional[str] = None
+    date_to: Optional[str] = None
+    window_days: Optional[int] = None
+    scope_description: Optional[str] = None
+
+
+class PendingVerificationReportRow(BaseModel):
+    """Row in the Pending Verification Report."""
+    instrument_id: str
+    reference_number: str
+    institution_id: str
+    institution_name: Optional[str] = None
+    bank_name: str
+    branch: Optional[str] = None
+    amount: str
+    maturity_date: str
+    trust_level: str
+    verification_status: str
+    source_status: str
+    request_reference: Optional[str] = None
+    request_date: Optional[str] = None
+    pending_age_days: Optional[int] = None
+    assigned_office: Optional[str] = None
+    assigned_officer: Optional[str] = None
+    is_simulated: bool = False
+    has_discrepancies: bool = False
+    discrepancy_count: int = 0
+    drill_down_path: str
+
+
+class PendingVerificationReportResponse(BaseModel):
+    """Dataset for Pending Verification Report."""
+    report_type: str = "PENDING_VERIFICATION"
+    generated_at: str
+    total_records: int
+    filters_applied: ReportFilterMeta
+    rows: List[PendingVerificationReportRow]
+
+
+class UpcomingMaturitiesReportRow(BaseModel):
+    """Row in the Upcoming Maturities Report."""
+    instrument_id: str
+    reference_number: str
+    institution_id: str
+    institution_name: Optional[str] = None
+    bank_name: str
+    branch: Optional[str] = None
+    amount: str
+    currency: str = "INR"
+    issue_date: str
+    maturity_date: str
+    days_to_maturity: int
+    administrative_status: str
+    trust_level: str
+    renewal_status: str
+    successor_instrument_id: Optional[str] = None
+    assigned_office: Optional[str] = None
+    assigned_officer: Optional[str] = None
+    drill_down_path: str
+
+
+class UpcomingMaturitiesReportResponse(BaseModel):
+    """Dataset for Upcoming Maturities Report."""
+    report_type: str = "UPCOMING_MATURITIES"
+    date_basis: str = "Asia/Kolkata Calendar Date"
+    window_days: int
+    date_from: str
+    date_to: str
+    generated_at: str
+    total_records: int
+    total_deposit_value: str
+    filters_applied: ReportFilterMeta
+    regulatory_notice: str = "Statutory deposit maturity tracking; maturity date does not equate to release eligibility."
+    rows: List[UpcomingMaturitiesReportRow]
+
+
+class MissingDocumentsReportRow(BaseModel):
+    """Row in the Missing / Non-Compliant Documents Report."""
+    finding_id: str
+    instrument_id: str
+    reference_number: str
+    institution_id: str
+    institution_name: Optional[str] = None
+    bank_name: str
+    assigned_office: Optional[str] = None
+    document_category: str
+    policy_version: Optional[int] = None
+    checklist_outcome: str
+    severity: str
+    rule_id: str
+    title: str
+    description: Optional[str] = None
+    last_updated_at: Optional[str] = None
+    drill_down_path: str
+
+
+class MissingDocumentsReportResponse(BaseModel):
+    """Dataset for Missing Documents Report."""
+    report_type: str = "MISSING_DOCUMENTS"
+    generated_at: str
+    total_records: int
+    filters_applied: ReportFilterMeta
+    rows: List[MissingDocumentsReportRow]
+
+
+class InterventionsReportRow(BaseModel):
+    """Row in the Interventions Required Report."""
+    intervention_type: str
+    entity_id: str
+    reference_number: str
+    institution_id: str
+    institution_name: Optional[str] = None
+    reason_description: str
+    severity: str
+    age_days: Optional[int] = None
+    deadline_date: Optional[str] = None
+    assigned_office: Optional[str] = None
+    assigned_officer: Optional[str] = None
+    next_appropriate_action: str
+    drill_down_path: str
+
+
+class InterventionsReportResponse(BaseModel):
+    """Dataset for Interventions Required Report."""
+    report_type: str = "INTERVENTIONS"
+    generated_at: str
+    total_records: int
+    filters_applied: ReportFilterMeta
+    rows: List[InterventionsReportRow]
+
+
+class AuditEvidencePackDocument(BaseModel):
+    """Document hash record in evidence pack."""
+    version_number: int
+    category: str
+    file_name: Optional[str] = None
+    sha256_hash: str
+    uploaded_at: str
+    uploader_name: Optional[str] = None
+
+
+class AuditEvidencePackResponse(BaseModel):
+    """Structured audit evidence pack extract."""
+    report_type: str = "AUDIT_EVIDENCE_PACK"
+    generated_at: str
+    instrument_id: str
+    reference_number: str
+    institution_id: str
+    institution_name: Optional[str] = None
+    administrative_status: str
+    trust_level: str
+    documents: List[AuditEvidencePackDocument]
+    field_provenance_count: int
+    verification_summary: Dict[str, Any]
+    scrutiny_observations_count: int
+    audit_events_count: int
+    audit_chain_verified: bool
+    audit_chain_status: str
+    certification_disclaimer: str = (
+        "Internal operational audit extract from FDR Sentinel. Does not constitute certified external judicial evidence "
+        "unless independently verified against the cryptographic tamper-evident sequence."
+    )
+
+

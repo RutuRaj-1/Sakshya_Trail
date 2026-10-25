@@ -405,3 +405,165 @@ export interface ScrutinyObservationAmendRequest {
 export interface ScrutinyObservationResolveRequest {
   resolution_reason: string;
 }
+
+// -----------------------------------------------------------------------------
+// Operational Reports & Evidence Pack Types (Prompt 4)
+// -----------------------------------------------------------------------------
+
+export interface ReportFilterMeta {
+  institution_id?: string | null;
+  bank_name?: string | null;
+  assigned_office?: string | null;
+  trust_level?: string | null;
+  status?: string | null;
+  verification_status?: string | null;
+  checklist_outcome?: string | null;
+  intervention_type?: string | null;
+  severity?: string | null;
+  date_from?: string | null;
+  date_to?: string | null;
+  scope_description?: string | null;
+}
+
+export interface PendingVerificationReportRow {
+  instrument_id: string;
+  reference_number: string;
+  institution_id: string;
+  institution_name?: string | null;
+  bank_name: string;
+  branch?: string | null;
+  verification_status: string;
+  source_status: string;
+  trust_level: string;
+  channel: string;
+  is_simulated: boolean;
+  request_date?: string | null;
+  pending_age_days: number;
+  assigned_office?: string | null;
+  assigned_officer?: string | null;
+  discrepancy_count: number;
+  drill_down_path: string;
+}
+
+export interface PendingVerificationReportResponse {
+  report_type: string;
+  generated_at: string;
+  total_records: number;
+  filters_applied: ReportFilterMeta;
+  rows: PendingVerificationReportRow[];
+}
+
+export interface UpcomingMaturitiesReportRow {
+  instrument_id: string;
+  reference_number: string;
+  institution_id: string;
+  institution_name?: string | null;
+  bank_name: string;
+  branch?: string | null;
+  amount: string;
+  currency: string;
+  issue_date: string;
+  maturity_date: string;
+  days_to_maturity: number;
+  administrative_status: string;
+  trust_level: string;
+  renewal_status: string;
+  successor_instrument_id?: string | null;
+  assigned_office?: string | null;
+  assigned_officer?: string | null;
+  drill_down_path: string;
+}
+
+export interface UpcomingMaturitiesReportResponse {
+  report_type: string;
+  date_basis: string;
+  window_days: number;
+  date_from: string;
+  date_to: string;
+  generated_at: string;
+  total_records: number;
+  total_deposit_value: string;
+  filters_applied: ReportFilterMeta;
+  rows: UpcomingMaturitiesReportRow[];
+}
+
+export interface MissingDocumentsReportRow {
+  finding_id: string;
+  instrument_id: string;
+  reference_number: string;
+  institution_id: string;
+  institution_name?: string | null;
+  bank_name: string;
+  rule_id: string;
+  document_category: string;
+  policy_version: string;
+  checklist_outcome: string;
+  severity: string;
+  finding_title: string;
+  last_updated?: string | null;
+  drill_down_path: string;
+}
+
+export interface MissingDocumentsReportResponse {
+  report_type: string;
+  generated_at: string;
+  total_records: number;
+  filters_applied: ReportFilterMeta;
+  rows: MissingDocumentsReportRow[];
+}
+
+export interface InterventionsReportRow {
+  intervention_type: string;
+  entity_id: string;
+  reference_number: string;
+  institution_id: string;
+  institution_name?: string | null;
+  reason_description: string;
+  severity: string;
+  age_days: number;
+  deadline_date?: string | null;
+  assigned_office?: string | null;
+  assigned_officer?: string | null;
+  next_appropriate_action: string;
+  drill_down_path: string;
+}
+
+export interface InterventionsReportResponse {
+  report_type: string;
+  generated_at: string;
+  total_records: number;
+  filters_applied: ReportFilterMeta;
+  rows: InterventionsReportRow[];
+}
+
+export interface AuditEvidencePackDocument {
+  version_number: number;
+  category: string;
+  file_name: string;
+  sha256_hash: string;
+  uploaded_at: string;
+  uploader_name?: string | null;
+}
+
+export interface AuditEvidencePackResponse {
+  instrument_id: string;
+  reference_number: string;
+  institution_id: string;
+  institution_name?: string | null;
+  bank_name: string;
+  amount: string;
+  trust_level: string;
+  status: string;
+  maturity_date: string;
+  documents: AuditEvidencePackDocument[];
+  field_provenance_count: number;
+  verification_summary: Record<string, any>;
+  scrutiny_observations_count: number;
+  audit_events_count: number;
+  audit_chain_verified: boolean;
+  chain_verification_status: string;
+  chain_verification_detail: string;
+  regulatory_disclaimer: string;
+  generated_at: string;
+}
+

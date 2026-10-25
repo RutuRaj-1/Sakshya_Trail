@@ -16,6 +16,7 @@ import { ChangePasswordPage } from '@/app/routes/ChangePasswordPage';
 import { ReleaseCasesPage } from '@/app/routes/ReleaseCasesPage';
 import { ReleaseDetailPage } from '@/app/routes/ReleaseDetailPage';
 import { UnifiedSearchPage } from '@/app/routes/UnifiedSearchPage';
+import { ReportsPage } from '@/app/routes/ReportsPage';
 import { ProtectedRoute } from '@/features/auth/ProtectedRoute';
 
 export const router = createBrowserRouter([
@@ -50,6 +51,10 @@ export const router = createBrowserRouter([
       {
         path: 'search',
         element: <UnifiedSearchPage />,
+      },
+      {
+        path: 'reports',
+        element: <ReportsPage />,
       },
       {
         path: 'instruments',
