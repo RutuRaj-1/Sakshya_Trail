@@ -1,16 +1,14 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { useParams, useNavigate, useSearchParams, Link } from 'react-router-dom';
+import { useParams, useSearchParams, Link } from 'react-router-dom';
 import {
   Shield,
   ShieldCheck,
   ShieldAlert,
-  ShieldX,
   ArrowLeft,
   RefreshCw,
   Send,
   CheckCircle2,
   AlertTriangle,
-  Clock,
   FileText,
   RotateCcw,
   Ban,
@@ -18,17 +16,9 @@ import {
   ExternalLink,
   ChevronRight,
   Search,
-  Building,
-  Building2,
-  Calendar,
-  Layers,
   History,
   FileSpreadsheet,
-  Check,
-  X,
   AlertOctagon,
-  Eye,
-  Info,
 } from 'lucide-react';
 import { useAuth } from '@/features/auth/AuthContext';
 import { verificationApi, instrumentsApi } from '@/api/endpoints';
@@ -39,29 +29,24 @@ import type {
   TrustTransitionHistoryItem,
   AggregateTrustSummary,
   VerificationRequestItem,
-  VerificationResponseItem,
   CreateVerificationRequestPayload,
   DispatchVerificationPayload,
   ManualVerificationRecordPayload,
   L2OfficerDecisionPayload,
   TrustDowngradePayload,
 } from '@/types';
-import { Badge } from '@/components/common/Badge';
 import { Button } from '@/components/common/Button';
 import { formatINR, formatDate, formatDateTime, cn } from '@/lib/utils';
 
 export const TrustVerificationDeskPage: React.FC = () => {
   const { id: routeInstrumentId } = useParams<{ id?: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
-  const navigate = useNavigate();
   const { user } = useAuth();
 
   // Active instrument ID (from URL param or query param)
   const activeInstrumentId = routeInstrumentId || searchParams.get('instrument_id') || '';
 
   // Roles & permissions
-  const isInstitutionUser = user?.role === 'INSTITUTION_USER';
-  const isAuditor = user?.role === 'AUDITOR';
   const canPerformOfficerActions = [
     'SYSTEM_ADMIN',
     'SCRUTINY_OFFICER',
@@ -131,7 +116,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
   const [isSubmittingDispatch, setIsSubmittingDispatch] = useState(false);
 
   const [manualRef, setManualRef] = useState('');
-  const [manualDate, setManualDate] = useState(new Date().toISOString().split('T')[0]);
+  const [manualDate, setManualDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [manualResult, setManualResult] = useState('MATCH');
   const [manualReason, setManualReason] = useState('');
   const [manualDocVersion, setManualDocVersion] = useState('');
@@ -1069,7 +1054,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
             </div>
           ) : (
             <div className="space-y-3">
-              {filteredProvenance.map((item, idx) => (
+              {filteredProvenance.map((item) => (
                 <div
                   key={item.id}
                   className={cn(
@@ -1361,7 +1346,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
                             {/* Action to apply this response to L3 directly */}
                             {canPerformOfficerActions &&
                               resp.result === 'MATCH' &&
-                              instrument.trust_level !== 'L3_BANK_CONFIRMED' && (
+                              instrument?.trust_level !== 'L3_BANK_CONFIRMED' && (
                                 <div className="pt-2 flex justify-end">
                                   <Button
                                     variant="outline"

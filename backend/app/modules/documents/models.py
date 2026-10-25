@@ -5,10 +5,14 @@ Provides the foundational data model for document intake, versioning, and integr
 import uuid
 from decimal import Decimal
 from datetime import datetime, timezone
-from typing import Optional, List
+from typing import Optional, List, TYPE_CHECKING
 from sqlalchemy import String, Text, DateTime, Integer, Boolean, ForeignKey, LargeBinary, Numeric
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.base import Base, TimestampMixin
+
+if TYPE_CHECKING:
+    from app.modules.institutions.models import Institution
+    from app.modules.instruments.models import Instrument
 
 
 class Document(Base, TimestampMixin):
@@ -38,7 +42,7 @@ class Document(Base, TimestampMixin):
     
     # Current version reference for convenience (denormalized for fast access)
     current_version_id: Mapped[Optional[str]] = mapped_column(
-        String(36), ForeignKey("document_versions.id", ondelete="SET NULL"), nullable=True
+        String(36), ForeignKey("document_versions.id", ondelete="SET NULL", use_alter=True), nullable=True
     )
     
     # Audit metadata

@@ -38,7 +38,7 @@ export const InstrumentModal: React.FC<Props> = ({
   const isEditing = !!instrumentToEdit;
 
   const [institutions, setInstitutions] = useState<Institution[]>([]);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState(() => ({
     institution_id: defaultInstitutionId || (isInstitutionUser ? user?.institution_id || '' : ''),
     instrument_type: 'FDR',
     bank_name: 'State Bank of India',
@@ -53,7 +53,7 @@ export const InstrumentModal: React.FC<Props> = ({
     assigned_office: '',
     remarks: '',
     status: 'REGISTERED',
-  });
+  }));
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [apiError, setApiError] = useState<string | null>(null);

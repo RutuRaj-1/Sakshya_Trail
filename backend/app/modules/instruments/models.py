@@ -6,10 +6,13 @@ foreign key, separate administrative status, trust level (L0-L3), and derived ma
 import uuid
 from decimal import Decimal
 from datetime import date, timedelta
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 from sqlalchemy import String, Numeric, Date, Boolean, Text, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.base import Base, TimestampMixin
+
+if TYPE_CHECKING:
+    from app.modules.institutions.models import Institution
 
 
 class Instrument(Base, TimestampMixin):

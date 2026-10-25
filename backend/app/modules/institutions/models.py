@@ -2,10 +2,14 @@
 Institutions Module - Complete Foundational SQLAlchemy Institution Model
 """
 import uuid
-from typing import List, Optional
+from typing import List, Optional, TYPE_CHECKING
 from sqlalchemy import String, Boolean, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.base import Base, TimestampMixin
+
+if TYPE_CHECKING:
+    from app.modules.auth.models import User
+    from app.modules.instruments.models import Instrument
 
 
 class Institution(Base, TimestampMixin):

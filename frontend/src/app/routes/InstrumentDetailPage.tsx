@@ -19,7 +19,6 @@ import {
   AlertTriangle,
   Lock,
   Send,
-  Building,
 } from 'lucide-react';
 
 export const InstrumentDetailPage: React.FC = () => {

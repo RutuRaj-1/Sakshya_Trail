@@ -1,5 +1,5 @@
 /**
- * Module 4 — Trust, Provenance & Verification Desk
+ * Module 4 â€” Trust, Provenance & Verification Desk
  * TypeScript type definitions mirroring backend Pydantic schemas.
  */
 

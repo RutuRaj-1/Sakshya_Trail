@@ -2,11 +2,14 @@
 Auth Module - SQLAlchemy User Model with RBAC and Institution Association
 """
 import uuid
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 from sqlalchemy import String, Boolean, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship, validates
 from app.db.base import Base, TimestampMixin
 from app.core.security import ALL_ROLES, ROLE_INSTITUTION_USER, INTERNAL_ROLES
+
+if TYPE_CHECKING:
+    from app.modules.institutions.models import Institution
 
 
 class User(Base, TimestampMixin):
