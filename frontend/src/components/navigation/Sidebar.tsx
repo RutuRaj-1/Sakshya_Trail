@@ -1,12 +1,11 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 import {
   LayoutDashboard,
   Building2,
   FileSpreadsheet,
   History,
   Activity,
-  Layers,
   FileCheck2,
   Users,
   KeyRound,
@@ -52,14 +51,23 @@ export const Sidebar: React.FC = () => {
   return (
     <aside className="w-64 bg-slate-900 text-slate-300 flex flex-col shrink-0 border-r border-slate-800 select-none">
       {/* Brand Subheader */}
-      <div className="p-4 border-b border-slate-800 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Layers className="w-4 h-4 text-sentinel-400" />
-          <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-            Lifecycle Platform
-          </span>
-        </div>
-        <span className="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded font-mono">
+      <div className="p-3.5 border-b border-slate-800 flex items-center justify-between">
+        <Link to="/dashboard" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
+          <img
+            src="/logo.png"
+            alt="SakshyaTrail"
+            className="h-8 w-auto object-contain bg-white/95 p-0.5 rounded shadow-2xs"
+          />
+          <div>
+            <span className="text-xs font-bold text-white tracking-tight block">
+              Sakshya<span className="text-teal-400">Trail</span>
+            </span>
+            <span className="text-[10px] text-slate-400 font-medium">
+              Lifecycle Platform
+            </span>
+          </div>
+        </Link>
+        <span className="text-[10px] bg-slate-800 text-teal-400 border border-teal-500/20 px-1.5 py-0.5 rounded font-mono font-semibold">
           SIH 26265
         </span>
       </div>

@@ -44,6 +44,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await authApi.logout();
     } finally {
       setUser(null);
+      sessionStorage.removeItem('dismiss_password_rotation');
     }
   };
 

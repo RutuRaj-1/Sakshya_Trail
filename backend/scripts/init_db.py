@@ -28,6 +28,8 @@ from app.core.security import (
     ROLE_INSTITUTION_USER,
     ROLE_AUDITOR,
     ROLE_BRANCH_HEAD,
+    ROLE_COMPETENT_AUTHORITY,
+    ROLE_FINANCE_OFFICER,
 )
 from app.common.exceptions import ConflictException
 
@@ -229,7 +231,41 @@ def seed_database(db: Optional[Session] = None):
         except ConflictException:
             print("  . User auditor.compliance@aicte-india.org already exists, skipping.")
 
-        print("[FDR Sentinel] Seeding synthetic demonstration FDR instruments...")
+        # 7. Competent Authority (Release Approval Authority)
+        try:
+            authority = provision_user(
+                db=db,
+                full_name="Member Secretary Dr. K. Radhakrishnan [DEMO]",
+                email="authority.member@aicte-india.org",
+                password="AuthorityPassword@2026",
+                role=ROLE_COMPETENT_AUTHORITY,
+                institution_id=None,
+                must_change_password=False,
+                actor_email="SYNTHETIC_INIT",
+                actor_role="SYSTEM_ADMIN",
+            )
+            print("  + Provisioned: authority.member@aicte-india.org (COMPETENT_AUTHORITY)")
+        except ConflictException:
+            print("  . User authority.member@aicte-india.org already exists, skipping.")
+
+        # 8. Finance Officer (Release Verification & Tracking)
+        try:
+            finance = provision_user(
+                db=db,
+                full_name="Finance Officer Rajesh Sharma [DEMO]",
+                email="finance.officer@aicte-india.org",
+                password="FinancePassword@2026",
+                role=ROLE_FINANCE_OFFICER,
+                institution_id=None,
+                must_change_password=False,
+                actor_email="SYNTHETIC_INIT",
+                actor_role="SYSTEM_ADMIN",
+            )
+            print("  + Provisioned: finance.officer@aicte-india.org (FINANCE_OFFICER)")
+        except ConflictException:
+            print("  . User finance.officer@aicte-india.org already exists, skipping.")
+
+        print("[SakshyaTrail] Seeding synthetic demonstration FDR instruments...")
         today = date.today()
 
         def seed_instrument_if_missing(data: dict):

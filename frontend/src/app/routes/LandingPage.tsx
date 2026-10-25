@@ -52,10 +52,12 @@ export const LandingPage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           {/* Logo & Brand Wordmark */}
           <Link to="/" className="flex items-center gap-3 group focus:outline-none focus:ring-2 focus:ring-[#0D9488] rounded-xl p-1">
-            <div className="w-11 h-11 rounded-xl bg-linear-to-br from-[#123C5A] to-[#0B253A] text-white flex items-center justify-center shadow-md shadow-[#123C5A]/20 transition-transform group-hover:scale-105">
-              <ShieldCheck className="w-6 h-6 text-teal-400" />
-            </div>
-            <div>
+            <img
+              src="/logo.png"
+              alt="SakshyaTrail Logo"
+              className="h-12 w-auto object-contain transition-transform group-hover:scale-105 drop-shadow-xs"
+            />
+            <div className="hidden sm:block">
               <div className="flex items-center gap-1.5">
                 <span className="text-xl font-extrabold tracking-tight text-[#0B253A]">
                   Sakshya<span className="text-[#0D9488]">Trail</span>
@@ -64,7 +66,7 @@ export const LandingPage: React.FC = () => {
                   SIH 26265
                 </span>
               </div>
-              <p className="text-[11px] font-medium text-[#607080] hidden sm:block leading-tight">
+              <p className="text-[11px] font-medium text-[#607080] leading-tight">
                 Security Deposit & FDR Lifecycle Integrity Platform
               </p>
             </div>
@@ -1095,18 +1097,20 @@ export const LandingPage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-8 border-b border-slate-800">
             {/* Wordmark */}
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-lg bg-teal-600 text-white flex items-center justify-center font-bold">
-                  <ShieldCheck className="w-4 h-4" />
-                </div>
+            <div className="flex items-center gap-3">
+              <img
+                src="/logo.png"
+                alt="SakshyaTrail Logo"
+                className="h-11 w-auto object-contain bg-white/95 p-1 rounded-lg"
+              />
+              <div>
                 <span className="text-base font-extrabold text-white tracking-tight">
                   Sakshya<span className="text-teal-400">Trail</span>
                 </span>
+                <p className="text-[11px] text-slate-400">
+                  Security Deposit & FDR Lifecycle Integrity Platform
+                </p>
               </div>
-              <p className="text-[11px] text-slate-500">
-                Security Deposit & FDR Lifecycle Integrity Platform
-              </p>
             </div>
 
             {/* Quick Links */}

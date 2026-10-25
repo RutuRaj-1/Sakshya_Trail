@@ -1,5 +1,5 @@
-import { ShieldCheck, Database, RefreshCw, LogOut, KeyRound } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Database, RefreshCw, LogOut, KeyRound } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useHealth } from '@/hooks/useHealth';
 import { useAuth } from '@/features/auth/AuthContext';
 import { StatusIndicator } from '@/components/common/StatusIndicator';
@@ -8,6 +8,7 @@ import { Badge } from '@/components/common/Badge';
 export const Header: React.FC = () => {
   const { liveness, readiness, isLoading, refresh } = useHealth();
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   const isDbReady = readiness?.is_ready ?? false;
   const dbDialect = readiness?.components?.database?.dialect?.toUpperCase() || 'SQL';
@@ -42,9 +43,11 @@ export const Header: React.FC = () => {
     <header className="h-16 bg-white border-b border-slate-200 sticky top-0 z-30 px-4 sm:px-6 flex items-center justify-between shadow-xs">
       {/* Title & Official Subtitle */}
       <Link to="/dashboard" className="flex items-center gap-3 hover:opacity-95 transition-opacity">
-        <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-sentinel-700 text-white font-bold shadow-sm shadow-sentinel-900/20">
-          <ShieldCheck className="w-5 h-5 text-sentinel-200" />
-        </div>
+        <img
+          src="/logo.png"
+          alt="SakshyaTrail Logo"
+          className="h-9 w-auto object-contain drop-shadow-2xs"
+        />
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-base font-bold tracking-tight text-slate-900">
@@ -134,7 +137,10 @@ export const Header: React.FC = () => {
             </Link>
 
             <button
-              onClick={() => logout()}
+              onClick={async () => {
+                await logout();
+                navigate('/', { replace: true });
+              }}
               className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
               title="Sign out of regulatory session"
               aria-label="Log out"

@@ -550,7 +550,8 @@ def test_m1_ac_15_audit_events_without_secret_leakage(client: TestClient, db_ses
     # Inspect audit events
     audit_res = client.get("/api/v1/audit/events", headers=headers)
     assert audit_res.status_code == 200
-    events = audit_res.json()
+    res_data = audit_res.json()
+    events = res_data.get("items", res_data.get("events", [])) if isinstance(res_data, dict) else res_data
     assert len(events) > 0
 
     for ev in events:
