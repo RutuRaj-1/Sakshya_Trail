@@ -87,6 +87,41 @@ class SimulatedClock(Clock):
 
 # Default singleton instance
 system_clock = SystemClock()
+_active_clock: Clock = system_clock
+
+
+def get_current_clock() -> Clock:
+    """Returns the current globally active clock instance."""
+    return _active_clock
+
+
+def set_current_clock(clock: Clock) -> None:
+    """Sets the active clock (e.g. to a SimulatedClock in tests or demo mode)."""
+    global _active_clock
+    _active_clock = clock
+
+
+def reset_to_system_clock() -> None:
+    """Resets the active clock back to the real operating system clock."""
+    global _active_clock
+    _active_clock = system_clock
+
+
+def get_clock_status(tz_name: Optional[str] = None) -> dict:
+    """Introspects current clock mode and simulated offsets."""
+    tz = tz_name or settings.LIFECYCLE_DEFAULT_TIMEZONE
+    clock = get_current_clock()
+    is_simulated = isinstance(clock, SimulatedClock)
+    offset_days = clock._offset.days if is_simulated else 0
+
+    return {
+        "is_simulated": is_simulated,
+        "active_timezone": tz,
+        "today": clock.today_in_tz(tz).isoformat(),
+        "now_utc": clock.now_utc().isoformat(),
+        "offset_days": offset_days,
+        "disclaimer": "DEMO DATE SIMULATION — NOT REAL TIME" if is_simulated else None,
+    }
 
 
 def get_calendar_days_between(start_date: Optional[date], end_date: Optional[date]) -> Optional[int]:

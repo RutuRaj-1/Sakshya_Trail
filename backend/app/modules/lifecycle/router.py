@@ -31,6 +31,12 @@ from app.modules.lifecycle.schemas import (
     LifecycleEvaluationResponse,
     BatchEvaluationRequest,
     BatchEvaluationResponse,
+    LifecycleJobRunResponse,
+    SchedulerRunStatusResponse,
+    TriggerJobRequest,
+    DemoClockStatusResponse,
+    DemoClockAdvanceRequest,
+    MonitoringListResponse,
 )
 from app.modules.lifecycle.policy_service import (
     create_policy,
@@ -268,3 +274,251 @@ def batch_evaluate_endpoint(
         material_transitions_count=material,
         evaluations=evals,
     )
+
+
+# --- Monitoring Endpoints -------------------------------------------------------
+
+@router.get(
+    "/assessments/{instrument_id}",
+    response_model=Optional[LifecycleEvaluationResponse],
+    summary="Get detailed lifecycle assessment for an instrument",
+)
+def get_instrument_assessment_endpoint(
+    instrument_id: str = Path(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    ev = get_latest_evaluation_for_instrument(db, instrument_id=instrument_id)
+    if not ev:
+        ev = evaluate_instrument_lifecycle(
+            db=db,
+            instrument_id=instrument_id,
+            actor_user_id=current_user.id,
+            actor_email=current_user.email,
+        )
+    return ev
+
+
+@router.get(
+    "/monitoring/approaching-maturity",
+    response_model=MonitoringListResponse,
+    summary="List instruments with approaching maturity (MATURING_SOON / CRITICAL_WINDOW)",
+)
+def list_approaching_maturity_endpoint(
+    page: int = Query(1, ge=1),
+    limit: int = Query(50, ge=1, le=100),
+    institution_id: Optional[str] = Query(None),
+    office: Optional[str] = Query(None),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    from app.modules.lifecycle.monitoring_service import list_monitoring_instruments
+    return list_monitoring_instruments(
+        db=db,
+        category="APPROACHING_MATURITY",
+        current_user=current_user,
+        page=page,
+        limit=limit,
+        institution_id=institution_id,
+        office=office,
+    )
+
+
+@router.get(
+    "/monitoring/matured",
+    response_model=MonitoringListResponse,
+    summary="List matured and expired instruments",
+)
+def list_matured_endpoint(
+    page: int = Query(1, ge=1),
+    limit: int = Query(50, ge=1, le=100),
+    institution_id: Optional[str] = Query(None),
+    office: Optional[str] = Query(None),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    from app.modules.lifecycle.monitoring_service import list_monitoring_instruments
+    return list_monitoring_instruments(
+        db=db,
+        category="MATURED",
+        current_user=current_user,
+        page=page,
+        limit=limit,
+        institution_id=institution_id,
+        office=office,
+    )
+
+
+@router.get(
+    "/monitoring/overdue",
+    response_model=MonitoringListResponse,
+    summary="List instruments with overdue or escalated compliance requirements",
+)
+def list_overdue_endpoint(
+    page: int = Query(1, ge=1),
+    limit: int = Query(50, ge=1, le=100),
+    institution_id: Optional[str] = Query(None),
+    office: Optional[str] = Query(None),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    from app.modules.lifecycle.monitoring_service import list_monitoring_instruments
+    return list_monitoring_instruments(
+        db=db,
+        category="OVERDUE",
+        current_user=current_user,
+        page=page,
+        limit=limit,
+        institution_id=institution_id,
+        office=office,
+    )
+
+
+# --- Scheduler Execution & Diagnostics Endpoints -------------------------------
+
+@router.post(
+    "/scheduler/trigger",
+    response_model=LifecycleJobRunResponse,
+    summary="Trigger a bounded maturity scan job manually (Officer / Admin)",
+)
+def trigger_scheduler_job_endpoint(
+    payload: TriggerJobRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_roles([ROLE_SYSTEM_ADMIN, ROLE_SCRUTINY_OFFICER, ROLE_BRANCH_HEAD])),
+):
+    from app.modules.lifecycle.scheduler import execute_lifecycle_scan_job
+    return execute_lifecycle_scan_job(
+        db=db,
+        job_type="MANUAL_EVALUATION",
+        trigger_source="MANUAL_API",
+        batch_size=payload.batch_size,
+        simulated_date=payload.simulated_date,
+        force_reevaluation=payload.force_reevaluation,
+        actor_user_id=current_user.id,
+        actor_email=current_user.email,
+    )
+
+
+@router.get(
+    "/scheduler/runs",
+    response_model=List[LifecycleJobRunResponse],
+    summary="List recent scheduler run execution logs",
+)
+def list_scheduler_runs_endpoint(
+    limit: int = Query(20, ge=1, le=100),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_roles([ROLE_SYSTEM_ADMIN, ROLE_SCRUTINY_OFFICER, ROLE_BRANCH_HEAD])),
+):
+    from sqlalchemy import select, desc
+    from app.modules.lifecycle.models import LifecycleJobRun
+    return list(db.scalars(select(LifecycleJobRun).order_by(desc(LifecycleJobRun.started_at)).limit(limit)).all())
+
+
+@router.get(
+    "/scheduler/runs/latest",
+    response_model=SchedulerRunStatusResponse,
+    summary="Get status of latest attempted and successful scheduler runs",
+)
+def get_latest_scheduler_runs_endpoint(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    from app.modules.lifecycle.scheduler import get_latest_job_runs
+    return get_latest_job_runs(db=db)
+
+
+# --- Demo Date-Advancement Endpoints --------------------------------------------
+
+@router.get(
+    "/demo/clock",
+    response_model=DemoClockStatusResponse,
+    summary="Read current active clock state (development/demo inspection)",
+)
+def get_demo_clock_status_endpoint(
+    current_user: User = Depends(get_current_user),
+):
+    from app.modules.lifecycle.clock import get_clock_status
+    return get_clock_status()
+
+
+@router.post(
+    "/demo/advance-clock",
+    response_model=DemoClockStatusResponse,
+    summary="Advance demo simulated clock forward (Development / Demo only)",
+)
+def advance_demo_clock_endpoint(
+    payload: DemoClockAdvanceRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_roles([ROLE_SYSTEM_ADMIN, ROLE_SCRUTINY_OFFICER])),
+):
+    from app.core.config import settings
+    if not settings.ENABLE_LIFECYCLE_DATE_ADVANCE or settings.ENVIRONMENT == "production":
+        raise AppException(
+            status_code=403,
+            message="Demo date advancement is strictly forbidden in production mode.",
+            code="DEMO_CONTROL_DISABLED_IN_PRODUCTION",
+        )
+
+    from app.modules.lifecycle.clock import (
+        get_current_clock,
+        set_current_clock,
+        SimulatedClock,
+        get_clock_status,
+    )
+    from app.modules.audit.service import log_audit_event
+
+    current_clock = get_current_clock()
+    if isinstance(current_clock, SimulatedClock):
+        sim_clock = current_clock
+    else:
+        sim_clock = SimulatedClock()
+        set_current_clock(sim_clock)
+
+    before_date = sim_clock.today_in_tz().isoformat()
+    if payload.target_date:
+        sim_clock.set_date(payload.target_date)
+    elif payload.days:
+        sim_clock.advance_days(payload.days)
+    else:
+        raise AppException(status_code=400, message="Must specify 'days' or 'target_date'", code="INVALID_PARAMETERS")
+
+    after_date = sim_clock.today_in_tz().isoformat()
+
+    log_audit_event(
+        db=db,
+        action="DEMO_DATE_ADVANCED",
+        entity_type="SYSTEM_CLOCK",
+        entity_id="SIMULATED_CLOCK",
+        actor_user_id=current_user.id,
+        actor_email=current_user.email,
+        metadata={"before_date": before_date, "after_date": after_date, "offset_days": sim_clock._offset.days},
+    )
+
+    return get_clock_status()
+
+
+@router.post(
+    "/demo/reset-clock",
+    response_model=DemoClockStatusResponse,
+    summary="Reset simulated clock back to host system time",
+)
+def reset_demo_clock_endpoint(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_roles([ROLE_SYSTEM_ADMIN])),
+):
+    from app.modules.lifecycle.clock import reset_to_system_clock, get_clock_status
+    from app.modules.audit.service import log_audit_event
+
+    reset_to_system_clock()
+
+    log_audit_event(
+        db=db,
+        action="DEMO_CLOCK_RESET",
+        entity_type="SYSTEM_CLOCK",
+        entity_id="SYSTEM_CLOCK",
+        actor_user_id=current_user.id,
+        actor_email=current_user.email,
+    )
+
+    return get_clock_status()
+

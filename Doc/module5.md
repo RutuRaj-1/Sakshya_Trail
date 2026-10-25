@@ -1,10 +1,14 @@
 # Module 5 — Lifecycle Orchestration, Policy Configuration and Renewal Lineage
-## Comprehensive Architecture, Data Foundation & Technical Specifications Guide (Prompt 1 of 5)
+## Comprehensive Architecture, Data Foundation & Technical Specifications Guide (Prompts 1 & 2 of 5)
 
-> **Module Status:** Foundational Architecture & Lineage Engine Implemented (Prompt 1 of 5 Verified)  
-> **Alembic Revision:** `b2c3d4e5f6a7` — Lifecycle Policies, Instrument Lineages & Lifecycle Evaluations  
-> **Backend Test Suite:** **305 passed** across all modules in 14.29s — **0 failures, 0 regressions**  
-> **Module 5 Foundation Tests:** **15 passed** (100% green coverage on all Prompt 1 acceptance criteria)  
+> **Module Status:** Maturity Monitoring, Scheduler Engine & Demo Clock Implemented (Prompts 1 & 2 of 5 Verified)  
+> **Alembic Revisions:**  
+> • `b2c3d4e5f6a7` — Lifecycle Policies, Instrument Lineages & Lifecycle Evaluations  
+> • `c3d4e5f6a7b8` — Lifecycle Job Runs & Idempotent Evaluation Constraint  
+> **Backend Test Suite:** **320 passed** across all modules in 13.71s — **0 failures, 0 regressions**  
+> **Prompt 1 Foundation Tests:** **15 passed** (100% green coverage on foundational criteria)  
+> **Prompt 2 Scheduler & Monitoring Tests:** **15 passed** (100% green coverage on Prompt 2 criteria)  
+> **Frontend Production Build:** **Compiled cleanly** with `tsc -b && vite build` in 449ms  
 > **Repository:** `FDR_Sentinel`  
 > **Author:** Senior Backend Architect, Workflow Engineer & PostgreSQL Data Modeller  
 > **Date:** October 2026  
@@ -282,9 +286,163 @@ The test suite in [`backend/tests/test_module5_lifecycle_foundation.py`](file://
 
 ---
 
-## 9. Next Steps for Prompt 2
+## 9. Date Calculation Rules & Day-Zero Conventions (Prompt 2)
 
-With the foundational data models, policy versioning, and renewal-lineage graph engine verified, development proceeds to **Prompt 2**:
-1. Implement the background worker and scheduler for periodic daily date-boundary evaluations.
-2. Build missed-run recovery and backpressure controls.
-3. Integrate notification delivery attempts and recipient role dispatching.
+The lifecycle evaluation engine implements exact, deterministic calendar date semantics:
+
+### Exact Formulae
+1. **Days to Maturity:**
+   $$\text{days\_to\_maturity} = \text{maturity\_date} - \text{evaluation\_date}$$
+2. **Day Zero Semantics:**
+   - $\text{days\_to\_maturity} > 0$: The instrument is active. Classified as `MATURING_SOON` or `CRITICAL_WINDOW` if within configured lead days, otherwise `ACTIVE`.
+   - $\text{days\_to\_maturity} == 0$: **The maturity date counts as Day Zero** and evaluates to `MaturityStage.MATURED`.
+   - $\text{days\_to\_maturity} < 0$: The instrument has passed its maturity date and evaluates to `MaturityStage.EXPIRED`.
+3. **Daily Boundary Timezone:**
+   - Daily boundaries are calculated strictly within the policy's configured timezone (`Asia/Kolkata` by default).
+   - Evaluating at 19:00 UTC on October 25 translates to 00:30 IST on October 26, evaluating under the October 26 boundary.
+4. **Action Deadlines vs Maturity:**
+   - $$\text{institution\_action\_due\_date} = \text{maturity\_date} - \text{institution\_action\_lead\_days}$$
+   - $$\text{officer\_action\_due\_date} = \text{maturity\_date} - \text{officer\_action\_lead\_days}$$
+   - When $\text{evaluation\_date} > \text{institution\_action\_due\_date}$, the action is overdue (`is_overdue = True`).
+   - When $\text{evaluation\_date} > \text{institution\_action\_due\_date} + \text{escalation\_interval\_days}$, the action is escalated (`is_escalated = True`, `due_condition = ESCALATED`).
+5. **Missing or Corrupted Dates:**
+   - Missing maturity date evaluates safely to `maturity_stage = NOT_EVALUABLE`, `days_to_maturity = None`, `due_condition = NORMAL`, and `is_overdue = False`.
+
+---
+
+## 10. Scheduled Batch Worker & Concurrency Lease Protection (Prompt 2)
+
+### Bounded Batch Processing
+To maintain bounded memory usage, the scheduler processes instruments in discrete batches (default: 50, configurable up to 500) using primary-key ordering:
+```sql
+SELECT id FROM instruments 
+WHERE status IN ('REGISTERED', 'DRAFT', 'UNDER_REVIEW') 
+ORDER BY id OFFSET :offset LIMIT :batch_size;
+```
+
+### Concurrency Protection via Distributed Job Leases
+- **Distributed Lease Locking:** The worker acquires an exclusive lease in `lifecycle_job_runs` before starting.
+- **Concurrent Rejection:** If another worker holds an active lease where `status == "RUNNING"` and `lease_expires_at > UTC_NOW()`, incoming runs are rejected with HTTP 409 `CONCURRENT_JOB_RUNNING`.
+- **Automatic Crash Recovery:** If a prior worker died leaving an unexpired lease that has since passed (`lease_expires_at <= UTC_NOW()`), the incoming worker marks the stale run as `FAILED` (with diagnostic error reason) and reacquires a fresh lease.
+- **Per-Record Error Isolation:** A single malformed record (e.g. corrupted cryptographic verification) does not abort the entire batch. The failed instrument error is logged in `error_summary_json`, `error_count` is incremented, and remaining instruments evaluate normally. The job finishes as `PARTIAL_FAILURE`.
+
+### Evaluation Idempotency
+- Running the evaluation multiple times on the same calendar date updates existing `lifecycle_evaluations` records in-place.
+- Backed by database unique constraint `uq_eval_instrument_date(instrument_id, evaluation_date)`.
+- Eliminates duplicate entries and spurious audit transitions.
+
+---
+
+## 11. Demo Date Advancement & Production Isolation (Prompt 2)
+
+Module 5 provides an injectable simulation clock (`SimulatedClock`) allowing authorized demonstrations and integration tests to move the evaluation date forward without modifying stored database dates.
+
+### Security & Operational Boundaries
+
+```
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                        DEMO CLOCK ISOLATION ARCHITECTURE                               │
+├────────────────────────────────────────────────────────────────────────────────────────┤
+│ 1. Production Lockout:                                                                 │
+│    If settings.ENVIRONMENT == "production" OR ENABLE_LIFECYCLE_DATE_ADVANCE is False,  │
+│    all advance and reset endpoints return HTTP 403 Forbidden with code                 │
+│    "DEMO_CONTROL_DISABLED_IN_PRODUCTION".                                              │
+│                                                                                        │
+│ 2. Real Data Immutability:                                                             │
+│    Advancing the clock shifts only the active Clock provider perspective. Actual       │
+│    FDR issue dates and maturity dates in `instruments` remain 100% untouched.          │
+│                                                                                        │
+│ 3. Explicit Audit Trail:                                                               │
+│    Every simulated date advance generates an immutable audit record:                    │
+│    action="DEMO_DATE_ADVANCED", entity_id="SIMULATED_CLOCK", with before/after dates.  │
+│                                                                                        │
+│ 4. Visual Compliance Notice:                                                           │
+│    The API returns `disclaimer="DEMO DATE SIMULATION — NOT REAL TIME"`, ensuring the   │
+│    frontend banner visibly alerts the user that simulation mode is active.             │
+│                                                                                        │
+│ 5. Boundary Protection:                                                                │
+│    Simulation clock can never elevate trust (L0-L3) or approve releases/refunds.       │
+└────────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 12. Monitoring & Diagnostic APIs (Prompt 2)
+
+Registered under `/api/v1/lifecycle`:
+
+| Method | Endpoint | Access Role | Description |
+|:---|:---|:---|:---|
+| `GET` | `/api/v1/lifecycle/assessments/{instrument_id}` | Authenticated | Real-time lifecycle assessment for an instrument. |
+| `GET` | `/api/v1/lifecycle/monitoring/approaching-maturity` | Tenancy-Scoped | Approaching-maturity instruments (`MATURING_SOON`, `CRITICAL_WINDOW`). |
+| `GET` | `/api/v1/lifecycle/monitoring/matured` | Tenancy-Scoped | Matured and expired instruments (`MATURED`, `EXPIRED`). |
+| `GET` | `/api/v1/lifecycle/monitoring/overdue` | Tenancy-Scoped | Overdue institution or officer actions (`is_overdue=True` or `is_escalated=True`). |
+| `POST` | `/api/v1/lifecycle/scheduler/trigger` | Admin / Officer | Manually trigger bounded evaluation scan. |
+| `GET` | `/api/v1/lifecycle/scheduler/runs` | Admin / Officer | List recent job execution logs with error summaries. |
+| `GET` | `/api/v1/lifecycle/scheduler/runs/latest` | Authenticated | Fetch latest attempted vs latest successful run status. |
+| `GET` | `/api/v1/lifecycle/demo/clock` | Authenticated | Inspect current clock status (real vs simulated). |
+| `POST` | `/api/v1/lifecycle/demo/advance-clock` | Admin / Officer | Advance simulation clock forward (Demo/Dev mode only). |
+| `POST` | `/api/v1/lifecycle/demo/reset-clock` | `SYSTEM_ADMIN` | Reset simulation clock to host OS time. |
+
+### Tenancy & Scoping Rules
+- **Institution Scope:** Users with role `ROLE_INSTITUTION_USER` only see instruments belonging to their own `institution_id`.
+- **Officer/Admin Scope:** Officers and System Admins see all instruments across institutions with optional filtering by `institution_id` or `office`.
+- **Cross-Module Surfacing:** The monitoring items surface Module 3 open findings count (`unresolved_findings_count`) and Module 4 bank verification status (`verification_status`) without duplicate data storage.
+
+---
+
+## 13. Operational Startup Guide
+
+### Starting the API Server
+```powershell
+cd backend
+uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+```
+
+### Running the Scheduled Batch Worker
+The batch scan engine can be invoked as a standalone CLI job or via a cron/scheduled task:
+```powershell
+cd backend
+python -c "from app.db.session import SessionLocal; from app.modules.lifecycle.scheduler import execute_lifecycle_scan_job; db = SessionLocal(); execute_lifecycle_scan_job(db, job_type='DAILY_MATURITY_SCAN', trigger_source='CRON_WORKER'); db.close()"
+```
+
+---
+
+## 14. Acceptance Verification Matrix
+
+### Prompt 1: Foundation & Lineage Tests (`test_module5_lifecycle_foundation.py`)
+15/15 tests passed covering policy versioning, cycle detection, and lineage DAGs.
+
+### Prompt 2: Scheduler & Monitoring Tests ([`backend/tests/test_module5_prompt2_scheduler.py`](file:///c:/Users/bhome/OneDrive/Desktop/VIT/SIH/SIH%202026/TOP%2075/FDR_Sentinel/backend/tests/test_module5_prompt2_scheduler.py))
+
+| Specification | Test Function | Result | Verification Notes |
+|:---:|:---|:---:|:---|
+| 1 | `test_maturity_calculation_before_on_and_after_date` | **PASSED** | Verifies future ($>0$), Day Zero ($=0$), and past ($<0$) maturity calculations. |
+| 2 | `test_configured_approaching_maturity_thresholds` | **PASSED** | Instruments $\le 30$ days evaluated as `MATURING_SOON`, $> 30$ days as `ACTIVE`. |
+| 3 | `test_unconfigured_threshold_behavior` | **PASSED** | Sparse policy intervals return `DueCondition.NORMAL` without inventing AICTE rules. |
+| 4 | `test_separate_institution_and_officer_due_dates` | **PASSED** | Proves separate lead days (15d vs 7d) and distinct overdue transitions. |
+| 5 | `test_timezone_boundary_behavior` | **PASSED** | 19:00 UTC Oct 25 evaluates to Oct 26 under `Asia/Kolkata` daily boundary. |
+| 6 | `test_missing_and_invalid_date_handling` | **PASSED** | Missing maturity date evaluates to `NOT_EVALUABLE` without exceptions. |
+| 7 | `test_evaluation_idempotency` | **PASSED** | Repeated runs on same date update existing row in-place; count remains 1. |
+| 8 | `test_multiple_worker_concurrent_evaluation_protection`| **PASSED** | Active unexpired lease rejects concurrent worker with HTTP 409. |
+| 9 | `test_partial_batch_failure_and_recovery` | **PASSED** | Isolated error logs error summary; other instruments succeed; `PARTIAL_FAILURE`. |
+| 10 | `test_worker_restart_and_stale_lease_recovery` | **PASSED** | Crashed run marked `FAILED`; fresh worker reacquires lease without deadlock. |
+| 11 | `test_accurate_job_run_summaries` | **PASSED** | Job run record persists accurate eligible, evaluated, success, error, and stage counts. |
+| 12 | `test_demo_date_advancement_changes_simulation_results_only` | **PASSED** | Shifted perspective modifies evaluation output; real FDR dates remain untouched. |
+| 13 | `test_demo_date_control_unavailable_in_production` | **PASSED** | `ENVIRONMENT="production"` blocks demo clock endpoints with HTTP 403 Forbidden. |
+| 14 | `test_no_trust_promotion_or_release_approval_from_maturity_evaluation` | **PASSED** | Evaluating matured FDR does not promote `trust_level` or approve release. |
+| 15 | `test_monitoring_apis_tenancy_and_filtering` | **PASSED** | Institution user sees only own college; officer sees cross-institution records. |
+
+### Global Regression Test Summary
+- **Total Backend Tests:** **320 passed** in 13.71s (0 failures, 0 regressions across Modules 1–5).
+- **Frontend Production Bundle:** **Compiled cleanly** in 449ms with zero TypeScript or build errors.
+
+---
+
+## 15. Next Steps for Prompt 3
+
+With the maturity evaluation engine, concurrency-protected batch scheduler, tenancy-scoped monitoring APIs, and demo simulation clock verified, development proceeds to **Prompt 3: Multi-Channel Reminder & Escalation Notification Engine**:
+1. Implement template-driven reminder dispatching for institution and officer roles.
+2. Build delivery tracking and retry mechanics.
+3. Implement escalation alerts for persistent compliance delinquency.
+

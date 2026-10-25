@@ -83,9 +83,10 @@ def evaluate_instrument_lifecycle(
         )
 
     # Determine evaluation clock & date
-    active_clock = clock or system_clock
+    from app.modules.lifecycle.clock import get_current_clock
+    active_clock = clock or get_current_clock()
     if simulated_date is not None:
-        if not settings.ENABLE_LIFECYCLE_DATE_ADVANCE:
+        if not settings.ENABLE_LIFECYCLE_DATE_ADVANCE or settings.ENVIRONMENT == "production":
             raise AppException(
                 status_code=403,
                 message="Simulated date advance is disabled in this environment configuration.",
@@ -154,9 +155,9 @@ def evaluate_instrument_lifecycle(
             elif inst_due_date and eval_date >= inst_due_date:
                 due_condition = DueCondition.INSTITUTION_ACTION_DUE.value
             else:
-                # Check for discrete reminder intervals
+                # Check for discrete reminder intervals if configured
                 configured_intervals = policy.reminder_intervals_days
-                if days_to_maturity in configured_intervals:
+                if configured_intervals and days_to_maturity in configured_intervals:
                     matched_interval = days_to_maturity
                     due_condition = DueCondition.REMINDER_DUE.value
                 else:
@@ -165,8 +166,32 @@ def evaluate_instrument_lifecycle(
             # Renewed predecessor is covered by its successor
             due_condition = DueCondition.NORMAL.value
 
+    # Check for existing record on the exact same evaluation date for idempotency
+    existing_record = db.scalar(
+        select(LifecycleEvaluation).where(
+            and_(
+                LifecycleEvaluation.instrument_id == instrument_id,
+                LifecycleEvaluation.evaluation_date == eval_date,
+            )
+        )
+    )
+
     # Prior evaluation comparison for material transitions
-    prior = get_latest_evaluation_for_instrument(db, instrument_id)
+    if existing_record:
+        prior = db.scalar(
+            select(LifecycleEvaluation)
+            .where(
+                and_(
+                    LifecycleEvaluation.instrument_id == instrument_id,
+                    LifecycleEvaluation.id != existing_record.id,
+                    LifecycleEvaluation.evaluation_date < eval_date,
+                )
+            )
+            .order_by(desc(LifecycleEvaluation.evaluation_date), desc(LifecycleEvaluation.evaluation_timestamp))
+        )
+    else:
+        prior = get_latest_evaluation_for_instrument(db, instrument_id)
+
     is_material = False
     if prior is None:
         is_material = True
@@ -179,42 +204,65 @@ def evaluate_instrument_lifecycle(
         ):
             is_material = True
 
-    eval_record = LifecycleEvaluation(
-        instrument_id=instrument_id,
-        policy_id=policy.id,
-        policy_version=policy.version,
-        evaluation_date=eval_date,
-        evaluation_timestamp=eval_ts,
-        evaluation_timezone=policy.timezone,
-        days_to_maturity=days_to_maturity,
-        maturity_stage=maturity_stage,
-        institution_action_due_date=inst_due_date,
-        officer_action_due_date=officer_due_date,
-        is_overdue=is_overdue,
-        is_escalated=is_escalated,
-        escalation_role=escalation_role,
-        due_condition=due_condition,
-        matched_reminder_interval_days=matched_interval,
-        lineage_relationship_id=active_lineage.id if active_lineage else None,
-        is_material_transition=is_material,
-        prior_evaluation_id=prior.id if prior else None,
-        metadata_json=json.dumps(
-            {
-                "instrument_reference": instrument.reference_number,
-                "bank_name": instrument.bank_name,
-                "amount": str(instrument.amount),
-                "policy_code": policy.policy_code,
-                "is_demo_policy": policy.is_demo,
-            }
-        ),
+    metadata_str = json.dumps(
+        {
+            "instrument_reference": instrument.reference_number,
+            "bank_name": instrument.bank_name,
+            "amount": str(instrument.amount),
+            "policy_code": policy.policy_code,
+            "is_demo_policy": policy.is_demo,
+        }
     )
 
-    db.add(eval_record)
+    if existing_record:
+        # Idempotent in-place update
+        existing_record.policy_id = policy.id
+        existing_record.policy_version = policy.version
+        existing_record.evaluation_timestamp = eval_ts
+        existing_record.evaluation_timezone = policy.timezone
+        existing_record.days_to_maturity = days_to_maturity
+        existing_record.maturity_stage = maturity_stage
+        existing_record.institution_action_due_date = inst_due_date
+        existing_record.officer_action_due_date = officer_due_date
+        existing_record.is_overdue = is_overdue
+        existing_record.is_escalated = is_escalated
+        existing_record.escalation_role = escalation_role
+        existing_record.due_condition = due_condition
+        existing_record.matched_reminder_interval_days = matched_interval
+        existing_record.lineage_relationship_id = active_lineage.id if active_lineage else None
+        existing_record.is_material_transition = is_material
+        existing_record.prior_evaluation_id = prior.id if prior else None
+        existing_record.metadata_json = metadata_str
+        eval_record = existing_record
+    else:
+        eval_record = LifecycleEvaluation(
+            instrument_id=instrument_id,
+            policy_id=policy.id,
+            policy_version=policy.version,
+            evaluation_date=eval_date,
+            evaluation_timestamp=eval_ts,
+            evaluation_timezone=policy.timezone,
+            days_to_maturity=days_to_maturity,
+            maturity_stage=maturity_stage,
+            institution_action_due_date=inst_due_date,
+            officer_action_due_date=officer_due_date,
+            is_overdue=is_overdue,
+            is_escalated=is_escalated,
+            escalation_role=escalation_role,
+            due_condition=due_condition,
+            matched_reminder_interval_days=matched_interval,
+            lineage_relationship_id=active_lineage.id if active_lineage else None,
+            is_material_transition=is_material,
+            prior_evaluation_id=prior.id if prior else None,
+            metadata_json=metadata_str,
+        )
+        db.add(eval_record)
+
     db.commit()
     db.refresh(eval_record)
 
     # Emit audit event for material lifecycle changes
-    if is_material:
+    if is_material and (not existing_record or existing_record.is_material_transition):
         log_audit_event(
             db=db,
             action="LIFECYCLE_STAGE_TRANSITION",

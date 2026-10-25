@@ -291,6 +291,7 @@ class LifecycleEvaluation(Base, TimestampMixin):
     metadata_json: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
     __table_args__ = (
+        UniqueConstraint("instrument_id", "evaluation_date", name="uq_eval_instrument_date"),
         Index("ix_eval_instrument_date", "instrument_id", "evaluation_date"),
         Index("ix_eval_maturity_stage", "maturity_stage"),
         Index("ix_eval_due_condition", "due_condition"),
@@ -305,4 +306,60 @@ class LifecycleEvaluation(Base, TimestampMixin):
     )
     lineage: Mapped[Optional["InstrumentLineage"]] = relationship(
         "InstrumentLineage", foreign_keys=[lineage_relationship_id]
+    )
+
+
+class LifecycleJobRun(Base, TimestampMixin):
+    """
+    Execution tracker, lease lock, and structured diagnostics log for
+    scheduled and on-demand maturity scan jobs.
+    """
+    __tablename__ = "lifecycle_job_runs"
+
+    id: Mapped[str] = mapped_column(
+        String(36), primary_key=True, default=lambda: str(uuid.uuid4())
+    )
+
+    job_type: Mapped[str] = mapped_column(
+        String(50), default="DAILY_MATURITY_SCAN", nullable=False
+    )
+    status: Mapped[str] = mapped_column(
+        String(50), default="RUNNING", index=True, nullable=False
+    )
+    trigger_source: Mapped[str] = mapped_column(
+        String(50), default="SCHEDULED", nullable=False
+    )
+
+    started_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=get_utc_now, nullable=False
+    )
+    completed_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+
+    evaluation_date: Mapped[date] = mapped_column(Date, nullable=False)
+    evaluation_timezone: Mapped[str] = mapped_column(
+        String(50), default="Asia/Kolkata", nullable=False
+    )
+
+    total_eligible: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    evaluated_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    success_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    error_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    material_transitions_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    approaching_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    matured_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    overdue_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+
+    worker_instance_id: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    lease_expires_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+
+    error_summary_json: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    metadata_json: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
+    __table_args__ = (
+        Index("ix_job_status_started", "status", "started_at"),
+        Index("ix_job_type_date", "job_type", "evaluation_date"),
     )

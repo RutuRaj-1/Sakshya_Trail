@@ -195,3 +195,93 @@ class BatchEvaluationResponse(BaseModel):
     evaluated_count: int
     material_transitions_count: int
     evaluations: List[LifecycleEvaluationResponse]
+
+
+# --- Scheduler & Diagnostics Schemas --------------------------------------------
+
+class LifecycleJobRunResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    job_type: str
+    status: str
+    trigger_source: str
+    started_at: datetime
+    completed_at: Optional[datetime] = None
+    evaluation_date: date
+    evaluation_timezone: str
+    total_eligible: int
+    evaluated_count: int
+    success_count: int
+    error_count: int
+    material_transitions_count: int
+    approaching_count: int
+    matured_count: int
+    overdue_count: int
+    worker_instance_id: Optional[str] = None
+    lease_expires_at: Optional[datetime] = None
+    error_summary_json: Optional[str] = None
+    metadata_json: Optional[str] = None
+    created_at: datetime
+
+
+class SchedulerRunStatusResponse(BaseModel):
+    last_attempted_run: Optional[LifecycleJobRunResponse] = None
+    last_successful_run: Optional[LifecycleJobRunResponse] = None
+    recent_runs: List[LifecycleJobRunResponse] = Field(default_factory=list)
+
+
+class TriggerJobRequest(BaseModel):
+    batch_size: int = Field(default=50, ge=1, le=500)
+    simulated_date: Optional[date] = None
+    force_reevaluation: bool = False
+
+
+# --- Demo Clock Schemas ---------------------------------------------------------
+
+class DemoClockStatusResponse(BaseModel):
+    is_simulated: bool
+    active_timezone: str
+    today: str
+    now_utc: str
+    offset_days: int
+    disclaimer: Optional[str] = None
+
+
+class DemoClockAdvanceRequest(BaseModel):
+    days: Optional[int] = Field(None, ge=1, le=3650)
+    target_date: Optional[date] = None
+
+
+# --- Monitoring Schemas ---------------------------------------------------------
+
+class MonitoringInstrumentItem(BaseModel):
+    instrument_id: str
+    institution_id: str
+    institution_name: Optional[str] = None
+    reference_number: str
+    bank_name: str
+    amount: str
+    issue_date: Optional[str] = None
+    maturity_date: Optional[str] = None
+    days_to_maturity: Optional[int] = None
+    maturity_stage: str
+    due_condition: str
+    is_overdue: bool
+    is_escalated: bool
+    escalation_role: Optional[str] = None
+    institution_action_due_date: Optional[str] = None
+    officer_action_due_date: Optional[str] = None
+    administrative_status: str
+    trust_level: str
+    unresolved_findings_count: int = 0
+    verification_status: Optional[str] = None
+
+
+class MonitoringListResponse(BaseModel):
+    category: str  # "APPROACHING_MATURITY", "MATURED", "OVERDUE"
+    total_count: int
+    page: int
+    limit: int
+    items: List[MonitoringInstrumentItem]
+
