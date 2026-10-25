@@ -19,6 +19,7 @@ Verifies all 15 required specifications:
 14. Migrations from the existing database.
 15. Zero regressions across Modules 1–4.
 """
+from typing import Tuple, List, Optional
 from decimal import Decimal
 from datetime import date, datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
