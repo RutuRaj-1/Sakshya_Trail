@@ -12,6 +12,7 @@ import {
   KeyRound,
   AlertTriangle,
   ShieldCheck,
+  FileText,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/features/auth/AuthContext';
@@ -26,6 +27,7 @@ interface NavItem {
 
 const baseNavItems: NavItem[] = [
   { name: 'Dashboard', to: '/', icon: LayoutDashboard },
+  { name: 'Release / Refund Cases', to: '/release', icon: FileText, badge: 'Module 6' },
   { name: 'Review Queue', to: '/findings/queue', icon: AlertTriangle, badge: 'Scrutiny' },
   { name: 'Trust & Verification', to: '/verification', icon: ShieldCheck, badge: 'Trust' },
   { name: 'FDR Instruments', to: '/instruments', icon: FileSpreadsheet, badge: 'Core' },
