@@ -12,6 +12,7 @@ import { formatINR, formatDate } from '@/lib/utils';
 import { InstrumentModal } from '@/features/instruments/InstrumentModal';
 import { LifecycleNotificationHistory } from '@/features/lifecycle/LifecycleNotificationHistory';
 import { RenewalLineageSection } from '@/features/lifecycle/RenewalLineageSection';
+import { NineStageLifecycleTracker } from '@/features/lifecycle/components/NineStageLifecycleTracker';
 import { useAuth } from '@/features/auth/AuthContext';
 import {
   FileSpreadsheet,
@@ -220,6 +221,14 @@ export const InstrumentDetailPage: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* Nine-Stage Lifecycle Tracker for this instrument */}
+      <NineStageLifecycleTracker
+        mode="instrument"
+        instrument={instrument}
+        snapshot={snapshot}
+        onNavigateTab={(tabKey) => setActiveTab(tabKey as any)}
+      />
 
       {/* Main FDR Certificate Header Card */}
       <div className="bg-white rounded-[10px] border border-[#C9D3DB] shadow-xs p-6 sm:p-8 space-y-6">

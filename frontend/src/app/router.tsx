@@ -18,6 +18,8 @@ import { ReleaseCasesPage } from '@/app/routes/ReleaseCasesPage';
 import { ReleaseDetailPage } from '@/app/routes/ReleaseDetailPage';
 import { UnifiedSearchPage } from '@/app/routes/UnifiedSearchPage';
 import { ReportsPage } from '@/app/routes/ReportsPage';
+import { DocumentsEvidencePage } from '@/app/routes/DocumentsEvidencePage';
+import { MonitoringRenewalsPage } from '@/app/routes/MonitoringRenewalsPage';
 import { ProtectedRoute } from '@/features/auth/ProtectedRoute';
 
 export const router = createBrowserRouter([
@@ -71,6 +73,14 @@ export const router = createBrowserRouter([
       {
         path: 'instruments/:id',
         element: <InstrumentDetailPage />,
+      },
+      {
+        path: 'documents',
+        element: <DocumentsEvidencePage />,
+      },
+      {
+        path: 'monitoring',
+        element: <MonitoringRenewalsPage />,
       },
       {
         path: 'institutions',

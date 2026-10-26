@@ -2,7 +2,7 @@
 
 <div align="center">
 
-<img src="./SakshyaTrail%20Security%20Logo.png" alt="SakshyaTrail Logo" width="180" style="margin-bottom: 12px;" />
+<img src="./SakshyaTrail%20Security%20Logo.png" alt="SakshyaTrail Logo" width="240" style="margin-bottom: 12px;" />
 
 ### *Every Record. Every Decision. Every Trail of Evidence.*
 

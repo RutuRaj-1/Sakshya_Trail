@@ -78,6 +78,7 @@ def list_instruments(
     trust_level: Optional[str] = None,
     maturity_start: Optional[date] = None,
     maturity_end: Optional[date] = None,
+    maturity_indicator: Optional[str] = None,
     sort_by: str = "created_at",
     sort_order: str = "desc",
     skip: int = 0,
@@ -101,9 +102,35 @@ def list_instruments(
         count_stmt = count_stmt.where(Instrument.institution_id == institution_id)
 
     # 2. Filters
+    today = date.today()
     if status_filter:
-        stmt = stmt.where(Instrument.status == status_filter)
-        count_stmt = count_stmt.where(Instrument.status == status_filter)
+        if status_filter in ("EXPIRING_SOON",):
+            stmt = stmt.where(Instrument.maturity_date >= today, Instrument.maturity_date <= today + timedelta(days=90))
+            count_stmt = count_stmt.where(Instrument.maturity_date >= today, Instrument.maturity_date <= today + timedelta(days=90))
+        elif status_filter in ("MATURED", "EXPIRED"):
+            stmt = stmt.where(Instrument.maturity_date < today)
+            count_stmt = count_stmt.where(Instrument.maturity_date < today)
+        elif status_filter == "ACTIVE":
+            stmt = stmt.where(Instrument.maturity_date > today + timedelta(days=90))
+            count_stmt = count_stmt.where(Instrument.maturity_date > today + timedelta(days=90))
+        elif status_filter in ("UNDER_SCRUTINY", "PENDING"):
+            pending_statuses = ["DRAFT", "SUBMITTED", "UNDER_SCRUTINY", "UNDER_REVIEW", "RETURNED_FOR_CORRECTION"]
+            stmt = stmt.where(Instrument.status.in_(pending_statuses))
+            count_stmt = count_stmt.where(Instrument.status.in_(pending_statuses))
+        else:
+            stmt = stmt.where(Instrument.status == status_filter)
+            count_stmt = count_stmt.where(Instrument.status == status_filter)
+
+    if maturity_indicator:
+        if maturity_indicator == "EXPIRING_SOON":
+            stmt = stmt.where(Instrument.maturity_date >= today, Instrument.maturity_date <= today + timedelta(days=90))
+            count_stmt = count_stmt.where(Instrument.maturity_date >= today, Instrument.maturity_date <= today + timedelta(days=90))
+        elif maturity_indicator in ("MATURED", "EXPIRED"):
+            stmt = stmt.where(Instrument.maturity_date < today)
+            count_stmt = count_stmt.where(Instrument.maturity_date < today)
+        elif maturity_indicator == "ACTIVE":
+            stmt = stmt.where(Instrument.maturity_date > today + timedelta(days=90))
+            count_stmt = count_stmt.where(Instrument.maturity_date > today + timedelta(days=90))
 
     if trust_level:
         stmt = stmt.where(Instrument.trust_level == trust_level)

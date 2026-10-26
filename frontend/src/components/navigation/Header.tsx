@@ -1,12 +1,16 @@
 import React from 'react';
-import { Database, RefreshCw, LogOut, KeyRound } from 'lucide-react';
+import { Database, RefreshCw, LogOut, KeyRound, Menu } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useHealth } from '@/hooks/useHealth';
 import { useAuth } from '@/features/auth/AuthContext';
 import { StatusIndicator } from '@/components/common/StatusIndicator';
 import { Badge } from '@/components/common/Badge';
 
-export const Header: React.FC = () => {
+export interface HeaderProps {
+  onToggleMobileMenu?: () => void;
+}
+
+export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
   const { liveness, readiness, isLoading, refresh } = useHealth();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -41,14 +45,26 @@ export const Header: React.FC = () => {
   };
 
   return (
-    <header className="h-16 bg-white border-b border-[#C9D3DB] sticky top-0 z-30 px-4 sm:px-6 flex items-center justify-between shadow-[0_1px_2px_rgba(13,37,56,0.03)] font-sans">
-      {/* Title & Official Subtitle */}
-      <Link to="/dashboard" className="flex items-center gap-3 hover:opacity-95 transition-opacity">
-        <img
-          src="/logo.png"
-          alt="SakshyaTrail Logo"
-          className="h-9 w-auto object-contain drop-shadow-2xs"
-        />
+    <header className="h-16 bg-white border-b border-[#C9D3DB] sticky top-0 z-30 px-3 sm:px-6 flex items-center justify-between shadow-[0_1px_2px_rgba(13,37,56,0.03)] font-sans">
+      <div className="flex items-center gap-2 sm:gap-3">
+        {onToggleMobileMenu && (
+          <button
+            type="button"
+            onClick={onToggleMobileMenu}
+            className="lg:hidden p-1.5 text-[#5D6A75] hover:text-[#0D2538] hover:bg-[#F5F4EF] rounded-[6px] transition cursor-pointer"
+            aria-label="Open navigation menu"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+        )}
+
+        {/* Title & Official Subtitle */}
+        <Link to="/dashboard" className="flex items-center gap-2.5 sm:gap-3 hover:opacity-95 transition-opacity">
+          <img
+            src="/logo.png"
+            alt="SakshyaTrail Logo"
+            className="h-8 sm:h-9 w-auto object-contain drop-shadow-2xs"
+          />
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-base font-bold tracking-tight text-[#0D2538]">
@@ -63,6 +79,7 @@ export const Header: React.FC = () => {
           </p>
         </div>
       </Link>
+    </div>
 
       {/* Real-time Diagnostics Bar & Authenticated User Section */}
       <div className="flex items-center gap-3 sm:gap-4">

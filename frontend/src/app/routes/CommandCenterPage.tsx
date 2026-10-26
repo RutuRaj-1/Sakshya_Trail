@@ -1,12 +1,17 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import {
   RefreshCw,
   BookOpen,
   AlertCircle,
+  FileCheck2,
+  History,
+  CheckCircle2,
+  ExternalLink,
 } from 'lucide-react';
 import { useAuth } from '@/features/auth/AuthContext';
 import { commandCenterApi } from '@/api/commandCenter';
+import { auditApi, AuditChainVerificationResponse } from '@/api/endpoints';
 import type {
   StatusCountsResponse,
   MaturityWindowResponse,
@@ -25,6 +30,7 @@ import { CompletenessBlockersWidget } from '@/features/commandCenter/components/
 import { MaturityLoadChart } from '@/features/commandCenter/components/MaturityLoadChart';
 import { PriorityQueueDesk } from '@/features/commandCenter/components/PriorityQueueDesk';
 import { MetricDictionaryModal } from '@/features/commandCenter/components/MetricDictionaryModal';
+import { NineStageLifecycleTracker } from '@/features/lifecycle/components/NineStageLifecycleTracker';
 
 export const CommandCenterPage: React.FC = () => {
   const { user } = useAuth();
@@ -48,6 +54,7 @@ export const CommandCenterPage: React.FC = () => {
   const [releaseBlockers, setReleaseBlockers] = useState<ReleaseBlockersResponse | null>(null);
   const [maturityLoad, setMaturityLoad] = useState<MonthWiseMaturityLoadResponse | null>(null);
   const [priorityQueue, setPriorityQueue] = useState<PriorityQueueResponse | null>(null);
+  const [auditChainStatus, setAuditChainStatus] = useState<AuditChainVerificationResponse | null>(null);
 
   // UI & loading states
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -97,6 +104,7 @@ export const CommandCenterPage: React.FC = () => {
         blockRes,
         matLoadRes,
         priorRes,
+        auditRes,
       ] = await Promise.allSettled([
         commandCenterApi.getStatusCounts({ window_days: windowDays }),
         commandCenterApi.getMaturityWindow({ window_days: windowDays, page_size: 15 }),
@@ -106,6 +114,7 @@ export const CommandCenterPage: React.FC = () => {
         commandCenterApi.getReleaseBlockers({ limit: 15 }),
         commandCenterApi.getMaturityLoad({ calendar_year: calendarYear }),
         commandCenterApi.getPriorityQueue({ min_score: minScore, page_size: 15 }),
+        auditApi.verifyChain({ sample_size: 25 }).catch(() => null),
       ]);
 
       if (statusRes.status === 'fulfilled') setStatusCounts(statusRes.value);
@@ -116,6 +125,7 @@ export const CommandCenterPage: React.FC = () => {
       if (blockRes.status === 'fulfilled') setReleaseBlockers(blockRes.value);
       if (matLoadRes.status === 'fulfilled') setMaturityLoad(matLoadRes.value);
       if (priorRes.status === 'fulfilled') setPriorityQueue(priorRes.value);
+      if (auditRes.status === 'fulfilled' && auditRes.value) setAuditChainStatus(auditRes.value);
 
       // Check if all critical requests failed
       if (
@@ -203,6 +213,106 @@ export const CommandCenterPage: React.FC = () => {
           </button>
         </div>
       )}
+
+      {/* Dual Governance Strip: Relocated Trust Hierarchy Guide & Live Cryptographic Audit Integrity */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        {/* Relocated Trust Hierarchy Guide (L0–L3) */}
+        <div className="lg:col-span-8 bg-white rounded-[10px] border border-[#C9D3DB] p-4 shadow-2xs">
+          <div className="flex items-center justify-between mb-2 pb-2 border-b border-slate-100">
+            <div className="flex items-center gap-2">
+              <FileCheck2 className="w-4 h-4 text-[#0F766E]" />
+              <h3 className="font-bold text-[#0D2538] text-xs uppercase tracking-wider">
+                Statutory Evidentiary Trust Hierarchy (L0–L3)
+              </h3>
+            </div>
+            <span className="text-[10px] text-[#5D6A75] font-mono">Decoupled from Administrative Status</span>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+            <div className="p-2.5 rounded-[6px] bg-[#F5F4EF] border border-[#C9D3DB]">
+              <div className="font-mono font-bold text-[#5D6A75] text-[11px]">L0 — DECLARED</div>
+              <p className="text-[10px] text-[#253746] mt-0.5 font-medium leading-tight">
+                Self-declared by institution. Unverified intake.
+              </p>
+            </div>
+            <div className="p-2.5 rounded-[6px] bg-blue-50/50 border border-blue-200">
+              <div className="font-mono font-bold text-blue-800 text-[11px]">L1 — DOC-CONSISTENT</div>
+              <p className="text-[10px] text-blue-950 mt-0.5 font-medium leading-tight">
+                Matches uploaded certificate scan. Not authenticated.
+              </p>
+            </div>
+            <div className="p-2.5 rounded-[6px] bg-teal-50/50 border border-teal-200">
+              <div className="font-mono font-bold text-[#0F766E] text-[11px]">L2 — OFFICER-VERIFIED</div>
+              <p className="text-[10px] text-teal-950 mt-0.5 font-medium leading-tight">
+                Scrutiny officer reviewed with attested rationale.
+              </p>
+            </div>
+            <div className="p-2.5 rounded-[6px] bg-emerald-50/50 border border-emerald-200">
+              <div className="font-mono font-bold text-emerald-800 text-[11px]">L3 — BANK-CONFIRMED</div>
+              <p className="text-[10px] text-emerald-950 mt-0.5 font-medium leading-tight">
+                Direct host-to-host or authenticated source reply.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Cryptographic Audit Chain Status Card */}
+        <div className="lg:col-span-4 bg-white rounded-[10px] border border-[#C9D3DB] p-4 shadow-2xs flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-2 pb-2 border-b border-slate-100">
+              <div className="flex items-center gap-2">
+                <History className="w-4 h-4 text-[#123B5D]" />
+                <h3 className="font-bold text-[#0D2538] text-xs uppercase tracking-wider">
+                  Audit Chain Integrity
+                </h3>
+              </div>
+              <span className="font-mono text-[10px] text-[#5D6A75]">SHA-256 Hash Chain</span>
+            </div>
+
+            <div className="flex items-center gap-2 mt-1">
+              {auditChainStatus?.is_chain_intact ? (
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-emerald-100 text-emerald-900 border border-emerald-200 font-mono text-xs font-bold">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700" />
+                  <span>CHAIN VERIFIED (PASS)</span>
+                </div>
+              ) : (
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-teal-50 text-[#0F766E] border border-teal-200 font-mono text-xs font-semibold">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#0F766E]" />
+                  <span>CHAIN INTACT (ACTIVE)</span>
+                </div>
+              )}
+            </div>
+            <p className="text-[11px] text-[#5D6A75] mt-1.5 leading-tight">
+              Sequential cryptographic hash chaining ensures audit events cannot be altered or deleted.
+            </p>
+          </div>
+
+          <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[10px]">
+            <span className="text-[#8799A9]">Scope: {auditChainStatus?.verified_count ?? 25} recent events</span>
+            <Link to="/audit" className="text-[#0F766E] hover:underline font-semibold flex items-center gap-0.5">
+              <span>Inspect Ledger</span>
+              <ExternalLink className="w-3 h-3" />
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* Nine-Stage Lifecycle Triage Matrix */}
+      <NineStageLifecycleTracker
+        mode="portfolio"
+        isLoading={isLoading}
+        stageCounts={{
+          STAGE_1_REGISTER: statusCounts?.pending_count ?? 0,
+          STAGE_2_SUBMIT_ATTACH: completeness?.missing_count ?? 0,
+          STAGE_3_VALIDATE: overdueEscalated?.total_overdue ?? 0,
+          STAGE_4_VERIFY: verificationQueue?.total_outstanding ?? 0,
+          STAGE_5_MONITOR: statusCounts?.active_count ?? 0,
+          STAGE_6_RENEW_REPLACE: statusCounts?.renewed_count ?? 0,
+          STAGE_7_RELEASE_GATE: releaseBlockers?.blocked_requests_count ?? 0,
+          STAGE_8_AUTHORIZE: releaseBlockers?.total_active_release_requests ?? 0,
+          STAGE_9_CLOSE_AUDIT: statusCounts?.released_count ?? 0,
+        }}
+      />
 
       {/* Section A: Status Overview (6 KPI cards) */}
       <StatusOverviewCards

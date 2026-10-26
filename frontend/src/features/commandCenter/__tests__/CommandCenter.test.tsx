@@ -10,6 +10,7 @@ import { MaturityLoadChart } from '../components/MaturityLoadChart';
 import { PriorityQueueDesk } from '../components/PriorityQueueDesk';
 import { CommandCenterPage } from '@/app/routes/CommandCenterPage';
 import { commandCenterApi } from '@/api/commandCenter';
+import { auditApi } from '@/api/endpoints';
 import type {
   StatusCountsResponse,
   MaturityWindowResponse,
@@ -399,6 +400,14 @@ describe('Command Center Components & Integration', () => {
     vi.spyOn(commandCenterApi, 'getReleaseBlockers').mockResolvedValue(mockReleaseBlockers);
     vi.spyOn(commandCenterApi, 'getMaturityLoad').mockResolvedValue(mockMaturityLoad);
     vi.spyOn(commandCenterApi, 'getPriorityQueue').mockResolvedValue(mockPriorityQueue);
+    vi.spyOn(auditApi, 'verifyChain').mockResolvedValue({
+      status: 'PASS',
+      is_chain_intact: true,
+      total_events_in_scope: 25,
+      verified_count: 25,
+      verification_timestamp: new Date().toISOString(),
+      verification_scope_description: 'Audit ledger sample',
+    });
 
     render(
       <MemoryRouter initialEntries={['/command-center?window_days=90']}>
@@ -410,7 +419,7 @@ describe('Command Center Components & Integration', () => {
 
     await waitFor(() => {
       expect(screen.getByText('Active Instruments')).toBeInTheDocument();
-      expect(screen.getByText('15')).toBeInTheDocument();
+      expect(screen.getAllByText('15').length).toBeGreaterThan(0);
       expect(screen.getAllByText('FDR-SBI-2026-001').length).toBeGreaterThan(0);
     });
   });

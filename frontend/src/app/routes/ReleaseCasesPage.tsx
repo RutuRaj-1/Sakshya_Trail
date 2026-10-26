@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Plus, Search, Filter, AlertCircle, Clock } from 'lucide-react';
-import { releaseApi, ReleaseRequest, ReleaseWorkflowStatus } from '@/api/release';
+import { Link, useNavigate } from 'react-router-dom';
+import { Plus, Search, Filter, AlertCircle, Clock, X, FileText } from 'lucide-react';
+import { releaseApi, ReleaseRequest, ReleaseWorkflowStatus, ReleaseRequestType, ReleaseCaseType } from '@/api/release';
+import { instrumentsApi } from '@/api/endpoints';
 import { useAuth } from '@/features/auth/AuthContext';
 import { Badge } from '@/components/common/Badge';
 
@@ -55,7 +56,55 @@ export const ReleaseCasesPage: React.FC = () => {
     fetchRequests();
   }, [statusFilter, search]);
 
-  const canCreateRequest = ['INSTITUTION_USER'].includes(user?.role || '');
+  const navigate = useNavigate();
+  const [instruments, setInstruments] = useState<any[]>([]);
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [selectedInstId, setSelectedInstId] = useState('');
+  const [requestType, setRequestType] = useState<ReleaseRequestType>('RELEASE');
+  const [caseType, setCaseType] = useState<ReleaseCaseType>('STANDARD_MATURITY_RELEASE');
+  const [requestReason, setRequestReason] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function loadEligibleInstruments() {
+      try {
+        const res = await instrumentsApi.list({ limit: 50 });
+        setInstruments(res.items);
+        if (res.items.length > 0) setSelectedInstId(res.items[0].id);
+      } catch (e) {
+        console.error('Failed to load instruments for release request:', e);
+      }
+    }
+    loadEligibleInstruments();
+  }, []);
+
+  const handleCreateRequest = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedInstId || !requestReason.trim()) {
+      setSubmitError('Please select an instrument and provide a request reason.');
+      return;
+    }
+
+    setIsSubmitting(true);
+    setSubmitError(null);
+    try {
+      const created = await releaseApi.create({
+        instrument_id: selectedInstId,
+        request_type: requestType,
+        case_type: caseType,
+        request_reason: requestReason.trim(),
+      });
+      setIsCreateOpen(false);
+      navigate(`/release/${created.id}`);
+    } catch (err: any) {
+      setSubmitError(err?.response?.data?.detail || err?.message || 'Failed to create release request.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const canCreateRequest = ['INSTITUTION_USER', 'SYSTEM_ADMIN', 'SCRUTINY_OFFICER'].includes(user?.role || '');
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto font-sans">
@@ -68,13 +117,17 @@ export const ReleaseCasesPage: React.FC = () => {
           </p>
         </div>
         {canCreateRequest && (
-          <Link
-            to="/release/new"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-[#123B5D] text-white rounded-[8px] hover:bg-[#0D2538] text-xs font-semibold shadow-xs transition"
+          <button
+            type="button"
+            onClick={() => {
+              setSubmitError(null);
+              setIsCreateOpen(true);
+            }}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-[#123B5D] text-white rounded-[8px] hover:bg-[#0D2538] text-xs font-semibold shadow-xs transition cursor-pointer"
           >
             <Plus className="w-4 h-4" />
-            New Request
-          </Link>
+            <span>New Release Request</span>
+          </button>
         )}
       </div>
 
@@ -141,13 +194,14 @@ export const ReleaseCasesPage: React.FC = () => {
           <p className="text-sm font-semibold text-[#0D2538] mb-1">No release cases found</p>
           <p className="text-xs text-[#5D6A75] mb-4">No records matched your search criteria or tenant scope.</p>
           {canCreateRequest && (
-            <Link
-              to="/release/new"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-[#123B5D] text-white rounded-[8px] hover:bg-[#0D2538] text-xs font-semibold transition"
+            <button
+              type="button"
+              onClick={() => setIsCreateOpen(true)}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-[#123B5D] text-white rounded-[8px] hover:bg-[#0D2538] text-xs font-semibold transition cursor-pointer"
             >
               <Plus className="w-4 h-4" />
               Create First Request
-            </Link>
+            </button>
           )}
         </div>
       )}
@@ -199,6 +253,117 @@ export const ReleaseCasesPage: React.FC = () => {
               ))}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {/* New Request Modal */}
+      {isCreateOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-2xs">
+          <div className="bg-white rounded-[10px] border border-[#C9D3DB] p-6 max-w-lg w-full space-y-4 shadow-xl">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+              <h3 className="font-bold text-[#0D2538] text-sm flex items-center gap-2">
+                <FileText className="w-4 h-4 text-[#0F766E]" />
+                <span>Initiate FDR Release / Refund Petition</span>
+              </h3>
+              <button
+                type="button"
+                onClick={() => setIsCreateOpen(false)}
+                className="text-slate-400 hover:text-slate-700 cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {submitError && (
+              <div className="p-3 rounded bg-rose-50 border border-rose-200 text-rose-800 text-[11px] flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
+                <span>{submitError}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleCreateRequest} className="space-y-3">
+              <div>
+                <label className="block text-[11px] font-semibold text-[#253746] mb-1">
+                  Select Pledged FDR Instrument *
+                </label>
+                <select
+                  value={selectedInstId}
+                  onChange={(e) => setSelectedInstId(e.target.value)}
+                  className="w-full text-xs rounded border border-[#C9D3DB] px-3 py-2 focus:outline-none focus:border-[#0F766E] bg-white font-mono"
+                  required
+                >
+                  {instruments.map((inst) => (
+                    <option key={inst.id} value={inst.id}>
+                      {inst.reference_number} — {inst.bank_name} (₹{inst.amount})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[11px] font-semibold text-[#253746] mb-1">
+                    Request Type *
+                  </label>
+                  <select
+                    value={requestType}
+                    onChange={(e) => setRequestType(e.target.value as ReleaseRequestType)}
+                    className="w-full text-xs rounded border border-[#C9D3DB] px-3 py-2 focus:outline-none focus:border-[#0F766E] bg-white"
+                  >
+                    <option value="RELEASE">Statutory Release</option>
+                    <option value="DISCHARGE">Lien Discharge</option>
+                    <option value="REFUND">Excess Deposit Refund</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-semibold text-[#253746] mb-1">
+                    Case Type *
+                  </label>
+                  <select
+                    value={caseType}
+                    onChange={(e) => setCaseType(e.target.value as ReleaseCaseType)}
+                    className="w-full text-xs rounded border border-[#C9D3DB] px-3 py-2 focus:outline-none focus:border-[#0F766E] bg-white"
+                  >
+                    <option value="STANDARD_MATURITY_RELEASE">Standard Maturity Release</option>
+                    <option value="EARLY_CLOSURE">Early Closure (With Sanction)</option>
+                    <option value="FORCED_MATURITY">Forced Maturity Settlement</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-semibold text-[#253746] mb-1">
+                  Petition Justification &amp; Notes *
+                </label>
+                <textarea
+                  placeholder="Detail the regulatory justification, course completion status, or council approval reference..."
+                  rows={3}
+                  value={requestReason}
+                  onChange={(e) => setRequestReason(e.target.value)}
+                  className="w-full text-xs rounded border border-[#C9D3DB] px-3 py-2 focus:outline-none focus:border-[#0F766E]"
+                  required
+                />
+              </div>
+
+              <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsCreateOpen(false)}
+                  className="px-3 py-1.5 rounded border border-[#C9D3DB] text-[#5D6A75] hover:bg-slate-100 font-medium cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting || !selectedInstId || !requestReason.trim()}
+                  className="px-4 py-1.5 rounded bg-[#0F766E] hover:bg-[#09544E] text-white font-semibold shadow-xs disabled:opacity-50 cursor-pointer"
+                >
+                  {isSubmitting ? 'Submitting Petition...' : 'Submit Draft Petition'}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>

@@ -124,6 +124,7 @@ export const instrumentsApi = {
     trust_level?: string;
     maturity_start?: string;
     maturity_end?: string;
+    maturity_indicator?: string;
     sort_by?: string;
     sort_order?: string;
     skip?: number;
@@ -136,6 +137,7 @@ export const instrumentsApi = {
     if (params?.trust_level) sp.append('trust_level', params.trust_level);
     if (params?.maturity_start) sp.append('maturity_start', params.maturity_start);
     if (params?.maturity_end) sp.append('maturity_end', params.maturity_end);
+    if (params?.maturity_indicator) sp.append('maturity_indicator', params.maturity_indicator);
     if (params?.sort_by) sp.append('sort_by', params.sort_by);
     if (params?.sort_order) sp.append('sort_order', params.sort_order);
     if (params?.skip !== undefined) sp.append('skip', String(params.skip));
@@ -462,5 +464,79 @@ export const auditApi = {
     const query = sp.toString() ? `?${sp.toString()}` : '';
     return apiClient.post<AuditChainVerificationResponse>(`/audit/verify${query}`, {});
   },
+};
+
+export interface DocumentItem {
+  id: string;
+  category: string;
+  title: string;
+  status: string;
+  current_version_number: number;
+  version_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DocumentVersionDetail {
+  id: string;
+  version_number: number;
+  filename: string;
+  content_type: string;
+  size_bytes: number;
+  sha256_hash: string;
+  processing_status: string;
+  scan_provider: string;
+  uploader_user_id?: string;
+  uploaded_at: string;
+}
+
+export interface DocumentDetail {
+  id: string;
+  instrument_id: string;
+  institution_id: string;
+  category: string;
+  title: string;
+  description?: string;
+  status: string;
+  current_version_id?: string;
+  created_by_user_id?: string;
+  created_at: string;
+  updated_at: string;
+  version_count: number;
+  versions: DocumentVersionDetail[];
+}
+
+export const documentsApi = {
+  listByInstrument: (instrumentId: string, params?: { offset?: number; limit?: number; category?: string }) => {
+    const sp = new URLSearchParams();
+    if (params?.offset !== undefined) sp.append('offset', String(params.offset));
+    if (params?.limit !== undefined) sp.append('limit', String(params.limit));
+    if (params?.category) sp.append('category', params.category);
+    const query = sp.toString() ? `?${sp.toString()}` : '';
+    return apiClient.get<{ total: number; offset: number; limit: number; items: DocumentItem[] }>(
+      `/instruments/${instrumentId}/documents${query}`
+    );
+  },
+  getDetail: (documentId: string) => apiClient.get<DocumentDetail>(`/documents/${documentId}`),
+  upload: (instrumentId: string, formData: FormData) =>
+    apiClient.post<{
+      success: boolean;
+      document_id: string;
+      version_id: string;
+      version_number: number;
+      category: string;
+      title: string;
+      filename: string;
+      content_type: string;
+      file_size: string;
+      sha256_hash: string;
+      processing_status: string;
+      scan_provider: string;
+      uploaded_at: string;
+    }>(`/instruments/${instrumentId}/documents`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }),
+  getDownloadUrl: (documentId: string, versionId: string) =>
+    `/api/v1/documents/${documentId}/versions/${versionId}/content`,
 };
 

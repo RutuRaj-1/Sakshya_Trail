@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { InstrumentsList } from '@/features/instruments/InstrumentsList';
 import { InstrumentModal } from '@/features/instruments/InstrumentModal';
 import { instrumentsApi, institutionsApi } from '@/api/endpoints';
@@ -20,6 +21,7 @@ import { useAuth } from '@/features/auth/AuthContext';
 
 export const InstrumentsPage: React.FC = () => {
   const { user } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
   const isInstitutionUser = user?.role === 'INSTITUTION_USER';
   const canRecord = ['SYSTEM_ADMIN', 'SCRUTINY_OFFICER', 'INSTITUTION_USER'].includes(
     user?.role || ''
@@ -32,13 +34,40 @@ export const InstrumentsPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Filters
+  // Filters initialized from searchParams
+  const paramStatus = searchParams.get('status') || searchParams.get('maturity_indicator') || 'ALL';
+  const paramTrust = searchParams.get('trust_level') || 'ALL';
+  const paramInst = searchParams.get('institution_id') || '';
+
   const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState('ALL');
-  const [trustFilter, setTrustFilter] = useState('ALL');
-  const [selectedInstFilter, setSelectedInstFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState(paramStatus);
+  const [trustFilter, setTrustFilter] = useState(paramTrust);
+  const [selectedInstFilter, setSelectedInstFilter] = useState(paramInst);
   const [page, setPage] = useState(1);
   const pageSize = 15;
+
+  // Sync state if URL changes externally
+  useEffect(() => {
+    const nextStatus = searchParams.get('status') || searchParams.get('maturity_indicator') || 'ALL';
+    const nextTrust = searchParams.get('trust_level') || 'ALL';
+    const nextInst = searchParams.get('institution_id') || '';
+    setStatusFilter(nextStatus);
+    setTrustFilter(nextTrust);
+    setSelectedInstFilter(nextInst);
+    setPage(1);
+  }, [searchParams]);
+
+  const updateUrlParam = (updates: Record<string, string | null>) => {
+    const next = new URLSearchParams(searchParams);
+    Object.entries(updates).forEach(([k, v]) => {
+      if (!v || v === 'ALL') {
+        next.delete(k);
+      } else {
+        next.set(k, v);
+      }
+    });
+    setSearchParams(next, { replace: true });
+  };
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -194,14 +223,30 @@ export const InstrumentsPage: React.FC = () => {
             <select
               value={statusFilter}
               onChange={(e) => {
-                setStatusFilter(e.target.value);
+                const val = e.target.value;
+                setStatusFilter(val);
                 setPage(1);
+                updateUrlParam({ status: val });
               }}
-              className="border border-[#8799A9] rounded-lg px-2.5 py-2 bg-white text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500"
+              className="border border-[#8799A9] rounded-lg px-2.5 py-2 bg-white text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500 font-mono text-xs"
             >
-              <option value="ALL">All Workflow Statuses</option>
-              <option value="REGISTERED">REGISTERED</option>
-              <option value="DRAFT">DRAFT</option>
+              <option value="ALL">All Statuses &amp; Lifecycles</option>
+              <optgroup label="Maturity Windows">
+                <option value="ACTIVE">ACTIVE (In-Term)</option>
+                <option value="EXPIRING_SOON">EXPIRING_SOON (≤ 90d)</option>
+                <option value="MATURED">MATURED / EXPIRED</option>
+              </optgroup>
+              <optgroup label="Administrative Status">
+                <option value="REGISTERED">REGISTERED</option>
+                <option value="DRAFT">DRAFT</option>
+                <option value="SUBMITTED">SUBMITTED</option>
+                <option value="UNDER_SCRUTINY">PENDING SCRUTINY</option>
+                <option value="RETURNED_FOR_CORRECTION">RETURNED FOR CORRECTION</option>
+              </optgroup>
+              <optgroup label="Lineage &amp; Discharge">
+                <option value="RENEWED">RENEWED</option>
+                <option value="RELEASED">RELEASED</option>
+              </optgroup>
             </select>
           </div>
 
@@ -209,10 +254,12 @@ export const InstrumentsPage: React.FC = () => {
           <select
             value={trustFilter}
             onChange={(e) => {
-              setTrustFilter(e.target.value);
+              const val = e.target.value;
+              setTrustFilter(val);
               setPage(1);
+              updateUrlParam({ trust_level: val });
             }}
-            className="border border-[#8799A9] rounded-lg px-2.5 py-2 bg-white text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500"
+            className="border border-[#8799A9] rounded-lg px-2.5 py-2 bg-white text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500 font-mono text-xs"
           >
             <option value="ALL">All Trust Levels</option>
             <option value="L0_DECLARED">L0 — DECLARED</option>
@@ -226,8 +273,10 @@ export const InstrumentsPage: React.FC = () => {
             <select
               value={selectedInstFilter}
               onChange={(e) => {
-                setSelectedInstFilter(e.target.value);
+                const val = e.target.value;
+                setSelectedInstFilter(val);
                 setPage(1);
+                updateUrlParam({ institution_id: val });
               }}
               className="border border-[#8799A9] rounded-lg px-2.5 py-2 bg-white text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500 max-w-[200px] truncate"
             >
