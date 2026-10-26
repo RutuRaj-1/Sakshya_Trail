@@ -20,6 +20,8 @@ PROCESSING_STATES = {
 # Document categories (prototype initial set; extensible)
 DEFAULT_CATEGORIES = {
     "FDR_COPY": "Scanned copy of the Fixed Deposit Receipt",
+    "FDR_RECEIPT": "Official FDR Receipt / Deposit Certificate",
+    "SANCTION_ORDER": "Regulatory or Institution Sanction Order",
     "BANK_CONFIRMATION": "Official bank confirmation letter",
     "LIEN_OR_PLEDGE_LETTER": "Lien or pledge endorsement letter",
     "AFFIDAVIT": "Sworn affidavit from institution",

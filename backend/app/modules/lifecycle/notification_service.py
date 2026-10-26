@@ -578,6 +578,40 @@ def retry_notification(
     return notif
 
 
+def _get_user_inbox_filter(current_user: User) -> List[Any]:
+    """
+    Constructs inbox query filters respecting strict role and tenant boundaries:
+    - INSTITUTION_USER: must belong to the user's institution.
+    - INTERNAL ROLES (SCRUTINY, BRANCH_HEAD, etc.): matched by recipient_user_id or recipient_role.
+    - SYSTEM_ADMIN: receives system-admin and targeted administrative alerts.
+    """
+    if current_user.role == "INSTITUTION_USER":
+        return [
+            LifecycleNotification.channel == "IN_APP",
+            LifecycleNotification.institution_id == current_user.institution_id,
+            or_(
+                LifecycleNotification.recipient_user_id == current_user.id,
+                LifecycleNotification.recipient_role == "INSTITUTION_USER",
+            ),
+        ]
+    elif current_user.role == "SYSTEM_ADMIN":
+        return [
+            LifecycleNotification.channel == "IN_APP",
+            or_(
+                LifecycleNotification.recipient_user_id == current_user.id,
+                LifecycleNotification.recipient_role == "SYSTEM_ADMIN",
+            ),
+        ]
+    else:
+        return [
+            LifecycleNotification.channel == "IN_APP",
+            or_(
+                LifecycleNotification.recipient_user_id == current_user.id,
+                LifecycleNotification.recipient_role == current_user.role,
+            ),
+        ]
+
+
 def mark_notification_as_read(
     db: Session,
     notification_id: str,
@@ -590,8 +624,16 @@ def mark_notification_as_read(
     if not notif:
         raise NotFoundException(f"Notification '{notification_id}' not found.")
 
-    if current_user.role == "INSTITUTION_USER" and notif.institution_id != current_user.institution_id:
-        raise ForbiddenException("Access denied.")
+    if current_user.role == "INSTITUTION_USER":
+        if notif.institution_id != current_user.institution_id:
+            raise ForbiddenException("Access denied.")
+    else:
+        if (
+            current_user.role != "SYSTEM_ADMIN"
+            and notif.recipient_user_id != current_user.id
+            and notif.recipient_role != current_user.role
+        ):
+            raise ForbiddenException("Access denied.")
 
     notif.is_read = True
     notif.read_at = get_utc_now()
@@ -638,16 +680,7 @@ def get_user_inbox_notifications(
     """
     Fetches in-app inbox notifications addressed to the current user or their assigned role.
     """
-    filters = [
-        LifecycleNotification.channel == "IN_APP",
-        or_(
-            LifecycleNotification.recipient_user_id == current_user.id,
-            and_(
-                LifecycleNotification.recipient_role == current_user.role,
-                LifecycleNotification.institution_id == current_user.institution_id,
-            ),
-        ),
-    ]
+    filters = _get_user_inbox_filter(current_user)
     if unread_only:
         filters.append(LifecycleNotification.is_read == False)  # noqa: E712
 

@@ -33,7 +33,8 @@ export function validateRedirectUrl(rawUrl: unknown, defaultUrl: string = '/dash
 
 /**
  * Role-based route authorization map.
- * Defines which roles are permitted to access sensitive routes.
+ * Defines which roles are permitted to access each route.
+ * Canonical Source of Truth: RBAC.md
  */
 const ROUTE_ROLE_PERMISSIONS: Array<{ pattern: RegExp; allowedRoles: ApplicationRole[] }> = [
   {
@@ -43,6 +44,30 @@ const ROUTE_ROLE_PERMISSIONS: Array<{ pattern: RegExp; allowedRoles: Application
   {
     pattern: /^\/audit(\/.*)?$/,
     allowedRoles: ['SYSTEM_ADMIN', 'AUDITOR', 'BRANCH_HEAD', 'COMPETENT_AUTHORITY'],
+  },
+  {
+    pattern: /^\/command-center(\/.*)?$/,
+    allowedRoles: ['SYSTEM_ADMIN', 'SCRUTINY_OFFICER', 'BRANCH_HEAD', 'COMPETENT_AUTHORITY'],
+  },
+  {
+    pattern: /^\/findings(\/.*)?$/,
+    allowedRoles: ['SYSTEM_ADMIN', 'SCRUTINY_OFFICER', 'BRANCH_HEAD', 'COMPETENT_AUTHORITY', 'FINANCE_OFFICER', 'AUDITOR'],
+  },
+  {
+    pattern: /^\/verification(\/.*)?$/,
+    allowedRoles: ['SYSTEM_ADMIN', 'SCRUTINY_OFFICER', 'BRANCH_HEAD', 'COMPETENT_AUTHORITY', 'FINANCE_OFFICER', 'AUDITOR'],
+  },
+  {
+    pattern: /^\/institutions(\/.*)?$/,
+    allowedRoles: ['SYSTEM_ADMIN', 'SCRUTINY_OFFICER', 'BRANCH_HEAD', 'COMPETENT_AUTHORITY', 'FINANCE_OFFICER', 'AUDITOR'],
+  },
+  {
+    pattern: /^\/reports(\/.*)?$/,
+    allowedRoles: ['SYSTEM_ADMIN', 'SCRUTINY_OFFICER', 'BRANCH_HEAD', 'COMPETENT_AUTHORITY', 'FINANCE_OFFICER', 'AUDITOR'],
+  },
+  {
+    pattern: /^\/health(\/.*)?$/,
+    allowedRoles: ['SYSTEM_ADMIN', 'SCRUTINY_OFFICER', 'AUDITOR'],
   },
   {
     pattern: /^\/change-password$/,

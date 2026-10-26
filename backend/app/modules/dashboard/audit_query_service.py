@@ -8,13 +8,12 @@ Implements PRD-FR-091, PRD-FR-092, PRD-FR-093, and PRD-FR-094:
 """
 import hashlib
 import json
-from typing import Optional, List, Dict, Any, TYPE_CHECKING
+from typing import Optional, List, Dict, Any
 from datetime import datetime, timezone
 from sqlalchemy.orm import Session
 from sqlalchemy import select, desc, func, or_
 
-if TYPE_CHECKING:
-    from app.modules.auth.models import User
+from app.modules.auth.models import User
 from app.modules.audit.models import AuditEvent
 from app.modules.audit.service import (
     compute_canonical_event_hash,

@@ -762,6 +762,45 @@ def mark_notification_read_endpoint(
     return mark_notification_as_read(db=db, notification_id=id, current_user=current_user)
 
 
+@router.post(
+    "/notifications/read-all",
+    summary="Mark all inbox notifications as read for current user",
+)
+def mark_all_notifications_read_endpoint(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    from app.modules.lifecycle.event_notification_service import mark_all_inbox_as_read
+    count = mark_all_inbox_as_read(db=db, current_user=current_user)
+    return {"message": "All notifications marked as read.", "marked_read": count}
+
+
+@router.get(
+    "/admin/oversight",
+    response_model=NotificationListResponse,
+    summary="Get operational oversight notification feed (System Admin only)",
+)
+@router.get(
+    "/notifications/admin-oversight",
+    response_model=NotificationListResponse,
+    summary="Get operational oversight notification feed (System Admin only)",
+)
+def get_admin_oversight_endpoint(
+    page: int = Query(1, ge=1),
+    limit: int = Query(50, ge=1, le=100),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_roles([ROLE_SYSTEM_ADMIN])),
+):
+    from app.modules.lifecycle.event_notification_service import get_admin_oversight_feed
+    total, records = get_admin_oversight_feed(db=db, page=page, limit=limit)
+    return NotificationListResponse(
+        total_count=total,
+        page=page,
+        limit=limit,
+        items=records,  # type: ignore[arg-type]
+    )
+
+
 @router.get(
     "/notifications/failed",
     response_model=NotificationListResponse,

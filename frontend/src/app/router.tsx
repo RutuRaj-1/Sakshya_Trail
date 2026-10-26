@@ -56,7 +56,11 @@ export const router = createBrowserRouter([
       },
       {
         path: 'command-center',
-        element: <CommandCenterPage />,
+        element: (
+          <ProtectedRoute allowedRoles={['SYSTEM_ADMIN', 'SCRUTINY_OFFICER', 'BRANCH_HEAD', 'COMPETENT_AUTHORITY']}>
+            <CommandCenterPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: 'search',
@@ -64,7 +68,11 @@ export const router = createBrowserRouter([
       },
       {
         path: 'reports',
-        element: <ReportsPage />,
+        element: (
+          <ProtectedRoute allowedRoles={['SYSTEM_ADMIN', 'SCRUTINY_OFFICER', 'BRANCH_HEAD', 'COMPETENT_AUTHORITY', 'FINANCE_OFFICER', 'AUDITOR']}>
+            <ReportsPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: 'instruments',
@@ -84,11 +92,19 @@ export const router = createBrowserRouter([
       },
       {
         path: 'institutions',
-        element: <InstitutionsPage />,
+        element: (
+          <ProtectedRoute allowedRoles={['SYSTEM_ADMIN', 'SCRUTINY_OFFICER', 'BRANCH_HEAD', 'COMPETENT_AUTHORITY', 'FINANCE_OFFICER', 'AUDITOR']}>
+            <InstitutionsPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: 'institutions/:id',
-        element: <InstitutionDetailPage />,
+        element: (
+          <ProtectedRoute allowedRoles={['SYSTEM_ADMIN', 'SCRUTINY_OFFICER', 'BRANCH_HEAD', 'COMPETENT_AUTHORITY', 'FINANCE_OFFICER', 'AUDITOR']}>
+            <InstitutionDetailPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: 'release',
@@ -100,15 +116,27 @@ export const router = createBrowserRouter([
       },
       {
         path: 'findings/queue',
-        element: <ReviewQueuePage />,
+        element: (
+          <ProtectedRoute allowedRoles={['SYSTEM_ADMIN', 'SCRUTINY_OFFICER', 'BRANCH_HEAD', 'COMPETENT_AUTHORITY', 'FINANCE_OFFICER', 'AUDITOR']}>
+            <ReviewQueuePage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: 'verification',
-        element: <TrustVerificationDeskPage />,
+        element: (
+          <ProtectedRoute allowedRoles={['SYSTEM_ADMIN', 'SCRUTINY_OFFICER', 'BRANCH_HEAD', 'COMPETENT_AUTHORITY', 'FINANCE_OFFICER', 'AUDITOR']}>
+            <TrustVerificationDeskPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: 'verification/:id',
-        element: <TrustVerificationDeskPage />,
+        element: (
+          <ProtectedRoute allowedRoles={['SYSTEM_ADMIN', 'SCRUTINY_OFFICER', 'BRANCH_HEAD', 'COMPETENT_AUTHORITY', 'FINANCE_OFFICER', 'AUDITOR']}>
+            <TrustVerificationDeskPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: 'users',
@@ -120,7 +148,11 @@ export const router = createBrowserRouter([
       },
       {
         path: 'health',
-        element: <HealthPage />,
+        element: (
+          <ProtectedRoute allowedRoles={['SYSTEM_ADMIN', 'SCRUTINY_OFFICER', 'AUDITOR']}>
+            <HealthPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: 'audit',

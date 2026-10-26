@@ -44,7 +44,12 @@ export const NAV_GROUPS: NavGroup[] = [
     title: 'Workspace',
     items: [
       { name: 'Overview', to: '/dashboard', icon: LayoutDashboard },
-      { name: 'Command Center', to: '/command-center', icon: SlidersHorizontal },
+      {
+        name: 'Command Center',
+        to: '/command-center',
+        icon: SlidersHorizontal,
+        allowedRoles: ['SYSTEM_ADMIN', 'SCRUTINY_OFFICER', 'BRANCH_HEAD', 'COMPETENT_AUTHORITY'],
+      },
     ],
   },
   {
@@ -57,14 +62,14 @@ export const NAV_GROUPS: NavGroup[] = [
         name: 'Validation & Review Queue',
         to: '/findings/queue',
         icon: AlertTriangle,
-        allowedRoles: ['SYSTEM_ADMIN', 'SCRUTINY_OFFICER', 'BRANCH_HEAD', 'COMPETENT_AUTHORITY', 'FINANCE_OFFICER'],
+        allowedRoles: ['SYSTEM_ADMIN', 'SCRUTINY_OFFICER', 'BRANCH_HEAD', 'COMPETENT_AUTHORITY', 'FINANCE_OFFICER', 'AUDITOR'],
         badgeKey: 'reviewQueueCount',
       },
       {
         name: 'Trust & Verification',
         to: '/verification',
         icon: ShieldCheck,
-        allowedRoles: ['SYSTEM_ADMIN', 'SCRUTINY_OFFICER', 'BRANCH_HEAD', 'COMPETENT_AUTHORITY', 'FINANCE_OFFICER'],
+        allowedRoles: ['SYSTEM_ADMIN', 'SCRUTINY_OFFICER', 'BRANCH_HEAD', 'COMPETENT_AUTHORITY', 'FINANCE_OFFICER', 'AUDITOR'],
         badgeKey: 'verificationQueueCount',
       },
       { name: 'Monitoring & Renewals', to: '/monitoring', icon: Clock },

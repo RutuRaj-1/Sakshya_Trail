@@ -329,6 +329,27 @@ def update_user_profile(
             metadata=changed_metadata,
         )
 
+        if "role" in changed_metadata:
+            try:
+                from app.modules.lifecycle.event_notification_service import emit_material_event
+                emit_material_event(
+                    db=db,
+                    event_type="USER_ROLE_ASSIGNMENT_CHANGED",
+                    entity_type="USER",
+                    entity_id=user.id,
+                    actor_user=current_admin,
+                    resulting_state=user.role,
+                    details={
+                        "target_user_id": user.id,
+                        "target_user_email": user.email,
+                        "old_role": changed_metadata["role"]["old"],
+                        "new_role": changed_metadata["role"]["new"],
+                    },
+                )
+                db.commit()
+            except Exception:
+                pass
+
     return user
 
 

@@ -404,6 +404,28 @@ def create_instrument(
     except Exception:
         pass
 
+    # Module 5: Emit material event notifications & admin oversight
+    try:
+        from app.modules.lifecycle.event_notification_service import emit_material_event
+        emit_material_event(
+            db=db,
+            event_type="INSTRUMENT_SUBMITTED",
+            entity_type="INSTRUMENT",
+            entity_id=instrument.id,
+            actor_user=current_user,
+            instrument_id=instrument.id,
+            institution_id=instrument.institution_id,
+            resulting_state=instrument.status,
+            details={
+                "reference_number": instrument.reference_number,
+                "bank_name": instrument.bank_name,
+                "amount": str(instrument.amount),
+            },
+        )
+        db.commit()
+    except Exception:
+        pass
+
     return InstrumentResponse(
         id=instrument.id,
         institution_id=instrument.institution_id,
@@ -568,6 +590,28 @@ def update_instrument(
                 )
     except Exception:
         pass
+
+    # Module 5: Emit material event if returned for correction
+    if "status" in changed_fields and inst.status == "RETURNED_FOR_CORRECTION":
+        try:
+            from app.modules.lifecycle.event_notification_service import emit_material_event
+            emit_material_event(
+                db=db,
+                event_type="SUBMISSION_RETURNED_FOR_CORRECTION",
+                entity_type="INSTRUMENT",
+                entity_id=inst.id,
+                actor_user=current_user,
+                instrument_id=inst.id,
+                institution_id=inst.institution_id,
+                resulting_state=inst.status,
+                details={
+                    "reference_number": inst.reference_number,
+                    "reason": inst.remarks or "Corrections requested on submitted instrument.",
+                },
+            )
+            db.commit()
+        except Exception:
+            pass
 
     parent_inst = db.scalar(select(Institution).where(Institution.id == inst.institution_id))
 

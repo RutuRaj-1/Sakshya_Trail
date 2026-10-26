@@ -14,6 +14,7 @@ from app.core.security import (
     ROLE_SCRUTINY_OFFICER,
     ROLE_BRANCH_HEAD,
     ROLE_COMPETENT_AUTHORITY,
+    ROLE_FINANCE_OFFICER,
     ROLE_INSTITUTION_USER,
     ALL_ROLES,
 )
@@ -157,7 +158,7 @@ def record_release_order_endpoint(
     id: str = Path(...),
     payload: ReleaseOrderCreate = ...,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_roles([ROLE_SYSTEM_ADMIN, ROLE_SCRUTINY_OFFICER, ROLE_BRANCH_HEAD, ROLE_COMPETENT_AUTHORITY])),
+    current_user: User = Depends(require_roles([ROLE_SYSTEM_ADMIN, ROLE_FINANCE_OFFICER, ROLE_COMPETENT_AUTHORITY])),
 ):
     return record_release_order(db=db, request_id=id, payload=payload, current_user=current_user)
 
@@ -189,7 +190,7 @@ def evaluate_readiness_endpoint(
     id: str = Path(...),
     force_reevaluate: bool = Query(False, description="Force reevaluation even if recent assessment exists"),
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_roles([ROLE_SYSTEM_ADMIN, ROLE_SCRUTINY_OFFICER, ROLE_COMPETENT_AUTHORITY])),
+    current_user: User = Depends(require_roles([ROLE_SYSTEM_ADMIN, ROLE_SCRUTINY_OFFICER, ROLE_BRANCH_HEAD, ROLE_COMPETENT_AUTHORITY])),
 ):
     """
     Evaluates readiness of a release request against the configured checklist profile.
@@ -273,7 +274,7 @@ def check_release_gate_endpoint(
     id: str = Path(...),
     target_status: str = Query("READY_FOR_AUTHORITY", description="Target workflow status"),
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_roles([ROLE_SYSTEM_ADMIN, ROLE_SCRUTINY_OFFICER, ROLE_COMPETENT_AUTHORITY])),
+    current_user: User = Depends(require_roles([ROLE_SYSTEM_ADMIN, ROLE_SCRUTINY_OFFICER, ROLE_BRANCH_HEAD, ROLE_COMPETENT_AUTHORITY])),
 ):
     """
     Server-side validation before state transitions.
@@ -445,7 +446,7 @@ def record_release_order_endpoint_decision(
     id: str = Path(...),
     payload: ReleaseOrderCreate = ...,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_roles([ROLE_SYSTEM_ADMIN, ROLE_SCRUTINY_OFFICER, ROLE_BRANCH_HEAD, ROLE_COMPETENT_AUTHORITY])),
+    current_user: User = Depends(require_roles([ROLE_SYSTEM_ADMIN, ROLE_FINANCE_OFFICER, ROLE_COMPETENT_AUTHORITY])),
 ):
     """
     Records official release letter (order reference, date, supporting docs).
@@ -472,7 +473,7 @@ def confirm_bank_action_endpoint(
     id: str = Path(...),
     bank_action_notes: Optional[str] = Query(None, description="Bank confirmation notes"),
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_roles([ROLE_SYSTEM_ADMIN, ROLE_BRANCH_HEAD, ROLE_COMPETENT_AUTHORITY])),
+    current_user: User = Depends(require_roles([ROLE_SYSTEM_ADMIN, ROLE_BRANCH_HEAD, ROLE_COMPETENT_AUTHORITY, ROLE_FINANCE_OFFICER])),
 ):
     """
     Confirms that bank has executed the release order.
@@ -499,7 +500,7 @@ def close_release_case_endpoint(
     id: str = Path(...),
     closure_notes: Optional[str] = Query(None, description="Case closure summary"),
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_roles([ROLE_SYSTEM_ADMIN, ROLE_SCRUTINY_OFFICER, ROLE_BRANCH_HEAD, ROLE_COMPETENT_AUTHORITY])),
+    current_user: User = Depends(require_roles([ROLE_SYSTEM_ADMIN, ROLE_BRANCH_HEAD, ROLE_COMPETENT_AUTHORITY, ROLE_FINANCE_OFFICER])),
 ):
     """
     Closes release case after completion.

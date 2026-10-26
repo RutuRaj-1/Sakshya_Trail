@@ -390,6 +390,31 @@ def run_validation(
     db.commit()
     db.refresh(run)
 
+    # Module 5: Emit material event notifications & admin oversight if findings were created
+    if new_findings > 0:
+        try:
+            from app.modules.lifecycle.event_notification_service import emit_material_event
+            actor_user = db.scalar(select(User).where(User.id == triggered_by_user_id)) if triggered_by_user_id else None
+            emit_material_event(
+                db=db,
+                event_type="VALIDATION_FINDING_CREATED",
+                entity_type="VALIDATION_RUN",
+                entity_id=run.id,
+                actor_user=actor_user,
+                instrument_id=instrument.id,
+                institution_id=instrument.institution_id,
+                resulting_state="FINDINGS_GENERATED",
+                details={
+                    "new_findings_count": new_findings,
+                    "reference_number": instrument.reference_number,
+                    "finding_code": f"{new_findings} finding(s) generated",
+                    "severity": "HIGH" if outcome_counts.get("FAIL", 0) > 0 else "MEDIUM",
+                },
+            )
+            db.commit()
+        except Exception:
+            pass
+
     # Safety assertion: no rule execution may modify trust_level
     refreshed = db.scalar(select(Instrument).where(Instrument.id == instrument_id))
     assert refreshed.trust_level == instrument.trust_level, (

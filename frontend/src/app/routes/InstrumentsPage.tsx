@@ -23,7 +23,7 @@ export const InstrumentsPage: React.FC = () => {
   const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const isInstitutionUser = user?.role === 'INSTITUTION_USER';
-  const canRecord = ['SYSTEM_ADMIN', 'SCRUTINY_OFFICER', 'INSTITUTION_USER'].includes(
+  const canRecord = ['SYSTEM_ADMIN', 'SCRUTINY_OFFICER', 'BRANCH_HEAD', 'INSTITUTION_USER'].includes(
     user?.role || ''
   );
 

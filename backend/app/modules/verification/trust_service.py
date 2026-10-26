@@ -578,6 +578,29 @@ def transition_trust_level(
         },
     )
 
+    # Module 5: Emit material event notifications & admin oversight
+    if target_trust_level == "L2_OFFICER_VERIFIED":
+        try:
+            from app.modules.lifecycle.event_notification_service import emit_material_event
+            emit_material_event(
+                db=db,
+                event_type="L2_OFFICER_ATTESTATION_RECORDED",
+                entity_type="INSTRUMENT",
+                entity_id=instrument.id,
+                actor_user=current_user,
+                instrument_id=instrument.id,
+                institution_id=instrument.institution_id,
+                resulting_state=instrument.status,
+                details={
+                    "attestation_type": "OFFICER_VERIFIED",
+                    "reference_number": instrument.reference_number,
+                    "reason": clean_reason,
+                },
+            )
+            db.commit()
+        except Exception:
+            pass
+
     return new_assessment
 
 

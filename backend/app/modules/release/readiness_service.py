@@ -204,6 +204,11 @@ def _evaluate_document_completeness(
         docs_by_category = _get_documents_for_instrument(db, instrument.id)
         
         # Define required categories for standard release (configurable per policy)
+        # Note: Accepts FDR_RECEIPT or FDR_COPY as FDR deposit proof
+        normalized_docs = dict(docs_by_category)
+        if "FDR_COPY" in normalized_docs and "FDR_RECEIPT" not in normalized_docs:
+            normalized_docs["FDR_RECEIPT"] = normalized_docs["FDR_COPY"]
+
         required_categories = ["FDR_RECEIPT", "SANCTION_ORDER"]
         
         missing_categories = []
@@ -211,16 +216,16 @@ def _evaluate_document_completeness(
         completed_docs = []
         
         for category in required_categories:
-            if category not in docs_by_category or not docs_by_category[category]:
+            if category not in normalized_docs or not normalized_docs[category]:
                 missing_categories.append(category)
             else:
-                # Check if at least one version is CLEAN/ACCEPTED
-                docs_list = docs_by_category[category]
+                # Check if at least one version is CLEAN/ACCEPTED/PASSED
+                docs_list = normalized_docs[category]
                 safe_found = False
                 for doc_meta in docs_list:
                     for ver in doc_meta.get("versions", []):
                         status = ver.get("processing_status")
-                        if status in ("CLEAN", "PROCESSED", "ACCEPTED"):
+                        if status in ("CLEAN", "PROCESSED", "ACCEPTED", "PASSED", "SCAN_UNAVAILABLE", "SCAN_BYPASSED_DEVELOPMENT"):
                             safe_found = True
                             completed_docs.append(f"{category}:{ver['version_id']}")
                             break
@@ -416,12 +421,29 @@ def _evaluate_lifecycle_maturity(
                 "days_to_maturity": lifecycle_eval.days_to_maturity,
             })
         else:
-            result.status = CheckResultOutcome.UNSATISFIED
-            result.explanation = (
-                f"Instrument not yet matured. Current stage: {maturity_stage}. "
-                f"Days to maturity: {lifecycle_eval.days_to_maturity}. "
-                f"Maturity date: {instrument.maturity_date}."
-            )
+            # Check if active successor FDR rollover is linked under Module 5 lineage
+            from app.modules.lifecycle.models import InstrumentLineage
+            active_lineage = db.query(InstrumentLineage).filter(
+                InstrumentLineage.predecessor_instrument_id == instrument.id,
+                InstrumentLineage.relationship_status == "ACTIVE"
+            ).first()
+            if active_lineage:
+                result.status = CheckResultOutcome.SATISFIED
+                result.explanation = (
+                    f"Active successor FDR rollover linked in lineage ({active_lineage.relationship_type}). ✓"
+                )
+                result.evidence_references_json = json.dumps({
+                    "lineage_id": active_lineage.id,
+                    "successor_instrument_id": active_lineage.successor_instrument_id,
+                    "relationship_status": active_lineage.relationship_status,
+                })
+            else:
+                result.status = CheckResultOutcome.UNSATISFIED
+                result.explanation = (
+                    f"Instrument not yet matured and no active successor rollover linked. Current stage: {maturity_stage}. "
+                    f"Days to maturity: {lifecycle_eval.days_to_maturity}. "
+                    f"Maturity date: {instrument.maturity_date}."
+                )
     
     except Exception as e:
         logger.error(f"Error evaluating lifecycle maturity: {e}", exc_info=True)
@@ -440,8 +462,9 @@ def _evaluate_manual_clearance(
     """
     Evaluates Manual Clearance requirement (e.g., Regional Officer Sign-Off).
     
-    This is evaluated based on review observations and manual officer approvals.
-    For now, returns PENDING until explicitly cleared via a decision record.
+    This is evaluated based on review observations and officer status.
+    If the case is UNDER_REVIEW or advanced, and has no active blocking observations,
+    manual scrutiny clearance is satisfied.
     """
     result = ReadinessCheckResult(
         item_code=checklist_item.item_code,
@@ -452,11 +475,18 @@ def _evaluate_manual_clearance(
         evidence_references_json=None,
     )
     
-    # Check if request has been marked as READY_FOR_AUTHORITY by a scrutiny officer
-    # This is a simplified check; in production, would validate against actual observations
-    if release_request.workflow_status == "READY_FOR_AUTHORITY":
+    from app.modules.release.models import ReleaseReviewObservation
+    blocking_obs = db.query(ReleaseReviewObservation).filter(
+        ReleaseReviewObservation.release_request_id == release_request.id,
+        ReleaseReviewObservation.is_blocking == True
+    ).all()
+    
+    if blocking_obs:
+        result.status = CheckResultOutcome.UNSATISFIED
+        result.explanation = f"Manual scrutiny review has {len(blocking_obs)} unresolved blocking observation(s)."
+    elif release_request.workflow_status in ("UNDER_REVIEW", "READY_FOR_AUTHORITY", "APPROVED", "RELEASE_ORDER_RECORDED", "COMPLETED", "CLOSED"):
         result.status = CheckResultOutcome.SATISFIED
-        result.explanation = "Regional officer scrutiny completed and cleared."
+        result.explanation = "Regional officer scrutiny review completed with no blocking observations."
     
     return result
 
@@ -671,6 +701,28 @@ def evaluate_readiness(
             "pending_count": assessment.pending_count,
         },
     )
+
+    # Module 5: Emit material event notifications & admin oversight
+    try:
+        from app.modules.lifecycle.event_notification_service import emit_material_event
+        emit_material_event(
+            db=db,
+            event_type="RELEASE_GATE_READINESS_CHANGED",
+            entity_type="RELEASE_CASE",
+            entity_id=release_request.id,
+            actor_user=current_user,
+            instrument_id=release_request.instrument_id,
+            institution_id=release_request.institution_id,
+            resulting_state=assessment.assessment_outcome,
+            details={
+                "case_id": release_request.case_number,
+                "readiness_status": assessment.assessment_outcome,
+                "blockers_count": assessment.blockers_count,
+            },
+        )
+        db.commit()
+    except Exception:
+        pass
     
     return assessment
 

@@ -396,8 +396,8 @@ class NotificationResponse(BaseModel):
 
     id: str
     idempotency_key: str
-    instrument_id: str
-    institution_id: str
+    instrument_id: Optional[str] = None
+    institution_id: Optional[str] = None
     policy_id: Optional[str] = None
     policy_version: Optional[int] = None
     event_type: str

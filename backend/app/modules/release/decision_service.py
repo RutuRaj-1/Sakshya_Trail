@@ -511,6 +511,27 @@ def return_for_correction(
         },
     )
     
+    # Module 5: Emit material event notifications & admin oversight
+    try:
+        from app.modules.lifecycle.event_notification_service import emit_material_event
+        emit_material_event(
+            db=db,
+            event_type="RELEASE_CASE_RETURNED",
+            entity_type="RELEASE_CASE",
+            entity_id=release_request.id,
+            actor_user=current_user,
+            instrument_id=release_request.instrument_id,
+            institution_id=release_request.institution_id,
+            resulting_state=ReleaseWorkflowStatus.RETURNED_FOR_CORRECTION.value,
+            details={
+                "case_id": release_request.case_number,
+                "reason": clean_reason,
+            },
+        )
+        db.commit()
+    except Exception:
+        pass
+
     return decision
 
 
@@ -601,6 +622,27 @@ def recommend_for_authority(
         },
     )
     
+    # Module 5: Emit material event notifications & admin oversight
+    try:
+        from app.modules.lifecycle.event_notification_service import emit_material_event
+        emit_material_event(
+            db=db,
+            event_type="RELEASE_CASE_RECOMMENDED",
+            entity_type="RELEASE_CASE",
+            entity_id=release_request.id,
+            actor_user=current_user,
+            instrument_id=release_request.instrument_id,
+            institution_id=release_request.institution_id,
+            resulting_state=ReleaseWorkflowStatus.READY_FOR_AUTHORITY.value,
+            details={
+                "case_id": release_request.case_number,
+                "reason": clean_reason,
+            },
+        )
+        db.commit()
+    except Exception:
+        pass
+
     return decision
 
 
@@ -736,6 +778,27 @@ def approve_release_request(
         },
     )
     
+    # Module 5: Emit material event notifications & admin oversight
+    try:
+        from app.modules.lifecycle.event_notification_service import emit_material_event
+        emit_material_event(
+            db=db,
+            event_type="RELEASE_CASE_APPROVED",
+            entity_type="RELEASE_CASE",
+            entity_id=release_request.id,
+            actor_user=current_user,
+            instrument_id=release_request.instrument_id,
+            institution_id=release_request.institution_id,
+            resulting_state=ReleaseWorkflowStatus.APPROVED.value,
+            details={
+                "case_id": release_request.case_number,
+                "reason": clean_reason,
+            },
+        )
+        db.commit()
+    except Exception:
+        pass
+
     return decision
 
 
@@ -809,6 +872,27 @@ def reject_release_request(
         },
     )
     
+    # Module 5: Emit material event notifications & admin oversight
+    try:
+        from app.modules.lifecycle.event_notification_service import emit_material_event
+        emit_material_event(
+            db=db,
+            event_type="RELEASE_CASE_REJECTED",
+            entity_type="RELEASE_CASE",
+            entity_id=release_request.id,
+            actor_user=current_user,
+            instrument_id=release_request.instrument_id,
+            institution_id=release_request.institution_id,
+            resulting_state=ReleaseWorkflowStatus.REJECTED.value,
+            details={
+                "case_id": release_request.case_number,
+                "reason": clean_reason,
+            },
+        )
+        db.commit()
+    except Exception:
+        pass
+
     return decision
 
 
@@ -879,6 +963,27 @@ def record_release_order(
         },
     )
     
+    # Module 5: Emit material event notifications & admin oversight
+    try:
+        from app.modules.lifecycle.event_notification_service import emit_material_event
+        emit_material_event(
+            db=db,
+            event_type="RELEASE_ORDER_RECORDED",
+            entity_type="RELEASE_ORDER",
+            entity_id=order.id,
+            actor_user=current_user,
+            instrument_id=release_request.instrument_id,
+            institution_id=release_request.institution_id,
+            resulting_state=ReleaseWorkflowStatus.RELEASE_ORDER_RECORDED.value,
+            details={
+                "case_id": release_request.case_number,
+                "release_order_number": payload.order_reference_number,
+            },
+        )
+        db.commit()
+    except Exception:
+        pass
+
     return order
 
 
@@ -947,6 +1052,27 @@ def confirm_bank_action(
         },
     )
     
+    # Module 5: Emit material event notifications & admin oversight
+    try:
+        from app.modules.lifecycle.event_notification_service import emit_material_event
+        emit_material_event(
+            db=db,
+            event_type="DOWNSTREAM_BANK_ACTION_RECORDED",
+            entity_type="RELEASE_CASE",
+            entity_id=release_request.id,
+            actor_user=current_user,
+            instrument_id=release_request.instrument_id,
+            institution_id=release_request.institution_id,
+            resulting_state=ReleaseWorkflowStatus.COMPLETED.value,
+            details={
+                "case_id": release_request.case_number,
+                "bank_disbursement_reference": bank_action_notes or "CONFIRMED",
+            },
+        )
+        db.commit()
+    except Exception:
+        pass
+
     return release_request
 
 

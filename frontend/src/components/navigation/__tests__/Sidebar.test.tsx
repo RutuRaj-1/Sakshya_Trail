@@ -110,17 +110,35 @@ describe('Sidebar Component Navigation & IA', () => {
 
     // Allowed for institution:
     expect(screen.getByText('Overview')).toBeInTheDocument();
-    expect(screen.getByText('Command Center')).toBeInTheDocument();
     expect(screen.getByText('Institutions & Instruments')).toBeInTheDocument();
     expect(screen.getByText('Documents & Evidence')).toBeInTheDocument();
     expect(screen.getByText('Monitoring & Renewals')).toBeInTheDocument();
     expect(screen.getByText('Release / Refund Cases')).toBeInTheDocument();
 
     // Restricted regulatory items must NOT be rendered for INSTITUTION_USER:
+    expect(screen.queryByText('Command Center')).not.toBeInTheDocument();
     expect(screen.queryByText('Validation & Review Queue')).not.toBeInTheDocument();
     expect(screen.queryByText('Trust & Verification')).not.toBeInTheDocument();
     expect(screen.queryByText('Operational Reports')).not.toBeInTheDocument();
     expect(screen.queryByText('Audit & Integrity')).not.toBeInTheDocument();
+    expect(screen.queryByText('System Users')).not.toBeInTheDocument();
+  });
+
+  it('renders Command Center and supervisory groups for BRANCH_HEAD', () => {
+    mockRole = 'BRANCH_HEAD';
+
+    render(
+      <MemoryRouter>
+        <Sidebar />
+      </MemoryRouter>
+    );
+
+    expect(screen.getByText('Overview')).toBeInTheDocument();
+    expect(screen.getByText('Command Center')).toBeInTheDocument();
+    expect(screen.getByText('Validation & Review Queue')).toBeInTheDocument();
+    expect(screen.getByText('Trust & Verification')).toBeInTheDocument();
+    expect(screen.getByText('Operational Reports')).toBeInTheDocument();
+    // System Users is strictly SYSTEM_ADMIN only
     expect(screen.queryByText('System Users')).not.toBeInTheDocument();
   });
 

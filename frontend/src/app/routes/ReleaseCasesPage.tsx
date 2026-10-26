@@ -104,7 +104,7 @@ export const ReleaseCasesPage: React.FC = () => {
     }
   };
 
-  const canCreateRequest = ['INSTITUTION_USER', 'SYSTEM_ADMIN', 'SCRUTINY_OFFICER'].includes(user?.role || '');
+  const canCreateRequest = ['INSTITUTION_USER', 'SYSTEM_ADMIN'].includes(user?.role || '');
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto font-sans">

@@ -84,8 +84,8 @@ class ExportService:
         "SCRUTINY_OFFICER",
         "BRANCH_HEAD",
         "COMPETENT_AUTHORITY",
+        "FINANCE_OFFICER",
         "AUDITOR",
-        "AUDIT_EXAMINER",
         "INSTITUTION_USER",
     ]
 

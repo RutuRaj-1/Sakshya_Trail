@@ -332,6 +332,14 @@ export const lifecycleApi = {
     apiClient.post<{ success: boolean; message: string }>(
       `/lifecycle/notifications/${notificationId}/read`
     ),
+  markAllNotificationsRead: () =>
+    apiClient.post<{ success: boolean; message: string; marked_read: number }>(
+      '/lifecycle/notifications/read-all'
+    ),
+  getAdminOversightFeed: (page: number = 1, limit: number = 50) =>
+    apiClient.get<import('@/types/lifecycle').NotificationListResponse>(
+      `/lifecycle/admin/oversight?page=${page}&limit=${limit}`
+    ),
   // Lineage & Renewal Methods (Module 5 Prompt 4)
   getLineage: (instrumentId: string) =>
     apiClient.get<import('@/types/lifecycle').LineageTreeResponse>(

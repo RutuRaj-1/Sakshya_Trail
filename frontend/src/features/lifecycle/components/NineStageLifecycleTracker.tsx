@@ -13,8 +13,10 @@ import {
   CheckCircle2,
   ChevronRight,
   ExternalLink,
+  ShieldAlert,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/features/auth/AuthContext';
 import type { Instrument } from '@/types';
 import type { InstrumentDetailSnapshotResponse } from '@/types/commandCenter';
 
@@ -154,6 +156,7 @@ interface InstrumentViewProps {
   instrument: Instrument;
   snapshot?: InstrumentDetailSnapshotResponse | null;
   onNavigateTab?: (tabKey: string) => void;
+  role?: string;
 }
 
 export type NineStageLifecycleTrackerProps = PortfolioViewProps | InstrumentViewProps;
@@ -167,7 +170,8 @@ export interface StageEvaluationResult {
 
 export function evaluateInstrumentLifecycleStage(
   instrument: Instrument,
-  snapshot?: InstrumentDetailSnapshotResponse | null
+  snapshot?: InstrumentDetailSnapshotResponse | null,
+  userRole?: string
 ): StageEvaluationResult {
   const status = instrument.status;
   const trust = instrument.trust_level;
@@ -181,15 +185,26 @@ export function evaluateInstrumentLifecycleStage(
   let statusSummary = '';
   let nextAction = '';
 
+  const isInstUser = userRole === 'INSTITUTION_USER';
+  const isOfficer = userRole === 'SCRUTINY_OFFICER' || userRole === 'BRANCH_HEAD';
+  const isFinance = userRole === 'FINANCE_OFFICER';
+  const isAuditor = userRole === 'AUDITOR';
+
   if (status === 'DRAFT') {
     currentStageNumber = hasDocuments ? 2 : 1;
     statusSummary = hasDocuments ? 'Evidence uploaded; pending final submission' : 'Initial FDR details recorded';
-    nextAction = hasDocuments ? 'Submit for statutory review' : 'Upload FDR certificate scan';
+    if (isInstUser) {
+      nextAction = hasDocuments ? 'Submit for statutory review' : 'Upload FDR certificate scan';
+    } else {
+      nextAction = hasDocuments ? 'Awaiting institutional submission' : 'Awaiting certificate upload by institution';
+    }
   } else if (status === 'RETURNED_FOR_CORRECTION') {
     currentStageNumber = 3;
     stageStatus = 'WARNING';
     statusSummary = 'Case returned by scrutiny officer for institutional correction';
-    nextAction = 'Amend certificate details and resubmit';
+    nextAction = isInstUser
+      ? 'Amend certificate details & resubmit'
+      : 'Awaiting institutional correction & resubmission';
   } else if (status === 'SUBMITTED' || status === 'UNDER_SCRUTINY') {
     currentStageNumber = 3;
     if (openObservations.length > 0) {
@@ -198,26 +213,50 @@ export function evaluateInstrumentLifecycleStage(
     } else {
       statusSummary = 'Under algorithmic and scrutiny officer review';
     }
-    nextAction = 'Resolve scrutiny findings';
+    if (isOfficer) {
+      nextAction = 'Examine findings in queue & record observation';
+    } else if (isInstUser) {
+      nextAction = 'Awaiting scrutiny officer validation outcome';
+    } else if (isAuditor) {
+      nextAction = 'Inspect scrutiny validation findings (read-only)';
+    } else {
+      nextAction = 'Review algorithmic scrutiny findings';
+    }
   } else if (status === 'REGISTERED' || status === 'ACTIVE') {
     if (trust === 'L0_DECLARED') {
       currentStageNumber = 4;
       statusSummary = 'Declared status; pending officer attestation (L2) or bank verification (L3)';
-      nextAction = 'Open Trust Desk to initiate bank confirmation';
+      if (isOfficer) {
+        nextAction = 'Dispatch bank confirmation request or record L2 decision';
+      } else if (isInstUser) {
+        nextAction = 'Awaiting bank confirmation / officer verification';
+      } else {
+        nextAction = 'Inspect trust provenance and verification status';
+      }
     } else if (maturityIndicator === 'EXPIRING_SOON') {
       currentStageNumber = 5;
       stageStatus = 'WARNING';
       statusSummary = 'Approaching statutory maturity (within ≤ 90 days)';
-      nextAction = 'Initiate renewal replacement or prepare release checklist';
+      if (isInstUser) {
+        nextAction = 'Initiate successor renewal or file release request';
+      } else if (isFinance) {
+        nextAction = 'Monitor reconciliation & prepare deposit accounting';
+      } else {
+        nextAction = 'Monitor maturity window & renewal timeline';
+      }
     } else if (maturityIndicator === 'EXPIRED') {
       currentStageNumber = 6;
       stageStatus = 'WARNING';
       statusSummary = 'Matured deposit; awaiting successor renewal or release petition';
-      nextAction = 'Draft successor renewal instrument or file release request';
+      nextAction = isInstUser
+        ? 'Draft successor renewal instrument or file release request'
+        : 'Track renewal continuity or release case filing';
     } else {
       currentStageNumber = 5;
       statusSummary = 'Active compliance: statutory lien marked and valid';
-      nextAction = 'Monitor periodic maturity timeline';
+      nextAction = isAuditor
+        ? 'Audit active lien & trust records'
+        : 'Monitor periodic maturity timeline';
     }
   } else if (status === 'RENEWED' || status === 'RENEWED_SUPERSEDED') {
     currentStageNumber = 6;
@@ -228,20 +267,17 @@ export function evaluateInstrumentLifecycleStage(
     currentStageNumber = 9;
     stageStatus = 'COMPLETED';
     statusSummary = 'Deposit discharged by competent authority and verified in audit ledger';
-    nextAction = 'Inspect permanent cryptographic audit record';
+    nextAction = isFinance
+      ? 'Verify bank confirmation and account reconciliation'
+      : 'Inspect permanent cryptographic audit record';
   }
 
   return { currentStageNumber, stageStatus, statusSummary, nextAction };
 }
 
-export const NineStageLifecycleTracker: React.FC<NineStageLifecycleTrackerProps> = (props) => {
+const PortfolioView: React.FC<PortfolioViewProps> = (props) => {
   const navigate = useNavigate();
-
-  // ---------------------------------------------------------------------------
-  // MODE 1: PORTFOLIO COCKPIT GRID (COMMAND CENTER)
-  // ---------------------------------------------------------------------------
-  if (props.mode === 'portfolio') {
-    const { stageCounts, isLoading } = props;
+  const { stageCounts, isLoading } = props;
 
     return (
       <section aria-labelledby="lifecycle-matrix-heading" className="space-y-3 font-sans">
@@ -323,22 +359,22 @@ export const NineStageLifecycleTracker: React.FC<NineStageLifecycleTrackerProps>
           })}
         </div>
       </section>
-    );
-  }
+  );
+};
 
-  // ---------------------------------------------------------------------------
-  // MODE 2: SINGLE INSTRUMENT DETAIL CONTEXT
-  // ---------------------------------------------------------------------------
-  const { instrument, snapshot, onNavigateTab } = props;
+const InstrumentView: React.FC<InstrumentViewProps> = (props) => {
+  const { user } = useAuth();
+  const { instrument, snapshot, onNavigateTab, role } = props;
+  const currentRole = role || user?.role;
 
-  const evalResult = evaluateInstrumentLifecycleStage(instrument, snapshot);
+  const evalResult = evaluateInstrumentLifecycleStage(instrument, snapshot, currentRole);
 
   return (
     <div className="bg-white rounded-[10px] border border-[#C9D3DB] p-5 shadow-2xs font-sans space-y-4">
       {/* Tracker Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
         <div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <span className="text-xs font-bold text-[#0D2538] uppercase tracking-wider">
               Statutory Lifecycle Progress
             </span>
@@ -354,15 +390,28 @@ export const NineStageLifecycleTracker: React.FC<NineStageLifecycleTrackerProps>
             >
               Stage {evalResult.currentStageNumber}: {LIFECYCLE_STAGES[evalResult.currentStageNumber - 1].label}
             </span>
+
+            {/* Separated Administrative, Trust, and Maturity Status Badges */}
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-100 text-slate-800 border border-slate-200">
+              Admin: <strong>{instrument.status}</strong>
+            </span>
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-blue-50 text-blue-800 border border-blue-200">
+              Trust: <strong>{instrument.trust_level}</strong>
+            </span>
+            {instrument.maturity_indicator && (
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-50 text-amber-900 border border-amber-200">
+                Maturity: <strong>{instrument.maturity_indicator}</strong>
+              </span>
+            )}
           </div>
-          <p className="text-xs text-[#5D6A75] mt-0.5">
+          <p className="text-xs text-[#5D6A75] mt-1.5">
             {evalResult.statusSummary}
           </p>
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
           <span className="text-[11px] text-[#5D6A75]">Next Action:</span>
-          <span className="text-[11px] font-semibold text-[#0F766E] bg-teal-50 px-2 py-1 rounded border border-teal-200">
+          <span className="text-[11px] font-semibold text-[#0F766E] bg-teal-50 px-2.5 py-1 rounded border border-teal-200">
             {evalResult.nextAction}
           </span>
         </div>
@@ -405,6 +454,14 @@ export const NineStageLifecycleTracker: React.FC<NineStageLifecycleTrackerProps>
         })}
       </div>
 
+      {/* Statutory Guardrail Notices */}
+      <div className="bg-[#FEF7E8] border border-[#F8DEAE] rounded-[6px] p-2.5 flex items-start gap-2 text-[11px] text-[#8A5A00]">
+        <ShieldAlert className="w-4 h-4 shrink-0 mt-0.5 text-[#8A5A00]" />
+        <div className="leading-relaxed">
+          <strong>Statutory Guardrails:</strong> (1) Uploading evidence or OCR consistency checks alone does <em>not</em> constitute genuine bank confirmation (Level 3 requires direct bank confirmation). (2) Competent Authority approval sanctions release but does <em>not</em> imply bank disbursement has completed (Stage 9 bank confirmation and closure required).
+        </div>
+      </div>
+
       <div className="text-[11px] text-[#5D6A75] flex items-center justify-between pt-1 border-t border-slate-100">
         <span>
           <strong>Note:</strong> Renewal (Stage 6) and Release (Stages 7–9) are branching paths. Deposits do not force-progress through all stages.
@@ -422,4 +479,11 @@ export const NineStageLifecycleTracker: React.FC<NineStageLifecycleTrackerProps>
       </div>
     </div>
   );
+};
+
+export const NineStageLifecycleTracker: React.FC<NineStageLifecycleTrackerProps> = (props) => {
+  if (props.mode === 'portfolio') {
+    return <PortfolioView {...props} />;
+  }
+  return <InstrumentView {...props} />;
 };

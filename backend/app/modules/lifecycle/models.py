@@ -434,11 +434,11 @@ class LifecycleNotification(Base, TimestampMixin):
     idempotency_key: Mapped[str] = mapped_column(
         String(255), unique=True, index=True, nullable=False
     )
-    instrument_id: Mapped[str] = mapped_column(
-        String(36), ForeignKey("instruments.id", ondelete="CASCADE"), index=True, nullable=False
+    instrument_id: Mapped[Optional[str]] = mapped_column(
+        String(36), ForeignKey("instruments.id", ondelete="CASCADE"), index=True, nullable=True
     )
-    institution_id: Mapped[str] = mapped_column(
-        String(36), ForeignKey("institutions.id", ondelete="RESTRICT"), index=True, nullable=False
+    institution_id: Mapped[Optional[str]] = mapped_column(
+        String(36), ForeignKey("institutions.id", ondelete="RESTRICT"), index=True, nullable=True
     )
     policy_id: Mapped[Optional[str]] = mapped_column(
         String(36), ForeignKey("lifecycle_policies.id", ondelete="SET NULL"), nullable=True
@@ -512,8 +512,8 @@ class LifecycleNotification(Base, TimestampMixin):
         cascade="all, delete-orphan",
         order_by="NotificationDeliveryAttempt.attempt_number",
     )
-    instrument: Mapped["Instrument"] = relationship("Instrument", foreign_keys=[instrument_id])
-    institution: Mapped["Institution"] = relationship("Institution", foreign_keys=[institution_id])
+    instrument: Mapped[Optional["Instrument"]] = relationship("Instrument", foreign_keys=[instrument_id])
+    institution: Mapped[Optional["Institution"]] = relationship("Institution", foreign_keys=[institution_id])
 
     # Compatibility properties for tests and view layer
     @property

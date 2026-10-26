@@ -18,7 +18,7 @@ from app.modules.documents.scanner import get_scanner_provider
 from app.modules.audit.service import log_audit_event
 from app.common.exceptions import NotFoundException, ForbiddenException
 
-router = APIRouter(prefix="/api/v1", tags=["documents"])
+router = APIRouter(tags=["documents"])
 
 
 @router.post("/instruments/{instrument_id}/documents")
@@ -180,6 +180,28 @@ async def create_and_upload_document(
     try:
         from app.modules.validation.engine import trigger_post_save_validation
         trigger_post_save_validation(db, doc.instrument_id, triggered_by_user_id=current_user.id)
+    except Exception:
+        pass
+
+    # Module 5: Emit material event notifications & admin oversight
+    try:
+        from app.modules.lifecycle.event_notification_service import emit_material_event
+        emit_material_event(
+            db=db,
+            event_type="DOCUMENT_UPLOADED",
+            entity_type="DOCUMENT",
+            entity_id=doc.id,
+            actor_user=current_user,
+            instrument_id=instrument.id,
+            institution_id=instrument.institution_id,
+            resulting_state=scan_result.status,
+            details={
+                "document_type": category,
+                "filename": file.filename,
+                "reference_number": instrument.reference_number,
+            },
+        )
+        db.commit()
     except Exception:
         pass
     

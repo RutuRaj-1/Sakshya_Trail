@@ -263,7 +263,7 @@ def _list_instrument_findings(
 )
 def create_validation_run_direct(
     instrument_id: str,
-    payload: RunValidationRequest,
+    payload: RunValidationRequest = RunValidationRequest(),
     db: Session = Depends(get_db),
     current_user: User = Depends(
         require_roles(

@@ -306,9 +306,30 @@ def create_release_request(
             "instrument_id": req.instrument_id,
             "institution_id": req.institution_id,
             "request_type": req.request_type,
-            "policy_profile_id": req.policy_profile_id,
         },
     )
+
+    # Module 5: Emit material event notifications & admin oversight
+    try:
+        from app.modules.lifecycle.event_notification_service import emit_material_event
+        emit_material_event(
+            db=db,
+            event_type="RELEASE_REQUEST_SUBMITTED",
+            entity_type="RELEASE_CASE",
+            entity_id=req.id,
+            actor_user=current_user,
+            instrument_id=req.instrument_id,
+            institution_id=req.institution_id,
+            resulting_state=req.workflow_status,
+            details={
+                "case_id": req.case_number,
+                "request_type": req.request_type,
+                "reason": req.request_reason,
+            },
+        )
+        db.commit()
+    except Exception:
+        pass
 
     return req
 

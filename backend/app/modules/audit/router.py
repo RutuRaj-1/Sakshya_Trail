@@ -38,12 +38,36 @@ def verify_audit_integrity(
     Identifies the earliest detected inconsistency if any.
     """
     from app.modules.dashboard.audit_query_service import AuditQueryService
-    return AuditQueryService.verify_audit_log_integrity(
+    result = AuditQueryService.verify_audit_log_integrity(
         db=db,
         current_user=current_user,
         sample_size=sample_size,
         start_sequence=start_sequence,
     )
+
+    try:
+        from app.modules.lifecycle.event_notification_service import emit_material_event
+        is_intact = result.get("is_chain_intact", False)
+        event_type = "AUDIT_CHAIN_VERIFICATION_PASSED" if is_intact else "AUDIT_CHAIN_VERIFICATION_FAILED"
+        inconsistency = result.get("first_inconsistency") or {}
+        emit_material_event(
+            db=db,
+            event_type=event_type,
+            entity_type="AUDIT_CHAIN",
+            entity_id="audit_ledger",
+            actor_user=current_user,
+            resulting_state="PASS" if is_intact else "TAMPER_DETECTED",
+            details={
+                "total_events": result.get("verified_count", 0),
+                "broken_sequence_number": inconsistency.get("sequence_number", "UNKNOWN"),
+                "failure_type": inconsistency.get("failure_type", "NONE"),
+            },
+        )
+        db.commit()
+    except Exception:
+        pass
+
+    return result
 
 
 @router.get("/events")

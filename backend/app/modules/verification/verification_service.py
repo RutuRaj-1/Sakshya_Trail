@@ -369,6 +369,31 @@ def dispatch_verification_request(
         },
     )
 
+    # Module 5: Emit material event notifications & admin oversight
+    try:
+        from app.modules.lifecycle.event_notification_service import emit_material_event
+        event_name = "SIMULATED_BANK_RESPONSE_RECORDED" if resp.is_simulated else "BANK_VERIFICATION_RECEIVED"
+        emit_material_event(
+            db=db,
+            event_type=event_name,
+            entity_type="VERIFICATION_RESPONSE",
+            entity_id=resp.id,
+            actor_user=current_user,
+            instrument_id=instrument.id,
+            institution_id=instrument.institution_id,
+            resulting_state=final_result,
+            details={
+                "bank_status": final_result,
+                "reference_number": instrument.reference_number,
+                "is_simulated": resp.is_simulated,
+            },
+            is_mock=bool(resp.is_simulated),
+            mock_disclaimer="SIMULATED DEMO RESPONSE — DOES NOT CONSTITUTE GENUINE BANK CONFIRMATION" if resp.is_simulated else None,
+        )
+        db.commit()
+    except Exception:
+        pass
+
     return resp
 
 

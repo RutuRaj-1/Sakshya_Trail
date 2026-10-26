@@ -39,34 +39,44 @@ export interface NotificationDeliveryAttempt {
 
 export interface LifecycleNotification {
   id: string;
-  instrument_id: string;
+  instrument_id?: string | null;
+  institution_id?: string | null;
   event_type: string;
   milestone_days?: number | null;
+  reminder_milestone_days?: number | null;
   recipient_role: string;
   recipient_user_id?: string | null;
-  channel: NotificationChannel;
-  status: NotificationDeliveryStatus;
+  channel: NotificationChannel | string;
+  status: NotificationDeliveryStatus | string;
   template_id?: string | null;
-  template_version?: string | null;
-  rendered_title: string;
-  rendered_message: string;
+  template_version?: string | number | null;
+  title?: string;
+  message?: string;
+  payload_metadata_json?: string | null;
+  rendered_title?: string;
+  rendered_message?: string;
   retry_count: number;
   max_retries: number;
   last_attempted_at?: string | null;
   final_delivered_at?: string | null;
+  delivered_at?: string | null;
   is_mock: boolean;
   mock_disclaimer?: string | null;
   is_read: boolean;
   read_at?: string | null;
   failure_category?: string | null;
   failure_details?: string | null;
+  failure_reason?: string | null;
   created_at: string;
-  attempts: NotificationDeliveryAttempt[];
+  attempts?: NotificationDeliveryAttempt[];
 }
 
 export interface NotificationListResponse {
-  notifications: LifecycleNotification[];
+  notifications?: LifecycleNotification[];
+  items?: LifecycleNotification[];
   total_count: number;
+  page?: number;
+  limit?: number;
 }
 
 export interface LifecycleEvaluation {

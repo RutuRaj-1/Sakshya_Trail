@@ -24,6 +24,9 @@ export const DocumentsEvidencePage: React.FC = () => {
   const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const isInstitutionUser = user?.role === 'INSTITUTION_USER';
+  const canUpload = ['SYSTEM_ADMIN', 'SCRUTINY_OFFICER', 'BRANCH_HEAD', 'INSTITUTION_USER'].includes(
+    user?.role || ''
+  );
 
   // Selection state
   const initialInstrumentId = searchParams.get('instrument_id') || '';
@@ -153,18 +156,20 @@ export const DocumentsEvidencePage: React.FC = () => {
           </p>
         </div>
 
-        <button
-          type="button"
-          onClick={() => {
-            setUploadError(null);
-            setIsUploadOpen(true);
-          }}
-          disabled={!selectedInstrumentId}
-          className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#0F766E] hover:bg-[#09544E] text-white text-xs font-semibold rounded-[8px] shadow-xs transition disabled:opacity-50 cursor-pointer shrink-0"
-        >
-          <UploadCloud className="w-4 h-4" />
-          <span>Upload Certified Evidence</span>
-        </button>
+        {canUpload && (
+          <button
+            type="button"
+            onClick={() => {
+              setUploadError(null);
+              setIsUploadOpen(true);
+            }}
+            disabled={!selectedInstrumentId}
+            className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#0F766E] hover:bg-[#09544E] text-white text-xs font-semibold rounded-[8px] shadow-xs transition disabled:opacity-50 cursor-pointer shrink-0"
+          >
+            <UploadCloud className="w-4 h-4" />
+            <span>Upload Certified Evidence</span>
+          </button>
+        )}
       </div>
 
       {/* Main Grid: Selector Column & Document View Column */}
