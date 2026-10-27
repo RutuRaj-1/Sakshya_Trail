@@ -16,8 +16,8 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178C6.svg?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4.0-38B2AC.svg?logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 [![Vite](https://img.shields.io/badge/Vite-8.0-646CFF.svg?logo=vite&logoColor=white)](https://vitejs.dev/)
-[![Pytest](https://img.shields.io/badge/Pytest-476%20Passed-success.svg?logo=pytest&logoColor=white)](https://docs.pytest.org/)
-[![Vitest](https://img.shields.io/badge/Vitest-50%20Passed-success.svg?logo=vitest&logoColor=white)](https://vitest.dev/)
+[![Pytest](https://img.shields.io/badge/Pytest-527%20Passed-success.svg?logo=pytest&logoColor=white)](https://docs.pytest.org/)
+[![Vitest](https://img.shields.io/badge/Vitest-94%20Passed-success.svg?logo=vitest&logoColor=white)](https://vitest.dev/)
 [![License](https://img.shields.io/badge/License-Proprietary%20%2F%20Regulatory-blue.svg)](#)
 
 </div>
@@ -309,25 +309,142 @@ npm run dev
 
 ---
 
-## 8. Pre-Configured Demo Accounts (1-Click Autofill)
+---
+
+## 8. Synthetic Demonstration Environment (20 Institutions, 10 Pune / 10 Mumbai, 80 FDRs)
+
+SakshyaTrail incorporates a dedicated, isolated, and fully deterministic **Synthetic Demonstration Environment** designed for reproducible SIH evaluation without contaminating or altering the persistent development database.
+
+### 8.1 Dedicated Database Architecture & Safety Invariants
+
+- **Isolated Target Database**: Configured via `SAKSHYATRAIL_DEMO_DATABASE_URL` (defaults to `sqlite:///./fdr_sentinel_demo.db`).
+- **Persistent Data Protection**: The primary development database (`fdr_sentinel.db`) is strictly guarded against destructive operations. Destructive reset commands (`--reset-demo`) assert that the target database explicitly contains `demo` in its path and will hard-fail if targeted against the persistent development database.
+- **Append-Only Audit Guard**: Audit events are cryptographically chained ($H_n = \text{SHA256}(H_{n-1} + E_n)$) and protected by SQLite database triggers prohibiting `UPDATE` or `DELETE`. Demonstration resets re-initialize a fresh schema rather than modifying historical ledger rows.
+
+### 8.2 Seeder CLI Workflow
+
+```bash
+cd backend
+.\.venv\Scripts\Activate.ps1
+
+# 1. Dry Run Mode: Inspect planned entities and validations with ZERO database modifications
+python scripts/demo_seed.py --dry-run
+
+# 2. Apply Mode: Reconcile or provision the 20 institutions, 80 FDRs, and nine-stage workflows
+python scripts/demo_seed.py --apply
+
+# 3. Verify Mode: Assert exact counts, foreign key integrity, and audit chain continuity
+python scripts/demo_seed.py --verify
+
+# 4. Clean Reset (Demo DB Only): Safely re-initialize the isolated demonstration schema
+python scripts/demo_seed.py --reset-demo --apply
+```
+
+### 8.3 The 20 Synthetic Institutions Directory
+
+All 20 institutions are visibly labelled `DEMO DATA — SYNTHETIC INSTITUTION` and use reserved example domains.
+
+#### Group A — Pune Jurisdiction (10 Institutions)
+
+| Code | Legal Name / Display Name | City | State | Nodal Officer Account |
+| :--- | :--- | :--- | :--- | :--- |
+| `DEMO-PUN-001` | DEMO — Deccan Valley Institute of Technology (SYNTHETIC) | Pune | Maharashtra | `nodal.pun001@example.com` |
+| `DEMO-PUN-002` | DEMO — Sahyadri Applied Sciences College (SYNTHETIC) | Pune | Maharashtra | `nodal.pun002@example.com` |
+| `DEMO-PUN-003` | DEMO — Mula-Mutha Engineering Institute (SYNTHETIC) | Pune | Maharashtra | `nodal.pun003@example.com` |
+| `DEMO-PUN-004` | DEMO — Hinjawadi School of Technical Studies (SYNTHETIC) | Pune | Maharashtra | `nodal.pun004@example.com` |
+| `DEMO-PUN-005` | DEMO — Kothrud Institute of Applied Engineering (SYNTHETIC) | Pune | Maharashtra | `nodal.pun005@example.com` |
+| `DEMO-PUN-006` | DEMO — Pashan College of Technology (SYNTHETIC) | Pune | Maharashtra | `nodal.pun006@example.com` |
+| `DEMO-PUN-007` | DEMO — Baner Institute of Digital Engineering (SYNTHETIC) | Pune | Maharashtra | `nodal.pun007@example.com` |
+| `DEMO-PUN-008` | DEMO — Hadapsar Technical Sciences College (SYNTHETIC) | Pune | Maharashtra | `nodal.pun008@example.com` |
+| `DEMO-PUN-009` | DEMO — Pimpri Centre for Engineering Studies (SYNTHETIC) | Pune | Maharashtra | `nodal.pun009@example.com` |
+| `DEMO-PUN-010` | DEMO — Warje Institute of Industrial Technology (SYNTHETIC) | Pune | Maharashtra | `nodal.pun010@example.com` |
+
+#### Group B — Mumbai Jurisdiction (10 Institutions)
+
+| Code | Legal Name / Display Name | City | State | Nodal Officer Account |
+| :--- | :--- | :--- | :--- | :--- |
+| `DEMO-MUM-001` | DEMO — Harbourview Institute of Technology (SYNTHETIC) | Mumbai | Maharashtra | `nodal.mum001@example.com` |
+| `DEMO-MUM-002` | DEMO — Western Bay College of Engineering (SYNTHETIC) | Mumbai | Maharashtra | `nodal.mum002@example.com` |
+| `DEMO-MUM-003` | DEMO — Sahar Institute of Applied Sciences (SYNTHETIC) | Mumbai | Maharashtra | `nodal.mum003@example.com` |
+| `DEMO-MUM-004` | DEMO — Powai Technical Studies College (SYNTHETIC) | Mumbai | Maharashtra | `nodal.mum004@example.com` |
+| `DEMO-MUM-005` | DEMO — Dadar Institute of Engineering (SYNTHETIC) | Mumbai | Maharashtra | `nodal.mum005@example.com` |
+| `DEMO-MUM-006` | DEMO — Chembur Applied Technology College (SYNTHETIC) | Mumbai | Maharashtra | `nodal.mum006@example.com` |
+| `DEMO-MUM-007` | DEMO — Borivali Centre for Technical Education (SYNTHETIC) | Mumbai | Maharashtra | `nodal.mum007@example.com` |
+| `DEMO-MUM-008` | DEMO — Andheri Institute of Engineering Studies (SYNTHETIC) | Mumbai | Maharashtra | `nodal.mum008@example.com` |
+| `DEMO-MUM-009` | DEMO — Goregaon Technical Sciences College (SYNTHETIC) | Mumbai | Maharashtra | `nodal.mum009@example.com` |
+| `DEMO-MUM-010` | DEMO — Vikhroli College of Industrial Technology (SYNTHETIC) | Mumbai | Maharashtra | `nodal.mum010@example.com` |
+
+### 8.4 The 80-Instrument Portfolio & 20 Scenario Categories
+
+Each institution holds exactly 4 synthetic FDR instruments (80 total across Pune and Mumbai), covering 20 distinct statutory scenario categories:
+
+1. **Draft FDRs**: Newly initiated deposit records pending submission (`DRAFT`).
+2. **Submitted Instruments**: Registered records awaiting bureau scrutiny (`SUBMITTED`).
+3. **Complete Evidence Vault**: Valid text-extractable PDFs with verified SHA-256 byte hashes.
+4. **Missing Evidence Vault**: Instruments flagged for missing mandatory deposit certificate uploads.
+5. **Amount / Date Discrepancies**: Discrepancies detected by the deterministic validation engine (e.g. certificate principal differs from declared).
+6. **Suspected Duplicates**: Detected duplicate instruments requiring human reviewer scrutiny.
+7. **Scrutiny Officer Provenance**: Preserved review observations, correction requests, and officer notes.
+8. **Pending Bank Verification**: Dispatched verification requests awaiting channel response.
+9. **Simulated Matching Bank Confirmations**: Simulated gateway responses confirming matching details.
+10. **Simulated Mismatching Responses**: Gateway responses indicating deposit details discrepancy.
+11. **Verification Timeouts**: Unresponsive banking channel simulated fallback states.
+12. **Approaching Maturity (≤ 90 Days)**: Active instruments in the warning window triggering compliance reminders.
+13. **Matured / Overdue Term**: Expired deposits evaluated by the business clock requiring reinvestment.
+14. **Recorded Lifecycle Reminders**: Multi-tier notifications (90d, 60d, 30d, overdue) in the notification inbox.
+15. **Successor Renewal Lineages**: Acyclic parent-child lineage records linking matured deposits to renewed receipts.
+16. **Release Blocked by Mandatory Checklist**: Release applications blocked by active lien or incomplete evidence.
+17. **Release Blocked by Open Discrepancies**: Release cases gated due to unresolved scrutiny findings.
+18. **Awaiting Competent Authority Decision**: Verified cases pending statutory approval by `COMPETENT_AUTHORITY`.
+19. **Approved Cases with Recorded Orders**: Cases with statutory approval and Finance Officer release order (`RELEASE_ORDER_RECORDED`).
+20. **Executed Settlement & Closure**: Fully settled release cases with confirmed downstream bank actions and closure.
+
+### 8.5 Live Database Metrics Inventory (`fdr_sentinel_demo.db`)
+
+*Verified directly from the database via `python scripts/demo_seed.py --verify`:*
+
+| Metric Category | Database Count | Statutory Verification Status |
+| :--- | :--- | :--- |
+| **Active Synthetic Institutions** | **20** | Exactly 10 in Pune, 10 in Mumbai, 0 in other cities [PASS] |
+| **Synthetic FDR Instruments** | **80** | Exactly 4 per institution, Numeric(18,2) exact precision [PASS] |
+| **Document Files & Versions** | **80** | SHA-256 hashed, watermarked, deterministic text extracted [PASS] |
+| **Deterministic Validation Findings**| **8** | Discrepancies (amount, date) and duplicate flags [PASS] |
+| **Bank Verification Requests** | **16** | Simulated match, mismatch, and timeout requests [PASS] |
+| **Lifecycle Evaluations** | **12** | Active, Expiring-Soon (≤90d), and Matured states [PASS] |
+| **Predecessor-Successor Lineages** | **4** | Valid renewal chains, anti-cycle enforced [PASS] |
+| **Release & Discharge Cases** | **20** | Incomplete, Blocked, Approved, and Settled cases [PASS] |
+| **Statutory Release Decisions** | **8** | Exclusive to `COMPETENT_AUTHORITY` [PASS] |
+| **Release Orders Recorded** | **8** | Exclusive to `FINANCE_OFFICER` [PASS] |
+| **Cryptographic Audit Events** | **106** | Complete SHA-256 forward-linked chain verified [PASS] |
+
+### 8.6 Evidentiary & Integration Limitations
+
+1. **PDF Text Extraction vs. OCR**: Deterministic text extraction parses digitally generated PDFs containing text layers. It does not perform optical character recognition (OCR) on rasterized scans.
+2. **Simulated Host-to-Host Banking Gateways**: Bank verification requests and responses are simulated through internal adapters. Simulated confirmations are visibly flagged and cannot establish Level-3 bank confirmation without authorized external cryptographic tokens.
+3. **Simulated Telecommunications**: Notification dispatches (Email, SMS, WhatsApp) record delivery state events in the database inbox without invoking live external telecommunication gateways.
+
+---
+
+## 9. Pre-Configured Demo Accounts (1-Click Autofill)
 
 On the Sign In page (`/login`), click any role card under **"SIH Evaluator Demo Accounts"** to autofill verified credentials:
 
 | Role Code | Official Email | Default Password | Primary Portal Permissions |
 | :--- | :--- | :--- | :--- |
-| `SYSTEM_ADMIN` | `admin@aicte-india.org` | `AdminPassword@2026` | Unrestricted bureau administration, user provisioning, audit chain verification. |
+| `SYSTEM_ADMIN` | `admin@aicte-india.org` | `AdminPassword@2026` | Bureau administration, user provisioning, cryptographic audit chain verification. |
 | `SCRUTINY_OFFICER` | `scrutiny.verma@aicte-india.org` | `OfficerPassword@2026` | Discrepancy review queue, L2 officer verification, scrutiny observations. |
 | `BRANCH_HEAD` | `branch.head.north@aicte-india.org` | `BranchPassword@2026` | Regional oversight, queue reassignment, operational reporting, audit review. |
-| `COMPETENT_AUTHORITY`| `authority.member@aicte-india.org`| `AuthorityPassword@2026`| **Exclusive authority** to approve statutory FDR release/refund orders. |
-| `FINANCE_OFFICER` | `finance.officer@aicte-india.org` | `FinancePassword@2026` | Financial reconciliation, deposit valuation, release order execution. |
+| `COMPETENT_AUTHORITY`| `authority.member@aicte-india.org`| `AuthorityPassword@2026`| **Exclusive statutory authority** to approve release/refund orders. |
+| `FINANCE_OFFICER` | `finance.officer@aicte-india.org` | `FinancePassword@2026` | Financial reconciliation, deposit valuation, release order recording. |
 | `AUDITOR` | `auditor.compliance@aicte-india.org`| `AuditorPassword@2026` | **Strictly read-only access**: audit chain verification, evidence pack export. |
-| `INSTITUTION_USER` | `nodal.pune@mims-demo.ac.in` | `NodalPassword@2026` | **Strict single-tenant isolation**: views only Maharashtra Institute (MIMS) records. |
+| `INSTITUTION_USER` (Pune) | `nodal.pun001@example.com` | `NodalPassword@2026` | **Tenant-isolated**: Scoped strictly to Deccan Valley Institute (DEMO-PUN-001). |
+| `INSTITUTION_USER` (Mumbai)| `nodal.mum001@example.com` | `NodalPassword@2026` | **Tenant-isolated**: Scoped strictly to Harbourview Institute (DEMO-MUM-001). |
 
 ---
 
-## 9. Comprehensive Testing & Verification
+## 10. Comprehensive Testing & Verification
 
-The codebase includes an exhaustive test suite covering unit, integration, authorization, and cryptographic acceptance criteria.
+The codebase includes an exhaustive test suite covering unit, integration, authorization, multi-tenancy, and cryptographic acceptance criteria.
 
 ### Run Backend Tests (Pytest)
 
@@ -335,31 +452,29 @@ The codebase includes an exhaustive test suite covering unit, integration, autho
 cd backend
 .\.venv\Scripts\Activate.ps1
 
-# Run the complete test suite (476 tests)
+# Run the complete test suite (527 tests)
 pytest
 
 # Run tests with execution duration and coverage summary
 pytest -v --durations=10
 
-# Run specific module test suites
-pytest tests/test_sakshyatrail_prompt2_auth_integration.py
-pytest tests/test_module7_prompt5_audit_integrity.py
-pytest tests/test_module6_prompt5_e2e_acceptance.py
+# Run specific demonstration environment test suite
+pytest tests/test_demo_environment_20_institutions.py -v
 ```
-*Current test status: **476 passed**, 0 failed.*
+*Current test status: **527 passed**, 0 failed.*
 
 ### Run Frontend Tests (Vitest)
 
 ```bash
 cd frontend
 
-# Run all component and route integration tests (50 tests)
-npm run test
+# Run all component and route integration tests (94 tests)
+npm test
 
 # Or run Vitest directly
 npx vitest run
 ```
-*Current test status: **50 passed**, 0 failed.*
+*Current test status: **94 passed**, 0 failed.*
 
 ### Run Static Type Check & Production Bundle Build
 
@@ -372,7 +487,7 @@ npx tsc -b
 # Compile production bundle
 npm run build
 ```
-*Production build completes cleanly in ~680ms.*
+*Production build completes cleanly in ~680ms with 0 errors.*
 
 ---
 

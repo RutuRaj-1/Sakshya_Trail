@@ -9,7 +9,8 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker, Session
 from app.core.config import settings
 
-is_sqlite = settings.DATABASE_URL.startswith("sqlite")
+active_db_url = settings.active_database_url
+is_sqlite = active_db_url.startswith("sqlite")
 
 engine_kwargs: Dict[str, Any] = {
     "echo": False,
@@ -25,7 +26,7 @@ else:
         "pool_pre_ping": True,
     })
 
-engine = create_engine(settings.DATABASE_URL, **engine_kwargs)
+engine = create_engine(active_db_url, **engine_kwargs)
 
 SessionLocal = sessionmaker(
     autocommit=False,

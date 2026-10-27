@@ -390,8 +390,8 @@ def transition_finding_status(
     from app.common.exceptions import AppException, ForbiddenException, ConflictException
     from app.core.security import ROLE_SCRUTINY_OFFICER, ROLE_BRANCH_HEAD, ROLE_SYSTEM_ADMIN
 
-    # 1. Role permission: Only officers and admins can change finding status
-    allowed_roles = (ROLE_SCRUTINY_OFFICER, ROLE_BRANCH_HEAD, ROLE_SYSTEM_ADMIN)
+    # 1. Role permission: Only regulatory scrutiny officers can change finding status
+    allowed_roles = (ROLE_SCRUTINY_OFFICER, ROLE_BRANCH_HEAD)
     if actor_user.role not in allowed_roles:
         raise ForbiddenException(
             f"Role '{actor_user.role}' is not authorized to transition finding status. "
@@ -506,7 +506,7 @@ def assign_finding(
     from app.modules.auth.models import User
     from app.core.security import ROLE_SCRUTINY_OFFICER, ROLE_BRANCH_HEAD, ROLE_SYSTEM_ADMIN
 
-    allowed_roles = (ROLE_SCRUTINY_OFFICER, ROLE_BRANCH_HEAD, ROLE_SYSTEM_ADMIN)
+    allowed_roles = (ROLE_SCRUTINY_OFFICER, ROLE_BRANCH_HEAD)
     if actor_user.role not in allowed_roles:
         raise ForbiddenException("Not authorized to assign findings.")
 
@@ -613,7 +613,7 @@ def return_instrument_for_correction(
     from app.modules.instruments.models import Instrument
     from app.core.security import ROLE_SCRUTINY_OFFICER, ROLE_BRANCH_HEAD, ROLE_SYSTEM_ADMIN
 
-    allowed_roles = (ROLE_SCRUTINY_OFFICER, ROLE_BRANCH_HEAD, ROLE_SYSTEM_ADMIN)
+    allowed_roles = (ROLE_SCRUTINY_OFFICER, ROLE_BRANCH_HEAD)
     if actor_user.role not in allowed_roles:
         raise ForbiddenException("Only authorized officers can return a submission for correction.")
 

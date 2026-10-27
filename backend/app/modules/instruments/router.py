@@ -36,6 +36,8 @@ router = APIRouter(prefix="/instruments", tags=["Instruments"])
 def list_registered_instruments(
     search: Optional[str] = Query(None, description="Search by reference, bank name, or institution"),
     institution_id: Optional[str] = Query(None, description="Filter by parent institution ID"),
+    city: Optional[str] = Query(None, description="Filter by institution city (e.g. Pune, Mumbai)"),
+    is_synthetic: Optional[bool] = Query(None, description="Filter by synthetic demonstration status"),
     status_filter: Optional[str] = Query(None, alias="status", description="Filter by administrative status"),
     trust_level: Optional[str] = Query(None, description="Filter by trust level (L0-L3)"),
     maturity_start: Optional[date] = Query(None, description="Filter instruments maturing on or after date"),
@@ -57,6 +59,8 @@ def list_registered_instruments(
         current_user=current_user,
         search=search,
         institution_id=institution_id,
+        city=city,
+        is_synthetic=is_synthetic,
         status_filter=status_filter,
         trust_level=trust_level,
         maturity_start=maturity_start,

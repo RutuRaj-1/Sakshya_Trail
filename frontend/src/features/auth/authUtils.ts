@@ -160,11 +160,11 @@ export function canCreateReleaseRequest(role?: ApplicationRole): boolean {
 
 /**
  * Authorized roles for sanctioning/approving statutory release petitions.
- * Strictly COMPETENT_AUTHORITY (and SYSTEM_ADMIN).
+ * Strictly exclusive to COMPETENT_AUTHORITY.
  */
 export function canApproveRelease(role?: ApplicationRole): boolean {
   if (!role) return false;
-  return role === 'COMPETENT_AUTHORITY' || role === 'SYSTEM_ADMIN';
+  return role === 'COMPETENT_AUTHORITY';
 }
 
 /**

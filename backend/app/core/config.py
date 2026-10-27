@@ -64,9 +64,18 @@ class Settings(BaseSettings):
 
     # Database
     DATABASE_URL: str = "sqlite:///./fdr_sentinel.db"
+    SAKSHYATRAIL_DEMO_DATABASE_URL: str = "sqlite:///./fdr_sentinel_demo.db"
+    SAKSHYATRAIL_DEMO_MODE: bool = False
     DB_POOL_SIZE: int = 5
     DB_MAX_OVERFLOW: int = 10
     DB_TIMEOUT: int = 30
+
+    @property
+    def active_database_url(self) -> str:
+        import os
+        if self.SAKSHYATRAIL_DEMO_MODE or os.environ.get("SAKSHYATRAIL_DEMO_MODE", "").lower() in ("1", "true", "yes"):
+            return os.environ.get("SAKSHYATRAIL_DEMO_DATABASE_URL", self.SAKSHYATRAIL_DEMO_DATABASE_URL)
+        return os.environ.get("DATABASE_URL", self.DATABASE_URL)
 
     # Firebase Configuration (Supplied in PS 26265)
     FIREBASE_API_KEY: str = "AIzaSyAqqvkCHZutYjILCXT6Q-SzvGn88holAps"

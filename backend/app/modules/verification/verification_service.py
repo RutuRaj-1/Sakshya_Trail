@@ -42,7 +42,7 @@ from app.modules.verification.adapters import (
     AdapterResponseResult,
 )
 
-OFFICER_ROLES = {ROLE_SYSTEM_ADMIN, ROLE_SCRUTINY_OFFICER, ROLE_BRANCH_HEAD}
+OFFICER_ROLES = {ROLE_SCRUTINY_OFFICER, ROLE_BRANCH_HEAD}
 
 
 def _assert_officer_access(current_user: User) -> None:

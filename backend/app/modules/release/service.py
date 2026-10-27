@@ -483,13 +483,13 @@ def record_release_decision(
             )
 
     elif payload.decision_type in (ReleaseDecisionType.RETURN_FOR_CORRECTION, ReleaseDecisionType.RECOMMEND_FOR_AUTHORITY):
-        if current_user.role not in ("SCRUTINY_OFFICER", "BRANCH_HEAD", "SYSTEM_ADMIN"):
+        if current_user.role not in ("SCRUTINY_OFFICER", "BRANCH_HEAD"):
             raise ForbiddenException(
                 f"Only scrutiny officers may review or recommend release requests. Attempted by {current_user.role}."
             )
 
     elif payload.decision_type in (ReleaseDecisionType.SUBMIT, ReleaseDecisionType.CANCEL):
-        if current_user.role not in ("INSTITUTION_USER", "SYSTEM_ADMIN"):
+        if current_user.role not in ("INSTITUTION_USER",):
             raise ForbiddenException(
                 f"Action restricted to institution users. Attempted by {current_user.role}."
             )

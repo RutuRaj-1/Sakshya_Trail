@@ -1,0 +1,3226 @@
+{
+  "total_endpoints": 156,
+  "total_operations": 169,
+  "operations": [
+    {
+      "method": "GET",
+      "path": "/",
+      "operation_id": "root_info__get",
+      "summary": "Root Info",
+      "description": "Service welcome information and navigation links.",
+      "tags": [
+        "Root"
+      ],
+      "parameters": [],
+      "has_request_body": false,
+      "responses": [
+        "200"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/audit",
+      "operation_id": "list_audit_events_api_v1_audit_get",
+      "summary": "List Audit Events",
+      "description": "Lists audit events with multi-attribute filtering, search, and row-level tenant scoping.\nAuditors and internal officers inspect administrative trails; institution users are scoped to their institution.",
+      "tags": [
+        "Audit Trails"
+      ],
+      "parameters": [
+        "entity_type",
+        "entity_id",
+        "action",
+        "outcome",
+        "actor_email",
+        "actor_role",
+        "date_from",
+        "date_to",
+        "search",
+        "skip",
+        "limit"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/audit/events",
+      "operation_id": "list_audit_events_api_v1_audit_events_get",
+      "summary": "List Audit Events",
+      "description": "Lists audit events with multi-attribute filtering, search, and row-level tenant scoping.\nAuditors and internal officers inspect administrative trails; institution users are scoped to their institution.",
+      "tags": [
+        "Audit Trails"
+      ],
+      "parameters": [
+        "entity_type",
+        "entity_id",
+        "action",
+        "outcome",
+        "actor_email",
+        "actor_role",
+        "date_from",
+        "date_to",
+        "search",
+        "skip",
+        "limit"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/audit/events/{event_id}",
+      "operation_id": "get_audit_event_detail_api_v1_audit_events__event_id__get",
+      "summary": "Get Audit Event Detail",
+      "description": "Retrieves full recorded details and cryptographic hashes for a single audit event.",
+      "tags": [
+        "Audit Trails"
+      ],
+      "parameters": [
+        "event_id"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/audit/integrity",
+      "operation_id": "verify_audit_integrity_api_v1_audit_integrity_get",
+      "summary": "Verify Audit Integrity",
+      "description": "Replays and cryptographically verifies the SHA-256 audit event chain (PRD-FR-093).\nVerifies monotonic sequence continuity, block hash linking, and canonical payload integrity.\nIdentifies the earliest detected inconsistency if any.",
+      "tags": [
+        "Audit Trails"
+      ],
+      "parameters": [
+        "sample_size",
+        "start_sequence"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/audit/verify",
+      "operation_id": "verify_audit_integrity_api_v1_audit_verify_post",
+      "summary": "Verify Audit Integrity",
+      "description": "Replays and cryptographically verifies the SHA-256 audit event chain (PRD-FR-093).\nVerifies monotonic sequence continuity, block hash linking, and canonical payload integrity.\nIdentifies the earliest detected inconsistency if any.",
+      "tags": [
+        "Audit Trails"
+      ],
+      "parameters": [
+        "sample_size",
+        "start_sequence"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/change-password",
+      "operation_id": "change_password_api_v1_auth_change_password_post",
+      "summary": "Change Password",
+      "description": "Rotates user password after verifying current credentials.\nClears must_change_password flag upon successful rotation.",
+      "tags": [
+        "Authentication & Access Control"
+      ],
+      "parameters": [],
+      "has_request_body": true,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/login",
+      "operation_id": "login_api_v1_auth_login_post",
+      "summary": "Login",
+      "description": "Authenticates user, creates signed session, and sets secure HttpOnly cookie.",
+      "tags": [
+        "Authentication & Access Control"
+      ],
+      "parameters": [],
+      "has_request_body": true,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/logout",
+      "operation_id": "logout_api_v1_auth_logout_post",
+      "summary": "Logout",
+      "description": "Clears the HttpOnly session cookie and logs audit event.",
+      "tags": [
+        "Authentication & Access Control"
+      ],
+      "parameters": [],
+      "has_request_body": false,
+      "responses": [
+        "200"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/auth/me",
+      "operation_id": "get_current_user_profile_api_v1_auth_me_get",
+      "summary": "Get Current User Profile",
+      "description": "Returns server-verified identity of currently authenticated user.",
+      "tags": [
+        "Authentication & Access Control"
+      ],
+      "parameters": [],
+      "has_request_body": false,
+      "responses": [
+        "200"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/auth/roles",
+      "operation_id": "list_roles_api_v1_auth_roles_get",
+      "summary": "List Roles",
+      "description": "Returns official AICTE Regulation Bureau role definitions.",
+      "tags": [
+        "Authentication & Access Control"
+      ],
+      "parameters": [],
+      "has_request_body": false,
+      "responses": [
+        "200"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/auth/users",
+      "operation_id": "get_users_list_api_v1_auth_users_get",
+      "summary": "Get Users List",
+      "description": "List user accounts with pagination, search, and role filtering.\nRestricted to SYSTEM_ADMIN.",
+      "tags": [
+        "Authentication & Access Control"
+      ],
+      "parameters": [
+        "search",
+        "role",
+        "is_active",
+        "institution_id",
+        "skip",
+        "limit"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/users",
+      "operation_id": "provision_new_user_api_v1_auth_users_post",
+      "summary": "Provision New User",
+      "description": "Authorized endpoint for SYSTEM_ADMIN to provision new application accounts.\nEnforces role allow-list and institution scoping requirements.",
+      "tags": [
+        "Authentication & Access Control"
+      ],
+      "parameters": [],
+      "has_request_body": true,
+      "responses": [
+        "201",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/auth/users/{user_id}",
+      "operation_id": "get_user_profile_api_v1_auth_users__user_id__get",
+      "summary": "Get User Profile",
+      "description": "Retrieve one user profile.\nAuthorized for SYSTEM_ADMIN or the individual user themselves.",
+      "tags": [
+        "Authentication & Access Control"
+      ],
+      "parameters": [
+        "user_id"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/auth/users/{user_id}",
+      "operation_id": "update_user_api_v1_auth_users__user_id__patch",
+      "summary": "Update User",
+      "description": "Update permitted user profile fields (full name, role, institution association).\nRestricted to SYSTEM_ADMIN. Enforces last-administrator protection.",
+      "tags": [
+        "Authentication & Access Control"
+      ],
+      "parameters": [
+        "user_id"
+      ],
+      "has_request_body": true,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/users/{user_id}/reset-password",
+      "operation_id": "reset_user_password_api_v1_auth_users__user_id__reset_password_post",
+      "summary": "Reset User Password",
+      "description": "Administrative password reset procedure.\nSets temporary password and forces must_change_password on next login.\nReturns temporary password in response for the administrator to securely communicate.\nNever stores or logs raw password or secret in audit logs.",
+      "tags": [
+        "Authentication & Access Control"
+      ],
+      "parameters": [
+        "user_id"
+      ],
+      "has_request_body": true,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/users/{user_id}/status",
+      "operation_id": "toggle_user_status_api_v1_auth_users__user_id__status_post",
+      "summary": "Toggle User Status",
+      "description": "Activate or deactivate a user account.\nRestricted to SYSTEM_ADMIN.\nEnforces last-administrator protection to prevent accidental lockout of all admins.",
+      "tags": [
+        "Authentication & Access Control"
+      ],
+      "parameters": [
+        "user_id"
+      ],
+      "has_request_body": true,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/dashboard/audit/integrity",
+      "operation_id": "verify_audit_integrity_api_v1_dashboard_audit_integrity_get",
+      "summary": "Verify Audit Integrity",
+      "description": "Verifies tamper-evident audit log sequence and integrity (PRD-FR-093).\nStrictly restricted to Auditor, Admin, and Branch Head roles.",
+      "tags": [
+        "Module 7 Command Center"
+      ],
+      "parameters": [
+        "sample_size"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/dashboard/command-center",
+      "operation_id": "get_command_center_api_v1_dashboard_command_center_get",
+      "summary": "Get Command Center",
+      "description": "Aggregated Command Center cockpit response combining all key cards and queues.",
+      "tags": [
+        "Module 7 Command Center"
+      ],
+      "parameters": [
+        "window_days"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/dashboard/document-completeness",
+      "operation_id": "get_document_completeness_api_v1_dashboard_document_completeness_get",
+      "summary": "Get Document Completeness",
+      "description": "Category E: Document completeness checklist outcomes.\nExplicitly reports policy status when unconfigured.",
+      "tags": [
+        "Module 7 Command Center"
+      ],
+      "parameters": [
+        "institution_id"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/dashboard/history/{instrument_id}",
+      "operation_id": "get_instrument_history_api_v1_dashboard_history__instrument_id__get",
+      "summary": "Get Instrument History",
+      "description": "Unified historical timeline combining documents, field provenance, and lifecycle evaluations (PRD-FR-072).",
+      "tags": [
+        "Module 7 Command Center"
+      ],
+      "parameters": [
+        "instrument_id"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/dashboard/instruments/{instrument_id}/detail",
+      "operation_id": "get_instrument_detail_snapshot_api_v1_dashboard_instruments__instrument_id__detail_get",
+      "summary": "Get Instrument Detail Snapshot",
+      "description": "Returns complete multi-dimensional snapshot of an instrument:\ncurrent snapshot, document history, field provenance, lifecycle/lineage,\naudit timeline, and append-only scrutiny observations.",
+      "tags": [
+        "Module 7 Command Center"
+      ],
+      "parameters": [
+        "instrument_id"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/dashboard/instruments/{instrument_id}/observations",
+      "operation_id": "list_instrument_observations_api_v1_dashboard_instruments__instrument_id__observations_get",
+      "summary": "List Instrument Observations",
+      "description": "Lists all observations recorded for an instrument (redacting internal-only notes for institutions).",
+      "tags": [
+        "Module 7 Command Center"
+      ],
+      "parameters": [
+        "instrument_id"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/dashboard/instruments/{instrument_id}/observations",
+      "operation_id": "create_instrument_observation_api_v1_dashboard_instruments__instrument_id__observations_post",
+      "summary": "Create Instrument Observation",
+      "description": "Creates an append-only scrutiny observation note attached to the instrument.\nAuditors are strictly read-only.",
+      "tags": [
+        "Module 7 Command Center"
+      ],
+      "parameters": [
+        "instrument_id"
+      ],
+      "has_request_body": true,
+      "responses": [
+        "201",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/dashboard/maturity-load",
+      "operation_id": "get_maturity_load_api_v1_dashboard_maturity_load_get",
+      "summary": "Get Maturity Load",
+      "description": "Category G: Deterministic month-wise count and sum of maturing instruments.",
+      "tags": [
+        "Module 7 Command Center"
+      ],
+      "parameters": [
+        "calendar_year",
+        "institution_id",
+        "bank_name",
+        "assigned_office"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/dashboard/maturity-window",
+      "operation_id": "get_maturity_window_api_v1_dashboard_maturity_window_get",
+      "summary": "Get Maturity Window",
+      "description": "Category B: Instruments maturing within an inclusive selectable date window.",
+      "tags": [
+        "Module 7 Command Center"
+      ],
+      "parameters": [
+        "start_date",
+        "end_date",
+        "window_days",
+        "institution_id",
+        "assigned_office",
+        "bank_name",
+        "page",
+        "page_size"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/dashboard/metrics/dictionary",
+      "operation_id": "get_metric_dictionary_api_v1_dashboard_metrics_dictionary_get",
+      "summary": "Get Metric Dictionary",
+      "description": "Returns the central Metric Dictionary documentation (PRD-FR-077).\nGuarantees transparent definitions, calculation rules, inclusions, and exclusions.",
+      "tags": [
+        "Module 7 Command Center"
+      ],
+      "parameters": [
+        "category"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/dashboard/observations/{observation_id}/amend",
+      "operation_id": "amend_scrutiny_observation_api_v1_dashboard_observations__observation_id__amend_post",
+      "summary": "Amend Scrutiny Observation",
+      "description": "Amends an observation by creating a superseding observation.\nThe prior note is marked SUPERSEDED but remains intact and auditable.",
+      "tags": [
+        "Module 7 Command Center"
+      ],
+      "parameters": [
+        "observation_id"
+      ],
+      "has_request_body": true,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/dashboard/observations/{observation_id}/resolve",
+      "operation_id": "resolve_scrutiny_observation_api_v1_dashboard_observations__observation_id__resolve_post",
+      "summary": "Resolve Scrutiny Observation",
+      "description": "Resolves an observation with mandatory rationale.\nRequires officer or elevated authority.",
+      "tags": [
+        "Module 7 Command Center"
+      ],
+      "parameters": [
+        "observation_id"
+      ],
+      "has_request_body": true,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/dashboard/overdue-escalated",
+      "operation_id": "get_overdue_escalated_api_v1_dashboard_overdue_escalated_get",
+      "summary": "Get Overdue Escalated",
+      "description": "Category C: Overdue compliance actions and escalated cases.",
+      "tags": [
+        "Module 7 Command Center"
+      ],
+      "parameters": [
+        "institution_id",
+        "assigned_office",
+        "limit"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/dashboard/priority-queue",
+      "operation_id": "get_priority_queue_api_v1_dashboard_priority_queue_get",
+      "summary": "Get Priority Queue",
+      "description": "Category H: Transparent operational priority queue (PRD-FR-075).",
+      "tags": [
+        "Module 7 Command Center"
+      ],
+      "parameters": [
+        "min_score",
+        "institution_id",
+        "assigned_office",
+        "bank_name",
+        "page",
+        "page_size"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/dashboard/release-blockers",
+      "operation_id": "get_release_blockers_api_v1_dashboard_release_blockers_get",
+      "summary": "Get Release Blockers",
+      "description": "Category F: Active release requests obstructed by unmet mandatory checklist items.",
+      "tags": [
+        "Module 7 Command Center"
+      ],
+      "parameters": [
+        "institution_id",
+        "case_type",
+        "limit"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/dashboard/reports/evidence-pack/{instrument_id}",
+      "operation_id": "get_audit_evidence_pack_api_v1_dashboard_reports_evidence_pack__instrument_id__get",
+      "summary": "Get Audit Evidence Pack",
+      "description": "Authorized audit evidence pack extract containing document hashes, field provenance,\nobservation lineage, and audit events trail.",
+      "tags": [
+        "Module 7 Command Center"
+      ],
+      "parameters": [
+        "instrument_id"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/dashboard/reports/interventions",
+      "operation_id": "get_interventions_report_api_v1_dashboard_reports_interventions_get",
+      "summary": "Get Interventions Report",
+      "description": "Interventions Required Report (overdue, escalated, discrepancy, release blocker).",
+      "tags": [
+        "Module 7 Command Center"
+      ],
+      "parameters": [
+        "institution_id",
+        "assigned_office",
+        "intervention_type",
+        "severity",
+        "limit",
+        "skip"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/dashboard/reports/missing-documents",
+      "operation_id": "get_missing_documents_report_api_v1_dashboard_reports_missing_documents_get",
+      "summary": "Get Missing Documents Report",
+      "description": "Missing and Non-Compliant Documents Report.",
+      "tags": [
+        "Module 7 Command Center"
+      ],
+      "parameters": [
+        "institution_id",
+        "bank_name",
+        "assigned_office",
+        "checklist_outcome",
+        "severity",
+        "limit",
+        "skip"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/dashboard/reports/pending-verification",
+      "operation_id": "get_pending_verification_report_api_v1_dashboard_reports_pending_verification_get",
+      "summary": "Get Pending Verification Report",
+      "description": "Pending Verification Report with source status and simulated indicator.",
+      "tags": [
+        "Module 7 Command Center"
+      ],
+      "parameters": [
+        "institution_id",
+        "bank_name",
+        "assigned_office",
+        "trust_level",
+        "verification_status",
+        "limit",
+        "skip"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/dashboard/reports/upcoming-maturities",
+      "operation_id": "get_upcoming_maturities_report_api_v1_dashboard_reports_upcoming_maturities_get",
+      "summary": "Get Upcoming Maturities Report",
+      "description": "Upcoming Maturities Report with exact Command Center date basis and renewal status.",
+      "tags": [
+        "Module 7 Command Center"
+      ],
+      "parameters": [
+        "window_days",
+        "date_from",
+        "date_to",
+        "institution_id",
+        "bank_name",
+        "assigned_office",
+        "trust_level",
+        "status",
+        "limit",
+        "skip"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/dashboard/reports/{report_type}",
+      "operation_id": "get_operational_report_api_v1_dashboard_reports__report_type__get",
+      "summary": "Get Operational Report",
+      "description": "Generic parameterized dispatcher for operational report datasets.",
+      "tags": [
+        "Module 7 Command Center"
+      ],
+      "parameters": [
+        "report_type",
+        "window_days",
+        "date_from",
+        "date_to",
+        "institution_id",
+        "bank_name",
+        "assigned_office",
+        "trust_level",
+        "status",
+        "verification_status",
+        "checklist_outcome",
+        "intervention_type",
+        "severity",
+        "limit",
+        "skip"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/dashboard/reports/{report_type}/export/csv",
+      "operation_id": "export_report_csv_api_v1_dashboard_reports__report_type__export_csv_get",
+      "summary": "Export Report Csv",
+      "description": "Exports operational report as secure CSV with formula injection defense and metadata block.\nAudited in compliance with regulatory trail requirements.",
+      "tags": [
+        "Module 7 Command Center"
+      ],
+      "parameters": [
+        "report_type",
+        "window_days",
+        "date_from",
+        "date_to",
+        "institution_id",
+        "bank_name",
+        "assigned_office",
+        "trust_level",
+        "status",
+        "verification_status",
+        "checklist_outcome",
+        "intervention_type",
+        "severity",
+        "limit"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/dashboard/reports/{report_type}/export/pdf",
+      "operation_id": "export_report_pdf_api_v1_dashboard_reports__report_type__export_pdf_get",
+      "summary": "Export Report Pdf",
+      "description": "Exports operational report as official PDF with ReportLab tabular layout and sensitivity label.\nAudited in compliance with regulatory trail requirements.",
+      "tags": [
+        "Module 7 Command Center"
+      ],
+      "parameters": [
+        "report_type",
+        "window_days",
+        "date_from",
+        "date_to",
+        "institution_id",
+        "bank_name",
+        "assigned_office",
+        "trust_level",
+        "status",
+        "verification_status",
+        "checklist_outcome",
+        "intervention_type",
+        "severity",
+        "limit"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/dashboard/search",
+      "operation_id": "search_instruments_api_v1_dashboard_search_get",
+      "summary": "Search Instruments",
+      "description": "Common role-scoped search for FDR instruments with sorting and pagination (PRD-FR-071).",
+      "tags": [
+        "Module 7 Command Center"
+      ],
+      "parameters": [
+        "q",
+        "institution_id",
+        "bank_name",
+        "assigned_office",
+        "status",
+        "trust_level",
+        "maturity_from",
+        "maturity_to",
+        "issue_from",
+        "issue_to",
+        "min_amount",
+        "max_amount",
+        "has_discrepancies",
+        "priority_category",
+        "sort_by",
+        "sort_order",
+        "skip",
+        "limit"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/dashboard/search/instruments",
+      "operation_id": "search_instruments_api_v1_dashboard_search_instruments_get",
+      "summary": "Search Instruments",
+      "description": "Common role-scoped search for FDR instruments with sorting and pagination (PRD-FR-071).",
+      "tags": [
+        "Module 7 Command Center"
+      ],
+      "parameters": [
+        "q",
+        "institution_id",
+        "bank_name",
+        "assigned_office",
+        "status",
+        "trust_level",
+        "maturity_from",
+        "maturity_to",
+        "issue_from",
+        "issue_to",
+        "min_amount",
+        "max_amount",
+        "has_discrepancies",
+        "priority_category",
+        "sort_by",
+        "sort_order",
+        "skip",
+        "limit"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/dashboard/search/release-cases",
+      "operation_id": "search_release_cases_api_v1_dashboard_search_release_cases_get",
+      "summary": "Search Release Cases",
+      "description": "Role-scoped search for Release & Refund cases with sorting and pagination.",
+      "tags": [
+        "Module 7 Command Center"
+      ],
+      "parameters": [
+        "q",
+        "institution_id",
+        "request_type",
+        "workflow_status",
+        "readiness_outcome",
+        "created_from",
+        "created_to",
+        "sort_by",
+        "sort_order",
+        "skip",
+        "limit"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/dashboard/status-counts",
+      "operation_id": "get_status_counts_api_v1_dashboard_status_counts_get",
+      "summary": "Get Status Counts",
+      "description": "Category A: Status counts breakdown (Active, Expiring Soon, Matured, Renewed, Released, Pending).",
+      "tags": [
+        "Module 7 Command Center"
+      ],
+      "parameters": [
+        "window_days",
+        "institution_id",
+        "assigned_office",
+        "bank_name",
+        "trust_level"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/dashboard/summary",
+      "operation_id": "get_dashboard_summary_api_v1_dashboard_summary_get",
+      "summary": "Get Dashboard Summary",
+      "description": "Returns scoped operational metrics for the Module 1 dashboard.\nMaintained for complete backward compatibility.",
+      "tags": [
+        "Module 7 Command Center"
+      ],
+      "parameters": [],
+      "has_request_body": false,
+      "responses": [
+        "200"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/dashboard/verification-queue",
+      "operation_id": "get_verification_queue_api_v1_dashboard_verification_queue_get",
+      "summary": "Get Verification Queue",
+      "description": "Category D: Outstanding verification requests, aging, and source-unavailable cases.",
+      "tags": [
+        "Module 7 Command Center"
+      ],
+      "parameters": [
+        "institution_id",
+        "bank_name",
+        "limit"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/documents/{document_id}",
+      "operation_id": "get_document_detail_api_v1_documents__document_id__get",
+      "summary": "Get Document Detail",
+      "description": "Retrieve complete document metadata including all versions.",
+      "tags": [
+        "documents"
+      ],
+      "parameters": [
+        "document_id"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/documents/{document_id}/versions",
+      "operation_id": "upload_document_new_version_api_v1_documents__document_id__versions_post",
+      "summary": "Upload Document New Version",
+      "description": "Upload a new version for an existing document.\nEnforces Auditor read-only restrictions, scans file, runs extraction,\nand triggers cross-validation.",
+      "tags": [
+        "documents"
+      ],
+      "parameters": [
+        "document_id"
+      ],
+      "has_request_body": true,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/documents/{document_id}/versions/{version_id}/content",
+      "operation_id": "download_document_content_api_v1_documents__document_id__versions__version_id__content_get",
+      "summary": "Download Document Content",
+      "description": "Download document version content with security checks.\n\n- Verifies document and version association\n- Checks access authorization\n- Refuses unsafe/quarantined files\n- Returns file with safe headers",
+      "tags": [
+        "documents"
+      ],
+      "parameters": [
+        "document_id",
+        "version_id"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/documents/{document_id}/versions/{version_id}/extract",
+      "operation_id": "trigger_version_extraction_endpoint_api_v1_documents__document_id__versions__version_id__extract_post",
+      "summary": "Trigger Version Extraction Endpoint",
+      "description": "Trigger or re-run automated extraction for a clean document version.",
+      "tags": [
+        "documents"
+      ],
+      "parameters": [
+        "document_id",
+        "version_id"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/findings/queue",
+      "operation_id": "get_review_queue_endpoint_api_v1_findings_queue_get",
+      "summary": "Discrepancy review queue with transparent priority scoring and tenant filtering",
+      "description": "",
+      "tags": [
+        "Validation \u2014 Module 3"
+      ],
+      "parameters": [
+        "status",
+        "severity",
+        "category",
+        "rule_id",
+        "instrument_id",
+        "institution_id",
+        "search",
+        "sort_by",
+        "sort_order",
+        "skip",
+        "limit"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/findings/{finding_id}",
+      "operation_id": "get_finding_by_id_direct_api_v1_findings__finding_id__get",
+      "summary": "Retrieve finding by ID with tenant scope check",
+      "description": "",
+      "tags": [
+        "Validation \u2014 Module 3"
+      ],
+      "parameters": [
+        "finding_id"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/findings/{finding_id}/assign",
+      "operation_id": "assign_finding_endpoint_api_v1_findings__finding_id__assign_post",
+      "summary": "Assign or reassign a finding to an authorized officer",
+      "description": "",
+      "tags": [
+        "Validation \u2014 Module 3"
+      ],
+      "parameters": [
+        "finding_id"
+      ],
+      "has_request_body": true,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/findings/{finding_id}/observations",
+      "operation_id": "add_finding_observation_endpoint_api_v1_findings__finding_id__observations_post",
+      "summary": "Add an officer review observation note to a finding",
+      "description": "",
+      "tags": [
+        "Validation \u2014 Module 3"
+      ],
+      "parameters": [
+        "finding_id"
+      ],
+      "has_request_body": true,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/findings/{finding_id}/re-evaluate",
+      "operation_id": "re_evaluate_finding_endpoint_api_v1_findings__finding_id__re_evaluate_post",
+      "summary": "Re-evaluate a specific finding",
+      "description": "",
+      "tags": [
+        "Validation \u2014 Module 3"
+      ],
+      "parameters": [
+        "finding_id"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/findings/{finding_id}/status",
+      "operation_id": "transition_finding_status_endpoint_api_v1_findings__finding_id__status_post",
+      "summary": "Transition finding status (OPEN -> IN_REVIEW -> RESOLVED/DISMISSED)",
+      "description": "",
+      "tags": [
+        "Validation \u2014 Module 3"
+      ],
+      "parameters": [
+        "finding_id"
+      ],
+      "has_request_body": true,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/health/live",
+      "operation_id": "liveness_check_api_v1_health_live_get",
+      "summary": "Liveness Probe",
+      "description": "Kubernetes / system liveness check.\nConfirms the FastAPI worker process is active and receiving requests.",
+      "tags": [
+        "System Health & Diagnostics"
+      ],
+      "parameters": [],
+      "has_request_body": false,
+      "responses": [
+        "200"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/health/ready",
+      "operation_id": "readiness_check_api_v1_health_ready_get",
+      "summary": "Readiness Probe",
+      "description": "Readiness check reporting whether PostgreSQL / database layer is reachable.\nExecutes a database ping ('SELECT 1') and returns components status.",
+      "tags": [
+        "System Health & Diagnostics"
+      ],
+      "parameters": [],
+      "has_request_body": false,
+      "responses": [
+        "200"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/institutions",
+      "operation_id": "list_registered_institutions_api_v1_institutions_get",
+      "summary": "List Registered Institutions",
+      "description": "List institutions visible to the caller:\n- INSTITUTION_USER: Restricted to reading their own institution record.\n- Internal roles: Full regulatory inspection visibility across the system.",
+      "tags": [
+        "Institutions"
+      ],
+      "parameters": [
+        "search",
+        "city",
+        "state",
+        "institution_type",
+        "is_active",
+        "is_synthetic",
+        "skip",
+        "limit"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/institutions",
+      "operation_id": "register_institution_api_v1_institutions_post",
+      "summary": "Register Institution",
+      "description": "Create a new registered institution.\nAuthorized for SYSTEM_ADMIN only.\nValidates normalized code, uniqueness, and creates an audit trail entry.",
+      "tags": [
+        "Institutions"
+      ],
+      "parameters": [],
+      "has_request_body": true,
+      "responses": [
+        "201",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/institutions/{institution_id}",
+      "operation_id": "retrieve_institution_api_v1_institutions__institution_id__get",
+      "summary": "Retrieve Institution",
+      "description": "Retrieve one authorized institution record.\n- INSTITUTION_USER: Allowed only if institution_id matches their assigned institution.\n- Inactive institutions remain retrievable for historical/audit continuity.",
+      "tags": [
+        "Institutions"
+      ],
+      "parameters": [
+        "institution_id"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/institutions/{institution_id}",
+      "operation_id": "patch_institution_api_v1_institutions__institution_id__patch",
+      "summary": "Patch Institution",
+      "description": "Update permitted fields of an institution:\n- SYSTEM_ADMIN: May update institutional, taxonomic, and contact fields.\n- INSTITUTION_USER: May update ONLY authorized contact and address details of their own institution.\n- All other roles: Read-only access; modification attempts are rejected with 403 Forbidden.",
+      "tags": [
+        "Institutions"
+      ],
+      "parameters": [
+        "institution_id"
+      ],
+      "has_request_body": true,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/institutions/{institution_id}/status",
+      "operation_id": "update_institution_status_api_v1_institutions__institution_id__status_post",
+      "summary": "Update Institution Status",
+      "description": "Controlled activation/deactivation of an institution.\nAuthorized for SYSTEM_ADMIN only.\nNo physical deletions are performed to preserve historical records and audit events.",
+      "tags": [
+        "Institutions"
+      ],
+      "parameters": [
+        "institution_id"
+      ],
+      "has_request_body": true,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/instruments",
+      "operation_id": "list_registered_instruments_api_v1_instruments_get",
+      "summary": "List Registered Instruments",
+      "description": "Retrieve registered financial instruments with pagination, search, filters, and allow-listed sorting.\nEnforces record scoping for INSTITUTION_USER.",
+      "tags": [
+        "Instruments"
+      ],
+      "parameters": [
+        "search",
+        "institution_id",
+        "city",
+        "is_synthetic",
+        "status",
+        "trust_level",
+        "maturity_start",
+        "maturity_end",
+        "maturity_indicator",
+        "sort_by",
+        "sort_order",
+        "skip",
+        "limit"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/instruments",
+      "operation_id": "record_instrument_api_v1_instruments_post",
+      "summary": "Record Instrument",
+      "description": "Record an initial Fixed Deposit Receipt (FDR) deposit.\n- Enforces ownership scoping for INSTITUTION_USER.\n- Requires active institution.\n- Validates amount and date boundaries.\n- Rejects trust escalation; starts at L0_DECLARED.\n- Conservative duplicate warning path.",
+      "tags": [
+        "Instruments"
+      ],
+      "parameters": [],
+      "has_request_body": true,
+      "responses": [
+        "201",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/instruments/summary",
+      "operation_id": "get_summary_metrics_api_v1_instruments_summary_get",
+      "summary": "Get Summary Metrics",
+      "description": "Executive summary metrics for statutory deposit oversight.",
+      "tags": [
+        "Instruments"
+      ],
+      "parameters": [],
+      "has_request_body": false,
+      "responses": [
+        "200"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/instruments/{id}/continuity",
+      "operation_id": "get_instrument_continuity_endpoint_api_v1_instruments__id__continuity_get",
+      "summary": "Get continuity gap/overlap assessment for instrument's active lineage link",
+      "description": "",
+      "tags": [
+        "Module 5 \u2014 Instrument Lifecycle & Lineage"
+      ],
+      "parameters": [
+        "id"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/instruments/{id}/lifecycle",
+      "operation_id": "get_instrument_latest_lifecycle_endpoint_api_v1_instruments__id__lifecycle_get",
+      "summary": "Get latest lifecycle evaluation snapshot for an instrument",
+      "description": "",
+      "tags": [
+        "Module 5 \u2014 Instrument Lifecycle & Lineage"
+      ],
+      "parameters": [
+        "id"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/instruments/{id}/lineage",
+      "operation_id": "get_instrument_lineage_tree_endpoint_api_v1_instruments__id__lineage_get",
+      "summary": "Get complete renewal lineage ancestry and successor chain for an instrument",
+      "description": "",
+      "tags": [
+        "Module 5 \u2014 Instrument Lifecycle & Lineage"
+      ],
+      "parameters": [
+        "id"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/instruments/{id}/renew",
+      "operation_id": "create_renewal_successor_endpoint_api_v1_instruments__id__renew_post",
+      "summary": "Create brand new successor instrument and link to predecessor",
+      "description": "",
+      "tags": [
+        "Module 5 \u2014 Instrument Lifecycle & Lineage"
+      ],
+      "parameters": [
+        "id"
+      ],
+      "has_request_body": true,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/instruments/{id}/renewal-draft",
+      "operation_id": "initiate_renewal_draft_endpoint_api_v1_instruments__id__renewal_draft_get",
+      "summary": "Initiate renewal draft for predecessor instrument",
+      "description": "",
+      "tags": [
+        "Module 5 \u2014 Instrument Lifecycle & Lineage"
+      ],
+      "parameters": [
+        "id"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/instruments/{instrument_id}",
+      "operation_id": "retrieve_instrument_api_v1_instruments__instrument_id__get",
+      "summary": "Retrieve Instrument",
+      "description": "Retrieve one authorized instrument by ID.\nScoped for INSTITUTION_USER.",
+      "tags": [
+        "Instruments"
+      ],
+      "parameters": [
+        "instrument_id"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/instruments/{instrument_id}",
+      "operation_id": "patch_instrument_api_v1_instruments__instrument_id__patch",
+      "summary": "Patch Instrument",
+      "description": "Update permitted registry fields on an instrument:\n- Scoped for INSTITUTION_USER to their own draft/registered instruments.\n- Scrutiny Officer can make registry corrections, with audit trail.\n- Modifying parent institution_id is prohibited.\n- Trust level escalation is prohibited.\n- Unsupported status transitions are rejected.",
+      "tags": [
+        "Instruments"
+      ],
+      "parameters": [
+        "instrument_id"
+      ],
+      "has_request_body": true,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/instruments/{instrument_id}/documents",
+      "operation_id": "create_and_upload_document_api_v1_instruments__instrument_id__documents_post",
+      "summary": "Create And Upload Document",
+      "description": "Create a new logical document and upload its first version.\n\n- Validates instrument exists and user can access it\n- Validates file upload (signature, size, type)\n- Scans file for malware\n- Records immutable version\n- Returns document and version metadata",
+      "tags": [
+        "documents"
+      ],
+      "parameters": [
+        "instrument_id"
+      ],
+      "has_request_body": true,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/instruments/{instrument_id}/documents",
+      "operation_id": "list_documents_by_instrument_api_v1_instruments__instrument_id__documents_get",
+      "summary": "List Documents By Instrument",
+      "description": "List documents for an instrument with pagination and filtering.",
+      "tags": [
+        "documents"
+      ],
+      "parameters": [
+        "instrument_id",
+        "offset",
+        "limit",
+        "category"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/instruments/{instrument_id}/findings",
+      "operation_id": "list_findings_direct_api_v1_instruments__instrument_id__findings_get",
+      "summary": "List validation findings for an instrument",
+      "description": "",
+      "tags": [
+        "Validation \u2014 Module 3"
+      ],
+      "parameters": [
+        "instrument_id",
+        "status",
+        "severity",
+        "category",
+        "sort_by",
+        "sort_order",
+        "skip",
+        "limit"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/instruments/{instrument_id}/notifications",
+      "operation_id": "get_instrument_notifications_endpoint_api_v1_instruments__instrument_id__notifications_get",
+      "summary": "Get tenancy-scoped notification history for an instrument",
+      "description": "",
+      "tags": [
+        "Module 5 \u2014 Instrument Lifecycle & Lineage"
+      ],
+      "parameters": [
+        "instrument_id",
+        "page",
+        "limit"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/instruments/{instrument_id}/return-for-correction",
+      "operation_id": "return_for_correction_endpoint_api_v1_instruments__instrument_id__return_for_correction_post",
+      "summary": "Return instrument to institution for correction with mandatory explanation",
+      "description": "",
+      "tags": [
+        "Validation \u2014 Module 3"
+      ],
+      "parameters": [
+        "instrument_id"
+      ],
+      "has_request_body": true,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/instruments/{instrument_id}/rules/{rule_id}/evaluate",
+      "operation_id": "evaluate_single_rule_endpoint_api_v1_instruments__instrument_id__rules__rule_id__evaluate_post",
+      "summary": "Evaluate a single allow-listed rule for testing/debugging",
+      "description": "",
+      "tags": [
+        "Validation \u2014 Module 3"
+      ],
+      "parameters": [
+        "instrument_id",
+        "rule_id"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/instruments/{instrument_id}/validation-runs",
+      "operation_id": "create_validation_run_direct_api_v1_instruments__instrument_id__validation_runs_post",
+      "summary": "Execute validation run for an instrument",
+      "description": "",
+      "tags": [
+        "Validation \u2014 Module 3"
+      ],
+      "parameters": [
+        "instrument_id"
+      ],
+      "has_request_body": true,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/instruments/{instrument_id}/validation-runs",
+      "operation_id": "list_validation_runs_direct_api_v1_instruments__instrument_id__validation_runs_get",
+      "summary": "List validation run history for an instrument",
+      "description": "",
+      "tags": [
+        "Validation \u2014 Module 3"
+      ],
+      "parameters": [
+        "instrument_id",
+        "skip",
+        "limit"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/lifecycle/admin/oversight",
+      "operation_id": "get_admin_oversight_endpoint_api_v1_lifecycle_admin_oversight_get",
+      "summary": "Get operational oversight notification feed (System Admin only)",
+      "description": "",
+      "tags": [
+        "Module 5 \u2014 Lifecycle & Renewal"
+      ],
+      "parameters": [
+        "page",
+        "limit"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/lifecycle/assessments/{instrument_id}",
+      "operation_id": "get_instrument_assessment_endpoint_api_v1_lifecycle_assessments__instrument_id__get",
+      "summary": "Get detailed lifecycle assessment for an instrument",
+      "description": "",
+      "tags": [
+        "Module 5 \u2014 Lifecycle & Renewal"
+      ],
+      "parameters": [
+        "instrument_id"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/lifecycle/batch-evaluate",
+      "operation_id": "batch_evaluate_endpoint_api_v1_lifecycle_batch_evaluate_post",
+      "summary": "Trigger batch lifecycle evaluation across instruments",
+      "description": "",
+      "tags": [
+        "Module 5 \u2014 Lifecycle & Renewal"
+      ],
+      "parameters": [],
+      "has_request_body": true,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/lifecycle/canonical-stages",
+      "operation_id": "get_canonical_stages_endpoint_api_v1_lifecycle_canonical_stages_get",
+      "summary": "Get authoritative nine-stage canonical workflow contracts",
+      "description": "Exposes the authoritative nine-stage FDR lifecycle contract connecting\nfrontend routes, backend APIs, permitted roles, action capabilities,\nand audit event definitions.",
+      "tags": [
+        "Module 5 \u2014 Lifecycle & Renewal"
+      ],
+      "parameters": [],
+      "has_request_body": false,
+      "responses": [
+        "200"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/lifecycle/demo/advance-clock",
+      "operation_id": "advance_demo_clock_endpoint_api_v1_lifecycle_demo_advance_clock_post",
+      "summary": "Advance demo simulated clock forward (Development / Demo only)",
+      "description": "",
+      "tags": [
+        "Module 5 \u2014 Lifecycle & Renewal"
+      ],
+      "parameters": [],
+      "has_request_body": true,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/lifecycle/demo/clock",
+      "operation_id": "get_demo_clock_status_endpoint_api_v1_lifecycle_demo_clock_get",
+      "summary": "Read current active clock state (development/demo inspection)",
+      "description": "",
+      "tags": [
+        "Module 5 \u2014 Lifecycle & Renewal"
+      ],
+      "parameters": [],
+      "has_request_body": false,
+      "responses": [
+        "200"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/lifecycle/demo/reset-clock",
+      "operation_id": "reset_demo_clock_endpoint_api_v1_lifecycle_demo_reset_clock_post",
+      "summary": "Reset simulated clock back to host system time",
+      "description": "",
+      "tags": [
+        "Module 5 \u2014 Lifecycle & Renewal"
+      ],
+      "parameters": [],
+      "has_request_body": false,
+      "responses": [
+        "200"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/lifecycle/evaluate",
+      "operation_id": "evaluate_lifecycle_endpoint_api_v1_lifecycle_evaluate_post",
+      "summary": "Perform on-demand or demo lifecycle evaluation for an instrument",
+      "description": "",
+      "tags": [
+        "Module 5 \u2014 Lifecycle & Renewal"
+      ],
+      "parameters": [],
+      "has_request_body": true,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/lifecycle/instruments/{id}/continuity",
+      "operation_id": "get_instrument_continuity_endpoint_api_v1_lifecycle_instruments__id__continuity_get",
+      "summary": "Get continuity gap/overlap assessment for instrument's active lineage link",
+      "description": "",
+      "tags": [
+        "Module 5 \u2014 Lifecycle & Renewal"
+      ],
+      "parameters": [
+        "id"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/lifecycle/instruments/{id}/lineage",
+      "operation_id": "get_instrument_lineage_tree_endpoint_api_v1_lifecycle_instruments__id__lineage_get",
+      "summary": "Get complete renewal lineage ancestry and successor chain for an instrument",
+      "description": "",
+      "tags": [
+        "Module 5 \u2014 Lifecycle & Renewal"
+      ],
+      "parameters": [
+        "id"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/lifecycle/instruments/{id}/renew",
+      "operation_id": "create_renewal_successor_endpoint_api_v1_lifecycle_instruments__id__renew_post",
+      "summary": "Create brand new successor instrument and link to predecessor",
+      "description": "",
+      "tags": [
+        "Module 5 \u2014 Lifecycle & Renewal"
+      ],
+      "parameters": [
+        "id"
+      ],
+      "has_request_body": true,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/lifecycle/instruments/{id}/renewal-draft",
+      "operation_id": "initiate_renewal_draft_endpoint_api_v1_lifecycle_instruments__id__renewal_draft_get",
+      "summary": "Initiate renewal draft for predecessor instrument",
+      "description": "",
+      "tags": [
+        "Module 5 \u2014 Lifecycle & Renewal"
+      ],
+      "parameters": [
+        "id"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/lifecycle/instruments/{instrument_id}/notifications",
+      "operation_id": "get_instrument_notifications_endpoint_api_v1_lifecycle_instruments__instrument_id__notifications_get",
+      "summary": "Get tenancy-scoped notification history for an instrument",
+      "description": "",
+      "tags": [
+        "Module 5 \u2014 Lifecycle & Renewal"
+      ],
+      "parameters": [
+        "instrument_id",
+        "page",
+        "limit"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/lifecycle/lineage/link",
+      "operation_id": "create_renewal_lineage_endpoint_api_v1_lifecycle_lineage_link_post",
+      "summary": "Link predecessor and successor instruments",
+      "description": "",
+      "tags": [
+        "Module 5 \u2014 Lifecycle & Renewal"
+      ],
+      "parameters": [],
+      "has_request_body": true,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/lifecycle/lineage/renew",
+      "operation_id": "create_renewal_lineage_endpoint_api_v1_lifecycle_lineage_renew_post",
+      "summary": "Create predecessor-successor renewal relationship link",
+      "description": "",
+      "tags": [
+        "Module 5 \u2014 Lifecycle & Renewal"
+      ],
+      "parameters": [],
+      "has_request_body": true,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/lifecycle/lineage/validate",
+      "operation_id": "validate_proposed_lineage_endpoint_api_v1_lifecycle_lineage_validate_post",
+      "summary": "Pre-validate proposed predecessor-successor renewal relationship",
+      "description": "",
+      "tags": [
+        "Module 5 \u2014 Lifecycle & Renewal"
+      ],
+      "parameters": [],
+      "has_request_body": true,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/lifecycle/lineage/{lineage_id}",
+      "operation_id": "get_lineage_endpoint_api_v1_lifecycle_lineage__lineage_id__get",
+      "summary": "Get lineage relationship details by ID",
+      "description": "",
+      "tags": [
+        "Module 5 \u2014 Lifecycle & Renewal"
+      ],
+      "parameters": [
+        "lineage_id"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/lifecycle/lineage/{lineage_id}/continuity",
+      "operation_id": "get_lineage_continuity_endpoint_api_v1_lifecycle_lineage__lineage_id__continuity_get",
+      "summary": "Get granular continuity gap/overlap assessment for a lineage edge",
+      "description": "",
+      "tags": [
+        "Module 5 \u2014 Lifecycle & Renewal"
+      ],
+      "parameters": [
+        "lineage_id"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/lifecycle/lineage/{lineage_id}/correct",
+      "operation_id": "correct_lineage_endpoint_api_v1_lifecycle_lineage__lineage_id__correct_post",
+      "summary": "Authorized correction, deactivation, or superseding of a lineage relationship",
+      "description": "",
+      "tags": [
+        "Module 5 \u2014 Lifecycle & Renewal"
+      ],
+      "parameters": [
+        "lineage_id"
+      ],
+      "has_request_body": true,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/lifecycle/monitoring/approaching-maturity",
+      "operation_id": "list_approaching_maturity_endpoint_api_v1_lifecycle_monitoring_approaching_maturity_get",
+      "summary": "List instruments with approaching maturity (MATURING_SOON / CRITICAL_WINDOW)",
+      "description": "",
+      "tags": [
+        "Module 5 \u2014 Lifecycle & Renewal"
+      ],
+      "parameters": [
+        "page",
+        "limit",
+        "institution_id",
+        "office"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/lifecycle/monitoring/matured",
+      "operation_id": "list_matured_endpoint_api_v1_lifecycle_monitoring_matured_get",
+      "summary": "List matured and expired instruments",
+      "description": "",
+      "tags": [
+        "Module 5 \u2014 Lifecycle & Renewal"
+      ],
+      "parameters": [
+        "page",
+        "limit",
+        "institution_id",
+        "office"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/lifecycle/monitoring/overdue",
+      "operation_id": "list_overdue_endpoint_api_v1_lifecycle_monitoring_overdue_get",
+      "summary": "List instruments with overdue or escalated compliance requirements",
+      "description": "",
+      "tags": [
+        "Module 5 \u2014 Lifecycle & Renewal"
+      ],
+      "parameters": [
+        "page",
+        "limit",
+        "institution_id",
+        "office"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/lifecycle/notifications/admin-oversight",
+      "operation_id": "get_admin_oversight_endpoint_api_v1_lifecycle_notifications_admin_oversight_get",
+      "summary": "Get operational oversight notification feed (System Admin only)",
+      "description": "",
+      "tags": [
+        "Module 5 \u2014 Lifecycle & Renewal"
+      ],
+      "parameters": [
+        "page",
+        "limit"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/lifecycle/notifications/dispatch-due",
+      "operation_id": "dispatch_due_reminders_endpoint_api_v1_lifecycle_notifications_dispatch_due_post",
+      "summary": "Trigger reminder dispatch for evaluated instruments",
+      "description": "",
+      "tags": [
+        "Module 5 \u2014 Lifecycle & Renewal"
+      ],
+      "parameters": [],
+      "has_request_body": true,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/lifecycle/notifications/failed",
+      "operation_id": "list_failed_notifications_endpoint_api_v1_lifecycle_notifications_failed_get",
+      "summary": "List failed or pending delivery attempts (Admin/Officer audit view)",
+      "description": "",
+      "tags": [
+        "Module 5 \u2014 Lifecycle & Renewal"
+      ],
+      "parameters": [
+        "page",
+        "limit"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/lifecycle/notifications/inbox",
+      "operation_id": "get_user_inbox_endpoint_api_v1_lifecycle_notifications_inbox_get",
+      "summary": "Get in-app notification inbox for the current user",
+      "description": "",
+      "tags": [
+        "Module 5 \u2014 Lifecycle & Renewal"
+      ],
+      "parameters": [
+        "unread_only",
+        "page",
+        "limit"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/lifecycle/notifications/read-all",
+      "operation_id": "mark_all_notifications_read_endpoint_api_v1_lifecycle_notifications_read_all_post",
+      "summary": "Mark all inbox notifications as read for current user",
+      "description": "",
+      "tags": [
+        "Module 5 \u2014 Lifecycle & Renewal"
+      ],
+      "parameters": [],
+      "has_request_body": false,
+      "responses": [
+        "200"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/lifecycle/notifications/{id}/read",
+      "operation_id": "mark_notification_read_endpoint_api_v1_lifecycle_notifications__id__read_post",
+      "summary": "Mark an in-app notification as read",
+      "description": "",
+      "tags": [
+        "Module 5 \u2014 Lifecycle & Renewal"
+      ],
+      "parameters": [
+        "id"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/lifecycle/notifications/{id}/retry",
+      "operation_id": "retry_notification_endpoint_api_v1_lifecycle_notifications__id__retry_post",
+      "summary": "Controlled administrative manual retry of a notification",
+      "description": "",
+      "tags": [
+        "Module 5 \u2014 Lifecycle & Renewal"
+      ],
+      "parameters": [
+        "id"
+      ],
+      "has_request_body": true,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/lifecycle/policies",
+      "operation_id": "create_lifecycle_policy_endpoint_api_v1_lifecycle_policies_post",
+      "summary": "Create a new versioned lifecycle policy (Admin only)",
+      "description": "",
+      "tags": [
+        "Module 5 \u2014 Lifecycle & Renewal"
+      ],
+      "parameters": [],
+      "has_request_body": true,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/lifecycle/policies",
+      "operation_id": "list_lifecycle_policies_endpoint_api_v1_lifecycle_policies_get",
+      "summary": "List versioned lifecycle policies",
+      "description": "",
+      "tags": [
+        "Module 5 \u2014 Lifecycle & Renewal"
+      ],
+      "parameters": [
+        "policy_code",
+        "status",
+        "include_demo"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/lifecycle/policies/{policy_id}",
+      "operation_id": "get_lifecycle_policy_endpoint_api_v1_lifecycle_policies__policy_id__get",
+      "summary": "Get lifecycle policy by ID",
+      "description": "",
+      "tags": [
+        "Module 5 \u2014 Lifecycle & Renewal"
+      ],
+      "parameters": [
+        "policy_id"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/lifecycle/policies/{policy_id}/activate",
+      "operation_id": "activate_lifecycle_policy_endpoint_api_v1_lifecycle_policies__policy_id__activate_post",
+      "summary": "Activate an approved policy (Admin only)",
+      "description": "",
+      "tags": [
+        "Module 5 \u2014 Lifecycle & Renewal"
+      ],
+      "parameters": [
+        "policy_id"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/lifecycle/policies/{policy_id}/approve",
+      "operation_id": "approve_lifecycle_policy_endpoint_api_v1_lifecycle_policies__policy_id__approve_post",
+      "summary": "Approve a draft policy (Admin / Competent Authority)",
+      "description": "",
+      "tags": [
+        "Module 5 \u2014 Lifecycle & Renewal"
+      ],
+      "parameters": [
+        "policy_id"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/lifecycle/scheduler/runs",
+      "operation_id": "list_scheduler_runs_endpoint_api_v1_lifecycle_scheduler_runs_get",
+      "summary": "List recent scheduler run execution logs",
+      "description": "",
+      "tags": [
+        "Module 5 \u2014 Lifecycle & Renewal"
+      ],
+      "parameters": [
+        "limit"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/lifecycle/scheduler/runs/latest",
+      "operation_id": "get_latest_scheduler_runs_endpoint_api_v1_lifecycle_scheduler_runs_latest_get",
+      "summary": "Get status of latest attempted and successful scheduler runs",
+      "description": "",
+      "tags": [
+        "Module 5 \u2014 Lifecycle & Renewal"
+      ],
+      "parameters": [],
+      "has_request_body": false,
+      "responses": [
+        "200"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/lifecycle/scheduler/trigger",
+      "operation_id": "trigger_scheduler_job_endpoint_api_v1_lifecycle_scheduler_trigger_post",
+      "summary": "Trigger a bounded maturity scan job manually (Officer / Admin)",
+      "description": "",
+      "tags": [
+        "Module 5 \u2014 Lifecycle & Renewal"
+      ],
+      "parameters": [],
+      "has_request_body": true,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/release/profiles/active",
+      "operation_id": "get_active_checklist_profile_endpoint_api_v1_release_profiles_active_get",
+      "summary": "Get active checklist profile for request and case type",
+      "description": "",
+      "tags": [
+        "Module 6 \u2014 Release & Refund"
+      ],
+      "parameters": [
+        "request_type",
+        "case_type"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/release/requests",
+      "operation_id": "create_release_request_endpoint_api_v1_release_requests_post",
+      "summary": "Create a new draft release, discharge, or refund request",
+      "description": "",
+      "tags": [
+        "Module 6 \u2014 Release & Refund"
+      ],
+      "parameters": [],
+      "has_request_body": true,
+      "responses": [
+        "201",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/release/requests",
+      "operation_id": "list_release_requests_endpoint_api_v1_release_requests_get",
+      "summary": "List release requests within user institutional tenancy",
+      "description": "",
+      "tags": [
+        "Module 6 \u2014 Release & Refund"
+      ],
+      "parameters": [
+        "status",
+        "page",
+        "limit"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/release/requests/{id}",
+      "operation_id": "get_release_request_detail_endpoint_api_v1_release_requests__id__get",
+      "summary": "Get comprehensive release case details, assessments, and decision history",
+      "description": "",
+      "tags": [
+        "Module 6 \u2014 Release & Refund"
+      ],
+      "parameters": [
+        "id"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/release/requests/{id}/approve",
+      "operation_id": "approve_release_request_endpoint_api_v1_release_requests__id__approve_post",
+      "summary": "Competent authority approves release request (READY_FOR_AUTHORITY \u2192 APPROVED)",
+      "description": "Competent authority grants final approval for release.\nEnforces maker-checker: current_user cannot be the original requester/reviewer.\nValidates Release Gate before approval.\nTransitions READY_FOR_AUTHORITY \u2192 APPROVED.",
+      "tags": [
+        "Module 6 \u2014 Release & Refund"
+      ],
+      "parameters": [
+        "id",
+        "reason"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "201",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/release/requests/{id}/check-gate",
+      "operation_id": "check_release_gate_endpoint_api_v1_release_requests__id__check_gate_post",
+      "summary": "Check Release Gate before approval or routing",
+      "description": "Server-side validation before state transitions.\nChecks readiness, staleness, and mandatory blockers.\n\nReturns:\n    {\n        \"gate_passes\": bool,\n        \"denial_reason\": Optional[str],\n        \"assessment\": ReadinessAssessmentResponse\n    }",
+      "tags": [
+        "Module 6 \u2014 Release & Refund"
+      ],
+      "parameters": [
+        "id",
+        "target_status"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/release/requests/{id}/close-case",
+      "operation_id": "close_release_case_endpoint_api_v1_release_requests__id__close_case_post",
+      "summary": "Close release case (COMPLETED \u2192 CLOSED)",
+      "description": "Closes release case after completion.\nTransitions COMPLETED \u2192 CLOSED.\nRecords closure notes and timestamp.",
+      "tags": [
+        "Module 6 \u2014 Release & Refund"
+      ],
+      "parameters": [
+        "id",
+        "closure_notes"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/release/requests/{id}/confirm-bank-action",
+      "operation_id": "confirm_bank_action_endpoint_api_v1_release_requests__id__confirm_bank_action_post",
+      "summary": "Confirm bank-side action on release order (BANK_SIDE_ACTION_PENDING \u2192 COMPLETED)",
+      "description": "Confirms that bank has executed the release order.\nTransitions BANK_SIDE_ACTION_PENDING \u2192 COMPLETED.\nRecords confirmation timestamp and notes.",
+      "tags": [
+        "Module 6 \u2014 Release & Refund"
+      ],
+      "parameters": [
+        "id",
+        "bank_action_notes"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/release/requests/{id}/decisions",
+      "operation_id": "record_release_decision_endpoint_api_v1_release_requests__id__decisions_post",
+      "summary": "Record an authorized workflow decision (submit, return, recommend, approve, reject)",
+      "description": "",
+      "tags": [
+        "Module 6 \u2014 Release & Refund"
+      ],
+      "parameters": [
+        "id"
+      ],
+      "has_request_body": true,
+      "responses": [
+        "201",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/release/requests/{id}/evaluate-readiness",
+      "operation_id": "evaluate_readiness_endpoint_api_v1_release_requests__id__evaluate_readiness_post",
+      "summary": "Evaluate readiness for a release request (creates assessment snapshot)",
+      "description": "Evaluates readiness of a release request against the configured checklist profile.\nCreates a new immutable assessment snapshot. Previous assessments remain intact.\n\nReturns detailed per-item evaluation results with evidence references.",
+      "tags": [
+        "Module 6 \u2014 Release & Refund"
+      ],
+      "parameters": [
+        "id",
+        "force_reevaluate"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/release/requests/{id}/observations",
+      "operation_id": "add_review_observation_endpoint_api_v1_release_requests__id__observations_post",
+      "summary": "Record a scrutiny officer observation or deficiency note",
+      "description": "",
+      "tags": [
+        "Module 6 \u2014 Release & Refund"
+      ],
+      "parameters": [
+        "id"
+      ],
+      "has_request_body": true,
+      "responses": [
+        "201",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/release/requests/{id}/orders",
+      "operation_id": "record_release_order_endpoint_api_v1_release_requests__id__orders_post",
+      "summary": "Record an official release letter / order tracking entry",
+      "description": "",
+      "tags": [
+        "Module 6 \u2014 Release & Refund"
+      ],
+      "parameters": [
+        "id"
+      ],
+      "has_request_body": true,
+      "responses": [
+        "201",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/release/requests/{id}/readiness",
+      "operation_id": "get_latest_readiness_endpoint_api_v1_release_requests__id__readiness_get",
+      "summary": "Get latest readiness assessment for a request",
+      "description": "Retrieves the most recent readiness assessment for a release request.",
+      "tags": [
+        "Module 6 \u2014 Release & Refund"
+      ],
+      "parameters": [
+        "id"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/release/requests/{id}/readiness/history",
+      "operation_id": "get_readiness_history_endpoint_api_v1_release_requests__id__readiness_history_get",
+      "summary": "Get assessment history for a request",
+      "description": "Retrieves historical readiness assessments for a release request.\nAssessments are returned in reverse chronological order (newest first).",
+      "tags": [
+        "Module 6 \u2014 Release & Refund"
+      ],
+      "parameters": [
+        "id",
+        "limit"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/release/requests/{id}/recommend-for-authority",
+      "operation_id": "recommend_for_authority_endpoint_api_v1_release_requests__id__recommend_for_authority_post",
+      "summary": "Officer recommends release request for competent authority (UNDER_REVIEW \u2192 READY_FOR_AUTHORITY)",
+      "description": "Officer completes scrutiny and recommends for authority approval.\nValidates Release Gate (no mandatory blockers).\nTransitions UNDER_REVIEW \u2192 READY_FOR_AUTHORITY.",
+      "tags": [
+        "Module 6 \u2014 Release & Refund"
+      ],
+      "parameters": [
+        "id",
+        "reason"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "201",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/release/requests/{id}/record-order",
+      "operation_id": "record_release_order_endpoint_decision_api_v1_release_requests__id__record_order_post",
+      "summary": "Record official release letter/order and bank routing (APPROVED \u2192 RELEASE_ORDER_RECORDED)",
+      "description": "Records official release letter (order reference, date, supporting docs).\nTransitions APPROVED \u2192 RELEASE_ORDER_RECORDED.\nBank action status initialized to PENDING.",
+      "tags": [
+        "Module 6 \u2014 Release & Refund"
+      ],
+      "parameters": [
+        "id"
+      ],
+      "has_request_body": true,
+      "responses": [
+        "201",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/release/requests/{id}/reject",
+      "operation_id": "reject_release_request_endpoint_api_v1_release_requests__id__reject_post",
+      "summary": "Authority rejects release request (READY_FOR_AUTHORITY \u2192 REJECTED)",
+      "description": "Authority rejects request, recording the decision rationale.\nTransitions READY_FOR_AUTHORITY \u2192 REJECTED.",
+      "tags": [
+        "Module 6 \u2014 Release & Refund"
+      ],
+      "parameters": [
+        "id",
+        "reason"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "201",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/release/requests/{id}/return-for-correction",
+      "operation_id": "return_for_correction_endpoint_api_v1_release_requests__id__return_for_correction_post",
+      "summary": "Officer identifies deficiencies and returns request to institution (\u2192 RETURNED_FOR_CORRECTION)",
+      "description": "Officer returns request for correction, recording the specific deficiencies.\nRequest transitions SUBMITTED/UNDER_REVIEW \u2192 RETURNED_FOR_CORRECTION.",
+      "tags": [
+        "Module 6 \u2014 Release & Refund"
+      ],
+      "parameters": [
+        "id",
+        "reason",
+        "deficiency_references"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "201",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/release/requests/{id}/start-review",
+      "operation_id": "start_review_endpoint_api_v1_release_requests__id__start_review_post",
+      "summary": "Officer accepts release request for scrutiny review (SUBMITTED \u2192 UNDER_REVIEW)",
+      "description": "Transitions request to UNDER_REVIEW state when officer begins scrutiny.\nNo approval reason required at this stage.",
+      "tags": [
+        "Module 6 \u2014 Release & Refund"
+      ],
+      "parameters": [
+        "id"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/validation/findings/queue",
+      "operation_id": "get_review_queue_compat_api_v1_validation_findings_queue_get",
+      "summary": "Discrepancy review queue (namespaced alias)",
+      "description": "",
+      "tags": [
+        "Validation \u2014 Module 3"
+      ],
+      "parameters": [
+        "status",
+        "severity",
+        "category",
+        "rule_id",
+        "instrument_id",
+        "institution_id",
+        "search",
+        "sort_by",
+        "sort_order",
+        "skip",
+        "limit"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/validation/findings/{finding_id}/assign",
+      "operation_id": "assign_finding_compat_api_v1_validation_findings__finding_id__assign_post",
+      "summary": "Assign finding (namespaced alias)",
+      "description": "",
+      "tags": [
+        "Validation \u2014 Module 3"
+      ],
+      "parameters": [
+        "finding_id"
+      ],
+      "has_request_body": true,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/validation/findings/{finding_id}/observations",
+      "operation_id": "add_finding_observation_compat_api_v1_validation_findings__finding_id__observations_post",
+      "summary": "Add observation note (namespaced alias)",
+      "description": "",
+      "tags": [
+        "Validation \u2014 Module 3"
+      ],
+      "parameters": [
+        "finding_id"
+      ],
+      "has_request_body": true,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/validation/findings/{finding_id}/status",
+      "operation_id": "transition_finding_status_compat_api_v1_validation_findings__finding_id__status_post",
+      "summary": "Transition finding status (namespaced alias)",
+      "description": "",
+      "tags": [
+        "Validation \u2014 Module 3"
+      ],
+      "parameters": [
+        "finding_id"
+      ],
+      "has_request_body": true,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/validation/instruments/{instrument_id}/findings",
+      "operation_id": "list_findings_compat_api_v1_validation_instruments__instrument_id__findings_get",
+      "summary": "List validation findings for an instrument (compat route)",
+      "description": "",
+      "tags": [
+        "Validation \u2014 Module 3"
+      ],
+      "parameters": [
+        "instrument_id",
+        "status",
+        "severity",
+        "category",
+        "skip",
+        "limit"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/validation/instruments/{instrument_id}/findings/{finding_id}",
+      "operation_id": "get_finding_compat_api_v1_validation_instruments__instrument_id__findings__finding_id__get",
+      "summary": "Get a specific validation finding (compat route)",
+      "description": "",
+      "tags": [
+        "Validation \u2014 Module 3"
+      ],
+      "parameters": [
+        "instrument_id",
+        "finding_id"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/validation/instruments/{instrument_id}/findings/{finding_id}/dismiss",
+      "operation_id": "dismiss_finding_endpoint_api_v1_validation_instruments__instrument_id__findings__finding_id__dismiss_post",
+      "summary": "Dismiss a finding (human reviewer decision)",
+      "description": "",
+      "tags": [
+        "Validation \u2014 Module 3"
+      ],
+      "parameters": [
+        "instrument_id",
+        "finding_id"
+      ],
+      "has_request_body": true,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/validation/instruments/{instrument_id}/return-for-correction",
+      "operation_id": "return_for_correction_compat_api_v1_validation_instruments__instrument_id__return_for_correction_post",
+      "summary": "Return instrument for correction (namespaced alias)",
+      "description": "",
+      "tags": [
+        "Validation \u2014 Module 3"
+      ],
+      "parameters": [
+        "instrument_id"
+      ],
+      "has_request_body": true,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/validation/instruments/{instrument_id}/run",
+      "operation_id": "run_validation_compat_api_v1_validation_instruments__instrument_id__run_post",
+      "summary": "Run validation rules for an instrument (compat route)",
+      "description": "",
+      "tags": [
+        "Validation \u2014 Module 3"
+      ],
+      "parameters": [
+        "instrument_id"
+      ],
+      "has_request_body": true,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/validation/policy",
+      "operation_id": "list_policy_api_v1_validation_policy_get",
+      "summary": "List active policy configuration values",
+      "description": "",
+      "tags": [
+        "Validation \u2014 Module 3"
+      ],
+      "parameters": [
+        "institution_id",
+        "active_only"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/validation/policy",
+      "operation_id": "create_or_update_policy_api_v1_validation_policy_post",
+      "summary": "Create or update a policy configuration value (SYSTEM_ADMIN only)",
+      "description": "",
+      "tags": [
+        "Validation \u2014 Module 3"
+      ],
+      "parameters": [],
+      "has_request_body": true,
+      "responses": [
+        "201",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/validation/rules",
+      "operation_id": "list_rules_api_v1_validation_rules_get",
+      "summary": "List all registered validation rules",
+      "description": "",
+      "tags": [
+        "Validation \u2014 Module 3"
+      ],
+      "parameters": [],
+      "has_request_body": false,
+      "responses": [
+        "200"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/verification/instruments/{instrument_id}/provenance",
+      "operation_id": "get_instrument_provenance_api_v1_verification_instruments__instrument_id__provenance_get",
+      "summary": "Get active field-level provenance for an instrument",
+      "description": "Retrieve all current active field-level provenance entries for the specified instrument.",
+      "tags": [
+        "Trust & Verification"
+      ],
+      "parameters": [
+        "instrument_id"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/verification/instruments/{instrument_id}/provenance/{field_name}/history",
+      "operation_id": "get_field_provenance_chain_api_v1_verification_instruments__instrument_id__provenance__field_name__history_get",
+      "summary": "Get complete historical provenance for a specific field",
+      "description": "Retrieve the chronological custody chain for a specific field on an instrument.",
+      "tags": [
+        "Trust & Verification"
+      ],
+      "parameters": [
+        "instrument_id",
+        "field_name"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/verification/instruments/{instrument_id}/requests",
+      "operation_id": "create_request_for_instrument_api_v1_verification_instruments__instrument_id__requests_post",
+      "summary": "Create a verification request for an instrument",
+      "description": "Dispatches a bank or external verification request for an instrument.",
+      "tags": [
+        "Trust & Verification"
+      ],
+      "parameters": [
+        "instrument_id"
+      ],
+      "has_request_body": true,
+      "responses": [
+        "201",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/verification/instruments/{instrument_id}/requests",
+      "operation_id": "list_requests_for_instrument_api_v1_verification_instruments__instrument_id__requests_get",
+      "summary": "List verification requests for an instrument",
+      "description": "Lists all verification requests associated with the given instrument.",
+      "tags": [
+        "Trust & Verification"
+      ],
+      "parameters": [
+        "instrument_id"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/verification/instruments/{instrument_id}/trust",
+      "operation_id": "get_instrument_trust_assessments_api_v1_verification_instruments__instrument_id__trust_get",
+      "summary": "Get active trust assessments for an instrument",
+      "description": "Retrieve current active trust assessments (aggregate and field-level).",
+      "tags": [
+        "Trust & Verification"
+      ],
+      "parameters": [
+        "instrument_id"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/verification/instruments/{instrument_id}/trust/downgrade",
+      "operation_id": "perform_trust_downgrade_endpoint_api_v1_verification_instruments__instrument_id__trust_downgrade_post",
+      "summary": "Perform an authorized trust downgrade or reassessment",
+      "description": "Perform an authorized trust downgrade or reassessment.\n\nRequired when:\n- A previously relied-on document becomes invalid or is withdrawn.\n- A new conflicting response appears.\n- An earlier response is found ineligible.\n- A prior officer decision is formally reversed.\n\nPreserves the previous trust level and evidence.\nNever deletes historical decisions.\nRequires an explicit reason describing the triggering event.",
+      "tags": [
+        "Trust & Verification"
+      ],
+      "parameters": [
+        "instrument_id"
+      ],
+      "has_request_body": true,
+      "responses": [
+        "201",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/verification/instruments/{instrument_id}/trust/history",
+      "operation_id": "get_instrument_trust_history_api_v1_verification_instruments__instrument_id__trust_history_get",
+      "summary": "Get durable audit history of trust transitions",
+      "description": "Retrieve the complete, append-only historical audit log of trust state changes.",
+      "tags": [
+        "Trust & Verification"
+      ],
+      "parameters": [
+        "instrument_id"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/verification/instruments/{instrument_id}/trust/l1-reassessment",
+      "operation_id": "request_l1_reassessment_endpoint_api_v1_verification_instruments__instrument_id__trust_l1_reassessment_post",
+      "summary": "Request L1 document-consistent trust reassessment",
+      "description": "Request an L1 (Document-Consistent) trust reassessment.\nRequires a specific, clean document version as evidence.\nRejects unreadable, blocked, quarantined, or stale evidence.",
+      "tags": [
+        "Trust & Verification"
+      ],
+      "parameters": [
+        "instrument_id"
+      ],
+      "has_request_body": true,
+      "responses": [
+        "201",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/verification/instruments/{instrument_id}/trust/l2-officer-decision",
+      "operation_id": "record_l2_officer_decision_endpoint_api_v1_verification_instruments__instrument_id__trust_l2_officer_decision_post",
+      "summary": "Record an authorized officer L2 verification decision",
+      "description": "Record an authorized scrutiny officer's L2 (Officer-Verified) decision.\nOnly SCRUTINY_OFFICER, BRANCH_HEAD, and SYSTEM_ADMIN roles are permitted.\nInstitution users and ordinary administrators cannot grant themselves L2.\nRequires an explicit meaningful reason and at least one evidence reference.",
+      "tags": [
+        "Trust & Verification"
+      ],
+      "parameters": [
+        "instrument_id"
+      ],
+      "has_request_body": true,
+      "responses": [
+        "201",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/verification/instruments/{instrument_id}/trust/l3-bank-confirmation",
+      "operation_id": "apply_l3_bank_confirmation_endpoint_api_v1_verification_instruments__instrument_id__trust_l3_bank_confirmation_post",
+      "summary": "Apply an eligible bank verification response as L3 confirmation",
+      "description": "Apply L3 (Bank-Confirmed) trust status from an eligible bank verification response.\n\nStrict requirements:\n- source_authorization_config must be provided (policy gate).\n- Response must be non-simulated.\n- Response result must be MATCH.\n- Response source_classification must be AUTHORIZED_BANK_RESPONSE.\n- request_code must match the parent request's reference_code.\n- Field-level correspondences must pass.\n\nA manual officer note alone does NOT qualify as a received bank confirmation.\nA simulated response CANNOT produce production L3.",
+      "tags": [
+        "Trust & Verification"
+      ],
+      "parameters": [
+        "instrument_id"
+      ],
+      "has_request_body": true,
+      "responses": [
+        "201",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/verification/instruments/{instrument_id}/trust/summary",
+      "operation_id": "get_instrument_trust_summary_api_v1_verification_instruments__instrument_id__trust_summary_get",
+      "summary": "Get computed aggregate trust summary for an instrument",
+      "description": "Compute and return the aggregate trust summary.\nThe aggregate is the MINIMUM trust level across all tracked fields.\nL3 for one field does NOT imply L3 for the entire instrument.",
+      "tags": [
+        "Trust & Verification"
+      ],
+      "parameters": [
+        "instrument_id"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/verification/instruments/{instrument_id}/trust/transition",
+      "operation_id": "execute_trust_transition_api_v1_verification_instruments__instrument_id__trust_transition_post",
+      "summary": "Generic trust level transition (L0-L3) \u2014 use dedicated endpoints where possible",
+      "description": "Centralized trust transition endpoint.\nEnforces role authorization, mandatory reasons, documentary evidence, and\nverification response validity. The API never accepts a bare trust_level field\nas authorization to promote an instrument.",
+      "tags": [
+        "Trust & Verification"
+      ],
+      "parameters": [
+        "instrument_id"
+      ],
+      "has_request_body": true,
+      "responses": [
+        "201",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/verification/requests/{request_id}",
+      "operation_id": "get_request_details_api_v1_verification_requests__request_id__get",
+      "summary": "Get verification request details and history",
+      "description": "Retrieves a specific verification request with its history and associated responses.",
+      "tags": [
+        "Trust & Verification"
+      ],
+      "parameters": [
+        "request_id"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/verification/requests/{request_id}/cancel",
+      "operation_id": "cancel_request_api_v1_verification_requests__request_id__cancel_post",
+      "summary": "Cancel or close a verification request",
+      "description": "Cancels an active or pending verification request with mandatory officer reason.",
+      "tags": [
+        "Trust & Verification"
+      ],
+      "parameters": [
+        "request_id"
+      ],
+      "has_request_body": true,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/verification/requests/{request_id}/dispatch",
+      "operation_id": "dispatch_request_api_v1_verification_requests__request_id__dispatch_post",
+      "summary": "Dispatch a verification request through configured adapter",
+      "description": "Executes the adapter dispatch and ingests the resulting confirmation response.",
+      "tags": [
+        "Trust & Verification"
+      ],
+      "parameters": [
+        "request_id"
+      ],
+      "has_request_body": true,
+      "responses": [
+        "201",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/verification/requests/{request_id}/manual-record",
+      "operation_id": "record_manual_evidence_api_v1_verification_requests__request_id__manual_record_post",
+      "summary": "Record manual external verification evidence",
+      "description": "Records an authorized officer's external manual verification letter or certificate.",
+      "tags": [
+        "Trust & Verification"
+      ],
+      "parameters": [
+        "request_id"
+      ],
+      "has_request_body": true,
+      "responses": [
+        "201",
+        "422"
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/verification/requests/{request_id}/retry",
+      "operation_id": "retry_request_api_v1_verification_requests__request_id__retry_post",
+      "summary": "Retry a timed-out or unavailable verification request",
+      "description": "Retries a verification request within bounded attempt limits.",
+      "tags": [
+        "Trust & Verification"
+      ],
+      "parameters": [
+        "request_id"
+      ],
+      "has_request_body": true,
+      "responses": [
+        "201",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/verification/responses/{response_id}",
+      "operation_id": "get_response_details_api_v1_verification_responses__response_id__get",
+      "summary": "Get verification response and field comparison details",
+      "description": "Retrieves full details of a verification response including field-by-field comparisons.",
+      "tags": [
+        "Trust & Verification"
+      ],
+      "parameters": [
+        "response_id"
+      ],
+      "has_request_body": false,
+      "responses": [
+        "200",
+        "422"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/healthz",
+      "operation_id": "liveness_check_healthz_get",
+      "summary": "Liveness Check",
+      "description": "Kubernetes / system liveness check.\nConfirms the FastAPI worker process is active and receiving requests.",
+      "tags": [
+        "Root Health"
+      ],
+      "parameters": [],
+      "has_request_body": false,
+      "responses": [
+        "200"
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/readyz",
+      "operation_id": "readiness_check_readyz_get",
+      "summary": "Readiness Check",
+      "description": "Readiness check reporting whether PostgreSQL / database layer is reachable.\nExecutes a database ping ('SELECT 1') and returns components status.",
+      "tags": [
+        "Root Health"
+      ],
+      "parameters": [],
+      "has_request_body": false,
+      "responses": [
+        "200"
+      ]
+    }
+  ]
+}

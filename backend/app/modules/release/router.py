@@ -317,7 +317,7 @@ def check_release_gate_endpoint(
 def start_review_endpoint(
     id: str = Path(...),
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_roles([ROLE_SYSTEM_ADMIN, ROLE_SCRUTINY_OFFICER, ROLE_BRANCH_HEAD])),
+    current_user: User = Depends(require_roles([ROLE_SCRUTINY_OFFICER, ROLE_BRANCH_HEAD])),
 ):
     """
     Transitions request to UNDER_REVIEW state when officer begins scrutiny.
@@ -339,7 +339,7 @@ def return_for_correction_endpoint(
     reason: str = Query(..., min_length=3, description="Mandatory deficiency notes"),
     deficiency_references: Optional[str] = Query(None, description="JSON references to deficiency findings"),
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_roles([ROLE_SYSTEM_ADMIN, ROLE_SCRUTINY_OFFICER, ROLE_BRANCH_HEAD])),
+    current_user: User = Depends(require_roles([ROLE_SCRUTINY_OFFICER, ROLE_BRANCH_HEAD])),
 ):
     """
     Officer returns request for correction, recording the specific deficiencies.
@@ -366,7 +366,7 @@ def recommend_for_authority_endpoint(
     id: str = Path(...),
     reason: str = Query(..., min_length=3, description="Mandatory recommendation notes"),
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_roles([ROLE_SYSTEM_ADMIN, ROLE_SCRUTINY_OFFICER, ROLE_BRANCH_HEAD])),
+    current_user: User = Depends(require_roles([ROLE_SCRUTINY_OFFICER, ROLE_BRANCH_HEAD])),
 ):
     """
     Officer completes scrutiny and recommends for authority approval.
@@ -474,7 +474,7 @@ def confirm_bank_action_endpoint(
     id: str = Path(...),
     bank_action_notes: Optional[str] = Query(None, description="Bank confirmation notes"),
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_roles([ROLE_SYSTEM_ADMIN, ROLE_BRANCH_HEAD, ROLE_COMPETENT_AUTHORITY, ROLE_FINANCE_OFFICER])),
+    current_user: User = Depends(require_roles([ROLE_BRANCH_HEAD, ROLE_FINANCE_OFFICER])),
 ):
     """
     Confirms that bank has executed the release order.
@@ -501,7 +501,7 @@ def close_release_case_endpoint(
     id: str = Path(...),
     closure_notes: Optional[str] = Query(None, description="Case closure summary"),
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_roles([ROLE_SYSTEM_ADMIN, ROLE_BRANCH_HEAD, ROLE_COMPETENT_AUTHORITY, ROLE_FINANCE_OFFICER])),
+    current_user: User = Depends(require_roles([ROLE_BRANCH_HEAD, ROLE_FINANCE_OFFICER])),
 ):
     """
     Closes release case after completion.

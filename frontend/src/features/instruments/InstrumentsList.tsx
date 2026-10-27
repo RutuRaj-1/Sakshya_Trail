@@ -146,8 +146,15 @@ export const InstrumentsList: React.FC<Props> = ({ instruments, isLoading }) => 
               <tr key={inst.id} className="hover:bg-[#F5F4EF]/70 transition-colors">
                 {/* Ref & Bank */}
                 <td className="py-3 px-4">
-                  <div className="font-mono font-bold text-[#0D2538] text-xs">
-                    {maskRef(inst.reference_number)}
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="font-mono font-bold text-[#0D2538] text-xs">
+                      {maskRef(inst.reference_number)}
+                    </span>
+                    {inst.is_synthetic && (
+                      <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-amber-100 text-amber-800 border border-amber-300">
+                        DEMO / SYNTHETIC
+                      </span>
+                    )}
                   </div>
                   <div className="text-[11px] text-[#5D6A75] flex items-center gap-1 mt-0.5">
                     <Building2 className="w-3 h-3 text-slate-400" />

@@ -36,9 +36,11 @@ router = APIRouter(prefix="/institutions", tags=["Institutions"])
 @router.get("", response_model=InstitutionListResponse)
 def list_registered_institutions(
     search: Optional[str] = Query(None, description="Search by code, legal name, or display name"),
+    city: Optional[str] = Query(None, description="Filter by city (e.g. Pune, Mumbai)"),
     state: Optional[str] = Query(None, description="Filter by state"),
     institution_type: Optional[str] = Query(None, description="Filter by institution taxonomy type"),
     is_active: Optional[bool] = Query(None, description="Filter by active status"),
+    is_synthetic: Optional[bool] = Query(None, description="Filter by synthetic demonstration status"),
     skip: int = Query(0, ge=0, description="Pagination offset"),
     limit: int = Query(50, ge=1, le=100, description="Page limit"),
     current_user: User = Depends(get_current_active_user),
@@ -53,9 +55,11 @@ def list_registered_institutions(
         db=db,
         current_user=current_user,
         search=search,
+        city=city,
         state=state,
         institution_type=institution_type,
         is_active=is_active,
+        is_synthetic=is_synthetic,
         skip=skip,
         limit=limit,
     )

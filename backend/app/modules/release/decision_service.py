@@ -95,7 +95,7 @@ TRANSITION_MATRIX = [
         from_status=ReleaseWorkflowStatus.SUBMITTED.value,
         to_status=ReleaseWorkflowStatus.UNDER_REVIEW.value,
         decision_type="START_REVIEW",
-        required_roles=["SCRUTINY_OFFICER", "BRANCH_HEAD", "SYSTEM_ADMIN"],
+        required_roles=["SCRUTINY_OFFICER", "BRANCH_HEAD"],
         requires_reason=False,
         description="Officer begins scrutiny review",
     ),
@@ -105,7 +105,7 @@ TRANSITION_MATRIX = [
         from_status=ReleaseWorkflowStatus.SUBMITTED.value,
         to_status=ReleaseWorkflowStatus.RETURNED_FOR_CORRECTION.value,
         decision_type=ReleaseDecisionType.RETURN_FOR_CORRECTION.value,
-        required_roles=["SCRUTINY_OFFICER", "BRANCH_HEAD", "SYSTEM_ADMIN"],
+        required_roles=["SCRUTINY_OFFICER", "BRANCH_HEAD"],
         requires_reason=True,
         description="Officer returns request to institution for deficiency correction",
     ),
@@ -114,7 +114,7 @@ TRANSITION_MATRIX = [
         from_status=ReleaseWorkflowStatus.UNDER_REVIEW.value,
         to_status=ReleaseWorkflowStatus.RETURNED_FOR_CORRECTION.value,
         decision_type=ReleaseDecisionType.RETURN_FOR_CORRECTION.value,
-        required_roles=["SCRUTINY_OFFICER", "BRANCH_HEAD", "SYSTEM_ADMIN"],
+        required_roles=["SCRUTINY_OFFICER", "BRANCH_HEAD"],
         requires_reason=True,
         description="Officer returns request to institution for deficiency correction",
     ),
@@ -134,7 +134,7 @@ TRANSITION_MATRIX = [
         from_status=ReleaseWorkflowStatus.UNDER_REVIEW.value,
         to_status=ReleaseWorkflowStatus.READY_FOR_AUTHORITY.value,
         decision_type=ReleaseDecisionType.RECOMMEND_FOR_AUTHORITY.value,
-        required_roles=["SCRUTINY_OFFICER", "BRANCH_HEAD", "SYSTEM_ADMIN"],
+        required_roles=["SCRUTINY_OFFICER", "BRANCH_HEAD"],
         requires_readiness=True,
         allows_blockers=False,
         requires_reason=True,
@@ -178,7 +178,7 @@ TRANSITION_MATRIX = [
         from_status=ReleaseWorkflowStatus.RELEASE_ORDER_RECORDED.value,
         to_status=ReleaseWorkflowStatus.BANK_SIDE_ACTION_PENDING.value,
         decision_type="PENDING_BANK_ACTION",
-        required_roles=["FINANCE_OFFICER", "SYSTEM_ADMIN"],
+        required_roles=["FINANCE_OFFICER", "BRANCH_HEAD"],
         requires_reason=False,
         description="Awaiting bank-side action confirmation",
     ),
@@ -188,7 +188,7 @@ TRANSITION_MATRIX = [
         from_status=ReleaseWorkflowStatus.BANK_SIDE_ACTION_PENDING.value,
         to_status=ReleaseWorkflowStatus.COMPLETED.value,
         decision_type="CONFIRM_BANK_ACTION",
-        required_roles=["FINANCE_OFFICER", "SYSTEM_ADMIN"],
+        required_roles=["FINANCE_OFFICER", "BRANCH_HEAD"],
         requires_reason=False,
         description="Bank action confirmed, case completed",
     ),
@@ -198,7 +198,7 @@ TRANSITION_MATRIX = [
         from_status=ReleaseWorkflowStatus.COMPLETED.value,
         to_status=ReleaseWorkflowStatus.CLOSED.value,
         decision_type="CLOSE_CASE",
-        required_roles=["FINANCE_OFFICER", "SYSTEM_ADMIN"],
+        required_roles=["FINANCE_OFFICER", "BRANCH_HEAD"],
         requires_reason=False,
         description="Case formally closed",
     ),
@@ -1023,7 +1023,7 @@ def confirm_bank_action(
     # Authorization
     auth_ok, auth_reason = check_user_authority(
         current_user,
-        ["FINANCE_OFFICER", "SYSTEM_ADMIN"],
+        ["FINANCE_OFFICER", "BRANCH_HEAD"],
     )
     if not auth_ok:
         raise ForbiddenException(auth_reason)
@@ -1112,7 +1112,7 @@ def close_release_case(
     # Authorization
     auth_ok, auth_reason = check_user_authority(
         current_user,
-        ["FINANCE_OFFICER", "SYSTEM_ADMIN"],
+        ["FINANCE_OFFICER", "BRANCH_HEAD"],
     )
     if not auth_ok:
         raise ForbiddenException(auth_reason)

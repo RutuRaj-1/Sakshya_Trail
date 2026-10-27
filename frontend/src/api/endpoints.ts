@@ -51,7 +51,9 @@ export const authApi = {
 export const institutionsApi = {
   list: (params?: {
     search?: string;
+    city?: string;
     state?: string;
+    is_synthetic?: boolean;
     institution_type?: string;
     is_active?: boolean;
     skip?: number;
@@ -59,7 +61,9 @@ export const institutionsApi = {
   }) => {
     const sp = new URLSearchParams();
     if (params?.search) sp.append('search', params.search);
+    if (params?.city) sp.append('city', params.city);
     if (params?.state) sp.append('state', params.state);
+    if (params?.is_synthetic !== undefined) sp.append('is_synthetic', String(params.is_synthetic));
     if (params?.institution_type) sp.append('institution_type', params.institution_type);
     if (params?.is_active !== undefined) sp.append('is_active', String(params.is_active));
     if (params?.skip !== undefined) sp.append('skip', String(params.skip));
@@ -120,6 +124,8 @@ export const instrumentsApi = {
   list: (params?: {
     search?: string;
     institution_id?: string;
+    city?: string;
+    is_synthetic?: boolean;
     status?: string;
     trust_level?: string;
     maturity_start?: string;
@@ -133,6 +139,8 @@ export const instrumentsApi = {
     const sp = new URLSearchParams();
     if (params?.search) sp.append('search', params.search);
     if (params?.institution_id) sp.append('institution_id', params.institution_id);
+    if (params?.city) sp.append('city', params.city);
+    if (params?.is_synthetic !== undefined) sp.append('is_synthetic', String(params.is_synthetic));
     if (params?.status) sp.append('status', params.status);
     if (params?.trust_level) sp.append('trust_level', params.trust_level);
     if (params?.maturity_start) sp.append('maturity_start', params.maturity_start);

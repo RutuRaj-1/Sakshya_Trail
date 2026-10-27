@@ -403,8 +403,8 @@ export const CANONICAL_FDR_STAGES: StageMappingDefinition[] = [
     permittedActionRoles: {
       sanction_release: ['COMPETENT_AUTHORITY'],
       record_release_order: ['FINANCE_OFFICER'],
-      record_bank_action: ['FINANCE_OFFICER', 'BRANCH_HEAD', 'COMPETENT_AUTHORITY', 'SYSTEM_ADMIN'],
-      close_case: ['FINANCE_OFFICER', 'BRANCH_HEAD', 'COMPETENT_AUTHORITY', 'SYSTEM_ADMIN'],
+      record_bank_action: ['FINANCE_OFFICER', 'BRANCH_HEAD'],
+      close_case: ['FINANCE_OFFICER', 'BRANCH_HEAD'],
     },
     preconditions: [
       'Readiness checklist passed with zero blockers.',

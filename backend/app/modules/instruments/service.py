@@ -74,6 +74,8 @@ def list_instruments(
     current_user: User,
     search: Optional[str] = None,
     institution_id: Optional[str] = None,
+    city: Optional[str] = None,
+    is_synthetic: Optional[bool] = None,
     status_filter: Optional[str] = None,
     trust_level: Optional[str] = None,
     maturity_start: Optional[date] = None,
@@ -100,6 +102,14 @@ def list_instruments(
     elif institution_id:
         stmt = stmt.where(Instrument.institution_id == institution_id)
         count_stmt = count_stmt.where(Instrument.institution_id == institution_id)
+
+    if is_synthetic is not None:
+        stmt = stmt.where(Instrument.is_synthetic == is_synthetic)
+        count_stmt = count_stmt.where(Instrument.is_synthetic == is_synthetic)
+
+    if city:
+        stmt = stmt.where(Institution.city.ilike(f"%{city.strip()}%"))
+        count_stmt = count_stmt.where(Institution.city.ilike(f"%{city.strip()}%"))
 
     # 2. Authoritative business clock and lifecycle policy resolution
     from app.modules.lifecycle.clock import get_business_date

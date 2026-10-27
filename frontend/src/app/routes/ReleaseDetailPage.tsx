@@ -119,9 +119,10 @@ export const ReleaseDetailPage: React.FC = () => {
   const role = user?.role;
   const status = details.workflow_status;
 
-  const isScrutinyOfficer = role === 'SCRUTINY_OFFICER' || role === 'BRANCH_HEAD' || role === 'SYSTEM_ADMIN';
+  const isScrutinyOfficer = role === 'SCRUTINY_OFFICER' || role === 'BRANCH_HEAD';
   const isCompetentAuthority = role === 'COMPETENT_AUTHORITY';
-  const isFinanceOfficer = role === 'FINANCE_OFFICER' || role === 'SYSTEM_ADMIN' || role === 'BRANCH_HEAD' || role === 'COMPETENT_AUTHORITY';
+  const isFinanceOfficer = role === 'FINANCE_OFFICER';
+  const isBranchHead = role === 'BRANCH_HEAD';
   const isAuditor = role === 'AUDITOR';
 
   return (
@@ -267,7 +268,7 @@ export const ReleaseDetailPage: React.FC = () => {
                 </Button>
               )}
 
-              {isFinanceOfficer && (status === 'RELEASE_ORDER_RECORDED' || status === 'BANK_SIDE_ACTION_PENDING') && (
+              {(isFinanceOfficer || isBranchHead) && (status === 'RELEASE_ORDER_RECORDED' || status === 'BANK_SIDE_ACTION_PENDING') && (
                 <>
                   <Button
                     size="sm"

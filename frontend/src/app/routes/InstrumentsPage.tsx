@@ -37,11 +37,13 @@ export const InstrumentsPage: React.FC = () => {
   const paramStatus = searchParams.get('status') || searchParams.get('maturity_indicator') || 'ALL';
   const paramTrust = searchParams.get('trust_level') || 'ALL';
   const paramInst = searchParams.get('institution_id') || '';
+  const paramCity = searchParams.get('city') || 'ALL';
 
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState(paramStatus);
   const [trustFilter, setTrustFilter] = useState(paramTrust);
   const [selectedInstFilter, setSelectedInstFilter] = useState(paramInst);
+  const [cityFilter, setCityFilter] = useState(paramCity);
   const [page, setPage] = useState(1);
   const pageSize = 15;
 
@@ -50,9 +52,11 @@ export const InstrumentsPage: React.FC = () => {
     const nextStatus = searchParams.get('status') || searchParams.get('maturity_indicator') || 'ALL';
     const nextTrust = searchParams.get('trust_level') || 'ALL';
     const nextInst = searchParams.get('institution_id') || '';
+    const nextCity = searchParams.get('city') || 'ALL';
     setStatusFilter(nextStatus);
     setTrustFilter(nextTrust);
     setSelectedInstFilter(nextInst);
+    setCityFilter(nextCity);
     setPage(1);
   }, [searchParams]);
 
@@ -93,6 +97,7 @@ export const InstrumentsPage: React.FC = () => {
       const statusParam = statusFilter !== 'ALL' ? statusFilter : undefined;
       const trustParam = trustFilter !== 'ALL' ? trustFilter : undefined;
       const instParam = selectedInstFilter || undefined;
+      const cityParam = cityFilter !== 'ALL' ? cityFilter : undefined;
 
       const [listRes, summaryRes] = await Promise.all([
         instrumentsApi.list({
@@ -100,6 +105,7 @@ export const InstrumentsPage: React.FC = () => {
           status: statusParam,
           trust_level: trustParam,
           institution_id: instParam,
+          city: cityParam,
           skip: (page - 1) * pageSize,
           limit: pageSize,
         }),
@@ -114,7 +120,7 @@ export const InstrumentsPage: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [search, statusFilter, trustFilter, selectedInstFilter, page]);
+  }, [search, statusFilter, trustFilter, selectedInstFilter, cityFilter, page]);
 
   useEffect(() => {
     loadInstruments();
@@ -265,6 +271,22 @@ export const InstrumentsPage: React.FC = () => {
             <option value="L1_DOCUMENT_CONSISTENT">L1 — DOC CONSISTENT</option>
             <option value="L2_OFFICER_VERIFIED">L2 — OFFICER VERIFIED</option>
             <option value="L3_BANK_CONFIRMED">L3 — BANK CONFIRMED</option>
+          </select>
+
+          {/* City Filter */}
+          <select
+            value={cityFilter}
+            onChange={(e) => {
+              const val = e.target.value;
+              setCityFilter(val);
+              setPage(1);
+              updateUrlParam({ city: val });
+            }}
+            className="border border-[#8799A9] rounded-lg px-2.5 py-2 bg-white text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500 font-medium text-xs"
+          >
+            <option value="ALL">All Demonstration Cities</option>
+            <option value="Pune">Pune Jurisdiction (40 FDRs)</option>
+            <option value="Mumbai">Mumbai Jurisdiction (40 FDRs)</option>
           </select>
 
           {/* Institution Filter for internal bureau officers */}

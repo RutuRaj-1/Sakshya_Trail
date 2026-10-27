@@ -362,7 +362,7 @@ def transition_finding_status_endpoint(
     payload: FindingStatusTransitionRequest,
     db: Session = Depends(get_db),
     current_user: User = Depends(
-        require_roles(ROLE_SYSTEM_ADMIN, ROLE_SCRUTINY_OFFICER, ROLE_BRANCH_HEAD)
+        require_roles(ROLE_SCRUTINY_OFFICER, ROLE_BRANCH_HEAD)
     ),
 ):
     finding = db.scalar(select(ValidationFinding).where(ValidationFinding.id == finding_id))
@@ -393,7 +393,7 @@ def assign_finding_endpoint(
     payload: FindingAssignRequest,
     db: Session = Depends(get_db),
     current_user: User = Depends(
-        require_roles(ROLE_SYSTEM_ADMIN, ROLE_SCRUTINY_OFFICER, ROLE_BRANCH_HEAD)
+        require_roles(ROLE_SCRUTINY_OFFICER, ROLE_BRANCH_HEAD)
     ),
 ):
     finding = db.scalar(select(ValidationFinding).where(ValidationFinding.id == finding_id))
@@ -422,7 +422,7 @@ def add_finding_observation_endpoint(
     payload: FindingObservationRequest,
     db: Session = Depends(get_db),
     current_user: User = Depends(
-        require_roles(ROLE_SYSTEM_ADMIN, ROLE_SCRUTINY_OFFICER, ROLE_BRANCH_HEAD)
+        require_roles(ROLE_SCRUTINY_OFFICER, ROLE_BRANCH_HEAD)
     ),
 ):
     finding = db.scalar(select(ValidationFinding).where(ValidationFinding.id == finding_id))
@@ -450,7 +450,7 @@ def return_for_correction_endpoint(
     payload: ReturnForCorrectionRequest,
     db: Session = Depends(get_db),
     current_user: User = Depends(
-        require_roles(ROLE_SYSTEM_ADMIN, ROLE_SCRUTINY_OFFICER, ROLE_BRANCH_HEAD)
+        require_roles(ROLE_SCRUTINY_OFFICER, ROLE_BRANCH_HEAD)
     ),
 ):
     instrument = return_instrument_for_correction(
@@ -613,7 +613,7 @@ def dismiss_finding_endpoint(
     payload: DismissFindingRequest,
     db: Session = Depends(get_db),
     current_user: User = Depends(
-        require_roles(ROLE_SYSTEM_ADMIN, ROLE_SCRUTINY_OFFICER, ROLE_BRANCH_HEAD)
+        require_roles(ROLE_SCRUTINY_OFFICER, ROLE_BRANCH_HEAD)
     ),
 ):
     instrument = _get_instrument_or_404(db, instrument_id)

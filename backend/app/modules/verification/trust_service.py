@@ -65,7 +65,7 @@ from app.modules.verification.models import (
 # ---------------------------------------------------------------------------
 
 # Roles that may perform L2 verification
-OFFICER_ROLES = {ROLE_SYSTEM_ADMIN, ROLE_SCRUTINY_OFFICER, ROLE_BRANCH_HEAD}
+OFFICER_ROLES = {ROLE_SCRUTINY_OFFICER, ROLE_BRANCH_HEAD}
 
 VALID_TRUST_LEVELS = {
     TrustLevel.L0_DECLARED.value,

@@ -40,9 +40,11 @@ def list_institutions(
     db: Session,
     current_user: User,
     search: Optional[str] = None,
+    city: Optional[str] = None,
     state: Optional[str] = None,
     institution_type: Optional[str] = None,
     is_active: Optional[bool] = None,
+    is_synthetic: Optional[bool] = None,
     skip: int = 0,
     limit: int = 50,
 ) -> Tuple[List[Institution], int]:
@@ -65,6 +67,14 @@ def list_institutions(
         if is_active is not None:
             stmt = stmt.where(Institution.is_active == is_active)
             count_stmt = count_stmt.where(Institution.is_active == is_active)
+
+    if is_synthetic is not None:
+        stmt = stmt.where(Institution.is_synthetic == is_synthetic)
+        count_stmt = count_stmt.where(Institution.is_synthetic == is_synthetic)
+
+    if city:
+        stmt = stmt.where(Institution.city.ilike(f"%{city.strip()}%"))
+        count_stmt = count_stmt.where(Institution.city.ilike(f"%{city.strip()}%"))
 
     if state:
         stmt = stmt.where(Institution.state.ilike(f"%{state.strip()}%"))

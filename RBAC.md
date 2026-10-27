@@ -175,8 +175,13 @@ The authorization architecture of **SakshyaTrail** is built upon five foundation
 * **Cryptographic Ledger Verification (Module 7):** Full verification of the SHA-256 audit ledger (`/audit`).
 
 #### What They DO NOT Have Access To:
-* **Regulatory Release Approval:** Strictly **prohibited** from approving release requests (`POST /release/requests/{id}/approve`). Administrative privilege cannot bypass statutory approval requirements.
-* **Tampering with Audit Logs:** Cannot delete, alter, or rewrite records in `audit_events` (hardware/trigger-enforced).
+* **Regulatory Release Decisions:** Strictly **prohibited** from approving or rejecting release petitions (`POST /release/requests/{id}/approve`, `POST /release/requests/{id}/reject`). Statutory authority cannot be exercised by IT platform administrators.
+* **Routine Release-Order Recording:** Strictly **prohibited** from recording official financial release orders (`POST /release/requests/{id}/record-order`). Reserved exclusively for `FINANCE_OFFICER`.
+* **Downstream Release Settlement:** Prohibited from confirming bank payouts or closing release cases (`POST /release/requests/{id}/confirm-bank-action`, `/close-case`). Reserved for `FINANCE_OFFICER` and supervisory `BRANCH_HEAD`.
+* **Casework Scrutiny Triage:** Excluded from routine desk review triage, start-review transitions, deficiency returns, and recommending cases to the authority.
+* **L2 Officer Trust Attestation:** Strictly barred from attesting to physical FDR certificates, wet ink stamps, or seals (`POST /verification/instruments/{id}/trust/l2-officer-decision`).
+* **Finding Resolution & Dismissal:** Prohibited from dismissing or resolving discrepancy findings on individual FDRs. Policy tuning is permitted (`POST /validation/policy`), but individual finding adjudication belongs strictly to scrutiny officers.
+* **Tampering with Audit Logs:** Absolutely cannot delete, alter, or rewrite records in `audit_events` (hardware/trigger-enforced).
 * **Self-Deactivation / Lockout:** Cannot deactivate their own account or remove the final active `SYSTEM_ADMIN` (last-administrator protection).
 
 ---
@@ -251,11 +256,11 @@ The authorization architecture of **SakshyaTrail** is built upon five foundation
 | List validation runs (`GET /instruments/{id}/validation-runs`) | Y | Y | Y | Y | Y | Y* | Y | `_enforce_instrument_scope` |
 | List findings for instrument (`GET /instruments/{id}/findings`) | Y | Y | Y | Y | Y | Y* | Y | `_enforce_instrument_scope` |
 | Access Review Queue (`GET /findings/queue`) | Y | Y | Y | Y | Y | - | Y(r) | Route guard + `ReviewQueuePage` |
-| Transition finding status (`POST /findings/{id}/status`) | Y | Y | Y | - | - | - | - | `require_roles(SA, SO, BH)` |
-| Assign finding (`POST /findings/{id}/assign`) | Y | Y | Y | - | - | - | - | `require_roles(SA, SO, BH)` |
-| Add review observation note (`POST /findings/{id}/observations`) | Y | Y | Y | - | - | - | - | `require_roles(SA, SO, BH)` |
-| Return for correction (`POST /instruments/{id}/return-for-correction`) | Y | Y | Y | - | - | - | - | `require_roles(SA, SO, BH)` |
-| Dismiss finding (`POST /validation/.../dismiss`) | Y | Y | Y | - | - | - | - | `require_roles(SA, SO, BH)` |
+| Transition finding status (`POST /findings/{id}/status`) | - | Y | Y | - | - | - | - | `require_roles(SO, BH)` |
+| Assign finding (`POST /findings/{id}/assign`) | - | Y | Y | - | - | - | - | `require_roles(SO, BH)` |
+| Add review observation note (`POST /findings/{id}/observations`) | - | Y | Y | - | - | - | - | `require_roles(SO, BH)` |
+| Return for correction (`POST /instruments/{id}/return-for-correction`) | - | Y | Y | - | - | - | - | `require_roles(SO, BH)` |
+| Dismiss finding (`POST /validation/.../dismiss`) | - | Y | Y | - | - | - | - | `require_roles(SO, BH)` |
 | List registered validation rules (`GET /validation/rules`) | Y | Y | Y | Y | Y | Y | Y | Authenticated user |
 | View active policy configs (`GET /validation/policy`) | Y | Y | Y | - | - | - | Y | `require_roles(SA, SO, BH, AU)` |
 | Create / update policy config (`POST /validation/policy`) | Y | - | - | - | - | - | - | **Strictly `require_roles(SA)`** |
@@ -269,12 +274,12 @@ The authorization architecture of **SakshyaTrail** is built upon five foundation
 | View provenance & trust summary (`GET /verification/...`) | Y | Y | Y | Y | Y | Y* | Y | Tenant assertion |
 | Generic trust transition (`POST /.../trust/transition`) | Y | Y | Y | - | - | - | - | `trust_service.py` gating |
 | L1 document-consistent request (`POST /.../l1-reassessment`) | Y | Y | Y | - | - | - | - | Clean document version required |
-| **L2 Officer trust attestation** (`POST /.../l2-officer-decision`) | Y | Y | Y | - | - | - | - | `OFFICER_ROLES` in `trust_service.py` |
-| **L3 Bank confirmation** (`POST /.../l3-bank-confirmation`) | Y | Y | Y | - | - | - | - | Policy gate + non-simulated MATCH |
+| **L2 Officer trust attestation** (`POST /.../l2-officer-decision`) | - | Y | Y | - | - | - | - | Strictly `OFFICER_ROLES (SO, BH)` |
+| **L3 Bank confirmation** (`POST /.../l3-bank-confirmation`) | - | Y | Y | - | - | - | - | Policy gate + non-simulated MATCH |
 | Trust downgrade / reassessment (`POST /.../trust/downgrade`) | Y | Y | Y | - | - | - | - | Mandatory triggering reason |
-| Create verification request (`POST /.../requests`) | Y | Y | Y | - | - | - | - | `_assert_officer_access` |
-| Dispatch request to adapter (`POST /requests/{id}/dispatch`) | Y | Y | Y | - | - | - | - | `_assert_officer_access` |
-| Record manual bank letter (`POST /requests/{id}/manual-record`) | Y | Y | Y | - | - | - | - | `_assert_officer_access` |
+| Create verification request (`POST /.../requests`) | - | Y | Y | - | - | - | - | `_assert_officer_access (SO, BH)` |
+| Dispatch request to adapter (`POST /requests/{id}/dispatch`) | - | Y | Y | - | - | - | - | `_assert_officer_access (SO, BH)` |
+| Record manual bank letter (`POST /requests/{id}/manual-record`) | - | Y | Y | - | - | - | - | `_assert_officer_access (SO, BH)` |
 | Retry or cancel request (`POST /requests/{id}/retry|cancel`) | Y | Y | Y | - | - | - | - | `_assert_officer_access` |
 | View verification requests & responses | Y | Y | Y | Y | Y | Y* | Y | Scoped query |
 
@@ -309,16 +314,16 @@ The authorization architecture of **SakshyaTrail** is built upon five foundation
 | Create draft release request (`POST /release/requests`) | Y | - | - | - | - | Y* | - | Institutional intake |
 | List / view release requests (`GET /release/requests`) | Y | Y | Y | Y | Y | Y* | Y | Scoped tenant check |
 | Add review observation note (`POST /requests/{id}/observations`) | Y | Y | Y | Y | - | - | - | `require_roles(SA, SO, BH, CA)` |
-| Start scrutiny review (`POST /requests/{id}/start-review`) | Y | Y | Y | - | - | - | - | `require_roles(SA, SO, BH)` |
-| Return for correction (`POST /requests/{id}/return-for-correction`) | Y | Y | Y | - | - | - | - | `require_roles(SA, SO, BH)` |
-| Recommend for authority (`POST /requests/{id}/recommend-for-authority`) | Y | Y | Y | - | - | - | - | `require_roles(SA, SO, BH)` |
+| Start scrutiny review (`POST /requests/{id}/start-review`) | - | Y | Y | - | - | - | - | `require_roles(SO, BH)` |
+| Return for correction (`POST /requests/{id}/return-for-correction`) | - | Y | Y | - | - | - | - | `require_roles(SO, BH)` |
+| Recommend for authority (`POST /requests/{id}/recommend-for-authority`) | - | Y | Y | - | - | - | - | `require_roles(SO, BH)` |
 | Evaluate readiness snapshot (`POST /requests/{id}/evaluate-readiness`) | Y | Y | Y | Y | - | - | - | `require_roles(SA, SO, BH, CA)` |
 | Check release gate (`POST /requests/{id}/check-gate`) | Y | Y | Y | Y | - | - | - | `require_roles(SA, SO, BH, CA)` |
 | **Approve release request** (`POST /requests/{id}/approve`) | - | - | - | **Y** | - | - | - | **Strictly `require_roles(CA)` + 4-Eye Gate** |
-| Reject release request (`POST /requests/{id}/reject`) | Y | - | - | Y | - | - | - | `require_roles(SA, CA)` |
-| **Record release order** (`POST /requests/{id}/record-order`) | Y | - | - | Y | Y | - | - | `require_roles(SA, FO, CA)` |
-| **Confirm bank action** (`POST /requests/{id}/confirm-bank-action`) | Y | - | Y | Y | Y | - | - | `require_roles(SA, BH, CA, FO)` |
-| **Close release case** (`POST /requests/{id}/close-case`) | Y | - | Y | Y | Y | - | - | `require_roles(SA, BH, CA, FO)` |
+| Reject release request (`POST /requests/{id}/reject`) | - | - | - | **Y** | - | - | - | **Strictly `require_roles(CA)`** |
+| **Record release order** (`POST /requests/{id}/record-order`) | - | - | - | - | **Y** | - | - | **Strictly `require_roles(FO)`** |
+| **Confirm bank action** (`POST /requests/{id}/confirm-bank-action`) | - | - | Y | - | Y | - | - | `require_roles(FO, BH)` |
+| **Close release case** (`POST /requests/{id}/close-case`) | - | - | Y | - | Y | - | - | `require_roles(FO, BH)` |
 
 > **Statutory Invariant (Module 6 Approval)**:
 > - Even `SYSTEM_ADMIN` is barred from approving release requests (`POST /release/requests/{id}/approve`).

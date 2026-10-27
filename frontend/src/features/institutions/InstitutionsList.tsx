@@ -75,8 +75,15 @@ export const InstitutionsList: React.FC<Props> = ({
                     {inst.code || inst.aicte_id}
                   </td>
                   <td className="py-3 px-4">
-                    <div className="font-semibold text-[#0D2538]">
-                      {inst.legal_name || inst.name}
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-semibold text-[#0D2538]">
+                        {inst.legal_name || inst.name}
+                      </span>
+                      {inst.is_synthetic && (
+                        <span className="inline-block px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300">
+                          DEMO DATA — SYNTHETIC INSTITUTION
+                        </span>
+                      )}
                     </div>
                     {inst.display_name && inst.display_name !== inst.legal_name && (
                       <div className="text-[11px] text-slate-400 font-sans">

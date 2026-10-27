@@ -311,21 +311,38 @@ export const LoginPage: React.FC = () => {
                 <div className="text-[10px] text-amber-700 font-mono truncate">auditor.compliance@...</div>
               </button>
 
-              {/* 7. Institution User (Active) */}
+              {/* 7. Institution User (Pune - DEMO-PUN-001) */}
               <button
                 type="button"
-                onClick={() => fillDemoAccount('nodal.pune@mims-demo.ac.in', 'NodalPassword@2026')}
-                className="p-2 border border-slate-200 rounded-lg text-left hover:border-teal-400 hover:bg-teal-50/40 transition-colors cursor-pointer group col-span-2"
+                onClick={() => fillDemoAccount('nodal.pun001@example.com', 'NodalPassword@2026')}
+                className="p-2 border border-slate-200 rounded-lg text-left hover:border-teal-400 hover:bg-teal-50/40 transition-colors cursor-pointer group"
               >
                 <div className="flex items-center justify-between">
                   <span className="font-bold text-[#0D2538] group-hover:text-teal-900 text-[11px]">
-                    Institution User (Nodal Officer)
+                    Nodal (Pune)
                   </span>
                   <span className="text-[9px] bg-slate-100 text-slate-600 px-1 py-0.5 rounded font-mono">
-                    MIMS Pune
+                    DEMO-PUN-001
                   </span>
                 </div>
-                <div className="text-[10px] text-slate-500 font-mono truncate">nodal.pune@mims-demo.ac.in</div>
+                <div className="text-[10px] text-slate-500 font-mono truncate">nodal.pun001@example.com</div>
+              </button>
+
+              {/* 8. Institution User (Mumbai - DEMO-MUM-001) */}
+              <button
+                type="button"
+                onClick={() => fillDemoAccount('nodal.mum001@example.com', 'NodalPassword@2026')}
+                className="p-2 border border-slate-200 rounded-lg text-left hover:border-teal-400 hover:bg-teal-50/40 transition-colors cursor-pointer group"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-[#0D2538] group-hover:text-teal-900 text-[11px]">
+                    Nodal (Mumbai)
+                  </span>
+                  <span className="text-[9px] bg-slate-100 text-slate-600 px-1 py-0.5 rounded font-mono">
+                    DEMO-MUM-001
+                  </span>
+                </div>
+                <div className="text-[10px] text-slate-500 font-mono truncate">nodal.mum001@example.com</div>
               </button>
             </div>
           </div>

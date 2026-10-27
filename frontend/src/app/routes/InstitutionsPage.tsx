@@ -29,6 +29,7 @@ export const InstitutionsPage: React.FC = () => {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'ACTIVE' | 'INACTIVE'>('ALL');
   const [typeFilter, setTypeFilter] = useState('ALL');
+  const [cityFilter, setCityFilter] = useState<'ALL' | 'Pune' | 'Mumbai'>('ALL');
   const [page, setPage] = useState(1);
   const pageSize = 15;
 
@@ -48,10 +49,12 @@ export const InstitutionsPage: React.FC = () => {
       const activeParam =
         statusFilter === 'ACTIVE' ? true : statusFilter === 'INACTIVE' ? false : undefined;
       const typeParam = typeFilter !== 'ALL' ? typeFilter : undefined;
+      const cityParam = cityFilter !== 'ALL' ? cityFilter : undefined;
 
       const res = await institutionsApi.list({
         search: search.trim() || undefined,
         institution_type: typeParam,
+        city: cityParam,
         is_active: activeParam,
         skip: (page - 1) * pageSize,
         limit: pageSize,
@@ -64,7 +67,7 @@ export const InstitutionsPage: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [search, statusFilter, typeFilter, page]);
+  }, [search, statusFilter, typeFilter, cityFilter, page]);
 
   useEffect(() => {
     loadInstitutions();
@@ -177,6 +180,20 @@ export const InstitutionsPage: React.FC = () => {
                 {t === 'ALL' ? 'All Classifications' : t.replace(/_/g, ' ')}
               </option>
             ))}
+          </select>
+
+          {/* City Filter */}
+          <select
+            value={cityFilter}
+            onChange={(e) => {
+              setCityFilter(e.target.value as any);
+              setPage(1);
+            }}
+            className="border border-[#8799A9] rounded-lg px-2.5 py-2 bg-white text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500 font-medium"
+          >
+            <option value="ALL">All Demonstration Cities</option>
+            <option value="Pune">Pune Jurisdiction (10 Inst)</option>
+            <option value="Mumbai">Mumbai Jurisdiction (10 Inst)</option>
           </select>
         </div>
 
