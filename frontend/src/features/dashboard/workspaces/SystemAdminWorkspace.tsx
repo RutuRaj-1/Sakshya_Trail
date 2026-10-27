@@ -26,6 +26,7 @@ export const SystemAdminWorkspace: React.FC = () => {
   const [health, setHealth] = useState<SystemHealth | null>(null);
   const [readiness, setReadiness] = useState<ReadinessState | null>(null);
   const [failedNotifications, setFailedNotifications] = useState<LifecycleNotification[]>([]);
+  const [totalFailedCount, setTotalFailedCount] = useState<number>(0);
   const [oversightNotifications, setOversightNotifications] = useState<LifecycleNotification[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -39,7 +40,7 @@ export const SystemAdminWorkspace: React.FC = () => {
         institutionsApi.list({ limit: 6 }),
         healthApi.getLiveness(),
         healthApi.getReadiness(),
-        lifecycleApi.listFailedNotifications(),
+        lifecycleApi.listFailedNotifications(1, 10),
         lifecycleApi.getAdminOversightFeed(1, 10),
       ]);
 
@@ -53,7 +54,11 @@ export const SystemAdminWorkspace: React.FC = () => {
       }
       if (liveRes.status === 'fulfilled') setHealth(liveRes.value);
       if (readyRes.status === 'fulfilled') setReadiness(readyRes.value);
-      if (failedNotifRes.status === 'fulfilled') setFailedNotifications(failedNotifRes.value || []);
+      if (failedNotifRes.status === 'fulfilled') {
+        const failedItems = failedNotifRes.value.items || failedNotifRes.value.notifications || [];
+        setFailedNotifications(failedItems);
+        setTotalFailedCount(failedNotifRes.value.total_count ?? failedItems.length);
+      }
       if (oversightRes.status === 'fulfilled') {
         const feed = oversightRes.value.items || oversightRes.value.notifications || [];
         setOversightNotifications(feed);
@@ -185,7 +190,7 @@ export const SystemAdminWorkspace: React.FC = () => {
             <div>
               <p className="text-[11px] font-bold text-[#5D6A75] uppercase tracking-wider">Failed Dispatches</p>
               <h3 className="text-xl font-bold text-[#0D2538] font-mono mt-0.5">
-                {isLoading ? '...' : failedNotifications.length}
+                {isLoading ? '...' : totalFailedCount}
               </h3>
               <p className="text-[10px] text-[#B42318] mt-0.5">Notification Delivery Failures</p>
             </div>

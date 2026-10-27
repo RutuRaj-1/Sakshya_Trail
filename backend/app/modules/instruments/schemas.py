@@ -75,6 +75,8 @@ class InstrumentUpdate(BaseModel):
     lien_holder: Optional[str] = Field(None, max_length=255)
     lien_details: Optional[str] = None
     assigned_office: Optional[str] = Field(None, max_length=100)
+    joint_with_aicte: Optional[bool] = None
+    lien_marked: Optional[bool] = None
     remarks: Optional[str] = Field(None, max_length=500)
     status: Optional[str] = None
     trust_level: Optional[str] = None

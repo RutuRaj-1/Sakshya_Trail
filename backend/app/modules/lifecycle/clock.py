@@ -107,6 +107,15 @@ def reset_to_system_clock() -> None:
     _active_clock = system_clock
 
 
+def get_business_date(tz_name: Optional[str] = None) -> date:
+    """
+    Returns the current calendar date in the authoritative business timezone
+    according to the active system or simulated clock.
+    """
+    tz = tz_name or settings.LIFECYCLE_DEFAULT_TIMEZONE
+    return get_current_clock().today_in_tz(tz)
+
+
 def get_clock_status(tz_name: Optional[str] = None) -> dict:
     """Introspects current clock mode and simulated offsets."""
     tz = tz_name or settings.LIFECYCLE_DEFAULT_TIMEZONE

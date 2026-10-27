@@ -320,9 +320,9 @@ export const lifecycleApi = {
       '/lifecycle/notifications/dispatch-due',
       { instrument_id: instrumentId }
     ),
-  listFailedNotifications: () =>
-    apiClient.get<import('@/types/lifecycle').LifecycleNotification[]>(
-      '/lifecycle/notifications/failed'
+  listFailedNotifications: (page: number = 1, limit: number = 50) =>
+    apiClient.get<import('@/types/lifecycle').NotificationListResponse>(
+      `/lifecycle/notifications/failed?page=${page}&limit=${limit}`
     ),
   getUserInbox: (unreadOnly: boolean = false) =>
     apiClient.get<import('@/types/lifecycle').NotificationListResponse>(
@@ -486,6 +486,29 @@ export interface DocumentItem {
   updated_at: string;
 }
 
+export interface ExtractedFieldsDetail {
+  id: string;
+  extraction_status: string;
+  confidence_overall?: number | null;
+  extracted_by?: string | null;
+  doc_bank_name?: string | null;
+  doc_bank_name_confidence?: number | null;
+  doc_reference_number?: string | null;
+  doc_reference_number_confidence?: number | null;
+  doc_amount_str?: string | null;
+  doc_amount_confidence?: number | null;
+  doc_issue_date_str?: string | null;
+  doc_issue_date_confidence?: number | null;
+  doc_maturity_date_str?: string | null;
+  doc_maturity_date_confidence?: number | null;
+  doc_account_holder?: string | null;
+  doc_account_holder_confidence?: number | null;
+  doc_lien_holder?: string | null;
+  doc_lien_holder_confidence?: number | null;
+  error_details?: string | null;
+  extracted_at?: string | null;
+}
+
 export interface DocumentVersionDetail {
   id: string;
   version_number: number;
@@ -497,6 +520,7 @@ export interface DocumentVersionDetail {
   scan_provider: string;
   uploader_user_id?: string;
   uploaded_at: string;
+  extracted_fields?: ExtractedFieldsDetail | null;
 }
 
 export interface DocumentDetail {
@@ -541,10 +565,32 @@ export const documentsApi = {
       sha256_hash: string;
       processing_status: string;
       scan_provider: string;
+      extraction_status?: string | null;
+      extracted_fields_id?: string | null;
       uploaded_at: string;
     }>(`/instruments/${instrumentId}/documents`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     }),
+  uploadVersion: (documentId: string, formData: FormData) =>
+    apiClient.post<{
+      success: boolean;
+      document_id: string;
+      version_id: string;
+      version_number: number;
+      filename: string;
+      content_type: string;
+      file_size: string;
+      sha256_hash: string;
+      processing_status: string;
+      scan_provider: string;
+      extraction_status?: string | null;
+      extracted_fields_id?: string | null;
+      uploaded_at: string;
+    }>(`/documents/${documentId}/versions`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }),
+  triggerExtraction: (documentId: string, versionId: string) =>
+    apiClient.post<ExtractedFieldsDetail>(`/documents/${documentId}/versions/${versionId}/extract`),
   getDownloadUrl: (documentId: string, versionId: string) =>
     `/api/v1/documents/${documentId}/versions/${versionId}/content`,
 };

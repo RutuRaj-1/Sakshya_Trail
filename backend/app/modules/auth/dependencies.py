@@ -15,18 +15,19 @@ from app.common.exceptions import UnauthorizedException, ForbiddenException
 
 def extract_token_from_request(request: Request) -> Optional[str]:
     """
-    Extracts session token from HttpOnly cookie first,
-    or falls back to Authorization Bearer header.
+    Extracts session token:
+    1. Explicit Authorization Bearer header takes priority (API / direct client request).
+    2. HttpOnly Cookie session fallback (browser frontend).
     """
-    # 1. HttpOnly Cookie
-    cookie_token = request.cookies.get(settings.AUTH_COOKIE_NAME)
-    if cookie_token:
-        return cookie_token
-
-    # 2. Authorization Header fallback
+    # 1. Authorization Header priority
     auth_header = request.headers.get("Authorization")
     if auth_header and auth_header.startswith("Bearer "):
         return auth_header[7:].strip()
+
+    # 2. HttpOnly Cookie fallback
+    cookie_token = request.cookies.get(settings.AUTH_COOKIE_NAME)
+    if cookie_token:
+        return cookie_token
 
     return None
 

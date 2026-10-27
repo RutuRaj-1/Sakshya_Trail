@@ -15,6 +15,7 @@ from app.core.security import (
     ROLE_SCRUTINY_OFFICER,
     ROLE_BRANCH_HEAD,
     ROLE_COMPETENT_AUTHORITY,
+    ROLE_AUDITOR,
     ALL_ROLES,
 )
 from app.modules.auth.dependencies import (
@@ -827,7 +828,7 @@ def list_failed_notifications_endpoint(
     page: int = Query(1, ge=1),
     limit: int = Query(50, ge=1, le=100),
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_roles([ROLE_SYSTEM_ADMIN, ROLE_SCRUTINY_OFFICER, ROLE_BRANCH_HEAD])),
+    current_user: User = Depends(require_roles([ROLE_SYSTEM_ADMIN, ROLE_SCRUTINY_OFFICER, ROLE_BRANCH_HEAD, ROLE_AUDITOR])),
 ):
     from app.modules.lifecycle.notification_service import list_failed_notifications
     total, records = list_failed_notifications(
@@ -879,7 +880,7 @@ def dispatch_due_reminders_endpoint(
     from app.modules.lifecycle.evaluation_service import get_latest_evaluation_for_instrument, evaluate_instrument_lifecycle
     from app.modules.lifecycle.notification_service import generate_and_dispatch_reminders_for_instrument
 
-    query = select(Instrument.id).where(Instrument.status.in_(["REGISTERED", "DRAFT", "UNDER_REVIEW"]))
+    query = select(Instrument.id).where(Instrument.status.in_(["ACTIVE", "REGISTERED", "SUBMITTED", "UNDER_REVIEW", "MATURING_SOON"]))
     if payload.instrument_ids:
         query = query.where(Instrument.id.in_(payload.instrument_ids))
     inst_ids = list(db.scalars(query.limit(payload.batch_size)).all())

@@ -109,8 +109,8 @@ export const MonitoringRenewalsPage: React.FC = () => {
       // Load failed notifications if exceptions or scheduler tab is selected
       if (['exceptions', 'scheduler'].includes(currentTab)) {
         try {
-          const failed = await lifecycleApi.listFailedNotifications();
-          setFailedNotifications(failed);
+          const res = await lifecycleApi.listFailedNotifications(1, 50);
+          setFailedNotifications(res.items || res.notifications || []);
         } catch {
           setFailedNotifications([]);
         }
@@ -543,7 +543,7 @@ export const MonitoringRenewalsPage: React.FC = () => {
                       Notification ID: {notif.id.slice(0, 8)}
                     </span>
                     <p className="text-[11px] text-[#5D6A75] mt-0.5">
-                      Type: <strong>{notif.notification_type}</strong> | Channel: {notif.channel}
+                      Type: <strong>{notif.notification_type || notif.event_type}</strong> | Channel: {notif.channel}
                     </p>
                   </div>
                   <button

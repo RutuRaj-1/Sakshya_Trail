@@ -146,7 +146,7 @@ TRANSITION_MATRIX = [
         from_status=ReleaseWorkflowStatus.READY_FOR_AUTHORITY.value,
         to_status=ReleaseWorkflowStatus.APPROVED.value,
         decision_type=ReleaseDecisionType.APPROVE.value,
-        required_roles=["COMPETENT_AUTHORITY", "SYSTEM_ADMIN"],
+        required_roles=["COMPETENT_AUTHORITY"],
         requires_readiness=True,
         allows_blockers=False,
         requires_reason=True,
@@ -158,7 +158,7 @@ TRANSITION_MATRIX = [
         from_status=ReleaseWorkflowStatus.READY_FOR_AUTHORITY.value,
         to_status=ReleaseWorkflowStatus.REJECTED.value,
         decision_type=ReleaseDecisionType.REJECT.value,
-        required_roles=["COMPETENT_AUTHORITY", "SYSTEM_ADMIN"],
+        required_roles=["COMPETENT_AUTHORITY"],
         requires_reason=True,
         description="Authorized competent authority rejects release",
     ),
@@ -168,7 +168,7 @@ TRANSITION_MATRIX = [
         from_status=ReleaseWorkflowStatus.APPROVED.value,
         to_status=ReleaseWorkflowStatus.RELEASE_ORDER_RECORDED.value,
         decision_type="RECORD_RELEASE_ORDER",
-        required_roles=["FINANCE_OFFICER", "COMPETENT_AUTHORITY", "SYSTEM_ADMIN"],
+        required_roles=["FINANCE_OFFICER"],
         requires_reason=False,
         description="Release order recorded after approval",
     ),
@@ -811,10 +811,10 @@ def reject_release_request(
     """
     Authorized competent authority rejects release.
     """
-    # Authorization
+    # Authorization: strictly restricted to COMPETENT_AUTHORITY
     auth_ok, auth_reason = check_user_authority(
         current_user,
-        ["COMPETENT_AUTHORITY", "SYSTEM_ADMIN"],
+        ["COMPETENT_AUTHORITY"],
     )
     if not auth_ok:
         raise ForbiddenException(auth_reason)
@@ -1150,5 +1150,26 @@ def close_release_case(
             "new_status": ReleaseWorkflowStatus.CLOSED.value,
         },
     )
+
+    # Module 5: Emit material event notification
+    try:
+        from app.modules.lifecycle.event_notification_service import emit_material_event
+        emit_material_event(
+            db=db,
+            event_type="RELEASE_CASE_CLOSED",
+            entity_type="RELEASE_CASE",
+            entity_id=release_request.id,
+            actor_user=current_user,
+            instrument_id=release_request.instrument_id,
+            institution_id=release_request.institution_id,
+            resulting_state=ReleaseWorkflowStatus.CLOSED.value,
+            details={
+                "case_number": release_request.case_number,
+                "closure_notes": closure_notes,
+            },
+        )
+        db.commit()
+    except Exception:
+        pass
     
     return release_request

@@ -48,7 +48,7 @@ vi.mock('@/api/endpoints', () => ({
   },
   lifecycleApi: {
     getUserInbox: vi.fn().mockResolvedValue({ notifications: [] }),
-    listFailedNotifications: vi.fn().mockResolvedValue([]),
+    listFailedNotifications: vi.fn().mockResolvedValue({ total_count: 0, items: [] }),
   },
   findingsApi: {
     getQueue: vi.fn().mockResolvedValue({ items: [], total: 0 }),

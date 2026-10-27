@@ -136,7 +136,8 @@ class DashboardService:
         Computes deterministic status breakdown: Active, Expiring soon, Matured, Renewed, Released, Pending.
         Does not conflate administrative status with trust level, verification state, or release state.
         """
-        today = date.today()
+        from app.modules.lifecycle.clock import get_business_date
+        today = get_business_date()
         expiring_threshold = today + timedelta(days=window_days)
 
         base_conditions = enforce_scope_and_get_conditions(
@@ -268,7 +269,8 @@ class DashboardService:
         Category B: Maturity window metrics and drilldown (PRD-FR-070b).
         Aggregates instruments maturing within selectable, inclusive date window.
         """
-        today = date.today()
+        from app.modules.lifecycle.clock import get_business_date
+        today = get_business_date()
         eff_start = start_date or today
         if end_date:
             eff_end = end_date

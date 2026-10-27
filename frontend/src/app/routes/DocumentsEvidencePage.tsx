@@ -90,12 +90,27 @@ export const DocumentsEvidencePage: React.FC = () => {
     loadDocuments();
   }, [loadDocuments]);
 
+  const [isRetrying, setIsRetrying] = useState<string | null>(null);
+
   const handleSelectDocument = async (docId: string) => {
     try {
       const detail = await documentsApi.getDetail(docId);
       setSelectedDocDetail(detail);
     } catch (err) {
       console.error('Failed to retrieve document versions:', err);
+    }
+  };
+
+  const handleTriggerExtraction = async (documentId: string, versionId: string) => {
+    setIsRetrying(versionId);
+    try {
+      await documentsApi.triggerExtraction(documentId, versionId);
+      const detail = await documentsApi.getDetail(documentId);
+      setSelectedDocDetail(detail);
+    } catch (err) {
+      console.error('Failed to trigger extraction:', err);
+    } finally {
+      setIsRetrying(null);
     }
   };
 
@@ -371,42 +386,48 @@ export const DocumentsEvidencePage: React.FC = () => {
                       <th className="px-3 py-2">Filename</th>
                       <th className="px-3 py-2">SHA-256 Byte Hash</th>
                       <th className="px-3 py-2">Scan Status</th>
+                      <th className="px-3 py-2">Extraction</th>
                       <th className="px-3 py-2">Size</th>
                       <th className="px-3 py-2">Upload Time</th>
                       <th className="px-3 py-2 text-right">Action</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 text-[11px]">
-                    {selectedDocDetail.versions.map((v) => (
+                    {selectedDocDetail.versions.map((v) => {
+                      const hash = v.sha256_hash || v.content_sha256 || '';
+                      const displayFilename = v.filename || v.original_filename || 'document';
+                      return (
                       <tr key={v.id} className="hover:bg-slate-50">
                         <td className="px-3 py-2 font-mono font-bold text-[#123B5D]">v{v.version_number}</td>
-                        <td className="px-3 py-2 font-medium text-[#253746] max-w-xs truncate">{v.filename}</td>
+                        <td className="px-3 py-2 font-medium text-[#253746] max-w-xs truncate">{displayFilename}</td>
                         <td className="px-3 py-2 font-mono text-[10px] text-[#5D6A75]">
                           <div className="flex items-center gap-1.5">
-                            <span className="truncate max-w-[140px]" title={v.sha256_hash}>
-                              {v.sha256_hash.slice(0, 16)}...
+                            <span className="truncate max-w-[140px]" title={hash}>
+                              {hash ? `${hash.slice(0, 16)}...` : '—'}
                             </span>
-                            <button
-                              type="button"
-                              onClick={() => handleCopyHash(v.sha256_hash)}
-                              className="p-0.5 text-slate-400 hover:text-[#0D2538]"
-                              title="Copy SHA-256 digest"
-                            >
-                              {copiedHash === v.sha256_hash ? (
-                                <Check className="w-3 h-3 text-emerald-600" />
-                              ) : (
-                                <Copy className="w-3 h-3" />
-                              )}
-                            </button>
+                            {hash && (
+                              <button
+                                type="button"
+                                onClick={() => handleCopyHash(hash)}
+                                className="p-0.5 text-slate-400 hover:text-[#0D2538]"
+                                title="Copy SHA-256 digest"
+                              >
+                                {copiedHash === hash ? (
+                                  <Check className="w-3 h-3 text-emerald-600" />
+                                ) : (
+                                  <Copy className="w-3 h-3" />
+                                )}
+                              </button>
+                            )}
                           </div>
                         </td>
                         <td className="px-3 py-2">
                           <span
                             className={cn(
                               'text-[9px] font-mono px-1.5 py-0.5 rounded font-semibold',
-                              v.processing_status === 'CLEAN' || v.processing_status === 'COMPLETED'
+                              (v.processing_status || v.scan_status) === 'CLEAN' || (v.processing_status || v.scan_status) === 'COMPLETED'
                                 ? 'bg-emerald-100 text-emerald-800'
-                                : v.processing_status === 'INFECTED'
+                                : (v.processing_status || v.scan_status) === 'INFECTED'
                                 ? 'bg-rose-100 text-rose-800'
                                 : 'bg-amber-100 text-amber-800'
                             )}
@@ -414,25 +435,112 @@ export const DocumentsEvidencePage: React.FC = () => {
                             {v.processing_status}
                           </span>
                         </td>
-                        <td className="px-3 py-2 font-mono text-slate-500">
-                          {(v.size_bytes / 1024).toFixed(1)} KB
-                        </td>
-                        <td className="px-3 py-2 text-slate-500">{formatDate(v.uploaded_at)}</td>
-                        <td className="px-3 py-2 text-right">
-                          <a
-                            href={documentsApi.getDownloadUrl(selectedDocDetail.id, v.id)}
-                            download={v.filename}
-                            className="inline-flex items-center gap-1 text-[#0F766E] hover:underline font-semibold"
+                        <td className="px-3 py-2">
+                          <span
+                            className={cn(
+                              'text-[9px] font-mono px-1.5 py-0.5 rounded font-semibold',
+                              ((v.extracted_fields?.extraction_status || v.extracted_fields?.status) === 'COMPLETED' ||
+                               (v.extracted_fields?.extraction_status || v.extracted_fields?.status) === 'SUCCESS')
+                                ? 'bg-emerald-100 text-emerald-800'
+                                : (v.extracted_fields?.extraction_status || v.extracted_fields?.status) === 'PARTIAL'
+                                ? 'bg-amber-100 text-amber-800'
+                                : (v.extracted_fields?.extraction_status || v.extracted_fields?.status) === 'FAILED'
+                                ? 'bg-rose-100 text-rose-800'
+                                : 'bg-slate-100 text-slate-600'
+                            )}
                           >
-                            <Download className="w-3 h-3" />
-                            <span>Download</span>
-                          </a>
+                            {v.extracted_fields?.extraction_status || v.extracted_fields?.status || 'PENDING'}
+                          </span>
+                        </td>
+                        <td className="px-3 py-2 font-mono text-slate-500">
+                          {(((v.size_bytes || v.file_size_bytes || 0)) / 1024).toFixed(1)} KB
+                        </td>
+                        <td className="px-3 py-2 text-slate-500">{formatDate(v.uploaded_at || v.created_at)}</td>
+                        <td className="px-3 py-2 text-right">
+                          <div className="flex items-center justify-end gap-2">
+                            {canUpload && ((v.processing_status || v.scan_status) === 'CLEAN') && (
+                              <button
+                                type="button"
+                                onClick={() => handleTriggerExtraction(selectedDocDetail.id, v.id)}
+                                disabled={isRetrying === v.id}
+                                className="inline-flex items-center gap-1 text-[10px] text-teal-700 hover:text-teal-900 font-medium"
+                                title="Re-extract candidate fields"
+                              >
+                                <RefreshCw className={cn("w-2.5 h-2.5", isRetrying === v.id && "animate-spin")} />
+                                <span>{isRetrying === v.id ? 'Extracting...' : 'Re-extract'}</span>
+                              </button>
+                            )}
+                            <a
+                              href={documentsApi.getDownloadUrl(selectedDocDetail.id, v.id)}
+                              download={displayFilename}
+                              className="inline-flex items-center gap-1 text-[#0F766E] hover:underline font-semibold"
+                            >
+                              <Download className="w-3 h-3" />
+                              <span>Download</span>
+                            </a>
+                          </div>
                         </td>
                       </tr>
-                    ))}
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
+
+              {/* Extracted Fields Detail Panel for Versions */}
+              {selectedDocDetail.versions.map((v) => v.extracted_fields && (
+                <div key={`ext-${v.id}`} className="mt-3 bg-slate-50 border border-slate-200 rounded-[8px] p-3 text-[11px] space-y-2">
+                  <div className="flex items-center justify-between border-b border-slate-200 pb-2">
+                    <span className="font-semibold text-slate-700 flex items-center gap-1.5">
+                      <FileCode className="w-3.5 h-3.5 text-teal-600" />
+                      Extracted Candidate Fields (Automated) — Version {v.version_number}
+                    </span>
+                    <span className="text-[10px] text-slate-500 font-mono">
+                      Provider: {v.extracted_fields.extracted_by || v.extracted_fields.provider || 'DeterministicPdfExtractor'}
+                      {((v.extracted_fields.confidence_overall !== null && v.extracted_fields.confidence_overall !== undefined) || v.extracted_fields.confidence_scores?.overall !== undefined) && ` • Confidence: ${(((v.extracted_fields.confidence_overall ?? v.extracted_fields.confidence_scores?.overall) || 0) * 100).toFixed(0)}%`}
+                    </span>
+                  </div>
+
+                  {(v.extracted_fields.extraction_status || v.extracted_fields.status) === 'FAILED' ? (
+                    <div className="text-rose-700 text-[10px] bg-rose-50 border border-rose-100 p-2 rounded">
+                      {v.extracted_fields.error_details || v.extracted_fields.raw_text_excerpt || 'OCR extraction failed or unsupported document format.'}
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                      <div className="bg-white p-2 rounded border border-slate-200">
+                        <span className="text-[9px] text-slate-500 block uppercase font-medium">Reference No</span>
+                        <span className="font-mono font-medium text-slate-800">{v.extracted_fields.doc_reference_number || '—'}</span>
+                      </div>
+                      <div className="bg-white p-2 rounded border border-slate-200">
+                        <span className="text-[9px] text-slate-500 block uppercase font-medium">Issuing Bank</span>
+                        <span className="font-medium text-slate-800">{v.extracted_fields.doc_bank_name || '—'}</span>
+                      </div>
+                      <div className="bg-white p-2 rounded border border-slate-200">
+                        <span className="text-[9px] text-slate-500 block uppercase font-medium">Printed Amount</span>
+                        <span className="font-mono font-semibold text-emerald-800">
+                          {v.extracted_fields.doc_amount_str ? `₹${v.extracted_fields.doc_amount_str}` : '—'}
+                        </span>
+                      </div>
+                      <div className="bg-white p-2 rounded border border-slate-200">
+                        <span className="text-[9px] text-slate-500 block uppercase font-medium">Maturity Date</span>
+                        <span className="font-medium text-slate-800">{v.extracted_fields.doc_maturity_date_str || '—'}</span>
+                      </div>
+                      <div className="bg-white p-2 rounded border border-slate-200 col-span-2">
+                        <span className="text-[9px] text-slate-500 block uppercase font-medium">Account / Depositor Holder</span>
+                        <span className="font-medium text-slate-800">{v.extracted_fields.doc_account_holder || '—'}</span>
+                      </div>
+                      <div className="bg-white p-2 rounded border border-slate-200 col-span-2">
+                        <span className="text-[9px] text-slate-500 block uppercase font-medium">Lien Marked To</span>
+                        <span className="font-medium text-slate-800">{v.extracted_fields.doc_lien_holder || '—'}</span>
+                      </div>
+                    </div>
+                  )}
+                  <p className="text-[9px] text-slate-500 italic flex items-center gap-1 pt-1">
+                    <AlertTriangle className="w-2.5 h-2.5 text-amber-500 shrink-0" />
+                    Notice: Candidate values extracted via deterministic text parser. Subject to Module 3 cross-validation and regulatory human scrutiny.
+                  </p>
+                </div>
+              ))}
             </div>
           )}
         </div>

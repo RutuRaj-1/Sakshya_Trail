@@ -21,6 +21,8 @@ from app.modules.documents.service import DocumentService
 from app.modules.documents.schemas import DocumentRead, DocumentCreateRequest, DocumentUpdateRequest
 from app.modules.documents.validation import validate_upload, UploadValidationError
 from app.modules.documents.scanner import get_scanner_provider
+from app.modules.documents.extraction_service import DocumentExtractionService
+from app.modules.validation.extracted_fields_service import get_extracted_fields
 from app.modules.audit.service import log_audit_event
 from app.common.exceptions import NotFoundException, ForbiddenException
 
@@ -163,6 +165,21 @@ async def create_and_upload_document(
         error_details=scan_result.error_message,
     )
     
+    # 6b. Automated Document Extraction (Deterministic text/PDF extraction)
+    extraction_record = None
+    extraction_status = None
+    if scan_result.status == "CLEAN":
+        try:
+            extraction_record = DocumentExtractionService.extract_and_persist(
+                db=db,
+                version=version,
+                file_content=file_content,
+                actor_user_id=current_user.id,
+            )
+            extraction_status = extraction_record.extraction_status
+        except Exception as e:
+            extraction_status = "FAILED"
+    
     # 7. Emit audit event
     log_audit_event(
         db=db,
@@ -182,15 +199,17 @@ async def create_and_upload_document(
             "sha256": version.sha256_hash,
             "scan_status": scan_result.status,
             "scan_provider": scan_result.provider,
+            "extraction_status": extraction_status,
         },
     )
 
-    # Trigger post-save validation for the instrument
-    try:
-        from app.modules.validation.engine import trigger_post_save_validation
-        trigger_post_save_validation(db, doc.instrument_id, triggered_by_user_id=current_user.id)
-    except Exception:
-        pass
+    # Trigger post-save validation for the instrument (if not already triggered by extraction)
+    if not extraction_record:
+        try:
+            from app.modules.validation.engine import trigger_post_save_validation
+            trigger_post_save_validation(db, doc.instrument_id, triggered_by_user_id=current_user.id)
+        except Exception:
+            pass
 
     # Module 5: Emit material event notifications & admin oversight
     try:
@@ -208,6 +227,7 @@ async def create_and_upload_document(
                 "document_type": category,
                 "filename": file.filename,
                 "reference_number": instrument.reference_number,
+                "extraction_status": extraction_status,
             },
         )
         db.commit()
@@ -227,6 +247,8 @@ async def create_and_upload_document(
         "sha256_hash": version.sha256_hash,
         "processing_status": scan_result.status,
         "scan_provider": scan_result.provider,
+        "extraction_status": extraction_status,
+        "extracted_fields_id": extraction_record.id if extraction_record else None,
         "uploaded_at": version.uploaded_at.isoformat(),
     }
 
@@ -324,9 +346,212 @@ async def get_document_detail(
                 "scan_provider": v.scan_provider,
                 "uploader_user_id": v.uploader_user_id,
                 "uploaded_at": v.uploaded_at.isoformat(),
+                "extracted_fields": {
+                    "id": ext.id,
+                    "extraction_status": ext.extraction_status,
+                    "confidence_overall": ext.confidence_overall,
+                    "extracted_by": ext.extracted_by,
+                    "doc_bank_name": ext.doc_bank_name,
+                    "doc_bank_name_confidence": ext.doc_bank_name_confidence,
+                    "doc_reference_number": ext.doc_reference_number,
+                    "doc_reference_number_confidence": ext.doc_reference_number_confidence,
+                    "doc_amount_str": ext.doc_amount_str,
+                    "doc_amount_confidence": ext.doc_amount_confidence,
+                    "doc_issue_date_str": ext.doc_issue_date_str,
+                    "doc_issue_date_confidence": ext.doc_issue_date_confidence,
+                    "doc_maturity_date_str": ext.doc_maturity_date_str,
+                    "doc_maturity_date_confidence": ext.doc_maturity_date_confidence,
+                    "doc_account_holder": ext.doc_account_holder,
+                    "doc_account_holder_confidence": ext.doc_account_holder_confidence,
+                    "doc_lien_holder": ext.doc_lien_holder,
+                    "doc_lien_holder_confidence": ext.doc_lien_holder_confidence,
+                    "error_details": ext.error_details,
+                    "extracted_at": ext.extracted_at.isoformat() if ext.extracted_at else None,
+                } if (ext := get_extracted_fields(db, v.id)) else None,
             }
             for v in sorted(doc.versions, key=lambda v: v.version_number)
         ],
+    }
+
+
+@router.post("/documents/{document_id}/versions")
+async def upload_document_new_version(
+    document_id: str,
+    file: UploadFile = File(...),
+    current_user: User = Depends(require_read_only_or_permitted),
+    db: Session = Depends(get_db),
+):
+    """
+    Upload a new version for an existing document.
+    Enforces Auditor read-only restrictions, scans file, runs extraction,
+    and triggers cross-validation.
+    """
+    if current_user.role == ROLE_AUDITOR:
+        raise ForbiddenException("Auditor role has strictly read-only inspection authority and cannot upload documents")
+
+    doc = DocumentService.get_document(db, document_id)
+    if not doc:
+        raise NotFoundException(f"Document {document_id} not found")
+
+    enforce_institution_scope(current_user, doc.institution_id)
+
+    try:
+        file_content = await file.read()
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Failed to read file: {e}",
+        )
+
+    mime_type, normalized_filename, size_str = validate_upload(
+        file.filename or "document",
+        file_content,
+        file.content_type,
+    )
+
+    version = DocumentService.upload_version(
+        db=db,
+        document_id=doc.id,
+        file_content=file_content,
+        original_filename=file.filename or "document",
+        content_type=mime_type,
+        uploader_user_id=current_user.id,
+    )
+
+    # Scan file
+    scanner = get_scanner_provider()
+    scan_result = scanner.scan_bytes(file_content, file.filename or "document")
+
+    DocumentService.update_version_processing_status(
+        db=db,
+        version_id=version.id,
+        processing_status=scan_result.status,
+        scan_provider=scan_result.provider,
+        scan_result_json=scan_result.to_json(),
+        error_details=scan_result.error_message,
+    )
+
+    # Extract if CLEAN
+    extraction_record = None
+    extraction_status = None
+    if scan_result.status == "CLEAN":
+        try:
+            extraction_record = DocumentExtractionService.extract_and_persist(
+                db=db,
+                version=version,
+                file_content=file_content,
+                actor_user_id=current_user.id,
+            )
+            extraction_status = extraction_record.extraction_status
+        except Exception:
+            extraction_status = "FAILED"
+
+    log_audit_event(
+        db=db,
+        action="DOCUMENT_VERSION_UPLOADED",
+        entity_type="DocumentVersion",
+        entity_id=version.id,
+        actor_user_id=current_user.id,
+        actor_email=current_user.email,
+        actor_role=current_user.role,
+        metadata={
+            "document_id": doc.id,
+            "version_id": version.id,
+            "version_number": version.version_number,
+            "filename": file.filename,
+            "content_type": mime_type,
+            "size_bytes": len(file_content),
+            "sha256": version.sha256_hash,
+            "scan_status": scan_result.status,
+            "extraction_status": extraction_status,
+        },
+    )
+
+    if not extraction_record:
+        try:
+            from app.modules.validation.engine import trigger_post_save_validation
+            trigger_post_save_validation(db, doc.instrument_id, triggered_by_user_id=current_user.id)
+        except Exception:
+            pass
+
+    return {
+        "success": True,
+        "document_id": doc.id,
+        "version_id": version.id,
+        "version_number": version.version_number,
+        "filename": normalized_filename,
+        "content_type": mime_type,
+        "file_size": size_str,
+        "sha256_hash": version.sha256_hash,
+        "processing_status": scan_result.status,
+        "scan_provider": scan_result.provider,
+        "extraction_status": extraction_status,
+        "extracted_fields_id": extraction_record.id if extraction_record else None,
+        "uploaded_at": version.uploaded_at.isoformat(),
+    }
+
+
+@router.post("/documents/{document_id}/versions/{version_id}/extract")
+async def trigger_version_extraction_endpoint(
+    document_id: str,
+    version_id: str,
+    current_user: User = Depends(require_read_only_or_permitted),
+    db: Session = Depends(get_db),
+):
+    """
+    Trigger or re-run automated extraction for a clean document version.
+    """
+    if current_user.role == ROLE_AUDITOR:
+        raise ForbiddenException("Auditor role has strictly read-only inspection authority and cannot trigger extraction modifications")
+
+    doc = DocumentService.get_document(db, document_id)
+    if not doc:
+        raise NotFoundException(f"Document {document_id} not found")
+
+    enforce_institution_scope(current_user, doc.institution_id)
+
+    version = DocumentService.get_version(db, version_id)
+    if not version or version.document_id != document_id:
+        raise NotFoundException("Version not found for this document")
+
+    if version.processing_status != "CLEAN":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Extraction cannot run on file with processing status '{version.processing_status}'. Only CLEAN files can be extracted.",
+        )
+
+    from app.modules.documents.storage import get_storage_provider
+    storage = get_storage_provider()
+    try:
+        file_content = storage.read_file(version.storage_key)
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to read file from storage: {e}",
+        )
+
+    extracted_record = DocumentExtractionService.extract_and_persist(
+        db=db,
+        version=version,
+        file_content=file_content,
+        actor_user_id=current_user.id,
+    )
+
+    return {
+        "success": True,
+        "document_id": doc.id,
+        "version_id": version.id,
+        "extraction_status": extracted_record.extraction_status,
+        "confidence_overall": extracted_record.confidence_overall,
+        "extracted_by": extracted_record.extracted_by,
+        "doc_bank_name": extracted_record.doc_bank_name,
+        "doc_reference_number": extracted_record.doc_reference_number,
+        "doc_amount_str": extracted_record.doc_amount_str,
+        "doc_issue_date_str": extracted_record.doc_issue_date_str,
+        "doc_maturity_date_str": extracted_record.doc_maturity_date_str,
+        "doc_account_holder": extracted_record.doc_account_holder,
+        "doc_lien_holder": extracted_record.doc_lien_holder,
+        "error_details": extracted_record.error_details,
     }
 
 

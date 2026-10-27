@@ -649,6 +649,28 @@ def return_instrument_for_correction(
             "institution_id": instrument.institution_id,
         },
     )
+
+    # Module 5: Emit material event notification
+    try:
+        from app.modules.lifecycle.event_notification_service import emit_material_event
+        emit_material_event(
+            db=db,
+            event_type="SUBMISSION_RETURNED_FOR_CORRECTION",
+            entity_type="INSTRUMENT",
+            entity_id=instrument.id,
+            actor_user=actor_user,
+            instrument_id=instrument.id,
+            institution_id=instrument.institution_id,
+            resulting_state="RETURNED_FOR_CORRECTION",
+            details={
+                "reference_number": instrument.reference_number,
+                "reason": explanation.strip(),
+            },
+        )
+        db.commit()
+    except Exception:
+        pass
+
     return instrument
 
 

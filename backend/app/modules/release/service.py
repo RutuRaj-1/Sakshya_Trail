@@ -456,6 +456,44 @@ def record_release_decision(
             code="EMPTY_DECISION_REASON",
         )
 
+    # Defense-in-depth: Auditor cannot record decisions
+    if current_user.role == "AUDITOR":
+        raise ForbiddenException("Auditor role has strictly read-only access and cannot record decisions.")
+
+    # Role-based decision permissions
+    if payload.decision_type in (ReleaseDecisionType.APPROVE, ReleaseDecisionType.REJECT):
+        if current_user.role != "COMPETENT_AUTHORITY":
+            log_audit_event(
+                db=db,
+                action="RELEASE_DECISION_DENIED",
+                entity_type="RELEASE_REQUEST",
+                entity_id=req.id,
+                actor_user_id=current_user.id,
+                actor_email=current_user.email,
+                actor_role=current_user.role,
+                outcome="DENIED",
+                metadata={
+                    "case_number": req.case_number,
+                    "attempted_decision": payload.decision_type.value,
+                    "reason": f"Only Competent Authority may make statutory release decisions ({payload.decision_type.value}). Attempted by {current_user.role}.",
+                },
+            )
+            raise ForbiddenException(
+                f"Only Competent Authority may make statutory release decisions ({payload.decision_type.value}). Attempted by {current_user.role}."
+            )
+
+    elif payload.decision_type in (ReleaseDecisionType.RETURN_FOR_CORRECTION, ReleaseDecisionType.RECOMMEND_FOR_AUTHORITY):
+        if current_user.role not in ("SCRUTINY_OFFICER", "BRANCH_HEAD", "SYSTEM_ADMIN"):
+            raise ForbiddenException(
+                f"Only scrutiny officers may review or recommend release requests. Attempted by {current_user.role}."
+            )
+
+    elif payload.decision_type in (ReleaseDecisionType.SUBMIT, ReleaseDecisionType.CANCEL):
+        if current_user.role not in ("INSTITUTION_USER", "SYSTEM_ADMIN"):
+            raise ForbiddenException(
+                f"Action restricted to institution users. Attempted by {current_user.role}."
+            )
+
     prev_status = req.workflow_status
     new_status = prev_status
 
@@ -466,18 +504,43 @@ def record_release_decision(
         req.submitted_at = get_utc_now()
 
     elif payload.decision_type == ReleaseDecisionType.RETURN_FOR_CORRECTION:
+        if prev_status not in (ReleaseWorkflowStatus.SUBMITTED.value, ReleaseWorkflowStatus.UNDER_REVIEW.value):
+            raise AppException(status_code=400, message=f"Cannot return for correction from status '{prev_status}'.", code="INVALID_TRANSITION")
         new_status = ReleaseWorkflowStatus.RETURNED_FOR_CORRECTION.value
 
     elif payload.decision_type == ReleaseDecisionType.RECOMMEND_FOR_AUTHORITY:
+        if prev_status not in (ReleaseWorkflowStatus.UNDER_REVIEW.value, ReleaseWorkflowStatus.SUBMITTED.value):
+            raise AppException(status_code=400, message=f"Cannot recommend for authority from status '{prev_status}'.", code="INVALID_TRANSITION")
         new_status = ReleaseWorkflowStatus.READY_FOR_AUTHORITY.value
 
     elif payload.decision_type == ReleaseDecisionType.APPROVE:
+        if prev_status != ReleaseWorkflowStatus.READY_FOR_AUTHORITY.value:
+            raise AppException(status_code=400, message=f"Can only approve from READY_FOR_AUTHORITY status; currently '{prev_status}'", code="INVALID_APPROVAL_STATE")
+        
+        # Enforce maker-checker: current user cannot be creator or primary reviewer
+        from app.modules.release.decision_service import check_maker_checker_separation
+        separation_ok, separation_reason = check_maker_checker_separation(
+            db=db,
+            release_request=req,
+            current_user=current_user,
+            decision_type=ReleaseDecisionType.APPROVE.value,
+        )
+        if not separation_ok:
+            raise AppException(
+                status_code=403,
+                message=f"Approval denied: {separation_reason}",
+                code="MAKER_CHECKER_VIOLATION",
+            )
         new_status = ReleaseWorkflowStatus.APPROVED.value
 
     elif payload.decision_type == ReleaseDecisionType.REJECT:
+        if prev_status != ReleaseWorkflowStatus.READY_FOR_AUTHORITY.value:
+            raise AppException(status_code=400, message=f"Can only reject from READY_FOR_AUTHORITY status; currently '{prev_status}'", code="INVALID_REJECTION_STATE")
         new_status = ReleaseWorkflowStatus.REJECTED.value
 
     elif payload.decision_type == ReleaseDecisionType.CANCEL:
+        if prev_status not in (ReleaseWorkflowStatus.DRAFT.value, ReleaseWorkflowStatus.SUBMITTED.value):
+            raise AppException(status_code=400, message=f"Cannot cancel request from status '{prev_status}'.", code="INVALID_TRANSITION")
         new_status = ReleaseWorkflowStatus.CANCELLED.value
 
     req.workflow_status = new_status
@@ -514,6 +577,33 @@ def record_release_decision(
             "new_status": new_status,
         },
     )
+
+    # Emit material event notification
+    try:
+        from app.modules.lifecycle.event_notification_service import emit_material_event
+        event_type_map = {
+            ReleaseDecisionType.APPROVE: "STATUTORY_RELEASE_SANCTIONED",
+            ReleaseDecisionType.REJECT: "RELEASE_CASE_REJECTED",
+            ReleaseDecisionType.RETURN_FOR_CORRECTION: "RELEASE_RETURNED_FOR_CORRECTION",
+            ReleaseDecisionType.SUBMIT: "RELEASE_PETITION_SUBMITTED",
+        }
+        evt = event_type_map.get(payload.decision_type)
+        if evt:
+            emit_material_event(
+                db=db,
+                event_type=evt,
+                entity_type="RELEASE_CASE",
+                entity_id=req.id,
+                actor_user=current_user,
+                instrument_id=req.instrument_id,
+                institution_id=req.institution_id,
+                resulting_state=new_status,
+                details={"case_id": req.case_number, "reason": reason},
+            )
+            db.commit()
+    except Exception:
+        pass
+
     return decision
 
 

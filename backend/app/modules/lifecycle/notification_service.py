@@ -258,6 +258,29 @@ def dispatch_single_notification(
         notification.failure_category = result.error_category or "DELIVERY_FAILURE"
         notification.failure_reason = result.error_message
         notification.next_retry_at = now + timedelta(minutes=notification.max_retries * 15)
+        try:
+            from app.modules.lifecycle.event_notification_service import emit_material_event
+            emit_material_event(
+                db=db,
+                event_type="NOTIFICATION_DELIVERY_FAILED",
+                entity_type="NOTIFICATION",
+                entity_id=notification.id,
+                instrument_id=notification.instrument_id,
+                institution_id=notification.institution_id,
+                resulting_state="FAILED",
+                details={
+                    "channel": notification.channel,
+                    "failure_category": notification.failure_category,
+                    "failure_reason": notification.failure_reason,
+                    "recipient_role": notification.recipient_role,
+                    "recipient_email": notification.recipient_email,
+                },
+                idempotency_suffix=f"attempt-{attempt_num}",
+                is_mock=notification.is_mock,
+                mock_disclaimer=notification.mock_disclaimer,
+            )
+        except Exception:
+            pass
 
     db.commit()
     db.refresh(notification)

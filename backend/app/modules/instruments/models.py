@@ -75,10 +75,13 @@ class Instrument(Base, TimestampMixin):
     def verification_level(self) -> str:
         return self.trust_level
 
-    # Concept 3: Derived Read-Only Maturity Indicator (based on maturity date and 90-day provisional window)
+    # Concept 3: Derived Read-Only Maturity Indicator (based on maturity date and authoritative business clock)
     @property
     def maturity_indicator(self) -> str:
-        today = date.today()
+        if self.maturity_date is None:
+            return "UNKNOWN"
+        from app.modules.lifecycle.clock import get_business_date
+        today = get_business_date()
         if self.maturity_date < today:
             return "EXPIRED"
         elif self.maturity_date <= today + timedelta(days=90):

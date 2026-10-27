@@ -101,18 +101,29 @@ def list_instruments(
         stmt = stmt.where(Instrument.institution_id == institution_id)
         count_stmt = count_stmt.where(Instrument.institution_id == institution_id)
 
-    # 2. Filters
-    today = date.today()
+    # 2. Authoritative business clock and lifecycle policy resolution
+    from app.modules.lifecycle.clock import get_business_date
+    from app.modules.lifecycle.policy_service import resolve_active_policy
+
+    today = get_business_date()
+    try:
+        active_policy = resolve_active_policy(db, instrument_type="FDR")
+        policy_intervals = active_policy.reminder_intervals_days if active_policy else [90]
+        expiring_window_days = max(policy_intervals) if policy_intervals else 90
+    except Exception:
+        expiring_window_days = 90
+    expiring_threshold = today + timedelta(days=expiring_window_days)
+
     if status_filter:
         if status_filter in ("EXPIRING_SOON",):
-            stmt = stmt.where(Instrument.maturity_date >= today, Instrument.maturity_date <= today + timedelta(days=90))
-            count_stmt = count_stmt.where(Instrument.maturity_date >= today, Instrument.maturity_date <= today + timedelta(days=90))
+            stmt = stmt.where(Instrument.maturity_date >= today, Instrument.maturity_date <= expiring_threshold)
+            count_stmt = count_stmt.where(Instrument.maturity_date >= today, Instrument.maturity_date <= expiring_threshold)
         elif status_filter in ("MATURED", "EXPIRED"):
             stmt = stmt.where(Instrument.maturity_date < today)
             count_stmt = count_stmt.where(Instrument.maturity_date < today)
         elif status_filter == "ACTIVE":
-            stmt = stmt.where(Instrument.maturity_date > today + timedelta(days=90))
-            count_stmt = count_stmt.where(Instrument.maturity_date > today + timedelta(days=90))
+            stmt = stmt.where(Instrument.maturity_date > expiring_threshold)
+            count_stmt = count_stmt.where(Instrument.maturity_date > expiring_threshold)
         elif status_filter in ("UNDER_SCRUTINY", "PENDING"):
             pending_statuses = ["DRAFT", "SUBMITTED", "UNDER_SCRUTINY", "UNDER_REVIEW", "RETURNED_FOR_CORRECTION"]
             stmt = stmt.where(Instrument.status.in_(pending_statuses))
@@ -123,14 +134,14 @@ def list_instruments(
 
     if maturity_indicator:
         if maturity_indicator == "EXPIRING_SOON":
-            stmt = stmt.where(Instrument.maturity_date >= today, Instrument.maturity_date <= today + timedelta(days=90))
-            count_stmt = count_stmt.where(Instrument.maturity_date >= today, Instrument.maturity_date <= today + timedelta(days=90))
+            stmt = stmt.where(Instrument.maturity_date >= today, Instrument.maturity_date <= expiring_threshold)
+            count_stmt = count_stmt.where(Instrument.maturity_date >= today, Instrument.maturity_date <= expiring_threshold)
         elif maturity_indicator in ("MATURED", "EXPIRED"):
             stmt = stmt.where(Instrument.maturity_date < today)
             count_stmt = count_stmt.where(Instrument.maturity_date < today)
         elif maturity_indicator == "ACTIVE":
-            stmt = stmt.where(Instrument.maturity_date > today + timedelta(days=90))
-            count_stmt = count_stmt.where(Instrument.maturity_date > today + timedelta(days=90))
+            stmt = stmt.where(Instrument.maturity_date > expiring_threshold)
+            count_stmt = count_stmt.where(Instrument.maturity_date > expiring_threshold)
 
     if trust_level:
         stmt = stmt.where(Instrument.trust_level == trust_level)
@@ -539,6 +550,7 @@ def update_instrument(
             )
 
     # Apply updates
+    old_status = inst.status
     changed_fields = {}
     for key, value in update_data.items():
         if hasattr(inst, key):
@@ -607,6 +619,30 @@ def update_instrument(
                 details={
                     "reference_number": inst.reference_number,
                     "reason": inst.remarks or "Corrections requested on submitted instrument.",
+                },
+            )
+            db.commit()
+        except Exception:
+            pass
+    elif old_status == "RETURNED_FOR_CORRECTION" and current_user.role == "INSTITUTION_USER":
+        # Institution submitted correction response
+        inst.status = "SUBMITTED"
+        db.commit()
+        db.refresh(inst)
+        try:
+            from app.modules.lifecycle.event_notification_service import emit_material_event
+            emit_material_event(
+                db=db,
+                event_type="CORRECTION_RESPONSE_SUBMITTED",
+                entity_type="INSTRUMENT",
+                entity_id=inst.id,
+                actor_user=current_user,
+                instrument_id=inst.id,
+                institution_id=inst.institution_id,
+                resulting_state=inst.status,
+                details={
+                    "reference_number": inst.reference_number,
+                    "changed_fields": list(changed_fields.keys()),
                 },
             )
             db.commit()

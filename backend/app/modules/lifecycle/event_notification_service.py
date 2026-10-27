@@ -245,6 +245,23 @@ def emit_material_event(
             f"Officer returned instrument {inst_ref_display} for correction.",
         ))
 
+    elif event_type == "CORRECTION_RESPONSE_SUBMITTED":
+        if institution_id:
+            recipients_to_notify.append((
+                "INSTITUTION_USER",
+                actor_user.id if actor_user and actor_user.role == "INSTITUTION_USER" else None,
+                institution_id,
+                "Correction Response Submitted",
+                f"Correction response for instrument {inst_ref_display} has been submitted for scrutiny.",
+            ))
+        recipients_to_notify.append((
+            "SCRUTINY_OFFICER",
+            None,
+            None,
+            "Correction Response Awaiting Review",
+            f"Institution has resubmitted corrected information for instrument {inst_ref_display}. Scrutiny review required.",
+        ))
+
     elif event_type == "SCRUTINY_REVIEW_COMPLETED":
         recipients_to_notify.append((
             "BRANCH_HEAD",
@@ -327,21 +344,29 @@ def emit_material_event(
             f"Release request submitted for instrument {inst_ref_display} (Case {case_id}).",
         ))
 
-    elif event_type == "RELEASE_GATE_READINESS_CHANGED":
+    elif event_type in ("RELEASE_GATE_READINESS_CHANGED", "RELEASE_READINESS_BLOCKED", "RELEASE_READINESS_SATISFIED"):
         readiness = details_dict.get("readiness_status", "EVALUATED")
+        blockers = details_dict.get("blockers_count", 0)
+        if readiness == "BLOCKED" or blockers > 0 or event_type == "RELEASE_READINESS_BLOCKED":
+            title = f"Release Gate Blocked: {blockers} Blocker(s) Active"
+            msg = f"Case {entity_id} on {inst_ref_display}: Readiness Gate is BLOCKED with {blockers} blocker(s). Authority sanction prohibited."
+        else:
+            title = "Release Gate Satisfied — Ready for Authority Review"
+            msg = f"Case {entity_id} on {inst_ref_display}: All mandatory release readiness criteria SATISFIED."
+
         recipients_to_notify.append((
             "BRANCH_HEAD",
             None,
             None,
-            "Release Gate Readiness Updated",
-            f"Case {entity_id} on {inst_ref_display}: Readiness Gate evaluated as {readiness}.",
+            title,
+            msg,
         ))
         recipients_to_notify.append((
             "COMPETENT_AUTHORITY",
             None,
             None,
-            "Release Gate Assessment Available",
-            f"Case {entity_id} on {inst_ref_display} reached readiness status: {readiness}.",
+            title,
+            msg,
         ))
 
     elif event_type == "RELEASE_CASE_RECOMMENDED":
@@ -424,15 +449,103 @@ def emit_material_event(
                 "INSTITUTION_USER",
                 None,
                 institution_id,
-                "Bank Disbursement Confirmed — Case Closed",
-                f"Bank disbursement reference {bank_ref} confirmed for {inst_ref_display}. Instrument release completed.",
+                "Bank Disbursement Confirmed",
+                f"Bank disbursement reference {bank_ref} confirmed for {inst_ref_display}. Awaiting final case closure.",
             ))
         recipients_to_notify.append((
             "FINANCE_OFFICER",
             None,
             None,
             "Downstream Bank Disbursement Confirmed",
-            f"Bank disbursement verified ({bank_ref}) for instrument {inst_ref_display}. Case closed.",
+            f"Bank disbursement verified ({bank_ref}) for instrument {inst_ref_display}. Ready for final closure.",
+        ))
+
+    elif event_type == "RELEASE_CASE_CLOSED":
+        case_no = details_dict.get("case_number", entity_id)
+        if institution_id:
+            recipients_to_notify.append((
+                "INSTITUTION_USER",
+                None,
+                institution_id,
+                "Release Case Formally Closed",
+                f"Release case {case_no} for instrument {inst_ref_display} has been formally closed.",
+            ))
+        recipients_to_notify.append((
+            "FINANCE_OFFICER",
+            None,
+            None,
+            "Release Case Formally Closed",
+            f"Release case {case_no} for instrument {inst_ref_display} has been marked CLOSED.",
+        ))
+        recipients_to_notify.append((
+            "BRANCH_HEAD",
+            None,
+            None,
+            "Release Case Closed",
+            f"Release case {case_no} on instrument {inst_ref_display} is formally CLOSED.",
+        ))
+
+    elif event_type in ("MATURITY_APPROACHING", "MATURITY_MILESTONE_REMINDER"):
+        days = details_dict.get("days_to_maturity", 30)
+        if institution_id:
+            recipients_to_notify.append((
+                "INSTITUTION_USER",
+                None,
+                institution_id,
+                f"Maturity Approaching: {days} Days Remaining",
+                f"Instrument {inst_ref_display} will mature in {days} days. Please review renewal requirements.",
+            ))
+        recipients_to_notify.append((
+            "SCRUTINY_OFFICER",
+            None,
+            None,
+            f"Instrument Maturing Soon ({days} Days)",
+            f"Instrument {inst_ref_display} matures in {days} days.",
+        ))
+
+    elif event_type in ("MATURITY_OVERDUE", "ACTION_OVERDUE"):
+        if institution_id:
+            recipients_to_notify.append((
+                "INSTITUTION_USER",
+                None,
+                institution_id,
+                "OVERDUE: Instrument Past Maturity Date",
+                f"Instrument {inst_ref_display} is past its maturity date without verified renewal. Immediate compliance action required.",
+            ))
+        recipients_to_notify.append((
+            "SCRUTINY_OFFICER",
+            None,
+            None,
+            "OVERDUE: Instrument Compliance Overdue",
+            f"Instrument {inst_ref_display} is past maturity date without verified renewal.",
+        ))
+        recipients_to_notify.append((
+            "BRANCH_HEAD",
+            None,
+            None,
+            "Escalation Notice: Overdue FDR Instrument",
+            f"Instrument {inst_ref_display} overdue past grace period. Escalation review required.",
+        ))
+
+    elif event_type in ("LIFECYCLE_EXCEPTION", "SCHEDULER_FAILURE"):
+        err_msg = details_dict.get("error_message", "Unexpected lifecycle evaluation exception")
+        recipients_to_notify.append((
+            "BRANCH_HEAD",
+            None,
+            None,
+            "Lifecycle Policy Exception Alert",
+            f"Lifecycle processing exception on {inst_ref_display}: {err_msg}",
+        ))
+
+    elif event_type in ("NOTIFICATION_DELIVERY_FAILED", "NOTIFICATION_RETRY_EXHAUSTED"):
+        channel = details_dict.get("channel", "EXTERNAL")
+        reason = details_dict.get("failure_reason", "Provider delivery failed")
+        recipients_to_notify.append((
+            "BRANCH_HEAD",
+            None,
+            None,
+            f"Notification Dispatch Failure ({channel})",
+            f"Notification delivery failed for {inst_ref_display} over {channel}. Reason: {reason}",
         ))
 
     elif event_type == "USER_ROLE_ASSIGNMENT_CHANGED":
