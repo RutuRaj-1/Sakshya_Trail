@@ -52,7 +52,14 @@ describe('evaluateInstrumentLifecycleStage Helper', () => {
     expect(evalRes.statusSummary).toMatch(/Evidence uploaded; pending final submission/i);
   });
 
-  it('evaluates Stage 3 for SUBMITTED or UNDER_SCRUTINY status', () => {
+  it('evaluates Stage 3 for SUBMITTED status without observations', () => {
+    const inst = { ...mockInstrument, status: 'SUBMITTED' as const };
+    const evalRes = evaluateInstrumentLifecycleStage(inst, null);
+    expect(evalRes.currentStageNumber).toBe(3);
+    expect(evalRes.statusSummary).toMatch(/Under deterministic rule engine validation/i);
+  });
+
+  it('evaluates Stage 4 for UNDER_SCRUTINY status with observations (Scrutiny & Review)', () => {
     const inst = { ...mockInstrument, status: 'UNDER_SCRUTINY' as const };
     const snapshot = {
       instrument: inst,
@@ -64,33 +71,43 @@ describe('evaluateInstrumentLifecycleStage Helper', () => {
       lifecycle_events: [],
     };
     const evalRes = evaluateInstrumentLifecycleStage(inst, snapshot as any);
-    expect(evalRes.currentStageNumber).toBe(3);
+    expect(evalRes.currentStageNumber).toBe(4);
     expect(evalRes.stageStatus).toBe('WARNING');
     expect(evalRes.statusSummary).toMatch(/1 scrutiny observation/i);
+    expect(evalRes.stageProgress).toHaveLength(9);
   });
 
-  it('evaluates Stage 4 for REGISTERED with L0_DECLARED trust', () => {
+  it('evaluates Stage 5 for REGISTERED with L0_DECLARED trust (Bank Verification & Trust)', () => {
     const inst = { ...mockInstrument, status: 'REGISTERED' as const, trust_level: 'L0_DECLARED' as const };
     const evalRes = evaluateInstrumentLifecycleStage(inst, null);
-    expect(evalRes.currentStageNumber).toBe(4);
+    expect(evalRes.currentStageNumber).toBe(5);
     expect(evalRes.statusSummary).toMatch(/Declared status; pending officer attestation/i);
   });
 
-  it('evaluates Stage 5 for active compliant instruments', () => {
+  it('evaluates Stage 6 for active compliant instruments (Lifecycle Monitoring)', () => {
     const inst = { ...mockInstrument, status: 'REGISTERED' as const, trust_level: 'L1_DOCUMENT_CONSISTENT' as const };
     const evalRes = evaluateInstrumentLifecycleStage(inst, null);
-    expect(evalRes.currentStageNumber).toBe(5);
+    expect(evalRes.currentStageNumber).toBe(6);
     expect(evalRes.statusSummary).toMatch(/Active compliance/i);
   });
 
-  it('evaluates Stage 6 for RENEWED instruments', () => {
+  it('evaluates Stage 7 for RENEWED instruments (Renewal & Successor Lineage)', () => {
     const inst = { ...mockInstrument, status: 'RENEWED' as const };
     const evalRes = evaluateInstrumentLifecycleStage(inst, null);
-    expect(evalRes.currentStageNumber).toBe(6);
+    expect(evalRes.currentStageNumber).toBe(7);
     expect(evalRes.stageStatus).toBe('COMPLETED');
+    expect(evalRes.statusSummary).toMatch(/Successfully renewed/i);
   });
 
-  it('evaluates Stage 9 for RELEASED instruments', () => {
+  it('evaluates Stage 8 for RELEASE_PENDING with blockers (Release Readiness)', () => {
+    const inst = { ...mockInstrument, status: 'RELEASE_PENDING' as const, lien_status: 'DISPUTED' as const };
+    const evalRes = evaluateInstrumentLifecycleStage(inst, null);
+    expect(evalRes.currentStageNumber).toBe(8);
+    expect(evalRes.stageStatus).toBe('BLOCKED');
+    expect(evalRes.statusSummary).toMatch(/Release blocked/i);
+  });
+
+  it('evaluates Stage 9 for RELEASED instruments (Maker-Checker Decision & Closure)', () => {
     const inst = { ...mockInstrument, status: 'RELEASED' as const };
     const evalRes = evaluateInstrumentLifecycleStage(inst, null);
     expect(evalRes.currentStageNumber).toBe(9);

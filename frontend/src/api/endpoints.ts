@@ -387,6 +387,7 @@ export const lifecycleApi = {
       `/lifecycle/lineage/${lineageId}/correct`,
       payload
     ),
+  getCanonicalStages: () => apiClient.get<any[]>('/lifecycle/canonical-stages'),
 };
 
 export interface AuditEventItem {

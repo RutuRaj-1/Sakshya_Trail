@@ -75,9 +75,26 @@ from app.modules.lifecycle.evaluation_service import (
     evaluate_batch_instruments,
 )
 from app.common.exceptions import AppException
+from app.core.canonical_stages import list_canonical_stages, StageContract
 
 router = APIRouter(prefix="/lifecycle", tags=["Module 5 — Lifecycle & Renewal"])
 instruments_lifecycle_router = APIRouter(prefix="/instruments", tags=["Module 5 — Instrument Lifecycle & Lineage"])
+
+
+@router.get(
+    "/canonical-stages",
+    response_model=List[StageContract],
+    summary="Get authoritative nine-stage canonical workflow contracts",
+)
+def get_canonical_stages_endpoint(
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Exposes the authoritative nine-stage FDR lifecycle contract connecting
+    frontend routes, backend APIs, permitted roles, action capabilities,
+    and audit event definitions.
+    """
+    return list_canonical_stages()
 
 
 # --- Policy Management Endpoints ------------------------------------------------
