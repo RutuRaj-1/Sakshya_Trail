@@ -17,6 +17,7 @@ import { instrumentsApi, documentsApi } from '@/api/endpoints';
 import type { Instrument } from '@/types';
 import type { DocumentItem, DocumentDetail } from '@/api/endpoints';
 import { useAuth } from '@/features/auth/AuthContext';
+import { canUploadDocument } from '@/features/auth/authUtils';
 import { Badge } from '@/components/common/Badge';
 import { formatDate, cn } from '@/lib/utils';
 
@@ -24,9 +25,7 @@ export const DocumentsEvidencePage: React.FC = () => {
   const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const isInstitutionUser = user?.role === 'INSTITUTION_USER';
-  const canUpload = ['SYSTEM_ADMIN', 'SCRUTINY_OFFICER', 'BRANCH_HEAD', 'INSTITUTION_USER'].includes(
-    user?.role || ''
-  );
+  const canUpload = canUploadDocument(user?.role);
 
   // Selection state
   const initialInstrumentId = searchParams.get('instrument_id') || '';

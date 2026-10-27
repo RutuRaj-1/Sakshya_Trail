@@ -22,12 +22,14 @@ import {
   MessageSquare,
   AlertOctagon,
 } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/features/auth/AuthContext';
 import { Badge } from '@/components/common/Badge';
 import { cn } from '@/lib/utils';
 
 export const ReviewQueuePage: React.FC = () => {
   const { user } = useAuth();
+  const [searchParams] = useSearchParams();
   const isInstitutionUser = user?.role === 'INSTITUTION_USER';
   const canPerformActions = ['SYSTEM_ADMIN', 'SCRUTINY_OFFICER', 'BRANCH_HEAD'].includes(
     user?.role || ''
@@ -40,9 +42,17 @@ export const ReviewQueuePage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
-  // Filters
+  // Filters initialized from searchParams if present
+  const paramStatus = searchParams.get('status') || 'ACTIVE';
   const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('ACTIVE'); // 'ACTIVE' = OPEN + IN_REVIEW, 'OPEN', 'IN_REVIEW', 'RESOLVED', 'DISMISSED', 'ALL'
+  const [statusFilter, setStatusFilter] = useState<string>(paramStatus); // 'ACTIVE' = OPEN + IN_REVIEW, 'OPEN', 'IN_REVIEW', 'RESOLVED', 'DISMISSED', 'ALL'
+
+  // Sync status if searchParams changes
+  useEffect(() => {
+    const nextStatus = searchParams.get('status') || 'ACTIVE';
+    setStatusFilter(nextStatus);
+    setPage(1);
+  }, [searchParams]);
   const [severityFilter, setSeverityFilter] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
   const [selectedInstFilter, setSelectedInstFilter] = useState('');

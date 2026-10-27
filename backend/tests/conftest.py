@@ -28,10 +28,27 @@ TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=test_
 @pytest.fixture(scope="session", autouse=True)
 def setup_test_db():
     Base.metadata.create_all(bind=test_engine)
+    from sqlalchemy import text
+    with test_engine.connect() as conn:
+        if test_engine.dialect.name == "sqlite":
+            conn.execute(text("""
+                CREATE TRIGGER IF NOT EXISTS prevent_audit_update
+                BEFORE UPDATE ON audit_events
+                BEGIN
+                    SELECT RAISE(FAIL, 'Mutation of audit records is strictly prohibited: audit_events table is append-only');
+                END;
+            """))
+            conn.execute(text("""
+                CREATE TRIGGER IF NOT EXISTS prevent_audit_delete
+                BEFORE DELETE ON audit_events
+                BEGIN
+                    SELECT RAISE(FAIL, 'Deletion of audit records is strictly prohibited: audit_events table is append-only');
+                END;
+            """))
+            conn.commit()
     yield
     # For SQLite with foreign key cycles (documents <-> document_versions),
     # disable foreign key checks during cleanup
-    from sqlalchemy import text
     with test_engine.connect() as conn:
         conn.execute(text("PRAGMA foreign_keys = OFF"))
         Base.metadata.drop_all(bind=conn)

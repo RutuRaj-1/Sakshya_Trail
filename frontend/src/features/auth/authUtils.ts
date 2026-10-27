@@ -124,3 +124,62 @@ export function getSafePostLoginRedirect(
 
   return safePath;
 }
+
+/**
+ * Role-level capability helpers aligning with authoritative backend RBAC policies.
+ * Ensures consistent frontend visibility boundaries without ad-hoc checks.
+ */
+
+/**
+ * Only INSTITUTION_USER (depositing/pledging for institution) and SYSTEM_ADMIN (bureau admin)
+ * are authorized to create or register new FDR certificates.
+ * Regulatory officers (SCRUTINY_OFFICER, BRANCH_HEAD, etc.) review and verify; they do not create deposits.
+ */
+export function canCreateInstrument(role?: ApplicationRole): boolean {
+  if (!role) return false;
+  return role === 'INSTITUTION_USER' || role === 'SYSTEM_ADMIN';
+}
+
+/**
+ * Authorized roles for uploading FDR documents and evidence files.
+ * Read-only auditors (AUDITOR) and non-evidence roles are excluded.
+ */
+export function canUploadDocument(role?: ApplicationRole): boolean {
+  if (!role) return false;
+  return ['SYSTEM_ADMIN', 'SCRUTINY_OFFICER', 'BRANCH_HEAD', 'INSTITUTION_USER'].includes(role);
+}
+
+/**
+ * Authorized roles for creating new release or refund requests.
+ * Initiated by INSTITUTION_USER or bureau SYSTEM_ADMIN.
+ */
+export function canCreateReleaseRequest(role?: ApplicationRole): boolean {
+  if (!role) return false;
+  return role === 'INSTITUTION_USER' || role === 'SYSTEM_ADMIN';
+}
+
+/**
+ * Authorized roles for sanctioning/approving statutory release petitions.
+ * Strictly COMPETENT_AUTHORITY (and SYSTEM_ADMIN).
+ */
+export function canApproveRelease(role?: ApplicationRole): boolean {
+  if (!role) return false;
+  return role === 'COMPETENT_AUTHORITY' || role === 'SYSTEM_ADMIN';
+}
+
+/**
+ * Authorized roles for recording official release discharge orders.
+ * Strictly restricted to FINANCE_OFFICER per Prompt 2 backend enforcement.
+ */
+export function canRecordReleaseOrder(role?: ApplicationRole): boolean {
+  if (!role) return false;
+  return role === 'FINANCE_OFFICER';
+}
+
+/**
+ * Returns true if role is strictly read-only auditor.
+ */
+export function isAuditorRole(role?: ApplicationRole): boolean {
+  return role === 'AUDITOR';
+}
+

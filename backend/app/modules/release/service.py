@@ -251,6 +251,10 @@ def create_release_request(
     if not instrument:
         raise NotFoundException(f"Instrument '{payload.instrument_id}' not found.")
 
+    # Auditor read-only restriction
+    if current_user.role == "AUDITOR":
+        raise ForbiddenException("Auditor role has strictly read-only inspection authority and cannot initiate release requests.")
+
     # Institutional tenancy check
     if current_user.role == "INSTITUTION_USER" and instrument.institution_id != current_user.institution_id:
         raise ForbiddenException("Access denied: You cannot create a release request for an instrument belonging to another institution.")
@@ -527,6 +531,45 @@ def record_release_order(
     is recorded and bank confirmation is tracked.
     """
     req = get_release_request(db, request_id, current_user)
+
+    # Authorization: strictly restricted to FINANCE_OFFICER
+    if current_user.role != "FINANCE_OFFICER":
+        log_audit_event(
+            db=db,
+            action="RELEASE_ORDER_RECORDING_DENIED",
+            entity_type="RELEASE_REQUEST",
+            entity_id=req.id,
+            actor_user_id=current_user.id,
+            actor_email=current_user.email,
+            actor_role=current_user.role,
+            outcome="DENIED",
+            metadata={
+                "case_number": req.case_number,
+                "reason": f"Only Finance Officer is authorized to record release orders. Attempted by {current_user.role}.",
+            },
+        )
+        raise ForbiddenException(f"Action forbidden for role '{current_user.role}'. Required: ['FINANCE_OFFICER']")
+
+    # State validation: order can only be recorded for approved cases
+    if req.workflow_status != ReleaseWorkflowStatus.APPROVED.value:
+        raise AppException(
+            status_code=400,
+            message=f"Can only record release order after APPROVED status; currently '{req.workflow_status}'",
+            code="INVALID_ORDER_RECORDING_STATE",
+        )
+
+    # Idempotency / duplicate order check
+    existing_order = db.scalar(
+        select(ReleaseOrderRecord).where(
+            ReleaseOrderRecord.release_request_id == req.id
+        )
+    )
+    if existing_order:
+        raise AppException(
+            status_code=400,
+            message=f"Release order already recorded for request '{req.id}'",
+            code="DUPLICATE_RELEASE_ORDER",
+        )
 
     order = ReleaseOrderRecord(
         release_request_id=req.id,

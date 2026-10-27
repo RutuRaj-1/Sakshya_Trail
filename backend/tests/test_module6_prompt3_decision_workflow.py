@@ -277,7 +277,7 @@ def test_1_5_approved_to_order_recorded(release_request_submitted, setup_data):
     )
     order = record_release_order(
         db=db, release_request=req, payload=payload,
-        current_user=setup_data["authority"]
+        current_user=setup_data["finance_officer"]
     )
     
     # Verify
@@ -574,7 +574,7 @@ def test_6_1_order_has_pending_status(release_request_submitted, setup_data):
     )
     order = record_release_order(
         db=db, release_request=req, payload=payload,
-        current_user=setup_data["authority"]
+        current_user=setup_data["finance_officer"]
     )
     
     # Verify bank status is PENDING
@@ -601,7 +601,7 @@ def test_6_2_confirm_sets_timestamp(release_request_submitted, setup_data):
     )
     order = record_release_order(
         db=db, release_request=req, payload=payload,
-        current_user=setup_data["authority"]
+        current_user=setup_data["finance_officer"]
     )
     
     # Set to RELEASE_ORDER_RECORDED
@@ -749,11 +749,11 @@ def test_9_1_order_stores_metadata(release_request_submitted, setup_data):
     )
     order = record_release_order(
         db=db, release_request=req, payload=payload,
-        current_user=setup_data["authority"]
+        current_user=setup_data["finance_officer"]
     )
     
     # Verify all fields stored
     assert order.order_reference_number == "RL/2026/12345"
     assert order.order_date == date(2026, 10, 25)
     assert order.notes == "Official FDR release letter."
-    assert order.responsible_officer_id == setup_data["authority"].id
+    assert order.responsible_officer_id == setup_data["finance_officer"].id

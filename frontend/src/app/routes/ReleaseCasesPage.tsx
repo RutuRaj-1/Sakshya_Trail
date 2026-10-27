@@ -4,6 +4,7 @@ import { Plus, Search, Filter, AlertCircle, Clock, X, FileText } from 'lucide-re
 import { releaseApi, ReleaseRequest, ReleaseWorkflowStatus, ReleaseRequestType, ReleaseCaseType } from '@/api/release';
 import { instrumentsApi } from '@/api/endpoints';
 import { useAuth } from '@/features/auth/AuthContext';
+import { canCreateReleaseRequest } from '@/features/auth/authUtils';
 import { Badge } from '@/components/common/Badge';
 
 const getStatusBadgeVariant = (status: ReleaseWorkflowStatus): 'default' | 'success' | 'warning' | 'danger' | 'info' | 'purple' | 'teal' => {
@@ -104,7 +105,7 @@ export const ReleaseCasesPage: React.FC = () => {
     }
   };
 
-  const canCreateRequest = ['INSTITUTION_USER', 'SYSTEM_ADMIN'].includes(user?.role || '');
+  const canCreateRequest = canCreateReleaseRequest(user?.role);
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto font-sans">

@@ -18,14 +18,13 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { useAuth } from '@/features/auth/AuthContext';
+import { canCreateInstrument } from '@/features/auth/authUtils';
 
 export const InstrumentsPage: React.FC = () => {
   const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const isInstitutionUser = user?.role === 'INSTITUTION_USER';
-  const canRecord = ['SYSTEM_ADMIN', 'SCRUTINY_OFFICER', 'BRANCH_HEAD', 'INSTITUTION_USER'].includes(
-    user?.role || ''
-  );
+  const canRecord = canCreateInstrument(user?.role);
 
   const [instruments, setInstruments] = useState<Instrument[]>([]);
   const [total, setTotal] = useState(0);

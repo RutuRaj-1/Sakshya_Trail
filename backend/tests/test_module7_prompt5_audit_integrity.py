@@ -50,19 +50,6 @@ from app.modules.audit.service import (
 from app.modules.dashboard.audit_query_service import AuditQueryService
 
 
-@pytest.fixture
-def db_session():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
-@pytest.fixture
-def client():
-    return TestClient(app)
-
 
 @pytest.fixture
 def auth_fixture(db_session):
@@ -127,6 +114,19 @@ def auth_fixture(db_session):
         )
         users[name_prefix] = user
         tokens[name_prefix] = token
+
+    # Seed initial audit event for tenant setup
+    log_audit_event(
+        db=db_session,
+        action="TENANT_SETUP_INITIALIZED",
+        entity_type="SYSTEM",
+        entity_id=f"inst-alpha-{suffix}",
+        actor_email=users["admin"].email,
+        actor_user_id=users["admin"].id,
+        actor_role=users["admin"].role,
+        outcome="SUCCESS",
+        metadata={"institutions": [inst_alpha.code, inst_beta.code]},
+    )
 
     return {
         "suffix": suffix,
@@ -243,45 +243,72 @@ def test_database_rejects_audit_update_and_delete(db_session, auth_fixture):
     - Trigger and ORM listener reject all mutation attempts.
     """
     admin = auth_fixture["users"]["admin"]
+    admin_email = admin.email
 
-    event = log_audit_event(
+    # 1. ORM-level UPDATE attempt must raise PermissionError
+    event1 = log_audit_event(
         db=db_session,
-        action="TEST_IMMUTABLE_EVENT",
+        action="TEST_IMMUTABLE_EVENT_1",
         entity_type="SYSTEM",
-        entity_id="test_lock",
-        actor_email=admin.email,
+        entity_id="test_lock_1",
+        actor_email=admin_email,
         outcome="SUCCESS",
         metadata={"immutable": True},
     )
-
-    # 1. ORM-level UPDATE attempt must raise PermissionError
-    event.action = "TAMPERED_ACTION_MUTATION"
+    event1.action = "TAMPERED_ACTION_MUTATION"
     with pytest.raises(PermissionError) as exc_info:
         db_session.commit()
     assert "append-only" in str(exc_info.value).lower()
     db_session.rollback()
 
     # 2. ORM-level DELETE attempt must raise PermissionError
+    event2 = log_audit_event(
+        db=db_session,
+        action="TEST_IMMUTABLE_EVENT_2",
+        entity_type="SYSTEM",
+        entity_id="test_lock_2",
+        actor_email=admin_email,
+        outcome="SUCCESS",
+        metadata={"immutable": True},
+    )
     with pytest.raises(PermissionError) as exc_info:
-        db_session.delete(event)
+        db_session.delete(event2)
         db_session.commit()
     assert "append-only" in str(exc_info.value).lower()
     db_session.rollback()
 
     # 3. Raw SQL UPDATE attempt must be rejected by the DB trigger
+    event3 = log_audit_event(
+        db=db_session,
+        action="TEST_IMMUTABLE_EVENT_3",
+        entity_type="SYSTEM",
+        entity_id="test_lock_3",
+        actor_email=admin_email,
+        outcome="SUCCESS",
+        metadata={"immutable": True},
+    )
     with pytest.raises((IntegrityError, OperationalError)):
         db_session.execute(
             text("UPDATE audit_events SET action = 'HACKED' WHERE id = :event_id"),
-            {"event_id": event.id},
+            {"event_id": event3.id},
         )
         db_session.commit()
     db_session.rollback()
 
     # 4. Raw SQL DELETE attempt must be rejected by the DB trigger
+    event4 = log_audit_event(
+        db=db_session,
+        action="TEST_IMMUTABLE_EVENT_4",
+        entity_type="SYSTEM",
+        entity_id="test_lock_4",
+        actor_email=admin_email,
+        outcome="SUCCESS",
+        metadata={"immutable": True},
+    )
     with pytest.raises((IntegrityError, OperationalError)):
         db_session.execute(
             text("DELETE FROM audit_events WHERE id = :event_id"),
-            {"event_id": event.id},
+            {"event_id": event4.id},
         )
         db_session.commit()
     db_session.rollback()

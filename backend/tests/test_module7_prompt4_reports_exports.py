@@ -24,18 +24,6 @@ from app.modules.release.models import ReleaseRequest
 from app.modules.audit.models import AuditEvent
 
 
-@pytest.fixture
-def db_session():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
-@pytest.fixture
-def client():
-    return TestClient(app)
 
 
 @pytest.fixture

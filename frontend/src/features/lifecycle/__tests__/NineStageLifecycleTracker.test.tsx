@@ -121,15 +121,15 @@ describe('NineStageLifecycleTracker Component', () => {
     );
 
     expect(screen.getByText(/Nine-Stage FDR Lifecycle Triage Matrix/i)).toBeInTheDocument();
-    expect(screen.getByText('Register')).toBeInTheDocument();
-    expect(screen.getByText('Submit & Attach Evidence')).toBeInTheDocument();
-    expect(screen.getByText('Validate')).toBeInTheDocument();
-    expect(screen.getByText('Verify')).toBeInTheDocument();
-    expect(screen.getByText('Monitor')).toBeInTheDocument();
-    expect(screen.getByText('Renew or Replace')).toBeInTheDocument();
-    expect(screen.getByText('Release Readiness Gate')).toBeInTheDocument();
-    expect(screen.getByText('Authorize')).toBeInTheDocument();
-    expect(screen.getByText('Close & Audit')).toBeInTheDocument();
+    expect(screen.getByText('FDR Submission & Registration')).toBeInTheDocument();
+    expect(screen.getByText('Document Upload & Evidence')).toBeInTheDocument();
+    expect(screen.getByText('Validation & Discrepancy Detection')).toBeInTheDocument();
+    expect(screen.getByText('Scrutiny & Review')).toBeInTheDocument();
+    expect(screen.getByText('Bank Verification & Trust')).toBeInTheDocument();
+    expect(screen.getByText('Lifecycle Monitoring')).toBeInTheDocument();
+    expect(screen.getByText('Renewal & Successor Lineage')).toBeInTheDocument();
+    expect(screen.getByText('Release Readiness')).toBeInTheDocument();
+    expect(screen.getByText('Maker-Checker Decision & Closure')).toBeInTheDocument();
 
     // Check count displays
     expect(screen.getByText('12')).toBeInTheDocument();

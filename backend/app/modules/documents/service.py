@@ -20,7 +20,9 @@ from app.modules.documents.schemas import (
 from app.modules.documents.storage import get_storage_provider, StorageException
 from app.modules.instruments.models import Instrument
 from app.modules.institutions.models import Institution
+from app.modules.auth.models import User
 from app.modules.audit.service import log_audit_event
+from app.common.exceptions import ForbiddenException
 
 
 class DocumentService:
@@ -50,8 +52,15 @@ class DocumentService:
             Created Document instance
         
         Raises:
+            ForbiddenException: If user is an Auditor
             ValueError: If instrument doesn't exist or is inactive
         """
+        # Service-layer defense: Auditor cannot mutate or create documents
+        if created_by_user_id:
+            user = db.query(User).filter(User.id == created_by_user_id).first()
+            if user and user.role == "AUDITOR":
+                raise ForbiddenException("Auditor role has strictly read-only inspection authority and cannot upload documents")
+
         # Verify instrument exists and get its institution
         instrument = db.query(Instrument).filter(Instrument.id == instrument_id).first()
         if not instrument:
@@ -125,6 +134,12 @@ class DocumentService:
             ValueError: If document not found
             StorageException: If storage write fails
         """
+        # Service-layer defense: Auditor cannot upload document versions
+        if uploader_user_id:
+            user = db.query(User).filter(User.id == uploader_user_id).first()
+            if user and user.role == "AUDITOR":
+                raise ForbiddenException("Auditor role has strictly read-only inspection authority and cannot upload documents")
+
         # Verify document exists
         document = db.query(Document).filter(Document.id == document_id).first()
         if not document:

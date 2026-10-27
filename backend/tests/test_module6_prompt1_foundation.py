@@ -149,7 +149,14 @@ def test_users(db_session: Session, test_institutions):
         password_hash="argon2_fake_hash",
         is_active=True,
     )
-    db_session.add_all([user_a, user_b, officer, authority, admin])
+    finance_officer = User(
+        email="finance.officer@aicte.gov.in",
+        full_name="Bureau Finance Officer",
+        role="FINANCE_OFFICER",
+        password_hash="argon2_fake_hash",
+        is_active=True,
+    )
+    db_session.add_all([user_a, user_b, officer, authority, admin, finance_officer])
     db_session.commit()
     return {
         "user_a": user_a,
@@ -157,6 +164,7 @@ def test_users(db_session: Session, test_institutions):
         "officer": officer,
         "authority": authority,
         "admin": admin,
+        "finance_officer": finance_officer,
     }
 
 
@@ -491,7 +499,7 @@ def test_9_release_order_recording_and_bank_action_tracking(
     db_session: Session, test_users, test_instrument
 ):
     user_a = test_users["user_a"]
-    officer = test_users["officer"]
+    finance_officer = test_users["finance_officer"]
 
     req = create_release_request(
         db=db_session,
@@ -515,7 +523,7 @@ def test_9_release_order_recording_and_bank_action_tracking(
             is_synthetic_demo=True,
             notes="Formal release communication dispatched to State Bank of India.",
         ),
-        current_user=officer,
+        current_user=finance_officer,
     )
 
     assert order.id is not None

@@ -3,7 +3,15 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { ProtectedRoute } from '@/features/auth/ProtectedRoute';
 import { DashboardPage } from '@/app/routes/DashboardPage';
+import { InstrumentsPage } from '@/app/routes/InstrumentsPage';
 import { NineStageLifecycleTracker } from '@/features/lifecycle/components/NineStageLifecycleTracker';
+import {
+  canCreateInstrument,
+  canUploadDocument,
+  canCreateReleaseRequest,
+  canRecordReleaseOrder,
+  isAuditorRole,
+} from '@/features/auth/authUtils';
 import type { ApplicationRole, Instrument } from '@/types';
 
 // Mock AuthContext
@@ -389,4 +397,85 @@ describe('Prompt 2 — Role-Specific Navigation, Direct Route Guards & Workspace
       expect(screen.getByText(/Inspect scrutiny validation findings \(read-only\)/i)).toBeInTheDocument();
     });
   });
+
+  describe('Prompt 3 — Action Permissions & Creation Button Visibility', () => {
+    it('omits Record FDR Instrument button for SCRUTINY_OFFICER, BRANCH_HEAD, FINANCE_OFFICER, AUDITOR, COMPETENT_AUTHORITY', async () => {
+      const nonCreators: ApplicationRole[] = [
+        'SCRUTINY_OFFICER',
+        'BRANCH_HEAD',
+        'FINANCE_OFFICER',
+        'AUDITOR',
+        'COMPETENT_AUTHORITY',
+      ];
+
+      for (const role of nonCreators) {
+        mockUser = { id: `user-${role}`, name: 'Officer', email: 'officer@aicte.gov.in', role };
+        const { unmount } = render(
+          <MemoryRouter>
+            <InstrumentsPage />
+          </MemoryRouter>
+        );
+        expect(screen.queryByText('Record FDR Instrument')).not.toBeInTheDocument();
+        unmount();
+      }
+    });
+
+    it('renders Record FDR Instrument button for authorized creators INSTITUTION_USER and SYSTEM_ADMIN', async () => {
+      mockUser = {
+        id: 'user-inst',
+        name: 'Institute Admin',
+        email: 'admin@college.edu',
+        role: 'INSTITUTION_USER',
+      };
+      const { unmount } = render(
+        <MemoryRouter>
+          <InstrumentsPage />
+        </MemoryRouter>
+      );
+      expect(screen.getByText('Record FDR Instrument')).toBeInTheDocument();
+      unmount();
+
+      mockUser = {
+        id: 'user-admin',
+        name: 'Sys Admin',
+        email: 'admin@aicte.gov.in',
+        role: 'SYSTEM_ADMIN',
+      };
+      render(
+        <MemoryRouter>
+          <InstrumentsPage />
+        </MemoryRouter>
+      );
+      expect(screen.getByText('Record FDR Instrument')).toBeInTheDocument();
+    });
+
+    it('verifies centralized capability helpers adhere to backend RBAC policy', () => {
+      expect(canCreateInstrument('INSTITUTION_USER')).toBe(true);
+      expect(canCreateInstrument('SYSTEM_ADMIN')).toBe(true);
+      expect(canCreateInstrument('SCRUTINY_OFFICER')).toBe(false);
+      expect(canCreateInstrument('BRANCH_HEAD')).toBe(false);
+      expect(canCreateInstrument('FINANCE_OFFICER')).toBe(false);
+      expect(canCreateInstrument('AUDITOR')).toBe(false);
+      expect(canCreateInstrument('COMPETENT_AUTHORITY')).toBe(false);
+
+      expect(canUploadDocument('INSTITUTION_USER')).toBe(true);
+      expect(canUploadDocument('SCRUTINY_OFFICER')).toBe(true);
+      expect(canUploadDocument('AUDITOR')).toBe(false);
+      expect(canUploadDocument('FINANCE_OFFICER')).toBe(false);
+
+      expect(canCreateReleaseRequest('INSTITUTION_USER')).toBe(true);
+      expect(canCreateReleaseRequest('SYSTEM_ADMIN')).toBe(true);
+      expect(canCreateReleaseRequest('AUDITOR')).toBe(false);
+      expect(canCreateReleaseRequest('SCRUTINY_OFFICER')).toBe(false);
+
+      expect(canRecordReleaseOrder('FINANCE_OFFICER')).toBe(true);
+      expect(canRecordReleaseOrder('COMPETENT_AUTHORITY')).toBe(false);
+      expect(canRecordReleaseOrder('AUDITOR')).toBe(false);
+
+      expect(isAuditorRole('AUDITOR')).toBe(true);
+      expect(isAuditorRole('FINANCE_OFFICER')).toBe(false);
+      expect(isAuditorRole('SYSTEM_ADMIN')).toBe(false);
+    });
+  });
 });
+

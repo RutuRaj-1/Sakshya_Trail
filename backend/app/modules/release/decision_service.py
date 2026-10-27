@@ -910,13 +910,23 @@ def record_release_order(
     Records official release order after approval.
     Requires FINANCE_OFFICER role and verified metadata.
     """
-    # Authorization
-    auth_ok, auth_reason = check_user_authority(
-        current_user,
-        ["FINANCE_OFFICER", "COMPETENT_AUTHORITY", "SYSTEM_ADMIN"],
-    )
-    if not auth_ok:
-        raise ForbiddenException(auth_reason)
+    # Authorization: strictly restricted to FINANCE_OFFICER
+    if current_user.role != "FINANCE_OFFICER":
+        log_audit_event(
+            db=db,
+            action="RELEASE_ORDER_RECORDING_DENIED",
+            entity_type="RELEASE_REQUEST",
+            entity_id=release_request.id,
+            actor_user_id=current_user.id,
+            actor_email=current_user.email,
+            actor_role=current_user.role,
+            outcome="DENIED",
+            metadata={
+                "case_number": release_request.case_number,
+                "reason": f"Only Finance Officer is authorized to record release orders. Attempted by {current_user.role}.",
+            },
+        )
+        raise ForbiddenException(f"Action forbidden for role '{current_user.role}'. Required: ['FINANCE_OFFICER']")
     
     # State validation
     if release_request.workflow_status != ReleaseWorkflowStatus.APPROVED.value:
@@ -924,6 +934,19 @@ def record_release_order(
             status_code=400,
             message="Can only record release order after APPROVED status",
             code="INVALID_ORDER_RECORDING_STATE",
+        )
+    
+    # Idempotency / duplicate order check
+    existing_order = db.scalar(
+        select(ReleaseOrderRecord).where(
+            ReleaseOrderRecord.release_request_id == release_request.id
+        )
+    )
+    if existing_order:
+        raise AppException(
+            status_code=400,
+            message=f"Release order already recorded for request '{release_request.id}'",
+            code="DUPLICATE_RELEASE_ORDER",
         )
     
     # Create order record

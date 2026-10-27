@@ -31,6 +31,14 @@ from app.modules.auth.models import User
 from app.modules.auth.service import provision_user
 from app.modules.institutions.models import Institution
 from app.modules.instruments.models import Instrument
+from app.modules.documents.models import Document, DocumentVersion
+from app.modules.documents.service import DocumentService
+from app.modules.release.models import ReleaseRequest, ReleaseOrderRecord
+from app.modules.release.schemas import ReleaseRequestCreate, ReleaseOrderCreate
+from app.modules.release.service import create_release_request, seed_demo_release_profile
+from app.modules.release.decision_service import approve_release_request, record_release_order as record_release_order_decision
+from app.modules.release.enums import ReleaseWorkflowStatus, ReleaseOrderStatus, BankActionStatus
+from app.common.exceptions import ForbiddenException, AppException
 
 
 @pytest.fixture
@@ -97,6 +105,22 @@ def auth_fixture(db_session: Session):
         institution_id=inst_b.id,
         must_change_password=False,
     )
+    authority = provision_user(
+        db=db_session,
+        full_name="Competent Authority P2",
+        email="authority.p2@aicte-india.org",
+        password="ValidPassword@2026",
+        role=ROLE_COMPETENT_AUTHORITY,
+        must_change_password=False,
+    )
+    finance_officer = provision_user(
+        db=db_session,
+        full_name="Finance Officer P2",
+        email="finance.p2@aicte-india.org",
+        password="ValidPassword@2026",
+        role=ROLE_FINANCE_OFFICER,
+        must_change_password=False,
+    )
     rotator_user = provision_user(
         db=db_session,
         full_name="First Time User P2",
@@ -129,6 +153,8 @@ def auth_fixture(db_session: Session):
         "auditor": auditor,
         "inst_user_a": inst_user_a,
         "inst_user_b": inst_user_b,
+        "authority": authority,
+        "finance_officer": finance_officer,
         "rotator_user": rotator_user,
         "instrument_a": instrument_a,
     }
@@ -311,3 +337,259 @@ def test_10_password_rotation_clears_must_change_password(client: TestClient, au
     )
     assert new_login.status_code == 200
     assert new_login.json()["user"]["must_change_password"] is False
+
+
+def test_11_auditor_document_upload_rejected_with_403(client: TestClient, auth_fixture, db_session: Session):
+    """
+    P0.2: Auditor is strictly read-only and cannot upload documents.
+    - Router rejects upload attempt with 403 Forbidden.
+    - Direct service invocation raises ForbiddenException.
+    - Zero records or document versions are created.
+    """
+    auditor_login = client.post(
+        "/api/v1/auth/login",
+        json={"email": "auditor.p2@aicte-india.org", "password": "ValidPassword@2026"},
+    )
+    auditor_token = auditor_login.json()["access_token"]
+    instrument_id = auth_fixture["instrument_a"].id
+    initial_docs_count = db_session.query(Document).filter(Document.instrument_id == instrument_id).count()
+
+    # 1. API endpoint call by Auditor -> 403 Forbidden
+    file_bytes = b"%PDF-1.4\n%synthetic pdf upload"
+    res = client.post(
+        f"/api/v1/instruments/{instrument_id}/documents",
+        data={"category": "FDR_COPY", "title": "Auditor FDR Copy"},
+        files={"file": ("test_doc.pdf", file_bytes, "application/pdf")},
+        headers={"Authorization": f"Bearer {auditor_token}"},
+    )
+    assert res.status_code == 403
+    assert "read-only" in res.json().get("error", "").lower() or "read-only" in res.json().get("detail", "").lower()
+
+    # Verify no document or version was persisted
+    final_docs_count = db_session.query(Document).filter(Document.instrument_id == instrument_id).count()
+    assert final_docs_count == initial_docs_count
+
+    # 2. Service layer defense directly
+    with pytest.raises(ForbiddenException):
+        DocumentService.create_document(
+            db=db_session,
+            instrument_id=instrument_id,
+            category="FDR_COPY",
+            created_by_user_id=auth_fixture["auditor"].id,
+        )
+
+
+def test_12_institution_user_document_upload_tenant_isolation(client: TestClient, auth_fixture, db_session: Session):
+    """
+    P0.2: Document upload preserves valid tenant isolation:
+    - Institution User A can upload to its own instrument.
+    - Institution User B cannot upload to Institution A's instrument (403 Forbidden).
+    """
+    # Login Institution User B
+    login_b = client.post(
+        "/api/v1/auth/login",
+        json={"email": "nodal.b.p2@beta.ac.in", "password": "ValidPassword@2026"},
+    )
+    token_b = login_b.json()["access_token"]
+
+    file_bytes = b"%PDF-1.4\n%synthetic pdf upload"
+    res = client.post(
+        f"/api/v1/instruments/{auth_fixture['instrument_a'].id}/documents",
+        data={"category": "FDR_COPY", "title": "Cross Tenant Attempt"},
+        files={"file": ("cross_tenant.pdf", file_bytes, "application/pdf")},
+        headers={"Authorization": f"Bearer {token_b}"},
+    )
+    assert res.status_code == 403
+
+    # Login Institution User A -> Success
+    login_a = client.post(
+        "/api/v1/auth/login",
+        json={"email": "nodal.a.p2@alpha.ac.in", "password": "ValidPassword@2026"},
+    )
+    token_a = login_a.json()["access_token"]
+
+    res_a = client.post(
+        f"/api/v1/instruments/{auth_fixture['instrument_a'].id}/documents",
+        data={"category": "FDR_COPY", "title": "Valid Institution A FDR"},
+        files={"file": ("valid_fdr.pdf", file_bytes, "application/pdf")},
+        headers={"Authorization": f"Bearer {token_a}"},
+    )
+    assert res_a.status_code in (200, 201)
+    assert res_a.json()["category"] == "FDR_COPY"
+
+
+def test_13_auditor_release_request_creation_rejected_with_403(client: TestClient, auth_fixture, db_session: Session):
+    """
+    P0.3: Auditor is strictly read-only and cannot create release requests.
+    - Router rejects attempt with 403 Forbidden.
+    - Direct service call raises ForbiddenException.
+    - No release request record is created.
+    """
+    auditor_login = client.post(
+        "/api/v1/auth/login",
+        json={"email": "auditor.p2@aicte-india.org", "password": "ValidPassword@2026"},
+    )
+    auditor_token = auditor_login.json()["access_token"]
+    instrument_id = auth_fixture["instrument_a"].id
+    initial_count = db_session.query(ReleaseRequest).filter(ReleaseRequest.instrument_id == instrument_id).count()
+
+    payload = {
+        "instrument_id": instrument_id,
+        "request_type": "RELEASE",
+        "case_type": "STANDARD_MATURITY_RELEASE",
+        "request_reason": "Auditor unauthorized release request attempt",
+    }
+
+    # API call
+    res = client.post(
+        "/api/v1/release/requests",
+        json=payload,
+        headers={"Authorization": f"Bearer {auditor_token}"},
+    )
+    assert res.status_code == 403
+    assert "read-only" in res.json().get("error", "").lower() or "read-only" in res.json().get("detail", "").lower()
+
+    # Verify no record created
+    final_count = db_session.query(ReleaseRequest).filter(ReleaseRequest.instrument_id == instrument_id).count()
+    assert final_count == initial_count
+
+    # Service call
+    with pytest.raises(ForbiddenException):
+        create_release_request(
+            db=db_session,
+            payload=ReleaseRequestCreate(**payload),
+            current_user=auth_fixture["auditor"],
+        )
+
+
+def test_14_institution_user_release_request_tenant_isolation(client: TestClient, auth_fixture, db_session: Session):
+    """
+    P0.3: Release request creation preserves valid tenant isolation:
+    - Institution User A can create release request for Instrument A.
+    - Institution User B cannot create release request for Instrument A (403 Forbidden).
+    """
+    # Ensure profile seeded
+    seed_demo_release_profile(db_session, created_by_user_id=auth_fixture["admin"].id)
+
+    # Institution User B attempting against Instrument A
+    login_b = client.post(
+        "/api/v1/auth/login",
+        json={"email": "nodal.b.p2@beta.ac.in", "password": "ValidPassword@2026"},
+    )
+    token_b = login_b.json()["access_token"]
+
+    payload = {
+        "instrument_id": auth_fixture["instrument_a"].id,
+        "request_type": "RELEASE",
+        "case_type": "STANDARD_MATURITY_RELEASE",
+        "request_reason": "Cross-institution attempt",
+    }
+
+    res_b = client.post(
+        "/api/v1/release/requests",
+        json=payload,
+        headers={"Authorization": f"Bearer {token_b}"},
+    )
+    assert res_b.status_code == 403
+
+    # Institution User A succeeds
+    login_a = client.post(
+        "/api/v1/auth/login",
+        json={"email": "nodal.a.p2@alpha.ac.in", "password": "ValidPassword@2026"},
+    )
+    token_a = login_a.json()["access_token"]
+
+    res_a = client.post(
+        "/api/v1/release/requests",
+        json=payload,
+        headers={"Authorization": f"Bearer {token_a}"},
+    )
+    assert res_a.status_code == 201
+    assert res_a.json()["workflow_status"] in ("DRAFT", "SUBMITTED")
+
+
+def test_15_release_order_recording_separation_of_duties(client: TestClient, auth_fixture, db_session: Session):
+    """
+    P0.4: Strict separation of duties between statutory approval and financial release-order recording.
+    - COMPETENT_AUTHORITY approves release request.
+    - COMPETENT_AUTHORITY receives 403 Forbidden when attempting to record the release order.
+    - SYSTEM_ADMIN receives 403 Forbidden when attempting to record the release order.
+    - FINANCE_OFFICER successfully records the release order.
+    - Order recording does not automatically complete bank action or close the case.
+    - Duplicate recording attempt is rejected with 400.
+    """
+    # 1. Seed profile and create a release request
+    profile = seed_demo_release_profile(db_session, created_by_user_id=auth_fixture["admin"].id)
+    req = create_release_request(
+        db=db_session,
+        payload=ReleaseRequestCreate(
+            instrument_id=auth_fixture["instrument_a"].id,
+            request_type="RELEASE",
+            case_type="STANDARD_MATURITY_RELEASE",
+            request_reason="Legitimate mature deposit release.",
+            policy_profile_id=profile.id,
+        ),
+        current_user=auth_fixture["inst_user_a"],
+    )
+
+    # 2. Advance to READY_FOR_AUTHORITY, then approve
+    req.workflow_status = ReleaseWorkflowStatus.APPROVED.value
+    db_session.commit()
+
+    # 3. Logins
+    order_payload = {
+        "order_reference_number": "RO-AICTE-P2-2026-001",
+        "order_date": str(date.today()),
+        "is_synthetic_demo": True,
+        "notes": "Financial release order dispatched to SBI branch.",
+    }
+
+    # 4. Competent Authority attempting to record order -> 403 Forbidden
+    client.cookies.clear()
+    client.post(
+        "/api/v1/auth/login",
+        json={"email": "authority.p2@aicte-india.org", "password": "ValidPassword@2026"},
+    )
+    ca_res = client.post(
+        f"/api/v1/release/requests/{req.id}/record-order",
+        json=order_payload,
+    )
+    assert ca_res.status_code == 403
+
+    # 5. System Admin attempting to record order -> 403 Forbidden
+    client.cookies.clear()
+    client.post(
+        "/api/v1/auth/login",
+        json={"email": "admin.p2@aicte-india.org", "password": "ValidPassword@2026"},
+    )
+    admin_res = client.post(
+        f"/api/v1/release/requests/{req.id}/record-order",
+        json=order_payload,
+    )
+    assert admin_res.status_code == 403
+
+    # 6. Finance Officer successfully records release order -> 201 Created
+    client.cookies.clear()
+    client.post(
+        "/api/v1/auth/login",
+        json={"email": "finance.p2@aicte-india.org", "password": "ValidPassword@2026"},
+    )
+    fo_res = client.post(
+        f"/api/v1/release/requests/{req.id}/record-order",
+        json=order_payload,
+    )
+    assert fo_res.status_code == 201
+    assert fo_res.json()["order_reference_number"] == "RO-AICTE-P2-2026-001"
+    assert fo_res.json()["bank_action_status"] == BankActionStatus.PENDING.value
+
+    # Verify workflow status advanced to RELEASE_ORDER_RECORDED, NOT COMPLETED or CLOSED
+    db_session.refresh(req)
+    assert req.workflow_status == ReleaseWorkflowStatus.RELEASE_ORDER_RECORDED.value
+
+    # 7. Duplicate order recording attempt -> 400 Bad Request
+    fo_dup_res = client.post(
+        f"/api/v1/release/requests/{req.id}/record-order",
+        json=order_payload,
+    )
+    assert fo_dup_res.status_code == 400
+

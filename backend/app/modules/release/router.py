@@ -21,6 +21,7 @@ from app.core.security import (
 from app.modules.auth.dependencies import (
     get_current_user,
     require_roles,
+    require_read_only_or_permitted,
 )
 from app.modules.auth.models import User
 from app.modules.release.models import ReleaseChecklistProfile
@@ -78,7 +79,7 @@ router = APIRouter(prefix="/release", tags=["Module 6 — Release & Refund"])
 def create_release_request_endpoint(
     payload: ReleaseRequestCreate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_read_only_or_permitted),
 ):
     return create_release_request(db=db, payload=payload, current_user=current_user)
 
@@ -158,7 +159,7 @@ def record_release_order_endpoint(
     id: str = Path(...),
     payload: ReleaseOrderCreate = ...,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_roles([ROLE_SYSTEM_ADMIN, ROLE_FINANCE_OFFICER, ROLE_COMPETENT_AUTHORITY])),
+    current_user: User = Depends(require_roles([ROLE_FINANCE_OFFICER])),
 ):
     return record_release_order(db=db, request_id=id, payload=payload, current_user=current_user)
 
@@ -446,7 +447,7 @@ def record_release_order_endpoint_decision(
     id: str = Path(...),
     payload: ReleaseOrderCreate = ...,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_roles([ROLE_SYSTEM_ADMIN, ROLE_FINANCE_OFFICER, ROLE_COMPETENT_AUTHORITY])),
+    current_user: User = Depends(require_roles([ROLE_FINANCE_OFFICER])),
 ):
     """
     Records official release letter (order reference, date, supporting docs).

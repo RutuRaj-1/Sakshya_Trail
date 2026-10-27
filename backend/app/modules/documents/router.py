@@ -7,8 +7,14 @@ from fastapi import APIRouter, Depends, UploadFile, File, Form, HTTPException, R
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
+from app.core.security import ROLE_AUDITOR
 from app.modules.auth.models import User
-from app.modules.auth.dependencies import get_current_active_user, require_roles, enforce_institution_scope
+from app.modules.auth.dependencies import (
+    get_current_active_user,
+    require_roles,
+    enforce_institution_scope,
+    require_read_only_or_permitted,
+)
 from app.modules.instruments.models import Instrument
 from app.modules.documents.models import Document, DocumentVersion
 from app.modules.documents.service import DocumentService
@@ -28,7 +34,7 @@ async def create_and_upload_document(
     title: Optional[str] = Form(None),
     description: Optional[str] = Form(None),
     file: UploadFile = File(...),
-    current_user: User = Depends(get_current_active_user),
+    current_user: User = Depends(require_read_only_or_permitted),
     db: Session = Depends(get_db),
 ):
     """
@@ -40,6 +46,9 @@ async def create_and_upload_document(
     - Records immutable version
     - Returns document and version metadata
     """
+    # 0. Strict defense-in-depth: Auditor cannot upload documents
+    if current_user.role == ROLE_AUDITOR:
+        raise ForbiddenException("Auditor role has strictly read-only inspection authority and cannot upload documents")
     
     # 1. Verify instrument exists and is active
     instrument = db.query(Instrument).filter(Instrument.id == instrument_id).first()
