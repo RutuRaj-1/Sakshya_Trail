@@ -94,7 +94,7 @@ export const LoginPage: React.FC = () => {
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
         <Link
           to="/"
-          className="inline-flex items-center gap-2 group focus:outline-none focus:ring-2 focus:ring-[#0F766E] rounded-[8px] p-1 mb-2"
+          className="inline-flex items-center gap-2 group focus:outline-none focus:ring-2 focus:ring-[#0F766E] rounded-none p-1 mb-2"
           title="Return to SakshyaTrail Landing Page"
         >
           <img
@@ -113,13 +113,13 @@ export const LoginPage: React.FC = () => {
 
       {/* Main Authentication Card */}
       <div className="mt-6 sm:mx-auto sm:w-full sm:max-w-md px-4 sm:px-0">
-        <div className="bg-white py-8 px-6 sm:px-10 shadow-lg shadow-slate-200/50 border border-[#C9D3DB] rounded-[10px] relative">
+        <div className="bg-white py-8 px-6 sm:px-10 shadow-lg shadow-slate-200/50 border border-[#C9D3DB] rounded-none relative">
           <form className="space-y-4" onSubmit={handleSubmit} noValidate>
             {/* Failure Alert */}
             {error && (
               <div
                 role="alert"
-                className="p-3.5 bg-rose-50 border border-rose-200 rounded-[8px] flex items-start gap-2.5 text-xs text-[#C62828] animate-in fade-in duration-200"
+                className="p-3.5 bg-rose-50 border border-rose-200 rounded-none flex items-start gap-2.5 text-xs text-[#C62828] animate-in fade-in duration-200"
               >
                 <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-500" />
                 <span className="leading-relaxed">{error}</span>
@@ -149,7 +149,7 @@ export const LoginPage: React.FC = () => {
                     if (error) setError(null);
                   }}
                   placeholder="name@aicte-india.org"
-                  className={`w-full pl-10 pr-3 py-2.5 text-sm border rounded-[8px] focus:outline-none focus:ring-2 bg-white transition-colors ${
+                  className={`w-full pl-10 pr-3 py-2.5 text-sm border rounded-none focus:outline-none focus:ring-2 bg-white transition-colors ${
                     emailTouched && email && !isEmailValid(email)
                       ? 'border-rose-300 focus:ring-rose-500 text-rose-900'
                       : 'border-[#C9D3DB] focus:ring-[#0F766E] focus:border-[#0F766E] text-[#253746]'
@@ -185,12 +185,12 @@ export const LoginPage: React.FC = () => {
                     if (error) setError(null);
                   }}
                   placeholder="••••••••••••"
-                  className="w-full pl-10 pr-10 py-2.5 text-sm border border-[#C9D3DB] rounded-[8px] focus:outline-none focus:ring-2 focus:ring-[#0F766E] focus:border-[#0F766E] bg-white text-[#253746] transition-colors"
+                  className="w-full pl-10 pr-10 py-2.5 text-sm border border-[#C9D3DB] rounded-none focus:outline-none focus:ring-2 focus:ring-[#0F766E] focus:border-[#0F766E] bg-white text-[#253746] transition-colors"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none p-1 rounded cursor-pointer"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none p-1 rounded-none cursor-pointer"
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -203,7 +203,7 @@ export const LoginPage: React.FC = () => {
               type="submit"
               size="lg"
               disabled={isLoading}
-              className="w-full bg-[#123B5D] hover:bg-[#0D2538] text-white font-bold py-2.5 rounded-[8px] shadow-md shadow-[#123B5D]/20 transition-all cursor-pointer mt-2"
+              className="w-full bg-[#123B5D] hover:bg-[#0D2538] text-white font-bold py-2.5 rounded-none shadow-md shadow-[#123B5D]/20 transition-all cursor-pointer mt-2"
             >
               {isLoading ? (
                 <div className="flex items-center justify-center gap-2">
@@ -229,7 +229,7 @@ export const LoginPage: React.FC = () => {
           {/* Development & Evaluator Accounts Strip */}
           <div className="mt-6 pt-5 border-t border-slate-100">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-teal-800 bg-teal-50 px-2 py-0.5 rounded border border-teal-200">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-teal-800 bg-teal-50 px-2 py-0.5 rounded-none border border-teal-200">
                 SIH Evaluator Demo Accounts
               </span>
               <span className="text-[10px] text-slate-400 font-mono">One-Click Autofill</span>
@@ -243,7 +243,7 @@ export const LoginPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => fillDemoAccount('admin@aicte-india.org', 'AdminPassword@2026')}
-                className="p-2 border border-slate-200 rounded-lg text-left hover:border-teal-400 hover:bg-teal-50/40 transition-colors cursor-pointer group"
+                className="p-2 border border-slate-200 rounded-none text-left hover:border-teal-400 hover:bg-teal-50/40 transition-colors cursor-pointer group"
               >
                 <div className="font-bold text-[#0D2538] group-hover:text-teal-900 text-[11px]">
                   System Admin
@@ -255,7 +255,7 @@ export const LoginPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => fillDemoAccount('scrutiny.verma@aicte-india.org', 'OfficerPassword@2026')}
-                className="p-2 border border-slate-200 rounded-lg text-left hover:border-teal-400 hover:bg-teal-50/40 transition-colors cursor-pointer group"
+                className="p-2 border border-slate-200 rounded-none text-left hover:border-teal-400 hover:bg-teal-50/40 transition-colors cursor-pointer group"
               >
                 <div className="font-bold text-[#0D2538] group-hover:text-teal-900 text-[11px]">
                   Scrutiny Officer
@@ -267,7 +267,7 @@ export const LoginPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => fillDemoAccount('branch.head.north@aicte-india.org', 'BranchPassword@2026')}
-                className="p-2 border border-slate-200 rounded-lg text-left hover:border-teal-400 hover:bg-teal-50/40 transition-colors cursor-pointer group"
+                className="p-2 border border-slate-200 rounded-none text-left hover:border-teal-400 hover:bg-teal-50/40 transition-colors cursor-pointer group"
               >
                 <div className="font-bold text-[#0D2538] group-hover:text-teal-900 text-[11px]">
                   Branch Head
@@ -279,7 +279,7 @@ export const LoginPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => fillDemoAccount('authority.member@aicte-india.org', 'AuthorityPassword@2026')}
-                className="p-2 border border-slate-200 rounded-lg text-left hover:border-teal-400 hover:bg-teal-50/40 transition-colors cursor-pointer group"
+                className="p-2 border border-slate-200 rounded-none text-left hover:border-teal-400 hover:bg-teal-50/40 transition-colors cursor-pointer group"
               >
                 <div className="font-bold text-[#0D2538] group-hover:text-teal-900 text-[11px]">
                   Competent Authority
@@ -291,7 +291,7 @@ export const LoginPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => fillDemoAccount('finance.officer@aicte-india.org', 'FinancePassword@2026')}
-                className="p-2 border border-slate-200 rounded-lg text-left hover:border-teal-400 hover:bg-teal-50/40 transition-colors cursor-pointer group"
+                className="p-2 border border-slate-200 rounded-none text-left hover:border-teal-400 hover:bg-teal-50/40 transition-colors cursor-pointer group"
               >
                 <div className="font-bold text-[#0D2538] group-hover:text-teal-900 text-[11px]">
                   Finance Officer
@@ -303,7 +303,7 @@ export const LoginPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => fillDemoAccount('auditor.compliance@aicte-india.org', 'AuditorPassword@2026')}
-                className="p-2 border border-slate-200 rounded-lg text-left hover:border-teal-400 hover:bg-teal-50/40 transition-colors cursor-pointer group"
+                className="p-2 border border-slate-200 rounded-none text-left hover:border-teal-400 hover:bg-teal-50/40 transition-colors cursor-pointer group"
               >
                 <div className="font-bold text-[#0D2538] group-hover:text-teal-900 text-[11px]">
                   Compliance Auditor
@@ -315,13 +315,13 @@ export const LoginPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => fillDemoAccount('nodal.pun001@example.com', 'NodalPassword@2026')}
-                className="p-2 border border-slate-200 rounded-lg text-left hover:border-teal-400 hover:bg-teal-50/40 transition-colors cursor-pointer group"
+                className="p-2 border border-slate-200 rounded-none text-left hover:border-teal-400 hover:bg-teal-50/40 transition-colors cursor-pointer group"
               >
                 <div className="flex items-center justify-between">
                   <span className="font-bold text-[#0D2538] group-hover:text-teal-900 text-[11px]">
                     Nodal (Pune)
                   </span>
-                  <span className="text-[9px] bg-slate-100 text-slate-600 px-1 py-0.5 rounded font-mono">
+                  <span className="text-[9px] bg-slate-100 text-slate-600 px-1 py-0.5 rounded-none font-mono">
                     DEMO-PUN-001
                   </span>
                 </div>
@@ -332,13 +332,13 @@ export const LoginPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => fillDemoAccount('nodal.mum001@example.com', 'NodalPassword@2026')}
-                className="p-2 border border-slate-200 rounded-lg text-left hover:border-teal-400 hover:bg-teal-50/40 transition-colors cursor-pointer group"
+                className="p-2 border border-slate-200 rounded-none text-left hover:border-teal-400 hover:bg-teal-50/40 transition-colors cursor-pointer group"
               >
                 <div className="flex items-center justify-between">
                   <span className="font-bold text-[#0D2538] group-hover:text-teal-900 text-[11px]">
                     Nodal (Mumbai)
                   </span>
-                  <span className="text-[9px] bg-slate-100 text-slate-600 px-1 py-0.5 rounded font-mono">
+                  <span className="text-[9px] bg-slate-100 text-slate-600 px-1 py-0.5 rounded-none font-mono">
                     DEMO-MUM-001
                   </span>
                 </div>

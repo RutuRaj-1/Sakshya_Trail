@@ -60,11 +60,11 @@ export const CompetentAuthorityWorkspace: React.FC = () => {
   return (
     <div className="space-y-6 max-w-7xl mx-auto font-sans">
       {/* Top Banner — Competent Authority */}
-      <div className="bg-[#0D2538] rounded-[10px] p-6 text-white shadow-xs border border-[#1e3c54]">
+      <div className="bg-[#0D2538] rounded-none p-6 text-white shadow-xs border border-[#1e3c54]">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-1.5">
-              <span className="bg-[#123B5D] text-[#8ACEC8] border border-[#0F766E]/40 text-[10px] font-semibold px-2 py-0.5 rounded font-mono uppercase">
+              <span className="bg-[#123B5D] text-[#8ACEC8] border border-[#0F766E]/40 text-[10px] font-semibold px-2 py-0.5 rounded-none font-mono uppercase">
                 Final Decision Authority
               </span>
               <span className="text-[#8799A9] text-xs font-mono">Stage 8 Sanction Desk</span>
@@ -96,7 +96,7 @@ export const CompetentAuthorityWorkspace: React.FC = () => {
       </div>
 
       {/* Statutory Guardrail Callout */}
-      <div className="bg-[#FEF7E8] border border-[#F8DEAE] rounded-lg p-3.5 flex items-start gap-2.5 text-xs text-[#8A5A00]">
+      <div className="bg-[#FEF7E8] border border-[#F8DEAE] rounded-none p-3.5 flex items-start gap-2.5 text-xs text-[#8A5A00]">
         <ShieldAlert className="w-4 h-4 shrink-0 mt-0.5" />
         <p className="leading-relaxed">
           <strong>Maker-Checker Statutory Protocol:</strong> The Competent Authority cannot approve a case they originally created or reviewed as a primary examiner. AI and automated checklists produce readiness evaluations but can <em>never</em> substitute for an authorized human sanction decision.
@@ -104,7 +104,7 @@ export const CompetentAuthorityWorkspace: React.FC = () => {
       </div>
 
       {error && (
-        <div className="bg-rose-50 border border-rose-200 rounded-lg p-4 flex items-center justify-between text-xs text-rose-800">
+        <div className="bg-rose-50 border border-rose-200 rounded-none p-4 flex items-center justify-between text-xs text-rose-800">
           <div className="flex items-center gap-2">
             <AlertCircle className="w-4 h-4 text-rose-600" />
             <span>{error}</span>
@@ -117,7 +117,7 @@ export const CompetentAuthorityWorkspace: React.FC = () => {
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="p-4 border-[#C9D3DB]">
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-lg bg-[#E6F4F2] text-[#0F766E] border border-[#99D5CE]">
+            <div className="p-3 rounded-none bg-[#E6F4F2] text-[#0F766E] border border-[#99D5CE]">
               <Scale className="w-5 h-5" />
             </div>
             <div>
@@ -132,7 +132,7 @@ export const CompetentAuthorityWorkspace: React.FC = () => {
 
         <Card className="p-4 border-[#C9D3DB]">
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-lg bg-[#FDF2F1] text-[#B42318] border border-[#FECDCA]">
+            <div className="p-3 rounded-none bg-[#FDF2F1] text-[#B42318] border border-[#FECDCA]">
               <XCircle className="w-5 h-5" />
             </div>
             <div>
@@ -147,7 +147,7 @@ export const CompetentAuthorityWorkspace: React.FC = () => {
 
         <Card className="p-4 border-[#C9D3DB]">
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-lg bg-[#E7F3EC] text-[#18794E] border border-[#B4DFC9]">
+            <div className="p-3 rounded-none bg-[#E7F3EC] text-[#18794E] border border-[#B4DFC9]">
               <CheckCircle className="w-5 h-5" />
             </div>
             <div>
@@ -162,7 +162,7 @@ export const CompetentAuthorityWorkspace: React.FC = () => {
 
         <Card className="p-4 border-[#C9D3DB]">
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-lg bg-[#EEF6FA] text-[#123B5D] border border-[#C4DEED]">
+            <div className="p-3 rounded-none bg-[#EEF6FA] text-[#123B5D] border border-[#C4DEED]">
               <ShieldCheck className="w-5 h-5" />
             </div>
             <div>
@@ -193,7 +193,7 @@ export const CompetentAuthorityWorkspace: React.FC = () => {
             </Link>
           </div>
 
-          <div className="bg-white rounded-[10px] border border-[#C9D3DB] overflow-hidden shadow-2xs">
+          <div className="bg-white rounded-none border border-[#C9D3DB] overflow-hidden shadow-2xs">
             {pendingCases.length === 0 ? (
               <div className="p-8 text-center text-xs text-[#5D6A75]">
                 <CheckCircle className="w-8 h-8 text-emerald-500 mx-auto mb-2" />
@@ -224,7 +224,7 @@ export const CompetentAuthorityWorkspace: React.FC = () => {
                         <td className="py-3 px-4 font-mono text-xs text-[#5D6A75]">{c.instrument_id.substring(0, 16)}...</td>
                         <td className="py-3 px-4 font-mono text-xs text-[#5D6A75]">{c.institution_id}</td>
                         <td className="py-3 px-4">
-                          <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-200">
+                          <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-none bg-emerald-100 text-emerald-800 border border-emerald-200">
                             GATE CLEARED
                           </span>
                         </td>
@@ -258,7 +258,7 @@ export const CompetentAuthorityWorkspace: React.FC = () => {
             </Link>
           </div>
 
-          <div className="bg-white rounded-[10px] border border-[#C9D3DB] p-4 space-y-3 shadow-2xs">
+          <div className="bg-white rounded-none border border-[#C9D3DB] p-4 space-y-3 shadow-2xs">
             {recentDecisions.length === 0 ? (
               <p className="text-xs text-[#5D6A75] text-center py-6">No historical decisions recorded.</p>
             ) : (
@@ -266,7 +266,7 @@ export const CompetentAuthorityWorkspace: React.FC = () => {
                 <Link
                   key={d.id}
                   to={`/release/${d.id}`}
-                  className="block p-3 rounded-lg border border-slate-200 hover:border-[#0F766E] transition-all bg-[#F5F4EF]/40"
+                  className="block p-3 rounded-none border border-slate-200 hover:border-[#0F766E] transition-all bg-[#F5F4EF]/40"
                 >
                   <div className="flex items-center justify-between">
                     <span className="font-mono font-bold text-xs text-[#0D2538]">{d.case_number}</span>

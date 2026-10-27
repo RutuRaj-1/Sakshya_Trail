@@ -58,11 +58,11 @@ export const FinanceOfficerWorkspace: React.FC = () => {
   return (
     <div className="space-y-6 max-w-7xl mx-auto font-sans">
       {/* Top Banner — Finance Officer */}
-      <div className="bg-[#0D2538] rounded-[10px] p-6 text-white shadow-xs border border-[#1e3c54]">
+      <div className="bg-[#0D2538] rounded-none p-6 text-white shadow-xs border border-[#1e3c54]">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-1.5">
-              <span className="bg-[#123B5D] text-[#8ACEC8] border border-[#0F766E]/40 text-[10px] font-semibold px-2 py-0.5 rounded font-mono uppercase">
+              <span className="bg-[#123B5D] text-[#8ACEC8] border border-[#0F766E]/40 text-[10px] font-semibold px-2 py-0.5 rounded-none font-mono uppercase">
                 Financial Operations
               </span>
               <span className="text-[#8799A9] text-xs font-mono">Discharge Orders & Bank Execution</span>
@@ -94,7 +94,7 @@ export const FinanceOfficerWorkspace: React.FC = () => {
       </div>
 
       {/* Statutory Notice */}
-      <div className="bg-[#EEF6FA] border border-[#C4DEED] rounded-lg p-3.5 flex items-start gap-2.5 text-xs text-[#245B7A]">
+      <div className="bg-[#EEF6FA] border border-[#C4DEED] rounded-none p-3.5 flex items-start gap-2.5 text-xs text-[#245B7A]">
         <ShieldAlert className="w-4 h-4 shrink-0 mt-0.5" />
         <p className="leading-relaxed">
           <strong>Accounting Invariant:</strong> An unverified bank action cannot be marked as completed. Official release letters must be recorded before confirming bank disbursement, and discharge closure requires confirmed bank acknowledgement.
@@ -102,7 +102,7 @@ export const FinanceOfficerWorkspace: React.FC = () => {
       </div>
 
       {error && (
-        <div className="bg-rose-50 border border-rose-200 rounded-lg p-4 flex items-center justify-between text-xs text-rose-800">
+        <div className="bg-rose-50 border border-rose-200 rounded-none p-4 flex items-center justify-between text-xs text-rose-800">
           <div className="flex items-center gap-2">
             <AlertCircle className="w-4 h-4 text-rose-600" />
             <span>{error}</span>
@@ -115,7 +115,7 @@ export const FinanceOfficerWorkspace: React.FC = () => {
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="p-4 border-[#C9D3DB]">
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-lg bg-[#E6F4F2] text-[#0F766E] border border-[#99D5CE]">
+            <div className="p-3 rounded-none bg-[#E6F4F2] text-[#0F766E] border border-[#99D5CE]">
               <FileText className="w-5 h-5" />
             </div>
             <div>
@@ -130,7 +130,7 @@ export const FinanceOfficerWorkspace: React.FC = () => {
 
         <Card className="p-4 border-[#C9D3DB]">
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-lg bg-[#FEF7E8] text-[#8A5A00] border border-[#F8DEAE]">
+            <div className="p-3 rounded-none bg-[#FEF7E8] text-[#8A5A00] border border-[#F8DEAE]">
               <Building className="w-5 h-5" />
             </div>
             <div>
@@ -145,7 +145,7 @@ export const FinanceOfficerWorkspace: React.FC = () => {
 
         <Card className="p-4 border-[#C9D3DB]">
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-lg bg-[#EEF6FA] text-[#123B5D] border border-[#C4DEED]">
+            <div className="p-3 rounded-none bg-[#EEF6FA] text-[#123B5D] border border-[#C4DEED]">
               <Coins className="w-5 h-5" />
             </div>
             <div>
@@ -160,7 +160,7 @@ export const FinanceOfficerWorkspace: React.FC = () => {
 
         <Card className="p-4 border-[#C9D3DB]">
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-lg bg-[#E7F3EC] text-[#18794E] border border-[#B4DFC9]">
+            <div className="p-3 rounded-none bg-[#E7F3EC] text-[#18794E] border border-[#B4DFC9]">
               <CheckCircle2 className="w-5 h-5" />
             </div>
             <div>
@@ -189,7 +189,7 @@ export const FinanceOfficerWorkspace: React.FC = () => {
           </Link>
         </div>
 
-        <div className="bg-white rounded-[10px] border border-[#C9D3DB] overflow-hidden shadow-2xs">
+        <div className="bg-white rounded-none border border-[#C9D3DB] overflow-hidden shadow-2xs">
           {allActionable.length === 0 ? (
             <div className="p-8 text-center text-xs text-[#5D6A75]">
               <CheckCircle2 className="w-8 h-8 text-emerald-500 mx-auto mb-2" />

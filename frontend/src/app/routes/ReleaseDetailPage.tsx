@@ -106,7 +106,7 @@ export const ReleaseDetailPage: React.FC = () => {
 
   if (error || !details) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex gap-3">
+      <div className="bg-red-50 border border-red-200 rounded-none p-4 flex gap-3">
         <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
         <div>
           <h3 className="font-semibold text-red-900">Error Loading Case</h3>
@@ -129,7 +129,7 @@ export const ReleaseDetailPage: React.FC = () => {
     <div className="space-y-6 max-w-7xl mx-auto font-sans">
       {/* Notifications */}
       {actionSuccess && (
-        <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4 flex items-center justify-between">
+        <div className="bg-emerald-50 border border-emerald-200 rounded-none p-4 flex items-center justify-between">
           <div className="flex items-center gap-2 text-emerald-800 text-sm font-medium">
             <CheckCircle2 className="w-5 h-5 text-emerald-600" />
             <span>{actionSuccess}</span>
@@ -141,7 +141,7 @@ export const ReleaseDetailPage: React.FC = () => {
       )}
 
       {actionError && (
-        <div className="bg-rose-50 border border-rose-200 rounded-lg p-4 flex items-center justify-between">
+        <div className="bg-rose-50 border border-rose-200 rounded-none p-4 flex items-center justify-between">
           <div className="flex items-center gap-2 text-rose-800 text-sm font-medium">
             <AlertCircle className="w-5 h-5 text-rose-600" />
             <span>{actionError}</span>
@@ -154,7 +154,7 @@ export const ReleaseDetailPage: React.FC = () => {
 
       {/* Auditor Read-Only Notice */}
       {isAuditor && (
-        <div className="bg-[#EEF6FA] border border-[#C4DEED] rounded-lg p-3 flex items-center gap-3">
+        <div className="bg-[#EEF6FA] border border-[#C4DEED] rounded-none p-3 flex items-center gap-3">
           <ShieldAlert className="w-5 h-5 text-[#245B7A] shrink-0" />
           <p className="text-xs text-[#245B7A] font-medium">
             <strong>Auditor Mode (PRD-FR-095):</strong> You have read-only inspection access. All workflow state-mutation actions are disabled.
@@ -163,12 +163,12 @@ export const ReleaseDetailPage: React.FC = () => {
       )}
 
       {/* Header */}
-      <div className="bg-white rounded-lg shadow-sm p-6 border border-[#C9D3DB]">
+      <div className="bg-white rounded-none shadow-sm p-6 border border-[#C9D3DB]">
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-4">
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-2xl sm:text-3xl font-extrabold text-[#0D2538] font-mono">{details.case_number}</h1>
-              <span className={cn('text-xs font-bold font-mono px-3 py-1 rounded-[6px]', statusColors[details.workflow_status])}>
+              <span className={cn('text-xs font-bold font-mono px-3 py-1 rounded-none', statusColors[details.workflow_status])}>
                 {details.workflow_status.replace(/_/g, ' ')}
               </span>
             </div>
@@ -294,7 +294,7 @@ export const ReleaseDetailPage: React.FC = () => {
         </div>
 
         {details.policy_profile?.is_demo && (
-          <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 flex gap-2 mb-4">
+          <div className="bg-amber-50 border border-amber-200 rounded-none p-3 flex gap-2 mb-4">
             <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0" />
             <p className="text-xs text-amber-800">
               <strong>Demo Policy:</strong> {details.policy_profile.demo_disclaimer}
@@ -327,7 +327,7 @@ export const ReleaseDetailPage: React.FC = () => {
       {/* Action Dialog Modal */}
       {activeModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-white rounded-xl max-w-lg w-full p-6 space-y-4 shadow-xl border border-slate-200">
+          <div className="bg-white rounded-none max-w-lg w-full p-6 space-y-4 shadow-xl border border-slate-200">
             <h3 className="text-lg font-bold text-[#0D2538]">
               {activeModal === 'recommend' && 'Recommend Case for Competent Authority Sanction'}
               {activeModal === 'returnCorrection' && 'Return Case for Institutional Correction'}
@@ -349,7 +349,7 @@ export const ReleaseDetailPage: React.FC = () => {
                     value={orderRefNumber}
                     onChange={(e) => setOrderRefNumber(e.target.value)}
                     placeholder="e.g. AICTE/FIN/2026/REL-9482"
-                    className="w-full px-3 py-2 border rounded-md text-sm font-mono"
+                    className="w-full px-3 py-2 border rounded-none text-sm font-mono"
                     required
                   />
                 </div>
@@ -361,7 +361,7 @@ export const ReleaseDetailPage: React.FC = () => {
                     type="date"
                     value={orderDate}
                     onChange={(e) => setOrderDate(e.target.value)}
-                    className="w-full px-3 py-2 border rounded-md text-sm font-mono"
+                    className="w-full px-3 py-2 border rounded-none text-sm font-mono"
                     required
                   />
                 </div>
@@ -382,7 +382,7 @@ export const ReleaseDetailPage: React.FC = () => {
                 value={modalReason}
                 onChange={(e) => setModalReason(e.target.value)}
                 placeholder="Enter justification..."
-                className="w-full h-24 p-2.5 border rounded-md text-sm"
+                className="w-full h-24 p-2.5 border rounded-none text-sm"
                 required
               />
             </div>
@@ -429,16 +429,16 @@ export const ReleaseDetailPage: React.FC = () => {
       )}
 
       {/* Request Details */}
-      <div className="bg-white rounded-lg shadow-sm p-6 border border-[#C9D3DB]">
+      <div className="bg-white rounded-none shadow-sm p-6 border border-[#C9D3DB]">
         <h2 className="text-sm font-bold text-[#0D2538] uppercase tracking-wider mb-2">Institutional Petition Justification</h2>
-        <div className="bg-[#F5F4EF] rounded-md p-4 border border-[#C9D3DB]">
+        <div className="bg-[#F5F4EF] rounded-none p-4 border border-[#C9D3DB]">
           <p className="text-xs text-[#253746] whitespace-pre-wrap leading-relaxed">{details.request_reason}</p>
         </div>
       </div>
 
       {/* Readiness Summary */}
       {details.assessments && details.assessments.length > 0 && (
-        <div className="bg-white rounded-lg shadow-sm p-6 border border-[#C9D3DB]">
+        <div className="bg-white rounded-none shadow-sm p-6 border border-[#C9D3DB]">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-sm font-bold text-[#0D2538] uppercase tracking-wider">Release Readiness Gate Assessment</h2>
             <span className="text-xs text-[#5D6A75] font-mono">Stage 7 Compliance Gate</span>
@@ -449,15 +449,15 @@ export const ReleaseDetailPage: React.FC = () => {
             return (
               <div className="space-y-4">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="p-3 rounded-lg bg-slate-50 border border-slate-200">
+                  <div className="p-3 rounded-none bg-slate-50 border border-slate-200">
                     <p className="text-xs font-semibold text-[#5D6A75] uppercase">Total Rules</p>
                     <p className="text-2xl font-bold text-[#0D2538] font-mono">{latestAssessment.total_items_count}</p>
                   </div>
-                  <div className="p-3 rounded-lg bg-emerald-50 border border-emerald-200">
+                  <div className="p-3 rounded-none bg-emerald-50 border border-emerald-200">
                     <p className="text-xs font-semibold text-emerald-800 uppercase">Satisfied</p>
                     <p className="text-2xl font-bold text-emerald-700 font-mono">{latestAssessment.satisfied_count}</p>
                   </div>
-                  <div className={cn('p-3 rounded-lg border', hasBlockers ? 'bg-rose-50 border-rose-200' : 'bg-slate-50 border-slate-200')}>
+                  <div className={cn('p-3 rounded-none border', hasBlockers ? 'bg-rose-50 border-rose-200' : 'bg-slate-50 border-slate-200')}>
                     <p className={cn('text-xs font-semibold uppercase', hasBlockers ? 'text-rose-800' : 'text-[#5D6A75]')}>
                       Blockers
                     </p>
@@ -465,7 +465,7 @@ export const ReleaseDetailPage: React.FC = () => {
                       {latestAssessment.blockers_count}
                     </p>
                   </div>
-                  <div className="p-3 rounded-lg bg-amber-50 border border-amber-200">
+                  <div className="p-3 rounded-none bg-amber-50 border border-amber-200">
                     <p className="text-xs font-semibold text-amber-800 uppercase">Pending Review</p>
                     <p className="text-2xl font-bold text-amber-700 font-mono">{latestAssessment.pending_count}</p>
                   </div>
@@ -473,7 +473,7 @@ export const ReleaseDetailPage: React.FC = () => {
 
                 <div
                   className={cn(
-                    'rounded-lg p-4 border',
+                    'rounded-none p-4 border',
                     latestAssessment.assessment_outcome === 'READY_FOR_APPROVAL'
                       ? 'bg-emerald-50 border-emerald-200'
                       : 'bg-amber-50 border-amber-200'
@@ -513,7 +513,7 @@ export const ReleaseDetailPage: React.FC = () => {
                     <h3 className="font-semibold text-xs text-[#0D2538] uppercase tracking-wider mb-2">Checklist Verification Rules</h3>
                     <div className="space-y-2">
                       {latestAssessment.results.map((item) => (
-                        <div key={item.id} className="border border-[#C9D3DB] rounded-lg p-3 flex gap-3 bg-white">
+                        <div key={item.id} className="border border-[#C9D3DB] rounded-none p-3 flex gap-3 bg-white">
                           <div className="flex-shrink-0 pt-0.5">
                             {item.status === 'SATISFIED' ? (
                               <CheckCircle className="w-4 h-4 text-emerald-600" />
@@ -530,7 +530,7 @@ export const ReleaseDetailPage: React.FC = () => {
                                 <p className="text-xs text-[#5D6A75] mt-0.5">{item.explanation}</p>
                               </div>
                               {item.is_mandatory_blocker && (
-                                <span className="text-[10px] font-bold uppercase bg-rose-100 text-rose-800 px-2 py-0.5 rounded font-mono">
+                                <span className="text-[10px] font-bold uppercase bg-rose-100 text-rose-800 px-2 py-0.5 rounded-none font-mono">
                                   Mandatory Blocker
                                 </span>
                               )}
@@ -553,11 +553,11 @@ export const ReleaseDetailPage: React.FC = () => {
 
       {/* Decisions History */}
       {details.decisions && details.decisions.length > 0 && (
-        <div className="bg-white rounded-lg shadow-sm p-6 border border-[#C9D3DB]">
+        <div className="bg-white rounded-none shadow-sm p-6 border border-[#C9D3DB]">
           <h2 className="text-sm font-bold text-[#0D2538] uppercase tracking-wider mb-4">Immutable Decision Audit Log</h2>
           <div className="space-y-3">
             {details.decisions.map((decision) => (
-              <div key={decision.id} className="border border-[#C9D3DB] rounded-lg p-3.5 bg-[#F5F4EF]/50">
+              <div key={decision.id} className="border border-[#C9D3DB] rounded-none p-3.5 bg-[#F5F4EF]/50">
                 <div className="flex items-start justify-between mb-1.5">
                   <div>
                     <span className="font-bold text-xs text-[#0D2538] font-mono mr-2">
@@ -571,7 +571,7 @@ export const ReleaseDetailPage: React.FC = () => {
                     {new Date(decision.created_at).toLocaleString()}
                   </span>
                 </div>
-                <p className="text-xs text-[#253746] bg-white p-2 rounded border border-slate-200 mt-1">{decision.reason}</p>
+                <p className="text-xs text-[#253746] bg-white p-2 rounded-none border border-slate-200 mt-1">{decision.reason}</p>
                 <div className="flex items-center gap-2 text-[10px] text-[#5D6A75] font-mono mt-2">
                   <span>{decision.previous_status}</span>
                   <span>&rarr;</span>

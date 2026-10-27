@@ -25,7 +25,7 @@ export const SystemAdminWorkspace: React.FC = () => {
   const [totalInstitutions, setTotalInstitutions] = useState<number>(0);
   const [health, setHealth] = useState<SystemHealth | null>(null);
   const [readiness, setReadiness] = useState<ReadinessState | null>(null);
-  const [failedNotifications, setFailedNotifications] = useState<LifecycleNotification[]>([]);
+  const [_failedNotifications, setFailedNotifications] = useState<LifecycleNotification[]>([]);
   const [totalFailedCount, setTotalFailedCount] = useState<number>(0);
   const [oversightNotifications, setOversightNotifications] = useState<LifecycleNotification[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -77,11 +77,11 @@ export const SystemAdminWorkspace: React.FC = () => {
   return (
     <div className="space-y-6 max-w-7xl mx-auto font-sans">
       {/* Top Banner — System Admin Cockpit */}
-      <div className="bg-[#0D2538] rounded-[10px] p-6 text-white shadow-xs border border-[#1e3c54]">
+      <div className="bg-[#0D2538] rounded-none p-6 text-white shadow-xs border border-[#1e3c54]">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-1.5">
-              <span className="bg-[#123B5D] text-[#8ACEC8] border border-[#0F766E]/40 text-[10px] font-semibold px-2 py-0.5 rounded font-mono uppercase">
+              <span className="bg-[#123B5D] text-[#8ACEC8] border border-[#0F766E]/40 text-[10px] font-semibold px-2 py-0.5 rounded-none font-mono uppercase">
                 Platform Superuser
               </span>
               <span className="text-[#8799A9] text-xs font-mono">System Administration Cockpit</span>
@@ -118,7 +118,7 @@ export const SystemAdminWorkspace: React.FC = () => {
       </div>
 
       {/* Admin Separation of Duties Notice */}
-      <div className="bg-[#FEF7E8] border border-[#F8DEAE] rounded-lg p-3.5 flex items-start gap-2.5 text-xs text-[#8A5A00]">
+      <div className="bg-[#FEF7E8] border border-[#F8DEAE] rounded-none p-3.5 flex items-start gap-2.5 text-xs text-[#8A5A00]">
         <ShieldAlert className="w-4 h-4 shrink-0 mt-0.5" />
         <p className="leading-relaxed">
           <strong>Maker-Checker Invariant (PRD-FR-095):</strong> System Administrators manage platform users, institutions, and infrastructure. The administrator role does <em>not</em> possess statutory authority to approve release requests or bypass Release Gate blockers.
@@ -126,7 +126,7 @@ export const SystemAdminWorkspace: React.FC = () => {
       </div>
 
       {error && (
-        <div className="bg-rose-50 border border-rose-200 rounded-lg p-4 flex items-center justify-between text-xs text-rose-800">
+        <div className="bg-rose-50 border border-rose-200 rounded-none p-4 flex items-center justify-between text-xs text-rose-800">
           <div className="flex items-center gap-2">
             <AlertCircle className="w-4 h-4 text-rose-600" />
             <span>{error}</span>
@@ -139,7 +139,7 @@ export const SystemAdminWorkspace: React.FC = () => {
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="p-4 border-[#C9D3DB]">
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-lg bg-[#E7F3EC] text-[#18794E] border border-[#B4DFC9]">
+            <div className="p-3 rounded-none bg-[#E7F3EC] text-[#18794E] border border-[#B4DFC9]">
               <Activity className="w-5 h-5" />
             </div>
             <div>
@@ -154,7 +154,7 @@ export const SystemAdminWorkspace: React.FC = () => {
 
         <Card className="p-4 border-[#C9D3DB]">
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-lg bg-[#EEF6FA] text-[#123B5D] border border-[#C4DEED]">
+            <div className="p-3 rounded-none bg-[#EEF6FA] text-[#123B5D] border border-[#C4DEED]">
               <Users className="w-5 h-5" />
             </div>
             <div>
@@ -169,7 +169,7 @@ export const SystemAdminWorkspace: React.FC = () => {
 
         <Card className="p-4 border-[#C9D3DB]">
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-lg bg-[#E6F4F2] text-[#0F766E] border border-[#99D5CE]">
+            <div className="p-3 rounded-none bg-[#E6F4F2] text-[#0F766E] border border-[#99D5CE]">
               <Building2 className="w-5 h-5" />
             </div>
             <div>
@@ -184,7 +184,7 @@ export const SystemAdminWorkspace: React.FC = () => {
 
         <Card className="p-4 border-[#C9D3DB]">
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-lg bg-[#FDF2F1] text-[#B42318] border border-[#FECDCA]">
+            <div className="p-3 rounded-none bg-[#FDF2F1] text-[#B42318] border border-[#FECDCA]">
               <AlertTriangle className="w-5 h-5" />
             </div>
             <div>
@@ -215,7 +215,7 @@ export const SystemAdminWorkspace: React.FC = () => {
             </Link>
           </div>
 
-          <div className="bg-white rounded-[10px] border border-[#C9D3DB] overflow-hidden shadow-2xs">
+          <div className="bg-white rounded-none border border-[#C9D3DB] overflow-hidden shadow-2xs">
             {users.length === 0 ? (
               <p className="text-xs text-[#5D6A75] text-center py-6">No users found.</p>
             ) : (
@@ -237,7 +237,7 @@ export const SystemAdminWorkspace: React.FC = () => {
                           <div className="text-[10px] text-[#8799A9] font-mono">{u.email}</div>
                         </td>
                         <td className="py-3 px-4">
-                          <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-blue-50 text-blue-800 border border-blue-200">
+                          <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-none bg-blue-50 text-blue-800 border border-blue-200">
                             {u.role}
                           </span>
                         </td>
@@ -273,7 +273,7 @@ export const SystemAdminWorkspace: React.FC = () => {
             </Link>
           </div>
 
-          <div className="bg-white rounded-[10px] border border-[#C9D3DB] overflow-hidden shadow-2xs">
+          <div className="bg-white rounded-none border border-[#C9D3DB] overflow-hidden shadow-2xs">
             {institutions.length === 0 ? (
               <p className="text-xs text-[#5D6A75] text-center py-6">No institutions registered.</p>
             ) : (
@@ -313,7 +313,7 @@ export const SystemAdminWorkspace: React.FC = () => {
       </div>
 
       {/* Operational Oversight Feed — Material Events & Audit Accountability */}
-      <div className="bg-white rounded-[10px] border border-[#C9D3DB] p-5 shadow-2xs space-y-4">
+      <div className="bg-white rounded-none border border-[#C9D3DB] p-5 shadow-2xs space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
           <div>
             <div className="flex items-center gap-2">
@@ -333,7 +333,7 @@ export const SystemAdminWorkspace: React.FC = () => {
         </div>
 
         {oversightNotifications.length === 0 ? (
-          <div className="text-center py-8 text-xs text-[#5D6A75] bg-slate-50 rounded-lg border border-dashed border-slate-200">
+          <div className="text-center py-8 text-xs text-[#5D6A75] bg-slate-50 rounded-none border border-dashed border-slate-200">
             <p className="font-semibold text-slate-700">No operational oversight events recorded yet.</p>
             <p className="text-[11px] text-slate-500 mt-1">Material actions across the 9 lifecycle stages will appear here in real time.</p>
           </div>
@@ -382,7 +382,7 @@ export const SystemAdminWorkspace: React.FC = () => {
                         {entityInfo.reference || notif.instrument_id || entityInfo.id || 'N/A'}
                       </td>
                       <td className="py-3 px-4">
-                        <span className="inline-flex items-center gap-1 text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200">
+                        <span className="inline-flex items-center gap-1 text-[10px] font-mono font-semibold px-2 py-0.5 rounded-none bg-emerald-50 text-emerald-800 border border-emerald-200">
                           ✓ SHA-256 Chained
                         </span>
                       </td>

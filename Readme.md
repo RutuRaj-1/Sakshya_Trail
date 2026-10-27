@@ -16,7 +16,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178C6.svg?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4.0-38B2AC.svg?logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 [![Vite](https://img.shields.io/badge/Vite-8.0-646CFF.svg?logo=vite&logoColor=white)](https://vitejs.dev/)
-[![Pytest](https://img.shields.io/badge/Pytest-527%20Passed-success.svg?logo=pytest&logoColor=white)](https://docs.pytest.org/)
+[![Pytest](https://img.shields.io/badge/Pytest-539%20Passed-success.svg?logo=pytest&logoColor=white)](https://docs.pytest.org/)
 [![Vitest](https://img.shields.io/badge/Vitest-94%20Passed-success.svg?logo=vitest&logoColor=white)](https://vitest.dev/)
 [![License](https://img.shields.io/badge/License-Proprietary%20%2F%20Regulatory-blue.svg)](#)
 

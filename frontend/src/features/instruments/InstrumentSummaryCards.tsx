@@ -60,14 +60,14 @@ export const InstrumentSummaryCards: React.FC<Props> = ({ summary, isLoading }) 
         <Card key={i} className="flex flex-col justify-between p-4">
           <div className="flex items-start justify-between">
             <span className="text-xs font-medium text-[#5D6A75]">{c.title}</span>
-            <div className={`p-2 rounded-lg border ${c.color}`}>
+            <div className={`p-2 rounded-none border ${c.color}`}>
               <c.icon className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-3">
             <div className="text-xl font-bold tracking-tight text-[#0D2538]">
               {isLoading ? (
-                <div className="h-6 w-20 bg-slate-200 rounded animate-pulse" />
+                <div className="h-6 w-20 bg-slate-200 rounded-none animate-pulse" />
               ) : (
                 c.value
               )}

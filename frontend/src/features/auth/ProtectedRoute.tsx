@@ -37,8 +37,8 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowe
   if (allowedRoles && !allowedRoles.includes(user.role)) {
     return (
       <div className="min-h-[70vh] flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl border border-rose-200 p-8 max-w-lg w-full text-center shadow-sm">
-          <div className="w-14 h-14 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-rose-100">
+        <div className="bg-white rounded-none border border-rose-200 p-8 max-w-lg w-full text-center shadow-sm">
+          <div className="w-14 h-14 bg-rose-50 text-rose-600 rounded-none flex items-center justify-center mx-auto mb-4 border border-rose-100">
             <ShieldAlert className="w-7 h-7" />
           </div>
           <h2 className="text-xl font-bold text-slate-900 tracking-tight">Access Restricted</h2>

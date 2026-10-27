@@ -106,7 +106,7 @@ export const StatusOverviewCards: React.FC<StatusOverviewCardsProps> = ({
         <div>
           <h2 id="status-overview-heading" className="text-base font-semibold text-[#0D2538] flex items-center gap-2">
             <span>Administrative Status Overview</span>
-            <span className="text-xs font-mono font-normal text-[#5D6A75] bg-slate-100 px-2 py-0.5 rounded border border-[#C9D3DB]">
+            <span className="text-xs font-mono font-normal text-[#5D6A75] bg-slate-100 px-2 py-0.5 rounded-none border border-[#C9D3DB]">
               PRD-FR-070a
             </span>
           </h2>
@@ -115,7 +115,7 @@ export const StatusOverviewCards: React.FC<StatusOverviewCardsProps> = ({
           </p>
         </div>
         {data && (
-          <div className="text-xs text-[#5D6A75] bg-slate-100 px-3 py-1.5 rounded-lg border border-[#C9D3DB] flex items-center gap-3">
+          <div className="text-xs text-[#5D6A75] bg-slate-100 px-3 py-1.5 rounded-none border border-[#C9D3DB] flex items-center gap-3">
             <span>
               Total Scope: <strong className="text-[#0D2538]">{data.total_instruments}</strong> FDRs
             </span>
@@ -134,7 +134,7 @@ export const StatusOverviewCards: React.FC<StatusOverviewCardsProps> = ({
             <div
               key={card.metricId}
               onClick={() => navigate(`/instruments?status=${encodeURIComponent(card.navFilter)}`)}
-              className={`rounded-[8px] border p-4 bg-white shadow-xs cursor-pointer transition-all duration-150 relative overflow-hidden group select-none ${card.borderClass} ${card.bgClass}`}
+              className={`rounded-none border p-4 bg-white shadow-xs cursor-pointer transition-all duration-150 relative overflow-hidden group select-none ${card.borderClass} ${card.bgClass}`}
               role="button"
               tabIndex={0}
               onKeyDown={(e) => {
@@ -145,7 +145,7 @@ export const StatusOverviewCards: React.FC<StatusOverviewCardsProps> = ({
               aria-label={`View ${card.title} - ${card.count} records`}
             >
               <div className="flex items-start justify-between">
-                <div className="p-2 rounded-lg bg-white shadow-xs border border-slate-100">
+                <div className="p-2 rounded-none bg-white shadow-xs border border-slate-100">
                   <Icon className={`w-4 h-4 ${card.iconClass}`} />
                 </div>
                 <div className="flex items-center gap-1">
@@ -170,7 +170,7 @@ export const StatusOverviewCards: React.FC<StatusOverviewCardsProps> = ({
               <div className="mt-3">
                 <div className="text-2xl font-bold text-[#0D2538] tracking-tight">
                   {isLoading ? (
-                    <div className="h-7 w-12 bg-slate-200 animate-pulse rounded" />
+                    <div className="h-7 w-12 bg-slate-200 animate-pulse rounded-none" />
                   ) : (
                     card.count
                   )}

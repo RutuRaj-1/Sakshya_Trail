@@ -515,6 +515,10 @@ export interface ExtractedFieldsDetail {
   doc_lien_holder_confidence?: number | null;
   error_details?: string | null;
   extracted_at?: string | null;
+  status?: string;
+  provider?: string;
+  confidence_scores?: Record<string, number | null>;
+  raw_text_excerpt?: string | null;
 }
 
 export interface DocumentVersionDetail {
@@ -529,6 +533,11 @@ export interface DocumentVersionDetail {
   uploader_user_id?: string;
   uploaded_at: string;
   extracted_fields?: ExtractedFieldsDetail | null;
+  content_sha256?: string;
+  original_filename?: string;
+  scan_status?: string;
+  file_size_bytes?: number;
+  created_at?: string;
 }
 
 export interface DocumentDetail {

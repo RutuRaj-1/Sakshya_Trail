@@ -345,7 +345,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile, className }) =>
           <img
             src="/logo.png"
             alt="SakshyaTrail"
-            className="h-8 w-auto object-contain bg-white p-0.5 rounded-[4px] shadow-2xs"
+            className="h-8 w-auto object-contain bg-white p-0.5 rounded-none shadow-2xs"
           />
           <div>
             <span className="text-xs font-bold text-white tracking-tight block">
@@ -358,14 +358,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile, className }) =>
         </Link>
 
         <div className="flex items-center gap-1.5">
-          <span className="text-[10px] bg-[#123B5D] text-[#8ACEC8] border border-[#0F766E]/40 px-1.5 py-0.5 rounded-[4px] font-mono font-semibold">
+          <span className="text-[10px] bg-[#123B5D] text-[#8ACEC8] border border-[#0F766E]/40 px-1.5 py-0.5 rounded-none font-mono font-semibold">
             SIH 26265
           </span>
           {onCloseMobile && (
             <button
               type="button"
               onClick={onCloseMobile}
-              className="lg:hidden p-1 text-[#8799A9] hover:text-white rounded"
+              className="lg:hidden p-1 text-[#8799A9] hover:text-white rounded-none"
               aria-label="Close sidebar"
             >
               <X className="w-4 h-4" />
@@ -391,7 +391,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile, className }) =>
               <button
                 type="button"
                 onClick={() => toggleGroup(group.id)}
-                className="w-full flex items-center justify-between px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#8799A9] hover:text-[#C9D3DB] transition-colors rounded cursor-pointer group"
+                className="w-full flex items-center justify-between px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#8799A9] hover:text-[#C9D3DB] transition-colors rounded-none cursor-pointer group"
                 aria-expanded={!isCollapsed}
               >
                 <div className="flex items-center gap-1.5">
@@ -423,7 +423,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile, className }) =>
                         to={item.to}
                         onClick={onCloseMobile}
                         className={cn(
-                          'flex items-center justify-between px-2.5 py-1.5 rounded-[6px] text-xs font-medium transition-all group border-l-2',
+                          'flex items-center justify-between px-2.5 py-1.5 rounded-none text-xs font-medium transition-all group border-l-2',
                           isActive
                             ? 'bg-[#123B5D] text-white border-[#0F766E] shadow-2xs font-semibold'
                             : 'text-[#C9D3DB] border-transparent hover:text-white hover:bg-[#123B5D]/40 hover:border-[#8799A9]'
@@ -455,7 +455,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile, className }) =>
                         {badgeCount !== undefined && badgeCount > 0 && (
                           <span
                             className={cn(
-                              'text-[10px] font-mono font-bold px-1.5 py-0.2 rounded shrink-0',
+                              'text-[10px] font-mono font-bold px-1.5 py-0.2 rounded-none shrink-0',
                               isActive
                                 ? 'bg-[#0F766E] text-white'
                                 : 'bg-[#123B5D] text-[#8ACEC8] group-hover:bg-[#0F766E] group-hover:text-white'
@@ -476,12 +476,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile, className }) =>
       </nav>
 
       {/* User Scope Footer */}
-      <div className="p-3 m-2 rounded-[6px] bg-[#091b29] border border-[#1e3c54] text-[11px] text-[#8799A9]">
+      <div className="p-3 m-2 rounded-none bg-[#091b29] border border-[#1e3c54] text-[11px] text-[#8799A9]">
         <div className="flex items-center justify-between">
           <span className="text-[10px] uppercase font-bold text-[#C9D3DB] tracking-wider">
             Session Scope
           </span>
-          <span className="font-mono text-[9px] text-[#8ACEC8] bg-[#123B5D] px-1 py-0.2 rounded font-semibold">
+          <span className="font-mono text-[9px] text-[#8ACEC8] bg-[#123B5D] px-1 py-0.2 rounded-none font-semibold">
             {user?.role?.slice(0, 12)}
           </span>
         </div>

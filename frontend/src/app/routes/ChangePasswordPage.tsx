@@ -61,7 +61,7 @@ export const ChangePasswordPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-slate-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans">
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
-        <div className="inline-flex items-center justify-center w-12 h-12 rounded-[10px] bg-amber-600 text-white shadow-md shadow-amber-900/20 mb-3">
+        <div className="inline-flex items-center justify-center w-12 h-12 rounded-none bg-amber-600 text-white shadow-md shadow-amber-900/20 mb-3">
           <KeyRound className="w-7 h-7 text-amber-100" />
         </div>
         <h2 className="text-2xl font-extrabold text-[#0D2538] tracking-tight">
@@ -75,10 +75,10 @@ export const ChangePasswordPage: React.FC = () => {
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md px-4 sm:px-0">
-        <div className="bg-white py-8 px-6 sm:px-10 shadow-sm border border-[#C9D3DB]/80 rounded-[10px]">
+        <div className="bg-white py-8 px-6 sm:px-10 shadow-sm border border-[#C9D3DB]/80 rounded-none">
           {success ? (
             <div className="p-6 text-center space-y-3">
-              <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto">
+              <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-none flex items-center justify-center mx-auto">
                 <CheckCircle className="w-6 h-6" />
               </div>
               <h3 className="text-base font-bold text-[#0D2538]">Password Changed Successfully</h3>
@@ -89,7 +89,7 @@ export const ChangePasswordPage: React.FC = () => {
           ) : (
             <form className="space-y-4" onSubmit={handleSubmit}>
               {error && (
-                <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-[10px] flex items-start gap-2.5 text-xs text-rose-700">
+                <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-none flex items-start gap-2.5 text-xs text-rose-700">
                   <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-500" />
                   <span>{error}</span>
                 </div>
@@ -107,7 +107,7 @@ export const ChangePasswordPage: React.FC = () => {
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
                     placeholder="••••••••••••"
-                    className="w-full pl-10 pr-3 py-2 text-sm border border-[#8799A9] rounded-[10px] focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white"
+                    className="w-full pl-10 pr-3 py-2 text-sm border border-[#8799A9] rounded-none focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white"
                   />
                 </div>
               </div>
@@ -125,7 +125,7 @@ export const ChangePasswordPage: React.FC = () => {
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     placeholder="Minimum 8 characters"
-                    className="w-full pl-10 pr-3 py-2 text-sm border border-[#8799A9] rounded-[10px] focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white"
+                    className="w-full pl-10 pr-3 py-2 text-sm border border-[#8799A9] rounded-none focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white"
                   />
                 </div>
               </div>
@@ -143,7 +143,7 @@ export const ChangePasswordPage: React.FC = () => {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Repeat new password"
-                    className="w-full pl-10 pr-3 py-2 text-sm border border-[#8799A9] rounded-[10px] focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white"
+                    className="w-full pl-10 pr-3 py-2 text-sm border border-[#8799A9] rounded-none focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white"
                   />
                 </div>
               </div>
@@ -153,7 +153,7 @@ export const ChangePasswordPage: React.FC = () => {
                   type="submit"
                   size="lg"
                   disabled={isLoading}
-                  className="w-full bg-amber-600 hover:bg-amber-700 text-white font-semibold py-2.5 rounded-[10px] shadow-sm"
+                  className="w-full bg-amber-600 hover:bg-amber-700 text-white font-semibold py-2.5 rounded-none shadow-sm"
                 >
                   {isLoading ? 'Updating Credentials...' : 'Save New Password & Continue'}
                 </Button>

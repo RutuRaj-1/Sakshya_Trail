@@ -16,7 +16,7 @@ export const OverdueEscalatedQueue: React.FC<OverdueEscalatedQueueProps> = ({
   isInstitutionUser = false,
 }) => {
   return (
-    <div className="bg-white rounded-[8px] border border-[#C9D3DB] shadow-xs overflow-hidden">
+    <div className="bg-white rounded-none border border-[#C9D3DB] shadow-xs overflow-hidden">
       {/* Header */}
       <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-[#F5F4EF]/50">
         <div className="flex items-center gap-2">
@@ -24,7 +24,7 @@ export const OverdueEscalatedQueue: React.FC<OverdueEscalatedQueueProps> = ({
           <h3 className="font-semibold text-[#0D2538] text-sm">
             Overdue & Escalated Work Items
           </h3>
-          <span className="text-[10px] font-mono text-[#5D6A75] bg-slate-200/80 px-1.5 py-0.5 rounded">
+          <span className="text-[10px] font-mono text-[#5D6A75] bg-slate-200/80 px-1.5 py-0.5 rounded-none">
             PRD-FR-070c
           </span>
         </div>
@@ -41,7 +41,7 @@ export const OverdueEscalatedQueue: React.FC<OverdueEscalatedQueueProps> = ({
           {Object.entries(data.by_office).map(([office, count]) => (
             <span
               key={office}
-              className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-white border border-[#C9D3DB] text-[#253746] font-mono text-[11px]"
+              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-none bg-white border border-[#C9D3DB] text-[#253746] font-mono text-[11px]"
             >
               <Building className="w-3 h-3 text-slate-400" />
               {office}: <strong>{count}</strong>
@@ -89,7 +89,7 @@ export const OverdueEscalatedQueue: React.FC<OverdueEscalatedQueueProps> = ({
                 return (
                   <tr key={`${item.record_type}-${item.record_id}`} className="hover:bg-[#F5F4EF]/80 transition-colors">
                     <td className="px-4 py-2.5">
-                      <span className="font-mono text-[10px] uppercase font-bold text-[#253746] bg-slate-100 px-1.5 py-0.5 rounded">
+                      <span className="font-mono text-[10px] uppercase font-bold text-[#253746] bg-slate-100 px-1.5 py-0.5 rounded-none">
                         {item.record_type}
                       </span>
                     </td>
@@ -122,13 +122,13 @@ export const OverdueEscalatedQueue: React.FC<OverdueEscalatedQueueProps> = ({
                       {item.due_date || 'N/A'}
                     </td>
                     <td className="px-4 py-2.5">
-                      <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-rose-100 text-rose-800">
+                      <span className="inline-flex items-center px-1.5 py-0.5 rounded-none text-[10px] font-semibold bg-rose-100 text-rose-800">
                         +{item.days_overdue} days
                       </span>
                     </td>
                     <td className="px-4 py-2.5">
                       {item.is_escalated ? (
-                        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded">
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded-none">
                           <Flame className="w-3 h-3" />
                           Escalated ({item.escalation_role || 'Higher Office'})
                         </span>

@@ -66,17 +66,17 @@ export const MetricDictionaryModal: React.FC<MetricDictionaryModalProps> = ({
       aria-modal="true"
       aria-labelledby="metric-dict-title"
     >
-      <div className="bg-white rounded-[10px] shadow-2xl border border-[#C9D3DB] w-full max-w-4xl max-h-[88vh] flex flex-col overflow-hidden">
+      <div className="bg-white rounded-none shadow-2xl border border-[#C9D3DB] w-full max-w-4xl max-h-[88vh] flex flex-col overflow-hidden">
         {/* Header */}
         <div className="p-4 sm:p-5 border-b border-[#C9D3DB] flex items-center justify-between bg-[#F5F4EF]">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 bg-[#EEF6FA] text-[#123B5D] rounded-lg">
+            <div className="p-2 bg-[#EEF6FA] text-[#123B5D] rounded-none">
               <BookOpen className="w-5 h-5" />
             </div>
             <div>
               <h2 id="metric-dict-title" className="text-base sm:text-lg font-bold text-[#0D2538] flex items-center gap-2">
                 <span>Command Center Metric Dictionary</span>
-                <span className="text-xs font-mono font-normal text-[#5D6A75] bg-white px-2 py-0.5 rounded border border-[#C9D3DB]">
+                <span className="text-xs font-mono font-normal text-[#5D6A75] bg-white px-2 py-0.5 rounded-none border border-[#C9D3DB]">
                   PRD-FR-077
                 </span>
               </h2>
@@ -88,7 +88,7 @@ export const MetricDictionaryModal: React.FC<MetricDictionaryModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="text-slate-400 hover:text-[#253746] p-1.5 rounded-lg hover:bg-slate-200/50 transition-colors"
+            className="text-slate-400 hover:text-[#253746] p-1.5 rounded-none hover:bg-slate-200/50 transition-colors"
             aria-label="Close metric dictionary"
           >
             <X className="w-5 h-5" />
@@ -104,7 +104,7 @@ export const MetricDictionaryModal: React.FC<MetricDictionaryModalProps> = ({
               placeholder="Search metrics by ID, label, or calculation..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-3 py-1.5 text-xs border border-[#C9D3DB] rounded-lg focus:outline-hidden focus:ring-1 focus:ring-sentinel-500"
+              className="w-full pl-9 pr-3 py-1.5 text-xs border border-[#C9D3DB] rounded-none focus:outline-hidden focus:ring-1 focus:ring-sentinel-500"
             />
           </div>
           <div className="flex items-center gap-1 overflow-x-auto pb-1 sm:pb-0">
@@ -113,7 +113,7 @@ export const MetricDictionaryModal: React.FC<MetricDictionaryModalProps> = ({
                 key={cat}
                 type="button"
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-2.5 py-1 text-xs rounded-md font-medium whitespace-nowrap transition-all ${
+                className={`px-2.5 py-1 text-xs rounded-none font-medium whitespace-nowrap transition-all ${
                   selectedCategory === cat
                     ? 'bg-[#123B5D] text-white font-semibold'
                     : 'bg-slate-100 text-[#5D6A75] hover:bg-slate-200'
@@ -138,7 +138,7 @@ export const MetricDictionaryModal: React.FC<MetricDictionaryModalProps> = ({
                 <div
                   key={m.metric_id}
                   onClick={() => setActiveMetric(m)}
-                  className={`p-2.5 rounded-lg cursor-pointer transition-colors text-left ${
+                  className={`p-2.5 rounded-none cursor-pointer transition-colors text-left ${
                     activeMetric?.metric_id === m.metric_id
                       ? 'bg-[#EEF6FA] border border-[#C4DEED] shadow-2xs'
                       : 'hover:bg-[#F5F4EF] border border-transparent'
@@ -148,7 +148,7 @@ export const MetricDictionaryModal: React.FC<MetricDictionaryModalProps> = ({
                     <span className="font-mono text-[10px] font-bold text-[#0D2538]">
                       {m.metric_id}
                     </span>
-                    <span className="text-[10px] font-mono text-slate-400 bg-slate-100 px-1.5 py-0.2 rounded">
+                    <span className="text-[10px] font-mono text-slate-400 bg-slate-100 px-1.5 py-0.2 rounded-none">
                       {m.prd_mapping}
                     </span>
                   </div>
@@ -165,10 +165,10 @@ export const MetricDictionaryModal: React.FC<MetricDictionaryModalProps> = ({
               <div className="space-y-4">
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="font-mono text-xs font-bold bg-[#EEF6FA] text-[#0D2538] px-2 py-0.5 rounded">
+                    <span className="font-mono text-xs font-bold bg-[#EEF6FA] text-[#0D2538] px-2 py-0.5 rounded-none">
                       {activeMetric.metric_id}
                     </span>
-                    <span className="text-xs font-mono text-[#5D6A75] bg-slate-100 px-2 py-0.5 rounded border border-[#C9D3DB]">
+                    <span className="text-xs font-mono text-[#5D6A75] bg-slate-100 px-2 py-0.5 rounded-none border border-[#C9D3DB]">
                       {activeMetric.prd_mapping}
                     </span>
                   </div>
@@ -176,7 +176,7 @@ export const MetricDictionaryModal: React.FC<MetricDictionaryModalProps> = ({
                   <p className="text-xs text-[#5D6A75] mt-1 leading-relaxed">{activeMetric.description}</p>
                 </div>
 
-                <div className="bg-slate-900 text-slate-200 rounded-lg p-3 font-mono text-xs space-y-1">
+                <div className="bg-slate-900 text-slate-200 rounded-none p-3 font-mono text-xs space-y-1">
                   <div className="text-slate-400 text-[10px] uppercase tracking-wider font-semibold">
                     Calculation Rule:
                   </div>
@@ -184,11 +184,11 @@ export const MetricDictionaryModal: React.FC<MetricDictionaryModalProps> = ({
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                  <div className="bg-[#F5F4EF] p-3 rounded-lg border border-slate-100">
+                  <div className="bg-[#F5F4EF] p-3 rounded-none border border-slate-100">
                     <span className="font-semibold text-[#253746] block mb-1">Inclusion Criteria:</span>
                     <span className="text-[#5D6A75] text-[11px] leading-relaxed">{activeMetric.inclusion_criteria}</span>
                   </div>
-                  <div className="bg-[#F5F4EF] p-3 rounded-lg border border-slate-100">
+                  <div className="bg-[#F5F4EF] p-3 rounded-none border border-slate-100">
                     <span className="font-semibold text-[#253746] block mb-1">Exclusion Criteria:</span>
                     <span className="text-[#5D6A75] text-[11px] leading-relaxed">{activeMetric.exclusion_criteria}</span>
                   </div>
@@ -226,7 +226,7 @@ export const MetricDictionaryModal: React.FC<MetricDictionaryModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-1.5 text-xs bg-slate-900 text-white font-medium rounded-lg hover:bg-slate-800 transition"
+            className="px-4 py-1.5 text-xs bg-slate-900 text-white font-medium rounded-none hover:bg-slate-800 transition"
           >
             Close Dictionary
           </button>

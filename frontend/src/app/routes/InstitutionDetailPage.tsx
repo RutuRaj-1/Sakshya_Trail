@@ -95,13 +95,13 @@ export const InstitutionDetailPage: React.FC = () => {
 
   if (error || !institution) {
     return (
-      <div className="max-w-2xl mx-auto my-12 p-8 bg-white rounded-[10px] border border-[#C9D3DB] text-center shadow-xs">
+      <div className="max-w-2xl mx-auto my-12 p-8 bg-white rounded-none border border-[#C9D3DB] text-center shadow-xs">
         <AlertCircle className="w-12 h-12 text-rose-500 mx-auto mb-3" />
         <h2 className="text-base font-semibold text-[#253746]">Institution Not Available</h2>
         <p className="text-xs text-[#5D6A75] mt-1 max-w-md mx-auto">{error || 'Record was not found.'}</p>
         <button
           onClick={() => navigate('/institutions')}
-          className="mt-6 inline-flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-[#253746] text-xs font-semibold rounded-lg transition-colors"
+          className="mt-6 inline-flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-[#253746] text-xs font-semibold rounded-none transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Return to Registry</span>
@@ -130,7 +130,7 @@ export const InstitutionDetailPage: React.FC = () => {
           {canEdit && (
             <button
               onClick={() => setIsEditModalOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#8799A9] bg-white hover:bg-[#F5F4EF] text-[#253746] font-semibold shadow-2xs transition-colors"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-none border border-[#8799A9] bg-white hover:bg-[#F5F4EF] text-[#253746] font-semibold shadow-2xs transition-colors"
             >
               <Edit2 className="w-3.5 h-3.5" />
               <span>{isInstitutionUser ? 'Update Nodal Contact' : 'Edit Institution'}</span>
@@ -143,7 +143,7 @@ export const InstitutionDetailPage: React.FC = () => {
                 setStatusReason('');
                 setShowStatusConfirm(true);
               }}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold shadow-2xs transition-colors ${
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-none font-semibold shadow-2xs transition-colors ${
                 institution.is_active
                   ? 'border border-amber-300 bg-amber-50 text-amber-800 hover:bg-amber-100'
                   : 'border border-emerald-300 bg-emerald-50 text-emerald-800 hover:bg-emerald-100'
@@ -166,15 +166,15 @@ export const InstitutionDetailPage: React.FC = () => {
       </div>
 
       {/* Main Profile Card */}
-      <div className="bg-white rounded-[10px] border border-[#C9D3DB] shadow-xs p-6 sm:p-8 space-y-6">
+      <div className="bg-white rounded-none border border-[#C9D3DB] shadow-xs p-6 sm:p-8 space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-6 border-b border-slate-100">
           <div className="flex items-start gap-4">
-            <div className="w-14 h-14 rounded-[10px] bg-[#EEF6FA] border border-sentinel-100 text-[#123B5D] flex items-center justify-center shrink-0">
+            <div className="w-14 h-14 rounded-none bg-[#EEF6FA] border border-sentinel-100 text-[#123B5D] flex items-center justify-center shrink-0">
               <Building2 className="w-7 h-7" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-mono text-xs px-2 py-0.5 rounded bg-[#EEF6FA] text-[#0D2538] font-bold">
+                <span className="font-mono text-xs px-2 py-0.5 rounded-none bg-[#EEF6FA] text-[#0D2538] font-bold">
                   {institution.code}
                 </span>
                 <Badge variant={institution.is_active ? 'success' : 'default'}>
@@ -211,7 +211,7 @@ export const InstitutionDetailPage: React.FC = () => {
               <span>Regulatory Classification & Jurisdiction</span>
             </h3>
 
-            <div className="bg-[#F5F4EF]/70 rounded-[10px] p-4 border border-[#C9D3DB]/80 space-y-2.5">
+            <div className="bg-[#F5F4EF]/70 rounded-none p-4 border border-[#C9D3DB]/80 space-y-2.5">
               <div className="flex justify-between">
                 <span className="text-[#5D6A75]">Taxonomy Type</span>
                 <span className="font-mono font-medium text-[#253746]">
@@ -244,7 +244,7 @@ export const InstitutionDetailPage: React.FC = () => {
               <span>Verified Institutional Contacts</span>
             </h3>
 
-            <div className="bg-[#F5F4EF]/70 rounded-[10px] p-4 border border-[#C9D3DB]/80 space-y-2.5">
+            <div className="bg-[#F5F4EF]/70 rounded-none p-4 border border-[#C9D3DB]/80 space-y-2.5">
               <div className="flex justify-between">
                 <span className="text-[#5D6A75]">Nodal / Registrar</span>
                 <span className="font-medium text-[#253746]">{institution.contact_name}</span>
@@ -277,7 +277,7 @@ export const InstitutionDetailPage: React.FC = () => {
       </div>
 
       {/* Linked Instruments Section (Connected to Real Instrument Registry) */}
-      <div className="bg-white rounded-[10px] border border-[#C9D3DB] shadow-xs p-6 space-y-4">
+      <div className="bg-white rounded-none border border-[#C9D3DB] shadow-xs p-6 space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <FileSpreadsheet className="w-5 h-5 text-[#123B5D]" />
@@ -288,7 +288,7 @@ export const InstitutionDetailPage: React.FC = () => {
           {canRecordFDR && (
             <button
               onClick={() => setIsAddInstrumentOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#0F766E] hover:bg-[#09544E] text-white font-semibold text-xs shadow-2xs transition-colors"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-none bg-[#0F766E] hover:bg-[#09544E] text-white font-semibold text-xs shadow-2xs transition-colors"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Record FDR for Institution</span>
@@ -297,7 +297,7 @@ export const InstitutionDetailPage: React.FC = () => {
         </div>
 
         {instruments.length === 0 ? (
-          <div className="p-8 text-center border-2 border-dashed border-[#C9D3DB] rounded-[10px] bg-[#F5F4EF]/50">
+          <div className="p-8 text-center border-2 border-dashed border-[#C9D3DB] rounded-none bg-[#F5F4EF]/50">
             <FileSpreadsheet className="w-10 h-10 text-slate-300 mx-auto mb-2" />
             <h3 className="text-xs font-semibold text-[#253746]">
               No Security Deposit Instruments Linked
@@ -308,7 +308,7 @@ export const InstitutionDetailPage: React.FC = () => {
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto rounded-[10px] border border-[#C9D3DB]">
+          <div className="overflow-x-auto rounded-none border border-[#C9D3DB]">
             <table className="w-full text-left text-xs">
               <thead className="bg-[#F5F4EF] border-b border-[#C9D3DB] uppercase font-semibold text-[#5D6A75]">
                 <tr>
@@ -335,7 +335,7 @@ export const InstitutionDetailPage: React.FC = () => {
                       {formatDate(instru.maturity_date)}
                     </td>
                     <td className="py-2.5 px-3">
-                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                      <span className={`px-2 py-0.5 rounded-none text-[10px] font-bold ${
                         instru.maturity_indicator === 'ACTIVE'
                           ? 'bg-emerald-100 text-emerald-800'
                           : instru.maturity_indicator === 'EXPIRING_SOON'
@@ -346,7 +346,7 @@ export const InstitutionDetailPage: React.FC = () => {
                       </span>
                     </td>
                     <td className="py-2.5 px-3">
-                      <span className="inline-flex items-center gap-1 font-mono text-[10px] font-bold px-2 py-0.5 rounded bg-purple-50 text-purple-800 border border-purple-200">
+                      <span className="inline-flex items-center gap-1 font-mono text-[10px] font-bold px-2 py-0.5 rounded-none bg-purple-50 text-purple-800 border border-purple-200">
                         <Shield className="w-2.5 h-2.5 text-purple-600" />
                         <span>{instru.trust_level}</span>
                       </span>
@@ -359,7 +359,7 @@ export const InstitutionDetailPage: React.FC = () => {
                     <td className="py-2.5 px-3 text-right">
                       <button
                         onClick={() => navigate(`/instruments/${instru.id}`)}
-                        className="p-1 text-[#5D6A75] hover:text-[#123B5D] rounded transition-colors inline-flex items-center gap-1 font-semibold"
+                        className="p-1 text-[#5D6A75] hover:text-[#123B5D] rounded-none transition-colors inline-flex items-center gap-1 font-semibold"
                       >
                         <Eye className="w-3.5 h-3.5" />
                         <span>View</span>
@@ -393,10 +393,10 @@ export const InstitutionDetailPage: React.FC = () => {
       {/* Status Confirmation Modal */}
       {showStatusConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-          <div className="bg-white rounded-[10px] shadow-2xl border border-[#C9D3DB] w-full max-w-md p-6 space-y-4 animate-in fade-in zoom-in-95 duration-150">
+          <div className="bg-white rounded-none shadow-2xl border border-[#C9D3DB] w-full max-w-md p-6 space-y-4 animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-start gap-3">
               <div
-                className={`p-2.5 rounded-[10px] ${
+                className={`p-2.5 rounded-none ${
                   institution.is_active
                     ? 'bg-amber-100 text-amber-700'
                     : 'bg-emerald-100 text-emerald-700'
@@ -431,7 +431,7 @@ export const InstitutionDetailPage: React.FC = () => {
                 value={statusReason}
                 onChange={(e) => setStatusReason(e.target.value)}
                 placeholder="Regulatory justification logged to audit trail..."
-                className="w-full text-xs p-2.5 border border-[#8799A9] rounded-lg focus:outline-none focus:ring-2 focus:ring-sentinel-500 bg-white"
+                className="w-full text-xs p-2.5 border border-[#8799A9] rounded-none focus:outline-none focus:ring-2 focus:ring-sentinel-500 bg-white"
               />
             </div>
 
@@ -440,7 +440,7 @@ export const InstitutionDetailPage: React.FC = () => {
                 type="button"
                 onClick={() => setShowStatusConfirm(false)}
                 disabled={isUpdatingStatus}
-                className="px-4 py-2 text-xs rounded-lg border border-[#8799A9] text-[#253746] hover:bg-slate-100 font-medium"
+                className="px-4 py-2 text-xs rounded-none border border-[#8799A9] text-[#253746] hover:bg-slate-100 font-medium"
               >
                 Cancel
               </button>
@@ -448,7 +448,7 @@ export const InstitutionDetailPage: React.FC = () => {
                 type="button"
                 onClick={handleToggleStatus}
                 disabled={isUpdatingStatus}
-                className={`px-4 py-2 text-xs rounded-lg text-white font-medium shadow-sm flex items-center gap-1.5 ${
+                className={`px-4 py-2 text-xs rounded-none text-white font-medium shadow-sm flex items-center gap-1.5 ${
                   institution.is_active
                     ? 'bg-amber-600 hover:bg-amber-700'
                     : 'bg-emerald-600 hover:bg-emerald-700'

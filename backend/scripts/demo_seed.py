@@ -397,8 +397,8 @@ class DemoSeeder:
         # 1. Internal Regulatory Roles (6 authoritative accounts)
         internal_roles = [
             ("AICTE System Administrator", "admin@aicte-india.org", "AdminPassword@2026", ROLE_SYSTEM_ADMIN),
-            ("Senior Scrutiny Officer Verma", "scrutiny.verma@aicte-india.org", "ScrutinyPassword@2026", ROLE_SCRUTINY_OFFICER),
-            ("Western Regional Branch Head", "branch.head.north@aicte-india.org", "BranchHeadPassword@2026", ROLE_BRANCH_HEAD),
+            ("Senior Scrutiny Officer Verma", "scrutiny.verma@aicte-india.org", "OfficerPassword@2026", ROLE_SCRUTINY_OFFICER),
+            ("Western Regional Branch Head", "branch.head.north@aicte-india.org", "BranchPassword@2026", ROLE_BRANCH_HEAD),
             ("Competent Authority Member", "authority.member@aicte-india.org", "AuthorityPassword@2026", ROLE_COMPETENT_AUTHORITY),
             ("Chief Finance Officer", "finance.officer@aicte-india.org", "FinancePassword@2026", ROLE_FINANCE_OFFICER),
             ("Statutory Compliance Auditor", "auditor.compliance@aicte-india.org", "AuditorPassword@2026", ROLE_AUDITOR),

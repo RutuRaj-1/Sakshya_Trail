@@ -34,7 +34,7 @@ export const MaturityWindowSection: React.FC<MaturityWindowSectionProps> = ({
   ];
 
   return (
-    <div className="bg-white rounded-[8px] border border-[#C9D3DB] shadow-xs overflow-hidden">
+    <div className="bg-white rounded-none border border-[#C9D3DB] shadow-xs overflow-hidden">
       {/* Header with window controls */}
       <div className="p-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#F5F4EF]/50">
         <div>
@@ -43,7 +43,7 @@ export const MaturityWindowSection: React.FC<MaturityWindowSectionProps> = ({
             <h3 className="font-semibold text-[#0D2538] text-sm">
               Maturity Window Monitor
             </h3>
-            <span className="text-[10px] font-mono text-[#5D6A75] bg-slate-200/80 px-1.5 py-0.5 rounded">
+            <span className="text-[10px] font-mono text-[#5D6A75] bg-slate-200/80 px-1.5 py-0.5 rounded-none">
               PRD-FR-070b
             </span>
           </div>
@@ -53,13 +53,13 @@ export const MaturityWindowSection: React.FC<MaturityWindowSectionProps> = ({
         </div>
 
         {/* Window Selector Buttons */}
-        <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border border-[#C9D3DB]">
+        <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-none border border-[#C9D3DB]">
           {windowOptions.map((opt) => (
             <button
               key={opt.value}
               type="button"
               onClick={() => onWindowChange(opt.value)}
-              className={`px-2.5 py-1 text-xs font-medium rounded-md transition-all ${
+              className={`px-2.5 py-1 text-xs font-medium rounded-none transition-all ${
                 selectedWindowDays === opt.value
                   ? 'bg-white text-[#0D2538] shadow-xs border border-[#C9D3DB]/60 font-semibold'
                   : 'text-[#5D6A75] hover:text-[#0D2538] hover:bg-slate-200/50'
@@ -161,11 +161,11 @@ export const MaturityWindowSection: React.FC<MaturityWindowSectionProps> = ({
                     </td>
                     <td className="px-4 py-2.5">
                       {isOverdue ? (
-                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-rose-100 text-rose-800">
+                        <span className="inline-flex items-center px-1.5 py-0.5 rounded-none text-[10px] font-semibold bg-rose-100 text-rose-800">
                           Elapsed ({Math.abs(item.days_to_maturity)}d ago)
                         </span>
                       ) : (
-                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-100 text-amber-800">
+                        <span className="inline-flex items-center px-1.5 py-0.5 rounded-none text-[10px] font-semibold bg-amber-100 text-amber-800">
                           In {item.days_to_maturity} days
                         </span>
                       )}

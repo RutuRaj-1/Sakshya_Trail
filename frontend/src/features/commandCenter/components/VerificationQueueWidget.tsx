@@ -14,7 +14,7 @@ export const VerificationQueueWidget: React.FC<VerificationQueueWidgetProps> = (
   isLoading,
 }) => {
   return (
-    <div className="bg-white rounded-[8px] border border-[#C9D3DB] shadow-xs overflow-hidden">
+    <div className="bg-white rounded-none border border-[#C9D3DB] shadow-xs overflow-hidden">
       {/* Header */}
       <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-[#F5F4EF]/50">
         <div>
@@ -23,7 +23,7 @@ export const VerificationQueueWidget: React.FC<VerificationQueueWidgetProps> = (
             <h3 className="font-semibold text-[#0D2538] text-sm">
               Bank Verification Desk & Telemetry
             </h3>
-            <span className="text-[10px] font-mono text-[#5D6A75] bg-slate-200/80 px-1.5 py-0.5 rounded">
+            <span className="text-[10px] font-mono text-[#5D6A75] bg-slate-200/80 px-1.5 py-0.5 rounded-none">
               PRD-FR-070d
             </span>
           </div>
@@ -44,16 +44,16 @@ export const VerificationQueueWidget: React.FC<VerificationQueueWidgetProps> = (
         <div className="px-4 py-2.5 bg-[#F5F4EF] border-b border-slate-100 flex flex-wrap items-center justify-between gap-3 text-xs">
           <div className="flex items-center gap-3">
             <span className="text-[#5D6A75] font-medium">Aging Distribution:</span>
-            <span className="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-mono text-[11px]">
+            <span className="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-none font-mono text-[11px]">
               &lt;7d: <strong>{data.age_distribution['<7d'] ?? 0}</strong>
             </span>
-            <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-mono text-[11px]">
+            <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-none font-mono text-[11px]">
               7–14d: <strong>{data.age_distribution['7-14d'] ?? 0}</strong>
             </span>
-            <span className="bg-amber-100 text-amber-800 px-2 py-0.5 rounded font-mono text-[11px]">
+            <span className="bg-amber-100 text-amber-800 px-2 py-0.5 rounded-none font-mono text-[11px]">
               15–30d: <strong>{data.age_distribution['15-30d'] ?? 0}</strong>
             </span>
-            <span className="bg-rose-100 text-rose-800 px-2 py-0.5 rounded font-mono text-[11px]">
+            <span className="bg-rose-100 text-rose-800 px-2 py-0.5 rounded-none font-mono text-[11px]">
               &gt;30d: <strong>{data.age_distribution['>30d'] ?? 0}</strong>
             </span>
           </div>
@@ -112,7 +112,7 @@ export const VerificationQueueWidget: React.FC<VerificationQueueWidgetProps> = (
                         <span className="font-mono text-[11px] text-[#253746]">{item.channel}</span>
                         {isSimulated && (
                           <span
-                            className="bg-amber-100 text-amber-800 border border-amber-300 text-[10px] font-bold px-1.5 py-0.2 rounded inline-flex items-center gap-0.5"
+                            className="bg-amber-100 text-amber-800 border border-amber-300 text-[10px] font-bold px-1.5 py-0.2 rounded-none inline-flex items-center gap-0.5"
                             title="Simulated Response — Prototype adapter only; strictly cannot promote to L3 trust"
                           >
                             SIMULATED
@@ -128,12 +128,12 @@ export const VerificationQueueWidget: React.FC<VerificationQueueWidgetProps> = (
                     </td>
                     <td className="px-4 py-2.5">
                       {item.is_source_unavailable ? (
-                        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-rose-700 bg-rose-50 border border-rose-200 px-1.5 py-0.5 rounded">
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-rose-700 bg-rose-50 border border-rose-200 px-1.5 py-0.5 rounded-none">
                           <AlertTriangle className="w-3 h-3" />
                           Source Unavailable
                         </span>
                       ) : (
-                        <span className="text-[11px] font-semibold text-[#253746] bg-slate-100 px-1.5 py-0.5 rounded">
+                        <span className="text-[11px] font-semibold text-[#253746] bg-slate-100 px-1.5 py-0.5 rounded-none">
                           {item.status}
                         </span>
                       )}

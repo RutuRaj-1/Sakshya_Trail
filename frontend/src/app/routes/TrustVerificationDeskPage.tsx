@@ -371,7 +371,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
     switch (level) {
       case 'L3_BANK_CONFIRMED':
         return (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-800 border border-purple-300 shadow-2xs">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-none text-xs font-bold bg-purple-100 text-purple-800 border border-purple-300 shadow-2xs">
             <ShieldCheck className="w-4 h-4 text-purple-600" />
             <span>L3 BANK CONFIRMED</span>
           </span>
@@ -379,14 +379,14 @@ export const TrustVerificationDeskPage: React.FC = () => {
       case 'L2_OFFICER_VERIFIED':
       case 'L2_OFFICER_REVIEWED':
         return (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 shadow-2xs">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-none text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 shadow-2xs">
             <ShieldCheck className="w-4 h-4 text-emerald-600" />
             <span>L2 OFFICER REVIEWED</span>
           </span>
         );
       case 'L1_DOCUMENT_CONSISTENT':
         return (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 border border-blue-300 shadow-2xs">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-none text-xs font-bold bg-blue-100 text-blue-800 border border-blue-300 shadow-2xs">
             <Shield className="w-4 h-4 text-blue-600" />
             <span>L1 DOCUMENT CONSISTENT</span>
           </span>
@@ -394,7 +394,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
       case 'L0_DECLARED':
       default:
         return (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-[#253746] border border-[#8799A9] shadow-2xs">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-none text-xs font-bold bg-slate-100 text-[#253746] border border-[#8799A9] shadow-2xs">
             <ShieldAlert className="w-4 h-4 text-[#5D6A75]" />
             <span>L0 DECLARED</span>
           </span>
@@ -467,7 +467,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
 
         {/* Hierarchy Overview Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="p-4 rounded-[10px] bg-white border border-[#C9D3DB] shadow-2xs">
+          <div className="p-4 rounded-none bg-white border border-[#C9D3DB] shadow-2xs">
             <div className="flex items-center justify-between mb-1">
               <span className="text-xs font-semibold text-[#5D6A75] uppercase tracking-wider">
                 Level 0 — Declared
@@ -480,7 +480,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
             <p className="text-xs text-[#5D6A75] mt-1">Self-declared statutory deposits</p>
           </div>
 
-          <div className="p-4 rounded-[10px] bg-white border border-blue-200 shadow-2xs">
+          <div className="p-4 rounded-none bg-white border border-blue-200 shadow-2xs">
             <div className="flex items-center justify-between mb-1">
               <span className="text-xs font-semibold text-blue-600 uppercase tracking-wider">
                 Level 1 — Consistent
@@ -493,7 +493,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
             <p className="text-xs text-blue-600/80 mt-1">OCR document rules validated</p>
           </div>
 
-          <div className="p-4 rounded-[10px] bg-white border border-emerald-200 shadow-2xs">
+          <div className="p-4 rounded-none bg-white border border-emerald-200 shadow-2xs">
             <div className="flex items-center justify-between mb-1">
               <span className="text-xs font-semibold text-emerald-600 uppercase tracking-wider">
                 Level 2 — Officer Verified
@@ -506,7 +506,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
             <p className="text-xs text-emerald-600/80 mt-1">Scrutiny officer reviewed & attested</p>
           </div>
 
-          <div className="p-4 rounded-[10px] bg-white border border-purple-200 shadow-2xs">
+          <div className="p-4 rounded-none bg-white border border-purple-200 shadow-2xs">
             <div className="flex items-center justify-between mb-1">
               <span className="text-xs font-semibold text-purple-600 uppercase tracking-wider">
                 Level 3 — Bank Confirmed
@@ -521,7 +521,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
         </div>
 
         {/* Directory Search & Filter Bar */}
-        <div className="p-4 bg-white rounded-[10px] border border-[#C9D3DB] shadow-2xs space-y-3">
+        <div className="p-4 bg-white rounded-none border border-[#C9D3DB] shadow-2xs space-y-3">
           <div className="flex flex-col md:flex-row gap-3">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
@@ -530,7 +530,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
                 placeholder="Search by FDR reference number, bank name, institution..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 border border-[#8799A9] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sentinel-500 text-[#253746]"
+                className="w-full pl-9 pr-4 py-2 border border-[#8799A9] rounded-none text-sm focus:outline-none focus:ring-2 focus:ring-sentinel-500 text-[#253746]"
               />
             </div>
             <div className="flex items-center gap-2">
@@ -538,7 +538,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
               <select
                 value={trustFilter}
                 onChange={(e) => setTrustFilter(e.target.value)}
-                className="px-3 py-2 border border-[#8799A9] rounded-lg text-sm bg-white text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500"
+                className="px-3 py-2 border border-[#8799A9] rounded-none text-sm bg-white text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500"
               >
                 <option value="ALL">All Trust Levels</option>
                 <option value="L0_DECLARED">L0 — Declared</option>
@@ -551,7 +551,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
         </div>
 
         {/* Directory Instruments Table */}
-        <div className="bg-white rounded-[10px] border border-[#C9D3DB] shadow-2xs overflow-hidden">
+        <div className="bg-white rounded-none border border-[#C9D3DB] shadow-2xs overflow-hidden">
           <div className="p-4 border-b border-[#C9D3DB] bg-[#F5F4EF]/50 flex items-center justify-between">
             <span className="text-xs font-bold text-[#253746] uppercase tracking-wider">
               Registered Instruments ({filteredDirectory.length})
@@ -640,7 +640,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
     <div className="space-y-6 max-w-7xl mx-auto pb-16">
       {/* Alert Messages */}
       {errorMessage && (
-        <div className="p-4 bg-rose-50 border border-rose-200 rounded-[10px] text-rose-800 flex items-start justify-between gap-3 shadow-2xs">
+        <div className="p-4 bg-rose-50 border border-rose-200 rounded-none text-rose-800 flex items-start justify-between gap-3 shadow-2xs">
           <div className="flex items-start gap-2.5">
             <AlertOctagon className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
             <div>
@@ -658,7 +658,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
       )}
 
       {successMessage && (
-        <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-[10px] text-emerald-800 flex items-start justify-between gap-3 shadow-2xs">
+        <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-none text-emerald-800 flex items-start justify-between gap-3 shadow-2xs">
           <div className="flex items-start gap-2.5">
             <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
             <div>
@@ -689,7 +689,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
           </Button>
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-mono text-xs font-bold text-[#123B5D] bg-[#EEF6FA] border border-[#C4DEED] px-2 py-0.5 rounded">
+              <span className="font-mono text-xs font-bold text-[#123B5D] bg-[#EEF6FA] border border-[#C4DEED] px-2 py-0.5 rounded-none">
                 Desk
               </span>
               <h1 className="text-xl sm:text-2xl font-bold text-[#0D2538] tracking-tight font-mono">
@@ -706,7 +706,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
           {instrument && (
             <Link
               to={`/instruments/${instrument.id}`}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[#5D6A75] bg-white border border-[#8799A9] rounded-lg hover:bg-[#F5F4EF] transition-colors shadow-2xs"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[#5D6A75] bg-white border border-[#8799A9] rounded-none hover:bg-[#F5F4EF] transition-colors shadow-2xs"
             >
               <ExternalLink className="w-3.5 h-3.5" />
               <span>Module 1 Detail</span>
@@ -728,7 +728,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
 
       {/* Summary Banner Card */}
       {instrument && (
-        <div className="bg-white rounded-[10px] border border-[#C9D3DB] p-5 shadow-2xs space-y-4">
+        <div className="bg-white rounded-none border border-[#C9D3DB] p-5 shadow-2xs space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-100">
             <div className="space-y-1">
               <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
@@ -741,7 +741,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
                   <span className="font-semibold text-[#253746]">{instrument.status}</span>
                 </span>
                 {trustAssessments.length > 0 && (
-                  <span className="text-[11px] font-mono bg-slate-100 text-[#5D6A75] px-2 py-0.5 rounded border border-[#C9D3DB]">
+                  <span className="text-[11px] font-mono bg-slate-100 text-[#5D6A75] px-2 py-0.5 rounded-none border border-[#C9D3DB]">
                     Concurrency Ver: {trustAssessments[0].concurrency_version}
                   </span>
                 )}
@@ -878,7 +878,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
         <div className="space-y-6">
           {/* Aggregate Field Breakdown */}
           {trustSummary && (
-            <div className="bg-white rounded-[10px] border border-[#C9D3DB] p-5 shadow-2xs space-y-4">
+            <div className="bg-white rounded-none border border-[#C9D3DB] p-5 shadow-2xs space-y-4">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-sm font-bold text-[#0D2538]">
@@ -891,7 +891,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-2">
                 {Object.entries(trustSummary.fields_by_level || {}).map(([lvl, fields]) => (
-                  <div key={lvl} className="p-3 bg-[#F5F4EF] rounded-lg border border-[#C9D3DB]">
+                  <div key={lvl} className="p-3 bg-[#F5F4EF] rounded-none border border-[#C9D3DB]">
                     <span className="text-[11px] font-mono font-bold text-[#5D6A75] block uppercase mb-1">
                       {lvl.replace('_', ' ')}
                     </span>
@@ -902,7 +902,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
                         {fields.map((f) => (
                           <span
                             key={f}
-                            className="text-[10px] font-mono bg-white text-[#253746] px-1.5 py-0.5 rounded border border-[#C9D3DB]"
+                            className="text-[10px] font-mono bg-white text-[#253746] px-1.5 py-0.5 rounded-none border border-[#C9D3DB]"
                           >
                             {f}
                           </span>
@@ -914,7 +914,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
               </div>
 
               {trustSummary.uncovered_fields?.length > 0 && (
-                <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-900 text-xs flex items-center gap-2">
+                <div className="p-3 bg-amber-50 border border-amber-200 rounded-none text-amber-900 text-xs flex items-center gap-2">
                   <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
                   <span>
                     Uncovered Fields lacking explicit assessment:{' '}
@@ -926,7 +926,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
           )}
 
           {/* Transition History Table */}
-          <div className="bg-white rounded-[10px] border border-[#C9D3DB] shadow-2xs overflow-hidden">
+          <div className="bg-white rounded-none border border-[#C9D3DB] shadow-2xs overflow-hidden">
             <div className="p-4 border-b border-[#C9D3DB] bg-[#F5F4EF]/50 flex items-center justify-between">
               <h3 className="text-xs font-bold text-[#253746] uppercase tracking-wider">
                 Audited Trust Transition History ({trustHistory.length})
@@ -972,7 +972,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
                               {item.new_trust_level}
                             </span>
                             {item.is_downgrade && (
-                              <span className="text-[9px] font-mono bg-rose-100 text-rose-700 px-1 rounded font-bold">
+                              <span className="text-[9px] font-mono bg-rose-100 text-rose-700 px-1 rounded-none font-bold">
                                 DOWNGRADE
                               </span>
                             )}
@@ -995,7 +995,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
                         <td className="py-3 px-4 text-center">
                           <span
                             className={cn(
-                              'text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase',
+                              'text-[10px] font-semibold px-2 py-0.5 rounded-none uppercase',
                               item.outcome === 'SUCCESS'
                                 ? 'bg-emerald-100 text-emerald-800'
                                 : 'bg-rose-100 text-rose-800'
@@ -1019,7 +1019,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
       {/* =================================================================== */}
       {activeTab === 'provenance' && (
         <div className="space-y-4">
-          <div className="bg-white rounded-[10px] border border-[#C9D3DB] p-4 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="bg-white rounded-none border border-[#C9D3DB] p-4 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <h3 className="text-sm font-bold text-[#0D2538]">
                 Field-Level Provenance & Audit Trail
@@ -1035,7 +1035,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
               <select
                 value={selectedFieldFilter}
                 onChange={(e) => setSelectedFieldFilter(e.target.value)}
-                className="px-3 py-1.5 border border-[#8799A9] rounded-lg text-xs bg-white text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500 font-mono"
+                className="px-3 py-1.5 border border-[#8799A9] rounded-none text-xs bg-white text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500 font-mono"
               >
                 <option value="ALL">All Fields ({availableFieldNames.length})</option>
                 {availableFieldNames.map((name) => (
@@ -1048,7 +1048,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
           </div>
 
           {filteredProvenance.length === 0 ? (
-            <div className="p-12 bg-white rounded-[10px] border border-[#C9D3DB] text-center text-slate-400">
+            <div className="p-12 bg-white rounded-none border border-[#C9D3DB] text-center text-slate-400">
               <FileText className="w-8 h-8 mx-auto mb-2 opacity-50" />
               <p className="text-xs font-medium">No provenance records logged for this filter.</p>
             </div>
@@ -1058,7 +1058,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
                 <div
                   key={item.id}
                   className={cn(
-                    'p-4 rounded-[10px] border bg-white shadow-2xs transition-all',
+                    'p-4 rounded-none border bg-white shadow-2xs transition-all',
                     item.is_active
                       ? 'border-sentinel-300 bg-[#EEF6FA]/20 ring-1 ring-sentinel-200'
                       : 'border-[#C9D3DB] opacity-80'
@@ -1066,11 +1066,11 @@ export const TrustVerificationDeskPage: React.FC = () => {
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-100">
                     <div className="flex items-center gap-2">
-                      <span className="font-mono text-xs font-bold text-sentinel-900 bg-slate-100 px-2 py-0.5 rounded border border-[#C9D3DB]">
+                      <span className="font-mono text-xs font-bold text-sentinel-900 bg-slate-100 px-2 py-0.5 rounded-none border border-[#C9D3DB]">
                         {item.field_name}
                       </span>
                       {item.is_active && (
-                        <span className="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full border border-emerald-200">
+                        <span className="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-none border border-emerald-200">
                           CURRENT ACTIVE VALUE
                         </span>
                       )}
@@ -1122,7 +1122,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
       {/* =================================================================== */}
       {activeTab === 'requests' && (
         <div className="space-y-4">
-          <div className="bg-white rounded-[10px] border border-[#C9D3DB] p-4 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="bg-white rounded-none border border-[#C9D3DB] p-4 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <h3 className="text-sm font-bold text-[#0D2538]">
                 Electronic Bank Verification Pipeline
@@ -1146,7 +1146,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
           </div>
 
           {verificationRequests.length === 0 ? (
-            <div className="p-12 bg-white rounded-[10px] border border-[#C9D3DB] text-center text-slate-400">
+            <div className="p-12 bg-white rounded-none border border-[#C9D3DB] text-center text-slate-400">
               <Send className="w-8 h-8 mx-auto mb-2 opacity-50" />
               <p className="text-xs font-medium">No bank verification requests dispatched yet.</p>
               {canPerformOfficerActions && (
@@ -1166,12 +1166,12 @@ export const TrustVerificationDeskPage: React.FC = () => {
               {verificationRequests.map((req) => (
                 <div
                   key={req.id}
-                  className="bg-white rounded-[10px] border border-[#C9D3DB] shadow-2xs overflow-hidden"
+                  className="bg-white rounded-none border border-[#C9D3DB] shadow-2xs overflow-hidden"
                 >
                   {/* Request Header */}
                   <div className="p-4 bg-[#F5F4EF]/80 border-b border-[#C9D3DB] flex flex-wrap items-center justify-between gap-3">
                     <div className="flex items-center gap-3">
-                      <span className="font-mono text-xs font-bold text-[#0D2538] bg-[#EEF6FA]/60 border border-[#C4DEED] px-2.5 py-1 rounded">
+                      <span className="font-mono text-xs font-bold text-[#0D2538] bg-[#EEF6FA]/60 border border-[#C4DEED] px-2.5 py-1 rounded-none">
                         {req.reference_code}
                       </span>
                       <span className="text-xs font-semibold text-[#253746]">
@@ -1179,7 +1179,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
                       </span>
                       <span
                         className={cn(
-                          'text-[10px] font-bold px-2 py-0.5 rounded-full uppercase',
+                          'text-[10px] font-bold px-2 py-0.5 rounded-none uppercase',
                           req.status === 'COMPLETED'
                             ? 'bg-emerald-100 text-emerald-800'
                             : req.status === 'DISPATCHED'
@@ -1282,7 +1282,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
                     </div>
 
                     {req.error_details && (
-                      <div className="p-3 bg-rose-50 border border-rose-200 rounded-lg text-rose-800 text-xs">
+                      <div className="p-3 bg-rose-50 border border-rose-200 rounded-none text-rose-800 text-xs">
                         <strong>Adapter Error:</strong> {req.error_details}
                       </div>
                     )}
@@ -1297,13 +1297,13 @@ export const TrustVerificationDeskPage: React.FC = () => {
                         {req.responses.map((resp) => (
                           <div
                             key={resp.id}
-                            className="p-3 rounded-lg border border-[#C9D3DB] bg-[#F5F4EF]/50 space-y-2"
+                            className="p-3 rounded-none border border-[#C9D3DB] bg-[#F5F4EF]/50 space-y-2"
                           >
                             <div className="flex flex-wrap items-center justify-between gap-2">
                               <div className="flex items-center gap-2">
                                 <span
                                   className={cn(
-                                    'text-xs font-bold px-2 py-0.5 rounded-full uppercase',
+                                    'text-xs font-bold px-2 py-0.5 rounded-none uppercase',
                                     resp.result === 'MATCH'
                                       ? 'bg-emerald-100 text-emerald-800'
                                       : resp.result === 'MISMATCH'
@@ -1317,7 +1317,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
                                   Ref: {resp.bank_reference_number || 'None'}
                                 </span>
                                 {resp.is_simulated && (
-                                  <span className="text-[10px] font-mono bg-purple-50 text-purple-700 border border-purple-200 px-1.5 py-0.2 rounded">
+                                  <span className="text-[10px] font-mono bg-purple-50 text-purple-700 border border-purple-200 px-1.5 py-0.2 rounded-none">
                                     SIMULATED ADAPTER
                                   </span>
                                 )}
@@ -1333,7 +1333,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
 
                             {/* Field Comparisons Table if available */}
                             {resp.field_comparisons_json && (
-                              <div className="mt-2 bg-white rounded border border-[#C9D3DB] p-2 text-[11px] font-mono">
+                              <div className="mt-2 bg-white rounded-none border border-[#C9D3DB] p-2 text-[11px] font-mono">
                                 <span className="text-slate-400 block text-[10px] uppercase font-bold mb-1">
                                   Bank Reconciliation Comparison
                                 </span>
@@ -1381,7 +1381,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
       {/* TAB 4: CONFLICT & DISCREPANCY MATRIX */}
       {/* =================================================================== */}
       {activeTab === 'conflicts' && (
-        <div className="bg-white rounded-[10px] border border-[#C9D3DB] p-5 shadow-2xs space-y-4">
+        <div className="bg-white rounded-none border border-[#C9D3DB] p-5 shadow-2xs space-y-4">
           <div className="border-b border-slate-100 pb-3">
             <h3 className="text-sm font-bold text-[#0D2538]">
               Multi-Source Evidence Conflict Matrix
@@ -1413,7 +1413,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
                     {completedResponses[0]?.bank_reference_number ? formatINR(instrument?.amount) : 'Pending Confirmation'}
                   </td>
                   <td className="py-3 px-3 text-center">
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-none bg-emerald-100 text-emerald-800">
                       CONSISTENT
                     </span>
                   </td>
@@ -1429,7 +1429,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
                     {completedResponses[0]?.bank_reference_number ? formatDate(instrument?.maturity_date) : 'Pending Confirmation'}
                   </td>
                   <td className="py-3 px-3 text-center">
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-none bg-emerald-100 text-emerald-800">
                       CONSISTENT
                     </span>
                   </td>
@@ -1445,7 +1445,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
                     {completedResponses[0]?.bank_reference_number || 'Pending Confirmation'}
                   </td>
                   <td className="py-3 px-3 text-center">
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-none bg-emerald-100 text-emerald-800">
                       CONSISTENT
                     </span>
                   </td>
@@ -1454,7 +1454,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
             </table>
           </div>
 
-          <div className="p-4 bg-[#F5F4EF] border border-[#C9D3DB] rounded-lg text-xs space-y-1.5 text-[#5D6A75]">
+          <div className="p-4 bg-[#F5F4EF] border border-[#C9D3DB] rounded-none text-xs space-y-1.5 text-[#5D6A75]">
             <p className="font-semibold text-[#253746]">Automated Conflict Downgrade Policy:</p>
             <p>
               Under Rule §4.3 of statutory verification protocols, any discrepancy between bank electronic feeds and declared fields blocks Level 3 confirmation and automatically downgrades the instrument trust state to Level 1, requiring reasoned scrutiny officer re-examination.
@@ -1468,7 +1468,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
       {/* =================================================================== */}
       {isL2ModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4">
-          <div className="bg-white rounded-[10px] border border-[#C9D3DB] max-w-lg w-full shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+          <div className="bg-white rounded-none border border-[#C9D3DB] max-w-lg w-full shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             <div className="p-5 border-b border-[#C9D3DB] bg-emerald-50/50 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <ShieldCheck className="w-5 h-5 text-emerald-600" />
@@ -1495,7 +1495,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
                   placeholder="Detail the documentary inspection, seal verification, and branch confirmation reviewed..."
                   value={l2Reason}
                   onChange={(e) => setL2Reason(e.target.value)}
-                  className="w-full px-3 py-2 border border-[#8799A9] rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-[#253746]"
+                  className="w-full px-3 py-2 border border-[#8799A9] rounded-none focus:outline-none focus:ring-2 focus:ring-emerald-500 text-[#253746]"
                 />
               </div>
 
@@ -1508,7 +1508,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
                   placeholder="e.g. DOC-VER-001"
                   value={l2DocVersion}
                   onChange={(e) => setL2DocVersion(e.target.value)}
-                  className="w-full px-3 py-2 border border-[#8799A9] rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono text-[#253746]"
+                  className="w-full px-3 py-2 border border-[#8799A9] rounded-none focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono text-[#253746]"
                 />
               </div>
 
@@ -1521,11 +1521,11 @@ export const TrustVerificationDeskPage: React.FC = () => {
                   placeholder="BRANCH-EMAIL-REF-102, AICTE-SEAL-VERIFIED"
                   value={l2EvidenceRefs}
                   onChange={(e) => setL2EvidenceRefs(e.target.value)}
-                  className="w-full px-3 py-2 border border-[#8799A9] rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono text-[#253746]"
+                  className="w-full px-3 py-2 border border-[#8799A9] rounded-none focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono text-[#253746]"
                 />
               </div>
 
-              <div className="p-3 bg-[#F5F4EF] border border-[#C9D3DB] rounded-lg text-[#5D6A75] space-y-1">
+              <div className="p-3 bg-[#F5F4EF] border border-[#C9D3DB] rounded-none text-[#5D6A75] space-y-1">
                 <p>
                   <strong>Target Level:</strong> L2_OFFICER_VERIFIED
                 </p>
@@ -1564,7 +1564,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
       {/* =================================================================== */}
       {isL3ModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4">
-          <div className="bg-white rounded-[10px] border border-[#C9D3DB] max-w-lg w-full shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+          <div className="bg-white rounded-none border border-[#C9D3DB] max-w-lg w-full shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             <div className="p-5 border-b border-[#C9D3DB] bg-purple-50/50 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <ShieldCheck className="w-5 h-5 text-purple-600" />
@@ -1589,7 +1589,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
                   <select
                     value={l3ResponseId}
                     onChange={(e) => setL3ResponseId(e.target.value)}
-                    className="w-full px-3 py-2 border border-[#8799A9] rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 font-mono text-[#253746]"
+                    className="w-full px-3 py-2 border border-[#8799A9] rounded-none focus:outline-none focus:ring-2 focus:ring-purple-500 font-mono text-[#253746]"
                     required
                   >
                     <option value="">Select verified bank response...</option>
@@ -1606,7 +1606,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
                     placeholder="Enter completed verification response ID..."
                     value={l3ResponseId}
                     onChange={(e) => setL3ResponseId(e.target.value)}
-                    className="w-full px-3 py-2 border border-[#8799A9] rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 font-mono text-[#253746]"
+                    className="w-full px-3 py-2 border border-[#8799A9] rounded-none focus:outline-none focus:ring-2 focus:ring-purple-500 font-mono text-[#253746]"
                   />
                 )}
               </div>
@@ -1619,7 +1619,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
                   type="text"
                   value={l3AuthConfig}
                   onChange={(e) => setL3AuthConfig(e.target.value)}
-                  className="w-full px-3 py-2 border border-[#8799A9] rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 font-mono text-[#253746]"
+                  className="w-full px-3 py-2 border border-[#8799A9] rounded-none focus:outline-none focus:ring-2 focus:ring-purple-500 font-mono text-[#253746]"
                 />
               </div>
 
@@ -1633,7 +1633,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
                   placeholder="Detail the electronic confirmation payload received from the bank..."
                   value={l3Reason}
                   onChange={(e) => setL3Reason(e.target.value)}
-                  className="w-full px-3 py-2 border border-[#8799A9] rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-[#253746]"
+                  className="w-full px-3 py-2 border border-[#8799A9] rounded-none focus:outline-none focus:ring-2 focus:ring-purple-500 text-[#253746]"
                 />
               </div>
 
@@ -1667,7 +1667,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
       {/* =================================================================== */}
       {isDowngradeModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4">
-          <div className="bg-white rounded-[10px] border border-[#C9D3DB] max-w-lg w-full shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+          <div className="bg-white rounded-none border border-[#C9D3DB] max-w-lg w-full shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             <div className="p-5 border-b border-[#C9D3DB] bg-rose-50/50 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <ShieldAlert className="w-5 h-5 text-rose-600" />
@@ -1691,7 +1691,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
                 <select
                   value={downgradeTarget}
                   onChange={(e) => setDowngradeTarget(e.target.value as any)}
-                  className="w-full px-3 py-2 border border-[#8799A9] rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 font-mono text-[#253746]"
+                  className="w-full px-3 py-2 border border-[#8799A9] rounded-none focus:outline-none focus:ring-2 focus:ring-rose-500 font-mono text-[#253746]"
                 >
                   <option value="L1_DOCUMENT_CONSISTENT">L1_DOCUMENT_CONSISTENT (Document Validated Only)</option>
                   <option value="L0_DECLARED">L0_DECLARED (Revert to Raw Declared State)</option>
@@ -1705,7 +1705,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
                 <select
                   value={downgradeTrigger}
                   onChange={(e) => setDowngradeTrigger(e.target.value)}
-                  className="w-full px-3 py-2 border border-[#8799A9] rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 text-[#253746]"
+                  className="w-full px-3 py-2 border border-[#8799A9] rounded-none focus:outline-none focus:ring-2 focus:ring-rose-500 text-[#253746]"
                 >
                   <option value="CONFLICTING_BANK_EVIDENCE">Conflicting Bank Evidence / Mismatch</option>
                   <option value="DOCUMENT_SUPERSEDED_OR_REVOKED">Document Revocation / Invalidation</option>
@@ -1724,7 +1724,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
                   placeholder="Detail the discovered conflict or policy justification necessitating downgrade..."
                   value={downgradeReason}
                   onChange={(e) => setDowngradeReason(e.target.value)}
-                  className="w-full px-3 py-2 border border-[#8799A9] rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 text-[#253746]"
+                  className="w-full px-3 py-2 border border-[#8799A9] rounded-none focus:outline-none focus:ring-2 focus:ring-rose-500 text-[#253746]"
                 />
               </div>
 
@@ -1758,7 +1758,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
       {/* =================================================================== */}
       {isNewRequestModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4">
-          <div className="bg-white rounded-[10px] border border-[#C9D3DB] max-w-lg w-full shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+          <div className="bg-white rounded-none border border-[#C9D3DB] max-w-lg w-full shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             <div className="p-5 border-b border-[#C9D3DB] bg-[#EEF6FA]/50 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Send className="w-5 h-5 text-[#123B5D]" />
@@ -1782,7 +1782,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
                 <select
                   value={newRequestChannel}
                   onChange={(e) => setNewRequestChannel(e.target.value)}
-                  className="w-full px-3 py-2 border border-[#8799A9] rounded-lg focus:outline-none focus:ring-2 focus:ring-sentinel-500 font-mono text-[#253746]"
+                  className="w-full px-3 py-2 border border-[#8799A9] rounded-none focus:outline-none focus:ring-2 focus:ring-sentinel-500 font-mono text-[#253746]"
                 >
                   <option value="SFTP_RECONCILIATION">SFTP_RECONCILIATION (Scheduled Batch)</option>
                   <option value="BANK_API">BANK_API (Synchronous Host-to-Host)</option>
@@ -1808,7 +1808,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
                             setNewRequestFields(newRequestFields.filter((item) => item !== f));
                           }
                         }}
-                        className="rounded border-[#8799A9] text-[#123B5D] focus:ring-sentinel-500"
+                        className="rounded-none border-[#8799A9] text-[#123B5D] focus:ring-sentinel-500"
                       />
                       <span>{f}</span>
                     </label>
@@ -1825,7 +1825,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
                   placeholder="e.g. Expedited scrutiny for annual AICTE approval cycle..."
                   value={newRequestNotes}
                   onChange={(e) => setNewRequestNotes(e.target.value)}
-                  className="w-full px-3 py-2 border border-[#8799A9] rounded-lg focus:outline-none focus:ring-2 focus:ring-sentinel-500 text-[#253746]"
+                  className="w-full px-3 py-2 border border-[#8799A9] rounded-none focus:outline-none focus:ring-2 focus:ring-sentinel-500 text-[#253746]"
                 />
               </div>
 
@@ -1859,7 +1859,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
       {/* =================================================================== */}
       {isDispatchRequestModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4">
-          <div className="bg-white rounded-[10px] border border-[#C9D3DB] max-w-md w-full shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+          <div className="bg-white rounded-none border border-[#C9D3DB] max-w-md w-full shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             <div className="p-5 border-b border-[#C9D3DB] bg-blue-50/50 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Send className="w-5 h-5 text-blue-600" />
@@ -1883,7 +1883,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
                 <select
                   value={dispatchScenario}
                   onChange={(e) => setDispatchScenario(e.target.value)}
-                  className="w-full px-3 py-2 border border-[#8799A9] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-[#253746] font-mono"
+                  className="w-full px-3 py-2 border border-[#8799A9] rounded-none focus:outline-none focus:ring-2 focus:ring-blue-500 text-[#253746] font-mono"
                 >
                   <option value="NORMAL_MATCH">NORMAL_MATCH (Clean statutory bank confirmation)</option>
                   <option value="AMOUNT_MISMATCH">AMOUNT_MISMATCH (Discrepancy test scenario)</option>
@@ -1926,7 +1926,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
       {/* =================================================================== */}
       {isManualEvidenceModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4">
-          <div className="bg-white rounded-[10px] border border-[#C9D3DB] max-w-lg w-full shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+          <div className="bg-white rounded-none border border-[#C9D3DB] max-w-lg w-full shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             <div className="p-5 border-b border-[#C9D3DB] bg-[#F5F4EF] flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <FileText className="w-5 h-5 text-[#253746]" />
@@ -1954,7 +1954,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
                     placeholder="e.g. SBI/CONF/2026/8912"
                     value={manualRef}
                     onChange={(e) => setManualRef(e.target.value)}
-                    className="w-full px-3 py-2 border border-[#8799A9] rounded-lg focus:outline-none focus:ring-2 focus:ring-sentinel-500 font-mono text-[#253746]"
+                    className="w-full px-3 py-2 border border-[#8799A9] rounded-none focus:outline-none focus:ring-2 focus:ring-sentinel-500 font-mono text-[#253746]"
                   />
                 </div>
 
@@ -1967,7 +1967,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
                     required
                     value={manualDate}
                     onChange={(e) => setManualDate(e.target.value)}
-                    className="w-full px-3 py-2 border border-[#8799A9] rounded-lg focus:outline-none focus:ring-2 focus:ring-sentinel-500 text-[#253746]"
+                    className="w-full px-3 py-2 border border-[#8799A9] rounded-none focus:outline-none focus:ring-2 focus:ring-sentinel-500 text-[#253746]"
                   />
                 </div>
               </div>
@@ -1979,7 +1979,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
                 <select
                   value={manualResult}
                   onChange={(e) => setManualResult(e.target.value)}
-                  className="w-full px-3 py-2 border border-[#8799A9] rounded-lg focus:outline-none focus:ring-2 focus:ring-sentinel-500 text-[#253746]"
+                  className="w-full px-3 py-2 border border-[#8799A9] rounded-none focus:outline-none focus:ring-2 focus:ring-sentinel-500 text-[#253746]"
                 >
                   <option value="MATCH">MATCH (Bank confirms all deposit particulars)</option>
                   <option value="MISMATCH">MISMATCH (Bank reports conflicting particulars)</option>
@@ -1997,7 +1997,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
                     placeholder="e.g. 1500000"
                     value={manualAmount}
                     onChange={(e) => setManualAmount(e.target.value)}
-                    className="w-full px-3 py-2 border border-[#8799A9] rounded-lg focus:outline-none focus:ring-2 focus:ring-sentinel-500 font-mono text-[#253746]"
+                    className="w-full px-3 py-2 border border-[#8799A9] rounded-none focus:outline-none focus:ring-2 focus:ring-sentinel-500 font-mono text-[#253746]"
                   />
                 </div>
 
@@ -2009,7 +2009,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
                     type="date"
                     value={manualMaturityDate}
                     onChange={(e) => setManualMaturityDate(e.target.value)}
-                    className="w-full px-3 py-2 border border-[#8799A9] rounded-lg focus:outline-none focus:ring-2 focus:ring-sentinel-500 text-[#253746]"
+                    className="w-full px-3 py-2 border border-[#8799A9] rounded-none focus:outline-none focus:ring-2 focus:ring-sentinel-500 text-[#253746]"
                   />
                 </div>
               </div>
@@ -2023,7 +2023,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
                   placeholder="e.g. DOC-VER-BANK-CONF-01"
                   value={manualDocVersion}
                   onChange={(e) => setManualDocVersion(e.target.value)}
-                  className="w-full px-3 py-2 border border-[#8799A9] rounded-lg focus:outline-none focus:ring-2 focus:ring-sentinel-500 font-mono text-[#253746]"
+                  className="w-full px-3 py-2 border border-[#8799A9] rounded-none focus:outline-none focus:ring-2 focus:ring-sentinel-500 font-mono text-[#253746]"
                 />
               </div>
 
@@ -2037,7 +2037,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
                   placeholder="Official bank confirmation letter or sealed certificate details..."
                   value={manualReason}
                   onChange={(e) => setManualReason(e.target.value)}
-                  className="w-full px-3 py-2 border border-[#8799A9] rounded-lg focus:outline-none focus:ring-2 focus:ring-sentinel-500 text-[#253746]"
+                  className="w-full px-3 py-2 border border-[#8799A9] rounded-none focus:outline-none focus:ring-2 focus:ring-sentinel-500 text-[#253746]"
                 />
               </div>
 

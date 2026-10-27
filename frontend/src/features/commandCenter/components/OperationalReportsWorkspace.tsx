@@ -193,7 +193,7 @@ export const OperationalReportsWorkspace: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#0D2538] border border-[#1e3c54] p-6 rounded-[10px] shadow-lg">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#0D2538] border border-[#1e3c54] p-6 rounded-none shadow-lg">
         <div>
           <div className="flex items-center gap-2">
             <FileSpreadsheet className="w-6 h-6 text-[#0F766E]" />
@@ -210,7 +210,7 @@ export const OperationalReportsWorkspace: React.FC = () => {
             onClick={handleExportCsv}
             disabled={!canExport || exportingCsv || loading}
             title={canExport ? 'Export filtered report as secure CSV' : 'Export permission required (Officer/Auditor/Admin)'}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-all shadow-sm ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-none font-medium text-sm transition-all shadow-sm ${
               canExport
                 ? 'bg-slate-800 hover:bg-slate-700 text-slate-100 border border-slate-700 hover:border-slate-600'
                 : 'bg-slate-900 text-slate-600 border border-slate-800 cursor-not-allowed'
@@ -224,7 +224,7 @@ export const OperationalReportsWorkspace: React.FC = () => {
             onClick={handleExportPdf}
             disabled={!canExport || exportingPdf || loading}
             title={canExport ? 'Export official compliance PDF' : 'Export permission required (Officer/Auditor/Admin)'}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-all shadow-sm ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-none font-medium text-sm transition-all shadow-sm ${
               canExport
                 ? 'bg-[#0F766E] hover:bg-[#09544E] text-white shadow-sentinel-950/40'
                 : 'bg-slate-900 text-slate-600 border border-slate-800 cursor-not-allowed'
@@ -249,7 +249,7 @@ export const OperationalReportsWorkspace: React.FC = () => {
           <Clock className="w-4 h-4" />
           <span>Pending Verification</span>
           {pendingData && (
-            <span className="ml-1.5 px-2 py-0.5 text-xs rounded-full bg-slate-800 text-slate-300 font-mono">
+            <span className="ml-1.5 px-2 py-0.5 text-xs rounded-none bg-slate-800 text-slate-300 font-mono">
               {pendingData.total_records}
             </span>
           )}
@@ -266,7 +266,7 @@ export const OperationalReportsWorkspace: React.FC = () => {
           <Calendar className="w-4 h-4" />
           <span>Upcoming Maturities</span>
           {maturitiesData && (
-            <span className="ml-1.5 px-2 py-0.5 text-xs rounded-full bg-slate-800 text-slate-300 font-mono">
+            <span className="ml-1.5 px-2 py-0.5 text-xs rounded-none bg-slate-800 text-slate-300 font-mono">
               {maturitiesData.total_records}
             </span>
           )}
@@ -283,7 +283,7 @@ export const OperationalReportsWorkspace: React.FC = () => {
           <FileCheck2 className="w-4 h-4" />
           <span>Missing Documents</span>
           {missingDocsData && (
-            <span className="ml-1.5 px-2 py-0.5 text-xs rounded-full bg-slate-800 text-slate-300 font-mono">
+            <span className="ml-1.5 px-2 py-0.5 text-xs rounded-none bg-slate-800 text-slate-300 font-mono">
               {missingDocsData.total_records}
             </span>
           )}
@@ -300,7 +300,7 @@ export const OperationalReportsWorkspace: React.FC = () => {
           <AlertTriangle className="w-4 h-4" />
           <span>Interventions Required</span>
           {interventionsData && (
-            <span className="ml-1.5 px-2 py-0.5 text-xs rounded-full bg-amber-950/60 text-amber-300 border border-amber-800/60 font-mono">
+            <span className="ml-1.5 px-2 py-0.5 text-xs rounded-none bg-amber-950/60 text-amber-300 border border-amber-800/60 font-mono">
               {interventionsData.total_records}
             </span>
           )}
@@ -308,7 +308,7 @@ export const OperationalReportsWorkspace: React.FC = () => {
       </div>
 
       {/* Filter Control Bar */}
-      <div className="bg-slate-900/80 border border-slate-800 p-4 rounded-[10px] space-y-4">
+      <div className="bg-slate-900/80 border border-slate-800 p-4 rounded-none space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-slate-300 text-sm font-semibold">
             <SlidersHorizontal className="w-4 h-4 text-[#0F766E]" />
@@ -331,7 +331,7 @@ export const OperationalReportsWorkspace: React.FC = () => {
                 <select
                   value={windowDays}
                   onChange={(e) => setWindowDays(Number(e.target.value))}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sentinel-500"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-none px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sentinel-500"
                 >
                   <option value={30}>Next 30 Days</option>
                   <option value={60}>Next 60 Days</option>
@@ -346,7 +346,7 @@ export const OperationalReportsWorkspace: React.FC = () => {
                   type="date"
                   value={dateFrom}
                   onChange={(e) => setDateFrom(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sentinel-500"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-none px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sentinel-500"
                 />
               </div>
               <div>
@@ -355,7 +355,7 @@ export const OperationalReportsWorkspace: React.FC = () => {
                   type="date"
                   value={dateTo}
                   onChange={(e) => setDateTo(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sentinel-500"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-none px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sentinel-500"
                 />
               </div>
             </>
@@ -369,7 +369,7 @@ export const OperationalReportsWorkspace: React.FC = () => {
               placeholder="Filter by bank..."
               value={bankName}
               onChange={(e) => setBankName(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sentinel-500 placeholder-slate-600"
+              className="w-full bg-slate-950 border border-slate-800 rounded-none px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sentinel-500 placeholder-slate-600"
             />
           </div>
 
@@ -381,7 +381,7 @@ export const OperationalReportsWorkspace: React.FC = () => {
               placeholder="e.g. Western Regional..."
               value={assignedOffice}
               onChange={(e) => setAssignedOffice(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sentinel-500 placeholder-slate-600"
+              className="w-full bg-slate-950 border border-slate-800 rounded-none px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sentinel-500 placeholder-slate-600"
             />
           </div>
 
@@ -392,7 +392,7 @@ export const OperationalReportsWorkspace: React.FC = () => {
               <select
                 value={trustLevel}
                 onChange={(e) => setTrustLevel(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sentinel-500"
+                className="w-full bg-slate-950 border border-slate-800 rounded-none px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sentinel-500"
               >
                 <option value="">All Trust Levels</option>
                 <option value="L0_DECLARED">L0 - Declared</option>
@@ -410,7 +410,7 @@ export const OperationalReportsWorkspace: React.FC = () => {
               <select
                 value={verificationStatus}
                 onChange={(e) => setVerificationStatus(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sentinel-500"
+                className="w-full bg-slate-950 border border-slate-800 rounded-none px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sentinel-500"
               >
                 <option value="">All Statuses</option>
                 <option value="PENDING">Pending</option>
@@ -429,7 +429,7 @@ export const OperationalReportsWorkspace: React.FC = () => {
               <select
                 value={checklistOutcome}
                 onChange={(e) => setChecklistOutcome(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sentinel-500"
+                className="w-full bg-slate-950 border border-slate-800 rounded-none px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sentinel-500"
               >
                 <option value="">All Outcomes</option>
                 <option value="MISSING">Missing Document</option>
@@ -447,7 +447,7 @@ export const OperationalReportsWorkspace: React.FC = () => {
               <select
                 value={severityFilter}
                 onChange={(e) => setSeverityFilter(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sentinel-500"
+                className="w-full bg-slate-950 border border-slate-800 rounded-none px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sentinel-500"
               >
                 <option value="">All Severities</option>
                 <option value="CRITICAL">Critical</option>
@@ -465,7 +465,7 @@ export const OperationalReportsWorkspace: React.FC = () => {
               <select
                 value={interventionType}
                 onChange={(e) => setInterventionType(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sentinel-500"
+                className="w-full bg-slate-950 border border-slate-800 rounded-none px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sentinel-500"
               >
                 <option value="">All Types</option>
                 <option value="OVERDUE_ESCALATION">Overdue & Escalated</option>
@@ -496,7 +496,7 @@ export const OperationalReportsWorkspace: React.FC = () => {
 
       {/* Error State */}
       {error && (
-        <div className="p-4 bg-rose-950/40 border border-rose-800/80 rounded-[10px] text-rose-300 text-sm flex items-center gap-3">
+        <div className="p-4 bg-rose-950/40 border border-rose-800/80 rounded-none text-rose-300 text-sm flex items-center gap-3">
           <AlertCircle className="w-5 h-5 shrink-0 text-rose-400" />
           <div>{error}</div>
         </div>
@@ -506,7 +506,7 @@ export const OperationalReportsWorkspace: React.FC = () => {
           REPORT VIEW A: PENDING VERIFICATION
          ========================================================================= */}
       {activeTab === 'PENDING_VERIFICATION' && (
-        <div className="bg-slate-900 border border-slate-800 rounded-[10px] overflow-hidden shadow-lg">
+        <div className="bg-slate-900 border border-slate-800 rounded-none overflow-hidden shadow-lg">
           <div className="p-4 border-b border-[#C9D3DB] flex items-center justify-between bg-slate-950/40">
             <div>
               <h2 className="text-base font-semibold text-white">Pending Electronic Verification Report</h2>
@@ -515,7 +515,7 @@ export const OperationalReportsWorkspace: React.FC = () => {
               </p>
             </div>
             {pendingData && (
-              <span className="text-xs font-mono text-slate-400 bg-slate-800 px-2.5 py-1 rounded border border-slate-700">
+              <span className="text-xs font-mono text-slate-400 bg-slate-800 px-2.5 py-1 rounded-none border border-slate-700">
                 {pendingData.total_records} Pending Instruments
               </span>
             )}
@@ -548,7 +548,7 @@ export const OperationalReportsWorkspace: React.FC = () => {
                       <td className="py-3 px-4 font-mono font-medium text-sentinel-300">
                         {row.reference_number}
                         {row.discrepancy_count > 0 && (
-                          <span className="ml-2 px-1.5 py-0.2 text-[10px] bg-rose-950 text-rose-300 border border-rose-800 rounded">
+                          <span className="ml-2 px-1.5 py-0.2 text-[10px] bg-rose-950 text-rose-300 border border-rose-800 rounded-none">
                             {row.discrepancy_count} disc
                           </span>
                         )}
@@ -562,7 +562,7 @@ export const OperationalReportsWorkspace: React.FC = () => {
                       </td>
                       <td className="py-3 px-4">
                         <span
-                          className={`px-2 py-0.5 rounded text-[10px] font-mono font-semibold ${
+                          className={`px-2 py-0.5 rounded-none text-[10px] font-mono font-semibold ${
                             row.verification_status === 'PENDING'
                               ? 'bg-amber-950 text-amber-300 border border-amber-800'
                               : row.verification_status === 'SOURCE_UNAVAILABLE'
@@ -577,11 +577,11 @@ export const OperationalReportsWorkspace: React.FC = () => {
                       </td>
                       <td className="py-3 px-4">
                         {row.is_simulated ? (
-                          <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-yellow-950/80 text-yellow-300 border border-yellow-700/60">
+                          <span className="px-2 py-0.5 rounded-none text-[10px] font-mono bg-yellow-950/80 text-yellow-300 border border-yellow-700/60">
                             SIMULATED
                           </span>
                         ) : (
-                          <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-950 text-emerald-300 border border-emerald-800">
+                          <span className="px-2 py-0.5 rounded-none text-[10px] font-mono bg-emerald-950 text-emerald-300 border border-emerald-800">
                             LIVE ({row.channel})
                           </span>
                         )}
@@ -596,7 +596,7 @@ export const OperationalReportsWorkspace: React.FC = () => {
                         <div className="flex items-center justify-end gap-2">
                           <button
                             onClick={() => handleOpenEvidencePack(row.instrument_id)}
-                            className="p-1.5 hover:bg-slate-800 rounded text-slate-400 hover:text-slate-200"
+                            className="p-1.5 hover:bg-slate-800 rounded-none text-slate-400 hover:text-slate-200"
                             title="Audit Evidence Pack"
                           >
                             <Eye className="w-4 h-4" />
@@ -625,14 +625,14 @@ export const OperationalReportsWorkspace: React.FC = () => {
       {activeTab === 'UPCOMING_MATURITIES' && (
         <div className="space-y-4">
           {/* Statutory Notice Callout */}
-          <div className="p-4 bg-blue-950/30 border border-blue-900/60 rounded-[10px] flex items-start gap-3">
+          <div className="p-4 bg-blue-950/30 border border-blue-900/60 rounded-none flex items-start gap-3">
             <Info className="w-5 h-5 text-blue-400 shrink-0 mt-0.5" />
             <div className="text-xs text-blue-200 leading-relaxed">
               <span className="font-semibold text-blue-100">Statutory Notice:</span> Approaching calendar maturity does not equate to release eligibility. Replacement instruments must be separately verified and validated prior to encashment or discharge authorization.
             </div>
           </div>
 
-          <div className="bg-slate-900 border border-slate-800 rounded-[10px] overflow-hidden shadow-lg">
+          <div className="bg-slate-900 border border-slate-800 rounded-none overflow-hidden shadow-lg">
             <div className="p-4 border-b border-[#C9D3DB] flex items-center justify-between bg-slate-950/40">
               <div>
                 <h2 className="text-base font-semibold text-white">Upcoming Deposit Maturities Report</h2>
@@ -642,10 +642,10 @@ export const OperationalReportsWorkspace: React.FC = () => {
               </div>
               {maturitiesData && (
                 <div className="flex items-center gap-3">
-                  <span className="text-xs font-mono text-slate-300 bg-slate-800 px-2.5 py-1 rounded border border-slate-700">
+                  <span className="text-xs font-mono text-slate-300 bg-slate-800 px-2.5 py-1 rounded-none border border-slate-700">
                     Total Deposit: ₹{Number(maturitiesData.total_deposit_value).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                   </span>
-                  <span className="text-xs font-mono text-sentinel-300 bg-sentinel-950 px-2.5 py-1 rounded border border-sentinel-800">
+                  <span className="text-xs font-mono text-sentinel-300 bg-sentinel-950 px-2.5 py-1 rounded-none border border-sentinel-800">
                     {maturitiesData.total_records} Records
                   </span>
                 </div>
@@ -702,13 +702,13 @@ export const OperationalReportsWorkspace: React.FC = () => {
                           </span>
                         </td>
                         <td className="py-3 px-4">
-                          <span className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-slate-800 text-slate-300 border border-slate-700">
+                          <span className="px-1.5 py-0.5 rounded-none text-[10px] font-mono bg-slate-800 text-slate-300 border border-slate-700">
                             {row.trust_level}
                           </span>
                         </td>
                         <td className="py-3 px-4">
                           <span
-                            className={`px-2 py-0.5 rounded text-[10px] font-mono font-medium ${
+                            className={`px-2 py-0.5 rounded-none text-[10px] font-mono font-medium ${
                               row.renewal_status === 'RENEWAL_LINKED'
                                 ? 'bg-emerald-950 text-emerald-300 border border-emerald-800'
                                 : 'bg-slate-800 text-slate-400'
@@ -721,7 +721,7 @@ export const OperationalReportsWorkspace: React.FC = () => {
                           <div className="flex items-center justify-end gap-2">
                             <button
                               onClick={() => handleOpenEvidencePack(row.instrument_id)}
-                              className="p-1.5 hover:bg-slate-800 rounded text-slate-400 hover:text-slate-200"
+                              className="p-1.5 hover:bg-slate-800 rounded-none text-slate-400 hover:text-slate-200"
                               title="Audit Evidence Pack"
                             >
                               <Eye className="w-4 h-4" />
@@ -749,7 +749,7 @@ export const OperationalReportsWorkspace: React.FC = () => {
           REPORT VIEW C: MISSING DOCUMENTS
          ========================================================================= */}
       {activeTab === 'MISSING_DOCUMENTS' && (
-        <div className="bg-slate-900 border border-slate-800 rounded-[10px] overflow-hidden shadow-lg">
+        <div className="bg-slate-900 border border-slate-800 rounded-none overflow-hidden shadow-lg">
           <div className="p-4 border-b border-[#C9D3DB] flex items-center justify-between bg-slate-950/40">
             <div>
               <h2 className="text-base font-semibold text-white">Missing & Non-Compliant Documents Report</h2>
@@ -758,7 +758,7 @@ export const OperationalReportsWorkspace: React.FC = () => {
               </p>
             </div>
             {missingDocsData && (
-              <span className="text-xs font-mono text-slate-400 bg-slate-800 px-2.5 py-1 rounded border border-slate-700">
+              <span className="text-xs font-mono text-slate-400 bg-slate-800 px-2.5 py-1 rounded-none border border-slate-700">
                 {missingDocsData.total_records} Non-Compliant Findings
               </span>
             )}
@@ -799,7 +799,7 @@ export const OperationalReportsWorkspace: React.FC = () => {
                       </td>
                       <td className="py-3 px-4">
                         <span
-                          className={`px-2 py-0.5 rounded text-[10px] font-mono font-semibold ${
+                          className={`px-2 py-0.5 rounded-none text-[10px] font-mono font-semibold ${
                             row.checklist_outcome === 'MISSING'
                               ? 'bg-rose-950 text-rose-300 border border-rose-800'
                               : 'bg-amber-950 text-amber-300 border border-amber-800'
@@ -813,7 +813,7 @@ export const OperationalReportsWorkspace: React.FC = () => {
                       </td>
                       <td className="py-3 px-4">
                         <span
-                          className={`px-2 py-0.5 rounded text-[10px] font-mono font-semibold ${
+                          className={`px-2 py-0.5 rounded-none text-[10px] font-mono font-semibold ${
                             row.severity === 'HIGH' || row.severity === 'CRITICAL'
                               ? 'bg-red-950 text-red-300 border border-red-800'
                               : 'bg-yellow-950 text-yellow-300 border border-yellow-800'
@@ -847,7 +847,7 @@ export const OperationalReportsWorkspace: React.FC = () => {
           REPORT VIEW D: INTERVENTIONS REQUIRED
          ========================================================================= */}
       {activeTab === 'INTERVENTIONS' && (
-        <div className="bg-slate-900 border border-slate-800 rounded-[10px] overflow-hidden shadow-lg">
+        <div className="bg-slate-900 border border-slate-800 rounded-none overflow-hidden shadow-lg">
           <div className="p-4 border-b border-[#C9D3DB] flex items-center justify-between bg-slate-950/40">
             <div>
               <h2 className="text-base font-semibold text-white">Operational Interventions Report</h2>
@@ -856,7 +856,7 @@ export const OperationalReportsWorkspace: React.FC = () => {
               </p>
             </div>
             {interventionsData && (
-              <span className="text-xs font-mono text-amber-400 bg-amber-950/60 px-2.5 py-1 rounded border border-amber-800/80">
+              <span className="text-xs font-mono text-amber-400 bg-amber-950/60 px-2.5 py-1 rounded-none border border-amber-800/80">
                 {interventionsData.total_records} Intervention Items
               </span>
             )}
@@ -888,7 +888,7 @@ export const OperationalReportsWorkspace: React.FC = () => {
                     <tr key={`${row.entity_id}-${idx}`} className="hover:bg-slate-800/50 transition-colors">
                       <td className="py-3 px-4 font-mono font-semibold">
                         <span
-                          className={`px-2 py-0.5 rounded text-[10px] ${
+                          className={`px-2 py-0.5 rounded-none text-[10px] ${
                             row.intervention_type === 'OVERDUE_ESCALATION'
                               ? 'bg-rose-950 text-rose-300 border border-rose-800'
                               : row.intervention_type === 'RELEASE_BLOCKER'
@@ -910,7 +910,7 @@ export const OperationalReportsWorkspace: React.FC = () => {
                       </td>
                       <td className="py-3 px-4">
                         <span
-                          className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold ${
+                          className={`px-2 py-0.5 rounded-none text-[10px] font-mono font-bold ${
                             row.severity === 'CRITICAL'
                               ? 'bg-red-950 text-red-300 border border-red-800'
                               : row.severity === 'HIGH'
@@ -950,7 +950,7 @@ export const OperationalReportsWorkspace: React.FC = () => {
          ========================================================================= */}
       {showEvidenceModal && (
         <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-slate-900 border border-slate-800 rounded-[10px] max-w-3xl w-full p-6 space-y-6 shadow-2xl">
+          <div className="bg-slate-900 border border-slate-800 rounded-none max-w-3xl w-full p-6 space-y-6 shadow-2xl">
             <div className="flex items-center justify-between border-b border-[#C9D3DB] pb-4">
               <div>
                 <h3 className="text-lg font-bold text-white flex items-center gap-2">
@@ -977,7 +977,7 @@ export const OperationalReportsWorkspace: React.FC = () => {
             ) : evidencePackData ? (
               <div className="space-y-6 max-h-[70vh] overflow-y-auto pr-2">
                 {/* Uncertified Regulatory Disclaimer Callout */}
-                <div className="p-3 bg-amber-950/40 border border-amber-800/80 rounded-lg flex items-start gap-2.5">
+                <div className="p-3 bg-amber-950/40 border border-amber-800/80 rounded-none flex items-start gap-2.5">
                   <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
                   <div className="text-[11px] text-amber-200 leading-snug">
                     <span className="font-semibold text-amber-100">Audit Disclaimer:</span> {evidencePackData.regulatory_disclaimer}
@@ -985,7 +985,7 @@ export const OperationalReportsWorkspace: React.FC = () => {
                 </div>
 
                 {/* Instrument Summary Card */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-950 p-4 rounded-lg border border-slate-800/80 font-mono text-xs">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-950 p-4 rounded-none border border-slate-800/80 font-mono text-xs">
                   <div>
                     <span className="text-slate-500 block text-[10px] uppercase">Reference</span>
                     <span className="text-white font-bold">{evidencePackData.reference_number}</span>
@@ -1015,7 +1015,7 @@ export const OperationalReportsWorkspace: React.FC = () => {
                   <h4 className="text-xs font-semibold text-slate-300 uppercase tracking-wider font-mono">
                     Document Version SHA-256 Checksums
                   </h4>
-                  <div className="border border-slate-800 rounded-lg overflow-hidden">
+                  <div className="border border-slate-800 rounded-none overflow-hidden">
                     <table className="w-full text-left text-xs">
                       <thead className="bg-slate-950 text-slate-400 font-mono text-[10px]">
                         <tr>
@@ -1043,15 +1043,15 @@ export const OperationalReportsWorkspace: React.FC = () => {
 
                 {/* Audit & Provenance Counters */}
                 <div className="grid grid-cols-3 gap-3 text-center text-xs">
-                  <div className="bg-slate-950 p-3 rounded-lg border border-slate-800">
+                  <div className="bg-slate-950 p-3 rounded-none border border-slate-800">
                     <span className="text-slate-500 block text-[10px] uppercase">Field Provenance</span>
                     <span className="text-base font-bold text-white font-mono">{evidencePackData.field_provenance_count}</span>
                   </div>
-                  <div className="bg-slate-950 p-3 rounded-lg border border-slate-800">
+                  <div className="bg-slate-950 p-3 rounded-none border border-slate-800">
                     <span className="text-slate-500 block text-[10px] uppercase">Scrutiny Notes</span>
                     <span className="text-base font-bold text-white font-mono">{evidencePackData.scrutiny_observations_count}</span>
                   </div>
-                  <div className="bg-slate-950 p-3 rounded-lg border border-slate-800">
+                  <div className="bg-slate-950 p-3 rounded-none border border-slate-800">
                     <span className="text-slate-500 block text-[10px] uppercase">Audit Trail Events</span>
                     <span className="text-base font-bold text-white font-mono">{evidencePackData.audit_events_count}</span>
                   </div>
@@ -1062,7 +1062,7 @@ export const OperationalReportsWorkspace: React.FC = () => {
             <div className="flex justify-end pt-4 border-t border-slate-800">
               <button
                 onClick={() => setShowEvidenceModal(false)}
-                className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium rounded-lg"
+                className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium rounded-none"
               >
                 Close Evidence Extract
               </button>

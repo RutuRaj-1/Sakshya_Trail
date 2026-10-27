@@ -59,11 +59,11 @@ export const BranchHeadWorkspace: React.FC = () => {
   return (
     <div className="space-y-6 max-w-7xl mx-auto font-sans">
       {/* Top Banner — Branch Head Cockpit */}
-      <div className="bg-[#0D2538] rounded-[10px] p-6 text-white shadow-xs border border-[#1e3c54]">
+      <div className="bg-[#0D2538] rounded-none p-6 text-white shadow-xs border border-[#1e3c54]">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-1.5">
-              <span className="bg-[#123B5D] text-[#8ACEC8] border border-[#0F766E]/40 text-[10px] font-semibold px-2 py-0.5 rounded font-mono uppercase">
+              <span className="bg-[#123B5D] text-[#8ACEC8] border border-[#0F766E]/40 text-[10px] font-semibold px-2 py-0.5 rounded-none font-mono uppercase">
                 Regional Oversight
               </span>
               <span className="text-[#8799A9] text-xs font-mono">Branch Head Cockpit</span>
@@ -100,7 +100,7 @@ export const BranchHeadWorkspace: React.FC = () => {
       </div>
 
       {error && (
-        <div className="bg-rose-50 border border-rose-200 rounded-lg p-4 flex items-center justify-between text-xs text-rose-800">
+        <div className="bg-rose-50 border border-rose-200 rounded-none p-4 flex items-center justify-between text-xs text-rose-800">
           <div className="flex items-center gap-2">
             <AlertCircle className="w-4 h-4 text-rose-600" />
             <span>{error}</span>
@@ -113,7 +113,7 @@ export const BranchHeadWorkspace: React.FC = () => {
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="p-4 border-[#C9D3DB]">
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-lg bg-[#FDF2F1] text-[#B42318] border border-[#FECDCA]">
+            <div className="p-3 rounded-none bg-[#FDF2F1] text-[#B42318] border border-[#FECDCA]">
               <AlertOctagon className="w-5 h-5" />
             </div>
             <div>
@@ -128,7 +128,7 @@ export const BranchHeadWorkspace: React.FC = () => {
 
         <Card className="p-4 border-[#C9D3DB]">
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-lg bg-[#FEF7E8] text-[#8A5A00] border border-[#F8DEAE]">
+            <div className="p-3 rounded-none bg-[#FEF7E8] text-[#8A5A00] border border-[#F8DEAE]">
               <TrendingUp className="w-5 h-5" />
             </div>
             <div>
@@ -143,7 +143,7 @@ export const BranchHeadWorkspace: React.FC = () => {
 
         <Card className="p-4 border-[#C9D3DB]">
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-lg bg-[#EEF6FA] text-[#123B5D] border border-[#C4DEED]">
+            <div className="p-3 rounded-none bg-[#EEF6FA] text-[#123B5D] border border-[#C4DEED]">
               <ClockAlert className="w-5 h-5" />
             </div>
             <div>
@@ -158,7 +158,7 @@ export const BranchHeadWorkspace: React.FC = () => {
 
         <Card className="p-4 border-[#C9D3DB]">
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-lg bg-[#E7F3EC] text-[#18794E] border border-[#B4DFC9]">
+            <div className="p-3 rounded-none bg-[#E7F3EC] text-[#18794E] border border-[#B4DFC9]">
               <ShieldCheck className="w-5 h-5" />
             </div>
             <div>
@@ -188,12 +188,12 @@ export const BranchHeadWorkspace: React.FC = () => {
             </Link>
           </div>
 
-          <div className="bg-white rounded-[10px] border border-[#C9D3DB] p-4 shadow-2xs space-y-3">
+          <div className="bg-white rounded-none border border-[#C9D3DB] p-4 shadow-2xs space-y-3">
             {(!overdue?.records || overdue.records.length === 0) ? (
               <p className="text-xs text-[#5D6A75] text-center py-6">No overdue reviews or escalations currently flagged.</p>
             ) : (
               overdue.records.slice(0, 4).map((item) => (
-                <div key={item.record_id} className="p-3 rounded-lg border border-rose-200 bg-rose-50/30 flex items-center justify-between">
+                <div key={item.record_id} className="p-3 rounded-none border border-rose-200 bg-rose-50/30 flex items-center justify-between">
                   <div>
                     <span className="font-mono font-bold text-xs text-[#0D2538]">{item.reference_number}</span>
                     <p className="text-xs text-[#5D6A75] mt-0.5">
@@ -226,16 +226,16 @@ export const BranchHeadWorkspace: React.FC = () => {
             </Link>
           </div>
 
-          <div className="bg-white rounded-[10px] border border-[#C9D3DB] p-4 shadow-2xs space-y-3">
+          <div className="bg-white rounded-none border border-[#C9D3DB] p-4 shadow-2xs space-y-3">
             {(!priorityQueue?.items || priorityQueue.items.length === 0) ? (
               <p className="text-xs text-[#5D6A75] text-center py-6">No high-risk instruments in triage queue.</p>
             ) : (
               priorityQueue.items.slice(0, 4).map((item) => (
-                <div key={item.instrument_id} className="p-3 rounded-lg border border-slate-200 bg-[#F5F4EF]/50 flex items-center justify-between">
+                <div key={item.instrument_id} className="p-3 rounded-none border border-slate-200 bg-[#F5F4EF]/50 flex items-center justify-between">
                   <div>
                     <div className="flex items-center gap-2">
                       <span className="font-mono font-bold text-xs text-[#0D2538]">{item.reference_number}</span>
-                      <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-200">
+                      <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-none bg-amber-100 text-amber-900 border border-amber-200">
                         Score: {item.priority_score}
                       </span>
                     </div>

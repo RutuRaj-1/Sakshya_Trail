@@ -220,7 +220,7 @@ export const UserAdminPage: React.FC = () => {
             setProvisionErrors({});
             setIsProvisionOpen(true);
           }}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#0F766E] hover:bg-[#09544E] text-white font-semibold shadow-xs transition-all"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-none bg-[#0F766E] hover:bg-[#09544E] text-white font-semibold shadow-xs transition-all"
         >
           <UserPlus className="w-4 h-4" />
           <span>Provision Account</span>
@@ -228,7 +228,7 @@ export const UserAdminPage: React.FC = () => {
       </div>
 
       {/* Filter Toolbar */}
-      <div className="bg-white p-4 rounded-[10px] border border-[#C9D3DB] shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+      <div className="bg-white p-4 rounded-none border border-[#C9D3DB] shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
         <div className="flex-1 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
           {/* Search */}
           <div className="relative flex-1 max-w-md">
@@ -241,7 +241,7 @@ export const UserAdminPage: React.FC = () => {
                 setPage(1);
               }}
               placeholder="Search by full name or email address..."
-              className="w-full pl-9 pr-3 py-2 border border-[#8799A9] rounded-lg text-[#253746] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sentinel-500 bg-white"
+              className="w-full pl-9 pr-3 py-2 border border-[#8799A9] rounded-none text-[#253746] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sentinel-500 bg-white"
             />
           </div>
 
@@ -254,7 +254,7 @@ export const UserAdminPage: React.FC = () => {
                 setRoleFilter(e.target.value);
                 setPage(1);
               }}
-              className="border border-[#8799A9] rounded-lg px-2.5 py-2 bg-white text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500"
+              className="border border-[#8799A9] rounded-none px-2.5 py-2 bg-white text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500"
             >
               <option value="ALL">All Application Roles</option>
               {roles.map((r) => (
@@ -272,7 +272,7 @@ export const UserAdminPage: React.FC = () => {
               setStatusFilter(e.target.value as any);
               setPage(1);
             }}
-            className="border border-[#8799A9] rounded-lg px-2.5 py-2 bg-white text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500"
+            className="border border-[#8799A9] rounded-none px-2.5 py-2 bg-white text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500"
           >
             <option value="ALL">All Statuses</option>
             <option value="ACTIVE">Active Users</option>
@@ -287,14 +287,14 @@ export const UserAdminPage: React.FC = () => {
       </div>
 
       {error && (
-        <div className="p-4 rounded-[10px] bg-rose-50 border border-rose-200 text-rose-700 flex items-center gap-2">
+        <div className="p-4 rounded-none bg-rose-50 border border-rose-200 text-rose-700 flex items-center gap-2">
           <AlertCircle className="w-4 h-4 shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
       {/* Users Table */}
-      <div className="bg-white rounded-[10px] border border-[#C9D3DB] overflow-hidden shadow-xs">
+      <div className="bg-white rounded-none border border-[#C9D3DB] overflow-hidden shadow-xs">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs text-[#253746]">
             <thead className="bg-[#F5F4EF] border-b border-[#C9D3DB] uppercase font-semibold text-[#5D6A75] tracking-wider">
@@ -337,7 +337,7 @@ export const UserAdminPage: React.FC = () => {
                         <div className="font-semibold text-[#0D2538] flex items-center gap-1.5">
                           <span>{u.full_name}</span>
                           {isCurrent && (
-                            <span className="text-[10px] px-1.5 py-0.2 rounded bg-[#EEF6FA] text-[#123B5D] font-mono">
+                            <span className="text-[10px] px-1.5 py-0.2 rounded-none bg-[#EEF6FA] text-[#123B5D] font-mono">
                               You
                             </span>
                           )}
@@ -345,7 +345,7 @@ export const UserAdminPage: React.FC = () => {
                         <div className="text-[#5D6A75] font-mono text-[11px]">{u.email}</div>
                       </td>
                       <td className="py-3.5 px-4">
-                        <span className="inline-flex items-center gap-1 font-mono font-medium px-2 py-0.5 rounded bg-slate-100 text-[#253746] text-[11px]">
+                        <span className="inline-flex items-center gap-1 font-mono font-medium px-2 py-0.5 rounded-none bg-slate-100 text-[#253746] text-[11px]">
                           <Shield className="w-3 h-3 text-[#123B5D]" />
                           {u.role}
                         </span>
@@ -371,7 +371,7 @@ export const UserAdminPage: React.FC = () => {
                       </td>
                       <td className="py-3.5 px-4">
                         {u.must_change_password ? (
-                          <span className="inline-flex items-center gap-1 text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded text-[10px] font-medium">
+                          <span className="inline-flex items-center gap-1 text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-none text-[10px] font-medium">
                             <KeyRound className="w-3 h-3" />
                             <span>Rotation Required</span>
                           </span>
@@ -391,7 +391,7 @@ export const UserAdminPage: React.FC = () => {
                               setTempPasswordResult(null);
                             }}
                             title="Reset Temporary Password"
-                            className="p-1.5 text-[#5D6A75] hover:text-[#123B5D] hover:bg-[#EEF6FA] rounded-lg transition-colors flex items-center gap-1 font-medium"
+                            className="p-1.5 text-[#5D6A75] hover:text-[#123B5D] hover:bg-[#EEF6FA] rounded-none transition-colors flex items-center gap-1 font-medium"
                           >
                             <KeyRound className="w-3.5 h-3.5" />
                             <span className="hidden sm:inline">Reset Pwd</span>
@@ -401,7 +401,7 @@ export const UserAdminPage: React.FC = () => {
                           <button
                             onClick={() => setStatusToggleTarget(u)}
                             title={u.is_active ? 'Deactivate User' : 'Activate User'}
-                            className={`p-1.5 rounded-lg transition-colors ${
+                            className={`p-1.5 rounded-none transition-colors ${
                               u.is_active
                                 ? 'text-amber-600 hover:text-amber-800 hover:bg-amber-50'
                                 : 'text-emerald-600 hover:text-emerald-800 hover:bg-emerald-50'
@@ -426,7 +426,7 @@ export const UserAdminPage: React.FC = () => {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between bg-white px-4 py-3 rounded-[10px] border border-[#C9D3DB] text-xs">
+        <div className="flex items-center justify-between bg-white px-4 py-3 rounded-none border border-[#C9D3DB] text-xs">
           <div className="text-[#5D6A75]">
             Page <span className="font-semibold text-[#253746]">{page}</span> of{' '}
             <span className="font-semibold text-[#253746]">{totalPages}</span>
@@ -435,14 +435,14 @@ export const UserAdminPage: React.FC = () => {
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1}
-              className="p-1.5 rounded-lg border border-[#8799A9] hover:bg-[#F5F4EF] disabled:opacity-40"
+              className="p-1.5 rounded-none border border-[#8799A9] hover:bg-[#F5F4EF] disabled:opacity-40"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
             <button
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}
-              className="p-1.5 rounded-lg border border-[#8799A9] hover:bg-[#F5F4EF] disabled:opacity-40"
+              className="p-1.5 rounded-none border border-[#8799A9] hover:bg-[#F5F4EF] disabled:opacity-40"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
@@ -453,10 +453,10 @@ export const UserAdminPage: React.FC = () => {
       {/* Provision User Modal */}
       {isProvisionOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-          <div className="bg-white rounded-[10px] shadow-2xl border border-[#C9D3DB] w-full max-w-lg overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+          <div className="bg-white rounded-none shadow-2xl border border-[#C9D3DB] w-full max-w-lg overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             <div className="px-6 py-4 border-b border-[#C9D3DB] flex items-center justify-between bg-[#F5F4EF]">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-[#EEF6FA] text-[#123B5D] flex items-center justify-center font-bold">
+                <div className="w-8 h-8 rounded-none bg-[#EEF6FA] text-[#123B5D] flex items-center justify-center font-bold">
                   <UserPlus className="w-4 h-4" />
                 </div>
                 <div>
@@ -468,7 +468,7 @@ export const UserAdminPage: React.FC = () => {
               </div>
               <button
                 onClick={() => setIsProvisionOpen(false)}
-                className="text-slate-400 hover:text-[#5D6A75] p-1 rounded-lg"
+                className="text-slate-400 hover:text-[#5D6A75] p-1 rounded-none"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -476,7 +476,7 @@ export const UserAdminPage: React.FC = () => {
 
             <form onSubmit={handleProvisionSubmit} className="p-6 space-y-3.5 text-xs">
               {provisionApiError && (
-                <div className="p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 flex items-start gap-2">
+                <div className="p-3 rounded-none bg-rose-50 border border-rose-200 text-rose-700 flex items-start gap-2">
                   <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
                   <span>{provisionApiError}</span>
                 </div>
@@ -493,7 +493,7 @@ export const UserAdminPage: React.FC = () => {
                     setProvisionForm({ ...provisionForm, full_name: e.target.value })
                   }
                   placeholder="e.g. Dr. Rajesh Kumar"
-                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-sentinel-500 bg-white ${
+                  className={`w-full px-3 py-2 border rounded-none focus:outline-none focus:ring-2 focus:ring-sentinel-500 bg-white ${
                     provisionErrors.full_name ? 'border-rose-400' : 'border-[#8799A9]'
                   }`}
                 />
@@ -511,7 +511,7 @@ export const UserAdminPage: React.FC = () => {
                   value={provisionForm.email}
                   onChange={(e) => setProvisionForm({ ...provisionForm, email: e.target.value })}
                   placeholder="rajesh.kumar@aicte-india.org"
-                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-sentinel-500 bg-white ${
+                  className={`w-full px-3 py-2 border rounded-none focus:outline-none focus:ring-2 focus:ring-sentinel-500 bg-white ${
                     provisionErrors.email ? 'border-rose-400' : 'border-[#8799A9]'
                   }`}
                 />
@@ -529,7 +529,7 @@ export const UserAdminPage: React.FC = () => {
                   value={provisionForm.password}
                   onChange={(e) => setProvisionForm({ ...provisionForm, password: e.target.value })}
                   placeholder="Minimum 8 characters (Argon2id hashed)"
-                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-sentinel-500 bg-white ${
+                  className={`w-full px-3 py-2 border rounded-none focus:outline-none focus:ring-2 focus:ring-sentinel-500 bg-white ${
                     provisionErrors.password ? 'border-rose-400' : 'border-[#8799A9]'
                   }`}
                 />
@@ -547,7 +547,7 @@ export const UserAdminPage: React.FC = () => {
                   onChange={(e) =>
                     setProvisionForm({ ...provisionForm, role: e.target.value, institution_id: '' })
                   }
-                  className="w-full px-3 py-2 border border-[#8799A9] rounded-lg focus:outline-none focus:ring-2 focus:ring-sentinel-500 bg-white"
+                  className="w-full px-3 py-2 border border-[#8799A9] rounded-none focus:outline-none focus:ring-2 focus:ring-sentinel-500 bg-white"
                 >
                   {roles.map((r) => (
                     <option key={r.name} value={r.name}>
@@ -567,7 +567,7 @@ export const UserAdminPage: React.FC = () => {
                     onChange={(e) =>
                       setProvisionForm({ ...provisionForm, institution_id: e.target.value })
                     }
-                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-sentinel-500 bg-white ${
+                    className={`w-full px-3 py-2 border rounded-none focus:outline-none focus:ring-2 focus:ring-sentinel-500 bg-white ${
                       provisionErrors.institution_id ? 'border-rose-400' : 'border-[#8799A9]'
                     }`}
                   >
@@ -595,7 +595,7 @@ export const UserAdminPage: React.FC = () => {
                       must_change_password: e.target.checked,
                     })
                   }
-                  className="rounded text-[#123B5D] focus:ring-sentinel-500"
+                  className="rounded-none text-[#123B5D] focus:ring-sentinel-500"
                 />
                 <label htmlFor="must_change" className="text-[#253746] cursor-pointer">
                   Require password change on first application login (Recommended)
@@ -607,14 +607,14 @@ export const UserAdminPage: React.FC = () => {
                   type="button"
                   onClick={() => setIsProvisionOpen(false)}
                   disabled={isProvisioning}
-                  className="px-4 py-2 rounded-lg border border-[#8799A9] text-[#253746] hover:bg-slate-100 font-medium"
+                  className="px-4 py-2 rounded-none border border-[#8799A9] text-[#253746] hover:bg-slate-100 font-medium"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isProvisioning}
-                  className="px-5 py-2 rounded-lg bg-[#0F766E] hover:bg-[#09544E] text-white font-medium shadow-sm flex items-center gap-1.5"
+                  className="px-5 py-2 rounded-none bg-[#0F766E] hover:bg-[#09544E] text-white font-medium shadow-sm flex items-center gap-1.5"
                 >
                   {isProvisioning && (
                     <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -630,9 +630,9 @@ export const UserAdminPage: React.FC = () => {
       {/* Reset Password Modal */}
       {resetTargetUser && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-          <div className="bg-white rounded-[10px] shadow-2xl border border-[#C9D3DB] w-full max-w-md p-6 space-y-4 animate-in fade-in zoom-in-95 duration-150">
+          <div className="bg-white rounded-none shadow-2xl border border-[#C9D3DB] w-full max-w-md p-6 space-y-4 animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-[10px] bg-[#EEF6FA] text-[#123B5D]">
+              <div className="p-2.5 rounded-none bg-[#EEF6FA] text-[#123B5D]">
                 <KeyRound className="w-5 h-5" />
               </div>
               <div>
@@ -652,7 +652,7 @@ export const UserAdminPage: React.FC = () => {
                   <span className="font-semibold text-amber-700">must_change_password</span> flag.
                   The user will be strictly forced to rotate this password upon their next login.
                 </p>
-                <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-800 text-[11px]">
+                <div className="p-3 bg-amber-50 border border-amber-200 rounded-none text-amber-800 text-[11px]">
                   <strong>Policy Notice:</strong> If email delivery is not configured, you must
                   securely communicate this temporary password directly to the verified officer.
                 </div>
@@ -662,7 +662,7 @@ export const UserAdminPage: React.FC = () => {
                     type="button"
                     onClick={() => setResetTargetUser(null)}
                     disabled={isResetting}
-                    className="px-4 py-2 rounded-lg border border-[#8799A9] text-[#253746] hover:bg-slate-100 font-medium"
+                    className="px-4 py-2 rounded-none border border-[#8799A9] text-[#253746] hover:bg-slate-100 font-medium"
                   >
                     Cancel
                   </button>
@@ -670,7 +670,7 @@ export const UserAdminPage: React.FC = () => {
                     type="button"
                     onClick={handleResetPassword}
                     disabled={isResetting}
-                    className="px-4 py-2 rounded-lg bg-[#0F766E] hover:bg-[#09544E] text-white font-medium shadow-sm flex items-center gap-1.5"
+                    className="px-4 py-2 rounded-none bg-[#0F766E] hover:bg-[#09544E] text-white font-medium shadow-sm flex items-center gap-1.5"
                   >
                     {isResetting && (
                       <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -681,7 +681,7 @@ export const UserAdminPage: React.FC = () => {
               </div>
             ) : (
               <div className="space-y-4">
-                <div className="p-4 rounded-[10px] bg-slate-900 text-white space-y-2">
+                <div className="p-4 rounded-none bg-slate-900 text-white space-y-2">
                   <span className="text-[10px] uppercase tracking-wider text-slate-400">
                     Temporary Administrative Password
                   </span>
@@ -691,7 +691,7 @@ export const UserAdminPage: React.FC = () => {
                     </span>
                     <button
                       onClick={() => copyToClipboard(tempPasswordResult)}
-                      className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors"
+                      className="p-1.5 rounded-none bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors"
                       title="Copy to clipboard"
                     >
                       {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
@@ -707,7 +707,7 @@ export const UserAdminPage: React.FC = () => {
                 <div className="flex justify-end pt-2">
                   <button
                     onClick={() => setResetTargetUser(null)}
-                    className="px-5 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-lg font-medium"
+                    className="px-5 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-none font-medium"
                   >
                     Done
                   </button>
@@ -721,10 +721,10 @@ export const UserAdminPage: React.FC = () => {
       {/* Status Toggle Modal */}
       {statusToggleTarget && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-          <div className="bg-white rounded-[10px] shadow-2xl border border-[#C9D3DB] w-full max-w-md p-6 space-y-4 animate-in fade-in zoom-in-95 duration-150">
+          <div className="bg-white rounded-none shadow-2xl border border-[#C9D3DB] w-full max-w-md p-6 space-y-4 animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-start gap-3">
               <div
-                className={`p-2.5 rounded-[10px] ${
+                className={`p-2.5 rounded-none ${
                   statusToggleTarget.is_active
                     ? 'bg-amber-100 text-amber-700'
                     : 'bg-emerald-100 text-emerald-700'
@@ -748,7 +748,7 @@ export const UserAdminPage: React.FC = () => {
               </div>
             </div>
 
-            <div className="p-3 bg-[#F5F4EF] rounded-lg border border-[#C9D3DB] text-xs">
+            <div className="p-3 bg-[#F5F4EF] rounded-none border border-[#C9D3DB] text-xs">
               <span className="font-semibold text-[#253746]">Account:</span>{' '}
               <span className="text-[#0D2538]">{statusToggleTarget.full_name}</span> (
               <span className="font-mono text-[#123B5D]">{statusToggleTarget.email}</span>)
@@ -759,7 +759,7 @@ export const UserAdminPage: React.FC = () => {
                 type="button"
                 onClick={() => setStatusToggleTarget(null)}
                 disabled={isTogglingStatus}
-                className="px-4 py-2 rounded-lg border border-[#8799A9] text-[#253746] hover:bg-slate-100 font-medium"
+                className="px-4 py-2 rounded-none border border-[#8799A9] text-[#253746] hover:bg-slate-100 font-medium"
               >
                 Cancel
               </button>
@@ -767,7 +767,7 @@ export const UserAdminPage: React.FC = () => {
                 type="button"
                 onClick={handleToggleStatus}
                 disabled={isTogglingStatus}
-                className={`px-4 py-2 rounded-lg text-white font-medium shadow-sm flex items-center gap-1.5 ${
+                className={`px-4 py-2 rounded-none text-white font-medium shadow-sm flex items-center gap-1.5 ${
                   statusToggleTarget.is_active
                     ? 'bg-amber-600 hover:bg-amber-700'
                     : 'bg-emerald-600 hover:bg-emerald-700'

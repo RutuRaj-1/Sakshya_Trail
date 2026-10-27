@@ -2,7 +2,6 @@ import React from 'react';
 import {
   FilePlus2,
   UploadCloud,
-  FileCheck2,
   ShieldCheck,
   Clock,
   RefreshCw,

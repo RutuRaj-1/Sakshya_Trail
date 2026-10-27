@@ -213,11 +213,11 @@ export const InstrumentModal: React.FC<Props> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-      <div className="bg-white rounded-[10px] shadow-2xl border border-[#C9D3DB] w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+      <div className="bg-white rounded-none shadow-2xl border border-[#C9D3DB] w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
         {/* Header */}
         <div className="px-6 py-4 border-b border-[#C9D3DB] flex items-center justify-between bg-[#F5F4EF]/80">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-[8px] bg-[#EEF6FA] text-[#123B5D] flex items-center justify-center font-bold">
+            <div className="w-9 h-9 rounded-none bg-[#EEF6FA] text-[#123B5D] flex items-center justify-center font-bold">
               <FileSpreadsheet className="w-5 h-5" />
             </div>
             <div>
@@ -225,7 +225,7 @@ export const InstrumentModal: React.FC<Props> = ({
                 <h2 className="text-base font-semibold text-[#0D2538]">
                   {isEditing ? 'Edit FDR Instrument Record' : 'Record Statutory FDR Instrument'}
                 </h2>
-                <span className="font-mono text-[10px] bg-purple-100 text-purple-800 font-bold px-2 py-0.5 rounded flex items-center gap-1">
+                <span className="font-mono text-[10px] bg-purple-100 text-purple-800 font-bold px-2 py-0.5 rounded-none flex items-center gap-1">
                   <Shield className="w-3 h-3 text-purple-700" />
                   <span>L0 — DECLARED</span>
                 </span>
@@ -237,7 +237,7 @@ export const InstrumentModal: React.FC<Props> = ({
           </div>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-[#5D6A75] p-1.5 rounded-lg hover:bg-slate-100 transition-colors"
+            className="text-slate-400 hover:text-[#5D6A75] p-1.5 rounded-none hover:bg-slate-100 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -246,7 +246,7 @@ export const InstrumentModal: React.FC<Props> = ({
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-4 text-xs">
           {apiError && (
-            <div className="p-3 rounded-lg bg-rose-50 border border-rose-200 flex items-start gap-2 text-rose-700">
+            <div className="p-3 rounded-none bg-rose-50 border border-rose-200 flex items-start gap-2 text-rose-700">
               <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">Submission Rejected</p>
@@ -257,7 +257,7 @@ export const InstrumentModal: React.FC<Props> = ({
 
           {/* DUPLICATE WARNING MODAL / PANEL */}
           {duplicateWarning && (
-            <div className="p-4 rounded-[8px] bg-amber-50 border-2 border-amber-300 space-y-3 animate-in fade-in">
+            <div className="p-4 rounded-none bg-amber-50 border-2 border-amber-300 space-y-3 animate-in fade-in">
               <div className="flex items-start gap-2.5 text-amber-900">
                 <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
                 <div>
@@ -270,14 +270,14 @@ export const InstrumentModal: React.FC<Props> = ({
               </div>
 
               {duplicateWarning.matching_records.length > 0 && (
-                <div className="bg-white rounded-lg border border-amber-200 p-2.5 max-h-36 overflow-y-auto space-y-1.5 text-[11px]">
+                <div className="bg-white rounded-none border border-amber-200 p-2.5 max-h-36 overflow-y-auto space-y-1.5 text-[11px]">
                   <p className="font-semibold text-[#253746] text-[10px] uppercase">
                     Matching Registered Instrument(s):
                   </p>
                   {duplicateWarning.matching_records.map((rec) => (
                     <div
                       key={rec.id}
-                      className="p-2 rounded bg-amber-50/50 border border-amber-100 flex items-center justify-between font-mono"
+                      className="p-2 rounded-none bg-amber-50/50 border border-amber-100 flex items-center justify-between font-mono"
                     >
                       <div>
                         <span className="font-bold text-[#253746]">{rec.reference_number}</span> —{' '}
@@ -301,7 +301,7 @@ export const InstrumentModal: React.FC<Props> = ({
                 <button
                   type="button"
                   onClick={() => setDuplicateWarning(null)}
-                  className="px-3 py-1.5 rounded-lg border border-[#8799A9] bg-white hover:bg-slate-100 font-medium text-[#253746]"
+                  className="px-3 py-1.5 rounded-none border border-[#8799A9] bg-white hover:bg-slate-100 font-medium text-[#253746]"
                 >
                   Cancel & Revise Reference
                 </button>
@@ -309,7 +309,7 @@ export const InstrumentModal: React.FC<Props> = ({
                   type="button"
                   onClick={() => submitInstrument(true)}
                   disabled={isSubmitting}
-                  className="px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-semibold flex items-center gap-1.5 shadow-xs"
+                  className="px-3 py-1.5 rounded-none bg-amber-600 hover:bg-amber-700 text-white font-semibold flex items-center gap-1.5 shadow-xs"
                 >
                   {isSubmitting ? (
                     <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -332,14 +332,14 @@ export const InstrumentModal: React.FC<Props> = ({
                 type="text"
                 disabled
                 value={user?.institution_id ? `Assigned Institution (${user.institution_id})` : 'Unassigned'}
-                className="w-full px-3 py-2 border border-[#8799A9] rounded-lg bg-slate-100 text-[#5D6A75] cursor-not-allowed font-medium"
+                className="w-full px-3 py-2 border border-[#8799A9] rounded-none bg-slate-100 text-[#5D6A75] cursor-not-allowed font-medium"
               />
             ) : (
               <select
                 disabled={isEditing}
                 value={formData.institution_id}
                 onChange={(e) => setFormData({ ...formData, institution_id: e.target.value })}
-                className={`w-full px-3 py-2 border rounded-lg bg-white text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500 ${
+                className={`w-full px-3 py-2 border rounded-none bg-white text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500 ${
                   errors.institution_id ? 'border-rose-400' : 'border-[#8799A9]'
                 } ${isEditing ? 'bg-slate-100 text-[#5D6A75] cursor-not-allowed' : ''}`}
               >
@@ -370,7 +370,7 @@ export const InstrumentModal: React.FC<Props> = ({
                   value={formData.bank_name}
                   onChange={(e) => setFormData({ ...formData, bank_name: e.target.value })}
                   placeholder="e.g. State Bank of India"
-                  className={`w-full px-3 py-2 border rounded-lg bg-white text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500 ${
+                  className={`w-full px-3 py-2 border rounded-none bg-white text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500 ${
                     errors.bank_name ? 'border-rose-400' : 'border-[#8799A9]'
                   }`}
                 />
@@ -391,7 +391,7 @@ export const InstrumentModal: React.FC<Props> = ({
                   value={formData.branch}
                   onChange={(e) => setFormData({ ...formData, branch: e.target.value })}
                   placeholder="e.g. Nariman Point Branch, Mumbai"
-                  className="w-full px-3 py-2 border border-[#8799A9] rounded-lg bg-white text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500"
+                  className="w-full px-3 py-2 border border-[#8799A9] rounded-none bg-white text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500"
                 />
               </div>
 
@@ -406,7 +406,7 @@ export const InstrumentModal: React.FC<Props> = ({
                     setFormData({ ...formData, reference_number: e.target.value.toUpperCase() })
                   }
                   placeholder="e.g. FDR-SBI-2026-9901"
-                  className={`w-full px-3 py-2 border rounded-lg bg-white text-[#253746] font-mono focus:outline-none focus:ring-2 focus:ring-sentinel-500 ${
+                  className={`w-full px-3 py-2 border rounded-none bg-white text-[#253746] font-mono focus:outline-none focus:ring-2 focus:ring-sentinel-500 ${
                     errors.reference_number ? 'border-rose-400' : 'border-[#8799A9]'
                   }`}
                 />
@@ -426,7 +426,7 @@ export const InstrumentModal: React.FC<Props> = ({
                   value={formData.amount}
                   onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
                   placeholder="e.g. 2500000.00"
-                  className={`w-full px-3 py-2 border rounded-lg bg-white text-[#253746] font-mono focus:outline-none focus:ring-2 focus:ring-sentinel-500 ${
+                  className={`w-full px-3 py-2 border rounded-none bg-white text-[#253746] font-mono focus:outline-none focus:ring-2 focus:ring-sentinel-500 ${
                     errors.amount ? 'border-rose-400' : 'border-[#8799A9]'
                   }`}
                 />
@@ -449,7 +449,7 @@ export const InstrumentModal: React.FC<Props> = ({
                   type="date"
                   value={formData.issue_date}
                   onChange={(e) => setFormData({ ...formData, issue_date: e.target.value })}
-                  className="w-full px-3 py-2 border border-[#8799A9] rounded-lg bg-white text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500 font-mono"
+                  className="w-full px-3 py-2 border border-[#8799A9] rounded-none bg-white text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500 font-mono"
                 />
                 {errors.issue_date && <p className="text-rose-600 mt-1">{errors.issue_date}</p>}
               </div>
@@ -462,7 +462,7 @@ export const InstrumentModal: React.FC<Props> = ({
                   type="date"
                   value={formData.maturity_date}
                   onChange={(e) => setFormData({ ...formData, maturity_date: e.target.value })}
-                  className={`w-full px-3 py-2 border rounded-lg bg-white text-[#253746] font-mono focus:outline-none focus:ring-2 focus:ring-sentinel-500 ${
+                  className={`w-full px-3 py-2 border rounded-none bg-white text-[#253746] font-mono focus:outline-none focus:ring-2 focus:ring-sentinel-500 ${
                     errors.maturity_date ? 'border-rose-400' : 'border-[#8799A9]'
                   }`}
                 />
@@ -475,7 +475,7 @@ export const InstrumentModal: React.FC<Props> = ({
 
           {/* Section: Trust Level & Regulatory Information */}
           <div className="pt-2 border-t border-[#C9D3DB] space-y-3">
-            <div className="p-3 rounded-lg bg-[#F5F4EF] border border-[#C9D3DB] flex items-start gap-2">
+            <div className="p-3 rounded-none bg-[#F5F4EF] border border-[#C9D3DB] flex items-start gap-2">
               <Info className="w-4 h-4 text-[#123B5D] shrink-0 mt-0.5" />
               <div className="text-[11px] text-[#5D6A75] space-y-1">
                 <p>
@@ -495,7 +495,7 @@ export const InstrumentModal: React.FC<Props> = ({
                   value={formData.lien_holder}
                   onChange={(e) => setFormData({ ...formData, lien_holder: e.target.value })}
                   placeholder="AICTE Regulation Bureau"
-                  className="w-full px-3 py-2 border border-[#8799A9] rounded-lg bg-white text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500"
+                  className="w-full px-3 py-2 border border-[#8799A9] rounded-none bg-white text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500"
                 />
               </div>
 
@@ -504,7 +504,7 @@ export const InstrumentModal: React.FC<Props> = ({
                 <select
                   value={formData.status}
                   onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                  className="w-full px-3 py-2 border border-[#8799A9] rounded-lg bg-white text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500"
+                  className="w-full px-3 py-2 border border-[#8799A9] rounded-none bg-white text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500"
                 >
                   <option value="REGISTERED">REGISTERED (Formal Registry Submission)</option>
                   <option value="DRAFT">DRAFT (Saved Institutional Draft)</option>
@@ -518,7 +518,7 @@ export const InstrumentModal: React.FC<Props> = ({
                   value={formData.remarks}
                   onChange={(e) => setFormData({ ...formData, remarks: e.target.value })}
                   placeholder="Any initial submission remarks or context..."
-                  className="w-full px-3 py-2 border border-[#8799A9] rounded-lg bg-white text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500"
+                  className="w-full px-3 py-2 border border-[#8799A9] rounded-none bg-white text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500"
                 />
               </div>
             </div>
@@ -530,14 +530,14 @@ export const InstrumentModal: React.FC<Props> = ({
               type="button"
               onClick={onClose}
               disabled={isSubmitting}
-              className="px-4 py-2 rounded-lg border border-[#8799A9] text-[#253746] hover:bg-slate-100 font-medium transition-colors"
+              className="px-4 py-2 rounded-none border border-[#8799A9] text-[#253746] hover:bg-slate-100 font-medium transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-5 py-2 rounded-lg bg-[#0F766E] hover:bg-[#09544E] text-white font-medium shadow-sm transition-all flex items-center gap-2 disabled:opacity-50"
+              className="px-5 py-2 rounded-none bg-[#0F766E] hover:bg-[#09544E] text-white font-medium shadow-sm transition-all flex items-center gap-2 disabled:opacity-50"
             >
               {isSubmitting ? (
                 <>

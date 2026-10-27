@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { SystemAdminWorkspace } from '@/features/dashboard/workspaces/SystemAdminWorkspace';
-import { lifecycleApi, usersApi, institutionsApi, healthApi } from '@/api/endpoints';
+import { lifecycleApi } from '@/api/endpoints';
 
 vi.mock('@/api/endpoints', () => ({
   usersApi: {

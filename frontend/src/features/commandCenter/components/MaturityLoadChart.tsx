@@ -28,7 +28,7 @@ export const MaturityLoadChart: React.FC<MaturityLoadChartProps> = ({
   ];
 
   return (
-    <div className="bg-white rounded-[8px] border border-[#C9D3DB] shadow-xs overflow-hidden">
+    <div className="bg-white rounded-none border border-[#C9D3DB] shadow-xs overflow-hidden">
       {/* Header */}
       <div className="p-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#F5F4EF]/50">
         <div>
@@ -37,7 +37,7 @@ export const MaturityLoadChart: React.FC<MaturityLoadChartProps> = ({
             <h3 className="font-semibold text-[#0D2538] text-sm">
               Month-Wise Maturity Load (Calendar Year {selectedYear})
             </h3>
-            <span className="text-[10px] font-mono text-[#5D6A75] bg-slate-200/80 px-1.5 py-0.5 rounded">
+            <span className="text-[10px] font-mono text-[#5D6A75] bg-slate-200/80 px-1.5 py-0.5 rounded-none">
               PRD-FR-076
             </span>
           </div>
@@ -54,7 +54,7 @@ export const MaturityLoadChart: React.FC<MaturityLoadChartProps> = ({
               aria-label="Select Calendar Year"
               value={selectedYear}
               onChange={(e) => onYearChange?.(Number(e.target.value))}
-              className="bg-white border border-[#C9D3DB] text-[#253746] text-xs rounded-md px-2 py-1 font-semibold focus:outline-hidden focus:ring-1 focus:ring-sentinel-500"
+              className="bg-white border border-[#C9D3DB] text-[#253746] text-xs rounded-none px-2 py-1 font-semibold focus:outline-hidden focus:ring-1 focus:ring-sentinel-500"
             >
               {[selectedYear - 1, selectedYear, selectedYear + 1, selectedYear + 2].map((yr) => (
                 <option key={yr} value={yr}>
@@ -65,11 +65,11 @@ export const MaturityLoadChart: React.FC<MaturityLoadChartProps> = ({
           </div>
 
           {/* Toggle View */}
-          <div className="flex items-center bg-slate-100 p-0.5 rounded-lg border border-[#C9D3DB] text-xs">
+          <div className="flex items-center bg-slate-100 p-0.5 rounded-none border border-[#C9D3DB] text-xs">
             <button
               type="button"
               onClick={() => setViewMode('chart')}
-              className={`flex items-center gap-1 px-2.5 py-1 rounded-md transition-all ${
+              className={`flex items-center gap-1 px-2.5 py-1 rounded-none transition-all ${
                 viewMode === 'chart'
                   ? 'bg-white text-[#0D2538] shadow-xs font-semibold'
                   : 'text-[#5D6A75] hover:text-[#253746]'
@@ -81,7 +81,7 @@ export const MaturityLoadChart: React.FC<MaturityLoadChartProps> = ({
             <button
               type="button"
               onClick={() => setViewMode('table')}
-              className={`flex items-center gap-1 px-2.5 py-1 rounded-md transition-all ${
+              className={`flex items-center gap-1 px-2.5 py-1 rounded-none transition-all ${
                 viewMode === 'table'
                   ? 'bg-white text-[#0D2538] shadow-xs font-semibold'
                   : 'text-[#5D6A75] hover:text-[#253746]'
@@ -125,14 +125,14 @@ export const MaturityLoadChart: React.FC<MaturityLoadChartProps> = ({
                     className="flex flex-col items-center justify-end h-full group relative"
                   >
                     {/* Tooltip on hover */}
-                    <div className="absolute -top-12 z-20 hidden group-hover:flex flex-col items-center bg-slate-900 text-white text-[10px] px-2 py-1 rounded shadow-md pointer-events-none whitespace-nowrap">
+                    <div className="absolute -top-12 z-20 hidden group-hover:flex flex-col items-center bg-slate-900 text-white text-[10px] px-2 py-1 rounded-none shadow-md pointer-events-none whitespace-nowrap">
                       <span><strong>{monthNames[point.month - 1]} {point.year}</strong></span>
                       <span>{point.instrument_count} FDRs ({formatINR(point.total_amount)})</span>
                     </div>
 
                     <div
                       style={{ height: `${heightPercent}%` }}
-                      className={`w-full rounded-t transition-all ${
+                      className={`w-full rounded-none transition-all ${
                         hasData
                           ? 'bg-[#0F766E] group-hover:bg-[#09544E]'
                           : 'bg-slate-100'

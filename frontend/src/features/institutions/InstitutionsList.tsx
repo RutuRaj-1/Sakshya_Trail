@@ -25,7 +25,7 @@ export const InstitutionsList: React.FC<Props> = ({
 
   if (isLoading) {
     return (
-      <div className="bg-white rounded-[8px] border border-[#C9D3DB] p-12 text-center text-[#5D6A75] shadow-xs">
+      <div className="bg-white rounded-none border border-[#C9D3DB] p-12 text-center text-[#5D6A75] shadow-xs">
         <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-[#C9D3DB] border-t-sentinel-600 mb-3" />
         <p className="text-sm font-medium">Loading verified institutions from regulatory registry...</p>
       </div>
@@ -34,7 +34,7 @@ export const InstitutionsList: React.FC<Props> = ({
 
   if (institutions.length === 0) {
     return (
-      <div className="bg-white rounded-[8px] border border-[#C9D3DB] p-12 text-center shadow-xs">
+      <div className="bg-white rounded-none border border-[#C9D3DB] p-12 text-center shadow-xs">
         <Building2 className="w-12 h-12 text-slate-300 mx-auto mb-3" />
         <h3 className="text-base font-semibold text-[#253746]">No Institutions Listed</h3>
         <p className="text-xs text-[#5D6A75] max-w-sm mx-auto mt-1">
@@ -45,7 +45,7 @@ export const InstitutionsList: React.FC<Props> = ({
   }
 
   return (
-    <div className="bg-white rounded-[8px] border border-[#C9D3DB] overflow-hidden shadow-xs">
+    <div className="bg-white rounded-none border border-[#C9D3DB] overflow-hidden shadow-xs">
       <div className="overflow-x-auto">
         <table className="w-full text-left text-xs text-[#253746]">
           <thead className="bg-[#F5F4EF] border-b border-[#C9D3DB] uppercase font-semibold text-[#5D6A75] tracking-wider">
@@ -80,7 +80,7 @@ export const InstitutionsList: React.FC<Props> = ({
                         {inst.legal_name || inst.name}
                       </span>
                       {inst.is_synthetic && (
-                        <span className="inline-block px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300">
+                        <span className="inline-block px-1.5 py-0.5 rounded-none text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300">
                           DEMO DATA — SYNTHETIC INSTITUTION
                         </span>
                       )}
@@ -103,7 +103,7 @@ export const InstitutionsList: React.FC<Props> = ({
                     )}
                   </td>
                   <td className="py-3 px-4">
-                    <span className="inline-block px-2 py-0.5 rounded bg-slate-100 text-[#253746] font-mono text-[10px]">
+                    <span className="inline-block px-2 py-0.5 rounded-none bg-slate-100 text-[#253746] font-mono text-[10px]">
                       {inst.institution_type || inst.category}
                     </span>
                   </td>
@@ -131,7 +131,7 @@ export const InstitutionsList: React.FC<Props> = ({
                       <button
                         onClick={() => navigate(`/institutions/${inst.id}`)}
                         title="View Full Profile"
-                        className="p-1.5 text-[#5D6A75] hover:text-[#123B5D] hover:bg-[#EEF6FA] rounded-lg transition-colors flex items-center gap-1 font-medium"
+                        className="p-1.5 text-[#5D6A75] hover:text-[#123B5D] hover:bg-[#EEF6FA] rounded-none transition-colors flex items-center gap-1 font-medium"
                       >
                         <Eye className="w-3.5 h-3.5" />
                         <span className="hidden sm:inline">Details</span>
@@ -141,7 +141,7 @@ export const InstitutionsList: React.FC<Props> = ({
                         <button
                           onClick={() => onEdit(inst)}
                           title="Edit Details"
-                          className="p-1.5 text-[#5D6A75] hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
+                          className="p-1.5 text-[#5D6A75] hover:text-blue-700 hover:bg-blue-50 rounded-none transition-colors"
                         >
                           <Edit2 className="w-3.5 h-3.5" />
                         </button>
@@ -151,7 +151,7 @@ export const InstitutionsList: React.FC<Props> = ({
                         <button
                           onClick={() => onStatusToggle(inst)}
                           title={isActive ? 'Deactivate Institution' : 'Activate Institution'}
-                          className={`p-1.5 rounded-lg transition-colors ${
+                          className={`p-1.5 rounded-none transition-colors ${
                             isActive
                               ? 'text-amber-600 hover:text-amber-800 hover:bg-amber-50'
                               : 'text-emerald-600 hover:text-emerald-800 hover:bg-emerald-50'

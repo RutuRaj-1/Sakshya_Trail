@@ -31,7 +31,7 @@ export const PriorityQueueDesk: React.FC<PriorityQueueDeskProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-[8px] border border-[#C9D3DB] shadow-xs overflow-hidden">
+    <div className="bg-white rounded-none border border-[#C9D3DB] shadow-xs overflow-hidden">
       {/* Header */}
       <div className="p-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#F5F4EF]/50">
         <div>
@@ -40,7 +40,7 @@ export const PriorityQueueDesk: React.FC<PriorityQueueDeskProps> = ({
             <h3 className="font-semibold text-[#0D2538] text-sm">
               Operational Priority Queue & Factor Transparency
             </h3>
-            <span className="text-[10px] font-mono text-[#5D6A75] bg-slate-200/80 px-1.5 py-0.5 rounded">
+            <span className="text-[10px] font-mono text-[#5D6A75] bg-slate-200/80 px-1.5 py-0.5 rounded-none">
               PRD-FR-075
             </span>
           </div>
@@ -57,7 +57,7 @@ export const PriorityQueueDesk: React.FC<PriorityQueueDeskProps> = ({
               aria-label="Filter Minimum Priority Score"
               value={minScore}
               onChange={(e) => onMinScoreChange(Number(e.target.value))}
-              className="bg-white border border-[#C9D3DB] text-[#253746] text-xs rounded-md px-2 py-1 font-semibold focus:outline-hidden"
+              className="bg-white border border-[#C9D3DB] text-[#253746] text-xs rounded-none px-2 py-1 font-semibold focus:outline-hidden"
             >
               <option value={0}>All Items (0+)</option>
               <option value={25}>Moderate+ (25+)</option>
@@ -69,7 +69,7 @@ export const PriorityQueueDesk: React.FC<PriorityQueueDeskProps> = ({
           <button
             type="button"
             onClick={() => setShowWeightsInfo(!showWeightsInfo)}
-            className="text-xs text-[#123B5D] bg-[#EEF6FA] border border-[#C4DEED] hover:bg-[#EEF6FA] px-2.5 py-1 rounded-md flex items-center gap-1 font-medium"
+            className="text-xs text-[#123B5D] bg-[#EEF6FA] border border-[#C4DEED] hover:bg-[#EEF6FA] px-2.5 py-1 rounded-none flex items-center gap-1 font-medium"
           >
             <Info className="w-3.5 h-3.5" />
             <span>Weights & Assumptions</span>
@@ -90,19 +90,19 @@ export const PriorityQueueDesk: React.FC<PriorityQueueDeskProps> = ({
         <div className="bg-[#F5F4EF] border-b border-[#C9D3DB] p-3 text-xs text-[#253746] space-y-1">
           <div className="font-semibold text-[#0D2538]">Deterministic Weight Assumptions Disclosed:</div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 font-mono text-[11px]">
-            <div className="bg-white p-2 rounded border border-[#C9D3DB]">
+            <div className="bg-white p-2 rounded-none border border-[#C9D3DB]">
               <span className="text-[#5D6A75] block">1. Urgency (Maturity Proximity):</span>
               <strong>35% Weight</strong>
             </div>
-            <div className="bg-white p-2 rounded border border-[#C9D3DB]">
+            <div className="bg-white p-2 rounded-none border border-[#C9D3DB]">
               <span className="text-[#5D6A75] block">2. Discrepancy Findings Severity:</span>
               <strong>25% Weight</strong>
             </div>
-            <div className="bg-white p-2 rounded border border-[#C9D3DB]">
+            <div className="bg-white p-2 rounded-none border border-[#C9D3DB]">
               <span className="text-[#5D6A75] block">3. Evidentiary Trust State:</span>
               <strong>20% Weight</strong>
             </div>
-            <div className="bg-white p-2 rounded border border-[#C9D3DB]">
+            <div className="bg-white p-2 rounded-none border border-[#C9D3DB]">
               <span className="text-[#5D6A75] block">4. Overdue Compliance Lead Time:</span>
               <strong>20% Weight</strong>
             </div>
@@ -147,7 +147,7 @@ export const PriorityQueueDesk: React.FC<PriorityQueueDeskProps> = ({
                   {/* Score */}
                   <td className="px-4 py-2.5">
                     <span
-                      className={`inline-flex items-center justify-center font-mono font-extrabold text-xs px-2 py-1 rounded-md border ${getScoreBadgeClass(
+                      className={`inline-flex items-center justify-center font-mono font-extrabold text-xs px-2 py-1 rounded-none border ${getScoreBadgeClass(
                         item.priority_score
                       )}`}
                     >
@@ -159,13 +159,13 @@ export const PriorityQueueDesk: React.FC<PriorityQueueDeskProps> = ({
                   <td className="px-4 py-2.5">
                     <div className="flex items-center gap-1.5 text-[10px] font-mono">
                       <span
-                        className="bg-slate-100 px-1.5 py-0.5 rounded text-[#253746]"
+                        className="bg-slate-100 px-1.5 py-0.5 rounded-none text-[#253746]"
                         title={`Urgency Factor: ${item.urgency_factor}/100 (35% weight)`}
                       >
                         Urg: <strong>{item.urgency_factor.toFixed(0)}</strong>
                       </span>
                       <span
-                        className={`px-1.5 py-0.5 rounded ${
+                        className={`px-1.5 py-0.5 rounded-none ${
                           item.discrepancy_factor > 0 ? 'bg-rose-100 text-rose-800 font-bold' : 'bg-slate-100 text-[#253746]'
                         }`}
                         title={`Discrepancy Factor: ${item.discrepancy_factor}/100 (25% weight)`}
@@ -173,13 +173,13 @@ export const PriorityQueueDesk: React.FC<PriorityQueueDeskProps> = ({
                         Disc: <strong>{item.discrepancy_factor.toFixed(0)}</strong>
                       </span>
                       <span
-                        className="bg-slate-100 px-1.5 py-0.5 rounded text-[#253746]"
+                        className="bg-slate-100 px-1.5 py-0.5 rounded-none text-[#253746]"
                         title={`Trust Factor: ${item.trust_factor}/100 (20% weight)`}
                       >
                         Trst: <strong>{item.trust_factor.toFixed(0)}</strong>
                       </span>
                       <span
-                        className={`px-1.5 py-0.5 rounded ${
+                        className={`px-1.5 py-0.5 rounded-none ${
                           item.overdue_factor > 0 ? 'bg-amber-100 text-amber-800 font-bold' : 'bg-slate-100 text-[#253746]'
                         }`}
                         title={`Overdue Factor: ${item.overdue_factor}/100 (20% weight)`}

@@ -51,7 +51,7 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
           <button
             type="button"
             onClick={onToggleMobileMenu}
-            className="lg:hidden p-1.5 text-[#5D6A75] hover:text-[#0D2538] hover:bg-[#F5F4EF] rounded-[6px] transition cursor-pointer"
+            className="lg:hidden p-1.5 text-[#5D6A75] hover:text-[#0D2538] hover:bg-[#F5F4EF] rounded-none transition cursor-pointer"
             aria-label="Open navigation menu"
           >
             <Menu className="w-5 h-5" />
@@ -84,7 +84,7 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
       {/* Real-time Diagnostics Bar & Authenticated User Section */}
       <div className="flex items-center gap-3 sm:gap-4">
         {/* Backend & DB Health Indicator - Structured Brutalism Container */}
-        <div className="hidden lg:flex items-center gap-2.5 px-3 py-1 bg-[#F5F4EF] border border-[#C9D3DB] rounded-[6px] text-xs">
+        <div className="hidden lg:flex items-center gap-2.5 px-3 py-1 bg-[#F5F4EF] border border-[#C9D3DB] rounded-none text-xs">
           <div className="flex items-center gap-1.5" title="FastAPI Backend Liveness">
             <StatusIndicator
               status={liveness ? 'online' : 'offline'}
@@ -116,7 +116,7 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
           <button
             onClick={() => refresh()}
             disabled={isLoading}
-            className="text-[#5D6A75] hover:text-[#0D2538] transition-colors ml-1 p-0.5 rounded-[4px] cursor-pointer"
+            className="text-[#5D6A75] hover:text-[#0D2538] transition-colors ml-1 p-0.5 rounded-none cursor-pointer"
             title="Refresh connectivity probes"
             aria-label="Refresh health checks"
           >
@@ -147,7 +147,7 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
 
             <Link
               to="/change-password"
-              className="p-1.5 text-[#5D6A75] hover:text-[#123B5D] hover:bg-[#EDF1F3] rounded-[6px] transition-colors cursor-pointer"
+              className="p-1.5 text-[#5D6A75] hover:text-[#123B5D] hover:bg-[#EDF1F3] rounded-none transition-colors cursor-pointer"
               title="Change account password"
               aria-label="Change password"
             >
@@ -159,7 +159,7 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
                 await logout();
                 navigate('/', { replace: true });
               }}
-              className="p-1.5 text-[#5D6A75] hover:text-[#B42318] hover:bg-[#FDF2F1] rounded-[6px] transition-colors cursor-pointer"
+              className="p-1.5 text-[#5D6A75] hover:text-[#B42318] hover:bg-[#FDF2F1] rounded-none transition-colors cursor-pointer"
               title="Sign out of regulatory session"
               aria-label="Log out"
             >

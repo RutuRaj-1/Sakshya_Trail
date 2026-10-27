@@ -58,6 +58,17 @@
   --color-sentinel-950: #071724;
   --color-slate-850: #0D2538;
   --color-slate-950: #071724;
+
+  /* Mandatory Rectangular Zero-Radius Scale (Prompt 11) */
+  --radius-xs: 0px;
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --radius-2xl: 0px;
+  --radius-3xl: 0px;
+  --radius-4xl: 0px;
+  --radius: 0px;
 }
 
 :root {
@@ -74,10 +85,20 @@
   --st-border: #8799A9;
   --st-border-subtle: #C9D3DB;
 
+  /* Standardized Design Tokens */
+  --surface-base: #F5F4EF;
+  --surface-panel: #FFFFFF;
+  --border-subtle: #C9D3DB;
+  --border-strong: #8799A9;
+  --border-width-default: 1px;
+  --text-primary: #0D2538;
+  --text-secondary: #5D6A75;
+  --accent-primary: #123B5D;
+  --accent-teal: #0F766E;
+  --focus-ring: #145DA0;
+
   /* Type */
-  --st-text: #253746;
-  --st-text-muted: #5D6A75;
-  --st-font-sans: "IBM Plex Sans", "Segoe UI", Roboto, Arial, sans-serif;
+  --st-font-sans: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
   --st-font-mono: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
 
   /* Semantic */
@@ -89,15 +110,18 @@
   --st-simulated-bg: #FFF3D6;
   --st-simulated-text: #7A4B00;
 
-  /* Shape and spacing */
-  --st-radius-control: 8px;
-  --st-radius-card: 10px;
-  --st-radius-dialog: 16px;
+  /* Shape and geometry — Strictly Rectangular (Zero Radius) */
+  --radius-container: 0px;
+  --radius-control: 0px;
+  --radius-panel: 0px;
+  --st-radius-control: 0px;
+  --st-radius-card: 0px;
+  --st-radius-dialog: 0px;
 
-  /* Selective glass */
-  --st-glass-bg: rgba(255, 255, 255, 0.85);
-  --st-glass-border: rgba(255, 255, 255, 0.78);
-  --st-glass-blur: 12px;
+  /* Restrained Enterprise Elevation */
+  --st-glass-bg: rgba(255, 255, 255, 0.95);
+  --st-glass-border: #C9D3DB;
+  --st-glass-blur: 8px;
 }
 
 html {
@@ -123,18 +147,18 @@ code,
   font-variant-numeric: tabular-nums;
 }
 
-/* Structured Brutalism Container Utility Classes */
+/* Structured Rectangular Container Utility Classes */
 .st-card {
   background: #FFFFFF;
   border: 1px solid #C9D3DB;
-  border-radius: 10px;
-  box-shadow: 0 1px 3px rgba(13, 37, 56, 0.05);
+  border-radius: 0px;
+  box-shadow: 0 1px 2px rgba(13, 37, 56, 0.04);
 }
 
 .st-panel {
   background: #FFFFFF;
   border: 1px solid #8799A9;
-  border-radius: 10px;
+  border-radius: 0px;
 }
 
 .st-border-emphasis {
@@ -147,11 +171,12 @@ code,
   border-color: #0F766E;
 }
 
-/* Selective Glassmorphism Utility */
+/* Institutional Flat Glassmorphism Utility */
 .st-glass-panel {
   background: var(--st-glass-bg);
   border: 1px solid var(--st-glass-border);
-  box-shadow: 0 8px 24px rgba(13, 37, 56, 0.08);
+  border-radius: 0px;
+  box-shadow: 0 2px 8px rgba(13, 37, 56, 0.05);
   -webkit-backdrop-filter: blur(var(--st-glass-blur));
   backdrop-filter: blur(var(--st-glass-blur));
 }
@@ -163,8 +188,9 @@ code,
 }
 
 :focus-visible {
-  outline: 3px solid var(--st-focus);
-  outline-offset: 2px;
+  outline: 2px solid var(--st-focus);
+  outline-offset: 1px;
+  border-radius: 0px;
 }
 
 @media (prefers-reduced-motion: reduce) {

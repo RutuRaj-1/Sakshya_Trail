@@ -154,10 +154,10 @@ export const DocumentsEvidencePage: React.FC = () => {
   return (
     <div className="space-y-6 max-w-7xl mx-auto font-sans text-xs pb-12">
       {/* Header */}
-      <div className="bg-[#0D2538] rounded-[10px] p-6 text-white shadow-[0_1px_3px_rgba(13,37,56,0.08)] border border-[#1e3c54] flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-[#0D2538] rounded-none p-6 text-white shadow-[0_1px_3px_rgba(13,37,56,0.08)] border border-[#1e3c54] flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="space-y-1.5 max-w-2xl">
           <div className="flex items-center gap-2">
-            <span className="bg-[#123B5D] text-[#8ACEC8] border border-[#0F766E]/40 text-[10px] font-semibold px-2.5 py-0.5 rounded-[4px] uppercase tracking-wider font-mono">
+            <span className="bg-[#123B5D] text-[#8ACEC8] border border-[#0F766E]/40 text-[10px] font-semibold px-2.5 py-0.5 rounded-none uppercase tracking-wider font-mono">
               {isInstitutionUser ? 'Institution Evidence Hub' : 'Module 2 Hub'}
             </span>
             <span className="text-[#8799A9] text-xs font-mono">Evidence Integrity Vault</span>
@@ -178,7 +178,7 @@ export const DocumentsEvidencePage: React.FC = () => {
               setIsUploadOpen(true);
             }}
             disabled={!selectedInstrumentId}
-            className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#0F766E] hover:bg-[#09544E] text-white text-xs font-semibold rounded-[8px] shadow-xs transition disabled:opacity-50 cursor-pointer shrink-0"
+            className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#0F766E] hover:bg-[#09544E] text-white text-xs font-semibold rounded-none shadow-xs transition disabled:opacity-50 cursor-pointer shrink-0"
           >
             <UploadCloud className="w-4 h-4" />
             <span>Upload Certified Evidence</span>
@@ -190,7 +190,7 @@ export const DocumentsEvidencePage: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Column: FDR Instrument Selector */}
         <div className="lg:col-span-4 space-y-3">
-          <div className="bg-white rounded-[10px] border border-[#C9D3DB] p-4 shadow-2xs space-y-3">
+          <div className="bg-white rounded-none border border-[#C9D3DB] p-4 shadow-2xs space-y-3">
             <div className="flex items-center justify-between">
               <h2 className="font-bold text-[#0D2538] text-xs uppercase tracking-wider">
                 Select FDR Instrument
@@ -207,7 +207,7 @@ export const DocumentsEvidencePage: React.FC = () => {
                 placeholder="Filter by ref or bank..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-8 pr-3 py-1.5 text-xs rounded-[6px] border border-[#C9D3DB] focus:outline-none focus:border-[#0F766E]"
+                className="w-full pl-8 pr-3 py-1.5 text-xs rounded-none border border-[#C9D3DB] focus:outline-none focus:border-[#0F766E]"
               />
             </div>
 
@@ -229,7 +229,7 @@ export const DocumentsEvidencePage: React.FC = () => {
                         setSearchParams({ instrument_id: inst.id });
                       }}
                       className={cn(
-                        'p-2.5 rounded-[6px] border cursor-pointer transition-all text-xs select-none',
+                        'p-2.5 rounded-none border cursor-pointer transition-all text-xs select-none',
                         isSelected
                           ? 'bg-[#123B5D] text-white border-[#0F766E] shadow-2xs'
                           : 'bg-[#F5F4EF]/50 hover:bg-[#F5F4EF] text-[#253746] border-slate-200'
@@ -239,7 +239,7 @@ export const DocumentsEvidencePage: React.FC = () => {
                         <span>{inst.reference_number}</span>
                         <span
                           className={cn(
-                            'text-[9px] px-1.5 py-0.2 rounded font-normal',
+                            'text-[9px] px-1.5 py-0.2 rounded-none font-normal',
                             isSelected ? 'bg-[#0F766E] text-white' : 'bg-slate-200 text-[#253746]'
                           )}
                         >
@@ -264,7 +264,7 @@ export const DocumentsEvidencePage: React.FC = () => {
         <div className="lg:col-span-8 space-y-4">
           {/* Active Instrument Context Bar */}
           {activeInstrument && (
-            <div className="bg-white rounded-[10px] border border-[#C9D3DB] p-4 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="bg-white rounded-none border border-[#C9D3DB] p-4 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <span className="text-[10px] font-mono text-[#8799A9] uppercase">Active FDR Context</span>
                 <div className="text-sm font-bold text-[#0D2538] flex items-center gap-2">
@@ -276,14 +276,14 @@ export const DocumentsEvidencePage: React.FC = () => {
               <div className="flex items-center gap-2">
                 <Link
                   to={`/instruments/${activeInstrument.id}`}
-                  className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded bg-[#F5F4EF] hover:bg-slate-200 text-[#0D2538] border border-[#C9D3DB] transition"
+                  className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-none bg-[#F5F4EF] hover:bg-slate-200 text-[#0D2538] border border-[#C9D3DB] transition"
                 >
                   <span>FDR Details</span>
                   <ExternalLink className="w-3 h-3 text-[#5D6A75]" />
                 </Link>
                 <Link
                   to={`/verification/${activeInstrument.id}`}
-                  className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded bg-purple-50 hover:bg-purple-100 text-purple-900 border border-purple-200 transition"
+                  className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-none bg-purple-50 hover:bg-purple-100 text-purple-900 border border-purple-200 transition"
                 >
                   <ShieldCheck className="w-3 h-3 text-purple-600" />
                   <span>Trust Desk</span>
@@ -293,7 +293,7 @@ export const DocumentsEvidencePage: React.FC = () => {
           )}
 
           {/* Document List */}
-          <div className="bg-white rounded-[10px] border border-[#C9D3DB] p-5 shadow-2xs space-y-4">
+          <div className="bg-white rounded-none border border-[#C9D3DB] p-5 shadow-2xs space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div>
                 <h2 className="font-bold text-[#0D2538] text-xs uppercase tracking-wider">
@@ -331,14 +331,14 @@ export const DocumentsEvidencePage: React.FC = () => {
                       key={doc.id}
                       onClick={() => handleSelectDocument(doc.id)}
                       className={cn(
-                        'p-3 rounded-[8px] border cursor-pointer transition-all flex items-center justify-between',
+                        'p-3 rounded-none border cursor-pointer transition-all flex items-center justify-between',
                         isInspected
                           ? 'border-[#0F766E] bg-teal-50/20 shadow-2xs'
                           : 'border-[#C9D3DB] hover:border-slate-400 bg-white'
                       )}
                     >
                       <div className="flex items-center gap-3">
-                        <div className="p-2 rounded bg-[#F5F4EF] text-[#123B5D]">
+                        <div className="p-2 rounded-none bg-[#F5F4EF] text-[#123B5D]">
                           <FileText className="w-4 h-4" />
                         </div>
                         <div>
@@ -366,7 +366,7 @@ export const DocumentsEvidencePage: React.FC = () => {
 
           {/* Inspected Document Version History & SHA-256 Hashes */}
           {selectedDocDetail && (
-            <div className="bg-white rounded-[10px] border border-[#C9D3DB] p-5 shadow-2xs space-y-4">
+            <div className="bg-white rounded-none border border-[#C9D3DB] p-5 shadow-2xs space-y-4">
               <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                 <div>
                   <h3 className="font-bold text-[#0D2538] text-xs uppercase tracking-wider">
@@ -424,7 +424,7 @@ export const DocumentsEvidencePage: React.FC = () => {
                         <td className="px-3 py-2">
                           <span
                             className={cn(
-                              'text-[9px] font-mono px-1.5 py-0.5 rounded font-semibold',
+                              'text-[9px] font-mono px-1.5 py-0.5 rounded-none font-semibold',
                               (v.processing_status || v.scan_status) === 'CLEAN' || (v.processing_status || v.scan_status) === 'COMPLETED'
                                 ? 'bg-emerald-100 text-emerald-800'
                                 : (v.processing_status || v.scan_status) === 'INFECTED'
@@ -438,7 +438,7 @@ export const DocumentsEvidencePage: React.FC = () => {
                         <td className="px-3 py-2">
                           <span
                             className={cn(
-                              'text-[9px] font-mono px-1.5 py-0.5 rounded font-semibold',
+                              'text-[9px] font-mono px-1.5 py-0.5 rounded-none font-semibold',
                               ((v.extracted_fields?.extraction_status || v.extracted_fields?.status) === 'COMPLETED' ||
                                (v.extracted_fields?.extraction_status || v.extracted_fields?.status) === 'SUCCESS')
                                 ? 'bg-emerald-100 text-emerald-800'
@@ -489,7 +489,7 @@ export const DocumentsEvidencePage: React.FC = () => {
 
               {/* Extracted Fields Detail Panel for Versions */}
               {selectedDocDetail.versions.map((v) => v.extracted_fields && (
-                <div key={`ext-${v.id}`} className="mt-3 bg-slate-50 border border-slate-200 rounded-[8px] p-3 text-[11px] space-y-2">
+                <div key={`ext-${v.id}`} className="mt-3 bg-slate-50 border border-slate-200 rounded-none p-3 text-[11px] space-y-2">
                   <div className="flex items-center justify-between border-b border-slate-200 pb-2">
                     <span className="font-semibold text-slate-700 flex items-center gap-1.5">
                       <FileCode className="w-3.5 h-3.5 text-teal-600" />
@@ -502,34 +502,34 @@ export const DocumentsEvidencePage: React.FC = () => {
                   </div>
 
                   {(v.extracted_fields.extraction_status || v.extracted_fields.status) === 'FAILED' ? (
-                    <div className="text-rose-700 text-[10px] bg-rose-50 border border-rose-100 p-2 rounded">
+                    <div className="text-rose-700 text-[10px] bg-rose-50 border border-rose-100 p-2 rounded-none">
                       {v.extracted_fields.error_details || v.extracted_fields.raw_text_excerpt || 'OCR extraction failed or unsupported document format.'}
                     </div>
                   ) : (
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                      <div className="bg-white p-2 rounded border border-slate-200">
+                      <div className="bg-white p-2 rounded-none border border-slate-200">
                         <span className="text-[9px] text-slate-500 block uppercase font-medium">Reference No</span>
                         <span className="font-mono font-medium text-slate-800">{v.extracted_fields.doc_reference_number || '—'}</span>
                       </div>
-                      <div className="bg-white p-2 rounded border border-slate-200">
+                      <div className="bg-white p-2 rounded-none border border-slate-200">
                         <span className="text-[9px] text-slate-500 block uppercase font-medium">Issuing Bank</span>
                         <span className="font-medium text-slate-800">{v.extracted_fields.doc_bank_name || '—'}</span>
                       </div>
-                      <div className="bg-white p-2 rounded border border-slate-200">
+                      <div className="bg-white p-2 rounded-none border border-slate-200">
                         <span className="text-[9px] text-slate-500 block uppercase font-medium">Printed Amount</span>
                         <span className="font-mono font-semibold text-emerald-800">
                           {v.extracted_fields.doc_amount_str ? `₹${v.extracted_fields.doc_amount_str}` : '—'}
                         </span>
                       </div>
-                      <div className="bg-white p-2 rounded border border-slate-200">
+                      <div className="bg-white p-2 rounded-none border border-slate-200">
                         <span className="text-[9px] text-slate-500 block uppercase font-medium">Maturity Date</span>
                         <span className="font-medium text-slate-800">{v.extracted_fields.doc_maturity_date_str || '—'}</span>
                       </div>
-                      <div className="bg-white p-2 rounded border border-slate-200 col-span-2">
+                      <div className="bg-white p-2 rounded-none border border-slate-200 col-span-2">
                         <span className="text-[9px] text-slate-500 block uppercase font-medium">Account / Depositor Holder</span>
                         <span className="font-medium text-slate-800">{v.extracted_fields.doc_account_holder || '—'}</span>
                       </div>
-                      <div className="bg-white p-2 rounded border border-slate-200 col-span-2">
+                      <div className="bg-white p-2 rounded-none border border-slate-200 col-span-2">
                         <span className="text-[9px] text-slate-500 block uppercase font-medium">Lien Marked To</span>
                         <span className="font-medium text-slate-800">{v.extracted_fields.doc_lien_holder || '—'}</span>
                       </div>
@@ -549,7 +549,7 @@ export const DocumentsEvidencePage: React.FC = () => {
       {/* Upload Modal */}
       {isUploadOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-2xs">
-          <div className="bg-white rounded-[10px] border border-[#C9D3DB] p-6 max-w-lg w-full space-y-4 shadow-xl">
+          <div className="bg-white rounded-none border border-[#C9D3DB] p-6 max-w-lg w-full space-y-4 shadow-xl">
             <div className="flex items-center justify-between pb-2 border-b border-slate-100">
               <h3 className="font-bold text-[#0D2538] text-sm flex items-center gap-2">
                 <UploadCloud className="w-4 h-4 text-[#0F766E]" />
@@ -565,7 +565,7 @@ export const DocumentsEvidencePage: React.FC = () => {
             </div>
 
             {uploadError && (
-              <div className="p-3 rounded bg-rose-50 border border-rose-200 text-rose-800 text-[11px] flex items-center gap-2">
+              <div className="p-3 rounded-none bg-rose-50 border border-rose-200 text-rose-800 text-[11px] flex items-center gap-2">
                 <AlertTriangle className="w-4 h-4 shrink-0 text-rose-600" />
                 <span>{uploadError}</span>
               </div>
@@ -579,7 +579,7 @@ export const DocumentsEvidencePage: React.FC = () => {
                 <select
                   value={uploadCategory}
                   onChange={(e) => setUploadCategory(e.target.value)}
-                  className="w-full text-xs rounded border border-[#C9D3DB] px-3 py-2 focus:outline-none focus:border-[#0F766E]"
+                  className="w-full text-xs rounded-none border border-[#C9D3DB] px-3 py-2 focus:outline-none focus:border-[#0F766E]"
                 >
                   <option value="FDR_CERTIFICATE">Fixed Deposit Certificate / Advice Scan</option>
                   <option value="BANK_CONFIRMATION_LETTER">Bank Confirmation Letter</option>
@@ -598,7 +598,7 @@ export const DocumentsEvidencePage: React.FC = () => {
                   placeholder="e.g. Canara Bank FDR Certificate 2026"
                   value={uploadTitle}
                   onChange={(e) => setUploadTitle(e.target.value)}
-                  className="w-full text-xs rounded border border-[#C9D3DB] px-3 py-2 focus:outline-none focus:border-[#0F766E]"
+                  className="w-full text-xs rounded-none border border-[#C9D3DB] px-3 py-2 focus:outline-none focus:border-[#0F766E]"
                 />
               </div>
 
@@ -611,7 +611,7 @@ export const DocumentsEvidencePage: React.FC = () => {
                   rows={2}
                   value={uploadDescription}
                   onChange={(e) => setUploadDescription(e.target.value)}
-                  className="w-full text-xs rounded border border-[#C9D3DB] px-3 py-2 focus:outline-none focus:border-[#0F766E]"
+                  className="w-full text-xs rounded-none border border-[#C9D3DB] px-3 py-2 focus:outline-none focus:border-[#0F766E]"
                 />
               </div>
 
@@ -623,7 +623,7 @@ export const DocumentsEvidencePage: React.FC = () => {
                   type="file"
                   accept=".pdf,.png,.jpg,.jpeg"
                   onChange={(e) => setUploadFile(e.target.files?.[0] || null)}
-                  className="w-full text-xs border border-dashed border-[#C9D3DB] p-3 rounded bg-[#F5F4EF]/50 cursor-pointer"
+                  className="w-full text-xs border border-dashed border-[#C9D3DB] p-3 rounded-none bg-[#F5F4EF]/50 cursor-pointer"
                   required
                 />
               </div>
@@ -632,14 +632,14 @@ export const DocumentsEvidencePage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsUploadOpen(false)}
-                  className="px-3 py-1.5 rounded border border-[#C9D3DB] text-[#5D6A75] hover:bg-slate-100 font-medium"
+                  className="px-3 py-1.5 rounded-none border border-[#C9D3DB] text-[#5D6A75] hover:bg-slate-100 font-medium"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isUploading || !uploadFile}
-                  className="px-4 py-1.5 rounded bg-[#0F766E] hover:bg-[#09544E] text-white font-semibold shadow-xs disabled:opacity-50"
+                  className="px-4 py-1.5 rounded-none bg-[#0F766E] hover:bg-[#09544E] text-white font-semibold shadow-xs disabled:opacity-50"
                 >
                   {isUploading ? 'Computing SHA-256 & Scanning...' : 'Upload & Hash'}
                 </button>

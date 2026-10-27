@@ -53,7 +53,7 @@ export const LandingPage: React.FC = () => {
           {/* Logo & Brand Wordmark - Aligned in Left Corner */}
           <Link
             to="/"
-            className="flex items-center gap-3 shrink-0 group focus:outline-none focus:ring-2 focus:ring-[#0F766E] rounded-xl p-1"
+            className="flex items-center gap-3 shrink-0 group focus:outline-none focus:ring-2 focus:ring-[#0F766E] rounded-none p-1"
           >
             <img
               src="/logo.png"
@@ -65,7 +65,7 @@ export const LandingPage: React.FC = () => {
                 <span className="text-xl font-extrabold tracking-tight text-[#0D2538] whitespace-nowrap">
                   Sakshya<span className="text-[#0F766E]">Trail</span>
                 </span>
-                <span className="text-[10px] font-mono font-semibold uppercase bg-teal-50 text-[#0F766E] border border-teal-200 px-1.5 py-0.5 rounded whitespace-nowrap">
+                <span className="text-[10px] font-mono font-semibold uppercase bg-teal-50 text-[#0F766E] border border-teal-200 px-1.5 py-0.5 rounded-none whitespace-nowrap">
                   SIH 26265
                 </span>
               </div>
@@ -81,7 +81,7 @@ export const LandingPage: React.FC = () => {
               <a
                 key={link.name}
                 href={link.href}
-                className="px-2.5 xl:px-3 py-1.5 rounded-lg hover:text-[#0D2538] hover:bg-slate-100/80 transition-colors whitespace-nowrap shrink-0"
+                className="px-2.5 xl:px-3 py-1.5 rounded-none hover:text-[#0D2538] hover:bg-slate-100/80 transition-colors whitespace-nowrap shrink-0"
               >
                 {link.name}
               </a>
@@ -137,7 +137,7 @@ export const LandingPage: React.FC = () => {
             </Link>
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500 cursor-pointer"
+              className="p-2 rounded-none text-slate-600 hover:text-slate-900 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500 cursor-pointer"
               aria-label="Toggle mobile menu"
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -154,7 +154,7 @@ export const LandingPage: React.FC = () => {
                   key={link.name}
                   href={link.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="px-3 py-2 rounded-lg text-[#5D6A75] hover:text-[#0D2538] hover:bg-slate-100 transition-colors"
+                  className="px-3 py-2 rounded-none text-[#5D6A75] hover:text-[#0D2538] hover:bg-slate-100 transition-colors"
                 >
                   {link.name}
                 </a>
@@ -178,7 +178,7 @@ export const LandingPage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center max-w-4xl mx-auto space-y-5">
             {/* Eyebrow Badge */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-50 border border-teal-200 text-[#0F766E] text-xs font-semibold uppercase tracking-wider shadow-2xs">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-none bg-teal-50 border border-teal-200 text-[#0F766E] text-xs font-semibold uppercase tracking-wider shadow-2xs">
               <Sparkles className="w-3.5 h-3.5" />
               SMART AUTOMATION · EVIDENCE-FIRST GOVERNANCE
             </div>
@@ -221,9 +221,9 @@ export const LandingPage: React.FC = () => {
 
           {/* Interactive Synthetic Application Visual Preview */}
           <div className="mt-14 max-w-5xl mx-auto">
-            <div className="bg-[#0D2538] rounded-[10px] p-2 sm:p-3 shadow-2xl border border-slate-700/60 ring-1 ring-slate-800">
+            <div className="bg-[#0D2538] rounded-none p-2 sm:p-3 shadow-2xl border border-slate-700/60 ring-1 ring-slate-800">
               {/* Window Bar Header */}
-              <div className="flex items-center justify-between px-3 py-2 bg-slate-900/80 rounded-xl mb-3 text-xs text-slate-400 font-mono">
+              <div className="flex items-center justify-between px-3 py-2 bg-slate-900/80 rounded-none mb-3 text-xs text-slate-400 font-mono">
                 <div className="flex items-center gap-2">
                   <div className="flex gap-1.5">
                     <div className="w-3 h-3 rounded-full bg-rose-500/80" />
@@ -239,25 +239,25 @@ export const LandingPage: React.FC = () => {
               </div>
 
               {/* Cockpit Card Container */}
-              <div className="bg-white rounded-xl p-4 sm:p-6 text-slate-800 space-y-4">
+              <div className="bg-white rounded-none p-4 sm:p-6 text-slate-800 space-y-4">
                 {/* Simulated Metrics Strip */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                  <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                  <div className="bg-slate-50 p-3 rounded-none border border-slate-200">
                     <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider block">Active Deposit Value</span>
                     <span className="text-lg font-bold text-[#0D2538] font-mono">₹ 37,50,00,000</span>
                     <span className="text-[10px] text-emerald-700 block mt-0.5">37 Validated FDRs</span>
                   </div>
-                  <div className="bg-amber-50/60 p-3 rounded-xl border border-amber-200">
+                  <div className="bg-amber-50/60 p-3 rounded-none border border-amber-200">
                     <span className="text-[10px] font-semibold text-amber-800 uppercase tracking-wider block">Upcoming Maturities</span>
                     <span className="text-lg font-bold text-amber-900 font-mono">4 Instruments</span>
                     <span className="text-[10px] text-amber-700 block mt-0.5">Within 90-day window</span>
                   </div>
-                  <div className="bg-teal-50/60 p-3 rounded-xl border border-teal-200">
+                  <div className="bg-teal-50/60 p-3 rounded-none border border-teal-200">
                     <span className="text-[10px] font-semibold text-teal-800 uppercase tracking-wider block">Trust Level Breakdown</span>
                     <span className="text-lg font-bold text-teal-900 font-mono">L2 Verified (28)</span>
                     <span className="text-[10px] text-teal-700 block mt-0.5">L3 Bank Confirmed: 6</span>
                   </div>
-                  <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                  <div className="bg-slate-50 p-3 rounded-none border border-slate-200">
                     <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider block">Release Gate Lock</span>
                     <span className="text-lg font-bold text-[#C62828] font-mono">2 Cases Blocked</span>
                     <span className="text-[10px] text-slate-500 block mt-0.5">Maker-checker active</span>
@@ -265,15 +265,15 @@ export const LandingPage: React.FC = () => {
                 </div>
 
                 {/* Synthetic Record Row Sample */}
-                <div className="bg-slate-50 rounded-xl p-4 border border-slate-200 font-mono text-xs space-y-2">
+                <div className="bg-slate-50 rounded-none p-4 border border-slate-200 font-mono text-xs space-y-2">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-2">
                     <div className="flex items-center gap-2">
-                      <span className="bg-teal-100 text-teal-800 font-bold px-2 py-0.5 rounded text-[11px]">
+                      <span className="bg-teal-100 text-teal-800 font-bold px-2 py-0.5 rounded-none text-[11px]">
                         FDR-SBI-2026-9041
                       </span>
                       <span className="font-semibold text-slate-800 font-sans">IIT Delhi Campus Development Security Deposit</span>
                     </div>
-                    <span className="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded text-[11px] self-start sm:self-auto">
+                    <span className="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-none text-[11px] self-start sm:self-auto">
                       TRUST: L2_OFFICER_VERIFIED
                     </span>
                   </div>
@@ -308,7 +308,7 @@ export const LandingPage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 rounded-none bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center shrink-0">
                 <Scale className="w-5 h-5" />
               </div>
               <div>
@@ -320,7 +320,7 @@ export const LandingPage: React.FC = () => {
             </div>
 
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 rounded-none bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center shrink-0">
                 <FileCheck2 className="w-5 h-5" />
               </div>
               <div>
@@ -332,7 +332,7 @@ export const LandingPage: React.FC = () => {
             </div>
 
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 rounded-none bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center shrink-0">
                 <Users className="w-5 h-5" />
               </div>
               <div>
@@ -344,7 +344,7 @@ export const LandingPage: React.FC = () => {
             </div>
 
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 rounded-none bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center shrink-0">
                 <History className="w-5 h-5" />
               </div>
               <div>
@@ -377,7 +377,7 @@ export const LandingPage: React.FC = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
           {/* Column 1: Conventional Vulnerabilities */}
-          <div className="bg-white rounded-[10px] p-6 sm:p-8 border border-rose-200/80 shadow-xs space-y-4">
+          <div className="bg-white rounded-none p-6 sm:p-8 border border-rose-200/80 shadow-xs space-y-4">
             <div className="flex items-center gap-2 text-[#C62828] font-bold text-base">
               <AlertTriangle className="w-5 h-5" /> Conventional Record Vulnerabilities
             </div>
@@ -406,7 +406,7 @@ export const LandingPage: React.FC = () => {
           </div>
 
           {/* Column 2: The SakshyaTrail Advantage */}
-          <div className="bg-white rounded-[10px] p-6 sm:p-8 border border-teal-200 shadow-xs space-y-4">
+          <div className="bg-white rounded-none p-6 sm:p-8 border border-teal-200 shadow-xs space-y-4">
             <div className="flex items-center gap-2 text-[#0F766E] font-bold text-base">
               <ShieldCheck className="w-5 h-5" /> The SakshyaTrail Architecture
             </div>
@@ -436,7 +436,7 @@ export const LandingPage: React.FC = () => {
         </div>
 
         {/* Position Statement Banner */}
-        <div className="mt-8 p-4 rounded-xl bg-slate-100/80 border border-[#C9D3DB] text-center text-xs text-[#5D6A75] max-w-3xl mx-auto">
+        <div className="mt-8 p-4 rounded-none bg-slate-100/80 border border-[#C9D3DB] text-center text-xs text-[#5D6A75] max-w-3xl mx-auto">
           <strong className="text-[#0D2538]">Architectural Position:</strong> SakshyaTrail is designed as a specialized <strong>complementary lifecycle-integrity layer</strong> to operate alongside existing regulatory frameworks and portal architectures.
         </div>
       </section>
@@ -461,7 +461,7 @@ export const LandingPage: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Stage 1 */}
-            <div className="bg-[#F5F4EF] rounded-[10px] p-6 border border-[#C9D3DB] hover:border-teal-300 transition-colors space-y-3 relative">
+            <div className="bg-[#F5F4EF] rounded-none p-6 border border-[#C9D3DB] hover:border-teal-300 transition-colors space-y-3 relative">
               <span className="text-2xl font-black text-teal-600/40 font-mono block">01</span>
               <div className="flex items-center gap-2 font-bold text-[#0D2538] text-base">
                 <Building2 className="w-5 h-5 text-[#0F766E]" /> 1. Submit
@@ -472,7 +472,7 @@ export const LandingPage: React.FC = () => {
             </div>
 
             {/* Stage 2 */}
-            <div className="bg-[#F5F4EF] rounded-[10px] p-6 border border-[#C9D3DB] hover:border-teal-300 transition-colors space-y-3 relative">
+            <div className="bg-[#F5F4EF] rounded-none p-6 border border-[#C9D3DB] hover:border-teal-300 transition-colors space-y-3 relative">
               <span className="text-2xl font-black text-teal-600/40 font-mono block">02</span>
               <div className="flex items-center gap-2 font-bold text-[#0D2538] text-base">
                 <FileText className="w-5 h-5 text-[#0F766E]" /> 2. Upload
@@ -483,7 +483,7 @@ export const LandingPage: React.FC = () => {
             </div>
 
             {/* Stage 3 */}
-            <div className="bg-[#F5F4EF] rounded-[10px] p-6 border border-[#C9D3DB] hover:border-teal-300 transition-colors space-y-3 relative">
+            <div className="bg-[#F5F4EF] rounded-none p-6 border border-[#C9D3DB] hover:border-teal-300 transition-colors space-y-3 relative">
               <span className="text-2xl font-black text-teal-600/40 font-mono block">03</span>
               <div className="flex items-center gap-2 font-bold text-[#0D2538] text-base">
                 <FileCheck2 className="w-5 h-5 text-[#0F766E]" /> 3. Validate
@@ -494,7 +494,7 @@ export const LandingPage: React.FC = () => {
             </div>
 
             {/* Stage 4 */}
-            <div className="bg-[#F5F4EF] rounded-[10px] p-6 border border-[#C9D3DB] hover:border-teal-300 transition-colors space-y-3 relative">
+            <div className="bg-[#F5F4EF] rounded-none p-6 border border-[#C9D3DB] hover:border-teal-300 transition-colors space-y-3 relative">
               <span className="text-2xl font-black text-teal-600/40 font-mono block">04</span>
               <div className="flex items-center gap-2 font-bold text-[#0D2538] text-base">
                 <ShieldCheck className="w-5 h-5 text-[#0F766E]" /> 4. Verify
@@ -505,7 +505,7 @@ export const LandingPage: React.FC = () => {
             </div>
 
             {/* Stage 5 */}
-            <div className="bg-[#F5F4EF] rounded-[10px] p-6 border border-[#C9D3DB] hover:border-teal-300 transition-colors space-y-3 relative">
+            <div className="bg-[#F5F4EF] rounded-none p-6 border border-[#C9D3DB] hover:border-teal-300 transition-colors space-y-3 relative">
               <span className="text-2xl font-black text-teal-600/40 font-mono block">05</span>
               <div className="flex items-center gap-2 font-bold text-[#0D2538] text-base">
                 <Clock className="w-5 h-5 text-[#0F766E]" /> 5. Monitor
@@ -516,7 +516,7 @@ export const LandingPage: React.FC = () => {
             </div>
 
             {/* Stage 6 */}
-            <div className="bg-[#F5F4EF] rounded-[10px] p-6 border border-[#C9D3DB] hover:border-teal-300 transition-colors space-y-3 relative">
+            <div className="bg-[#F5F4EF] rounded-none p-6 border border-[#C9D3DB] hover:border-teal-300 transition-colors space-y-3 relative">
               <span className="text-2xl font-black text-teal-600/40 font-mono block">06</span>
               <div className="flex items-center gap-2 font-bold text-[#0D2538] text-base">
                 <RefreshCw className="w-5 h-5 text-[#0F766E]" /> 6. Renew
@@ -527,7 +527,7 @@ export const LandingPage: React.FC = () => {
             </div>
 
             {/* Stage 7 */}
-            <div className="bg-[#F5F4EF] rounded-[10px] p-6 border border-[#C9D3DB] hover:border-teal-300 transition-colors space-y-3 relative">
+            <div className="bg-[#F5F4EF] rounded-none p-6 border border-[#C9D3DB] hover:border-teal-300 transition-colors space-y-3 relative">
               <span className="text-2xl font-black text-teal-600/40 font-mono block">07</span>
               <div className="flex items-center gap-2 font-bold text-[#0D2538] text-base">
                 <Lock className="w-5 h-5 text-[#0F766E]" /> 7. Release Gate
@@ -538,7 +538,7 @@ export const LandingPage: React.FC = () => {
             </div>
 
             {/* Stage 8 */}
-            <div className="bg-[#F5F4EF] rounded-[10px] p-6 border border-[#C9D3DB] hover:border-teal-300 transition-colors space-y-3 relative">
+            <div className="bg-[#F5F4EF] rounded-none p-6 border border-[#C9D3DB] hover:border-teal-300 transition-colors space-y-3 relative">
               <span className="text-2xl font-black text-teal-600/40 font-mono block">08</span>
               <div className="flex items-center gap-2 font-bold text-[#0D2538] text-base">
                 <Scale className="w-5 h-5 text-[#0F766E]" /> 8. Approve
@@ -549,7 +549,7 @@ export const LandingPage: React.FC = () => {
             </div>
 
             {/* Stage 9 */}
-            <div className="bg-[#F5F4EF] rounded-[10px] p-6 border border-[#C9D3DB] hover:border-teal-300 transition-colors space-y-3 relative">
+            <div className="bg-[#F5F4EF] rounded-none p-6 border border-[#C9D3DB] hover:border-teal-300 transition-colors space-y-3 relative">
               <span className="text-2xl font-black text-teal-600/40 font-mono block">09</span>
               <div className="flex items-center gap-2 font-bold text-[#0D2538] text-base">
                 <History className="w-5 h-5 text-[#0F766E]" /> 9. Audit & Report
@@ -585,9 +585,9 @@ export const LandingPage: React.FC = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {/* L0 Card */}
-          <div className="bg-white rounded-[10px] p-6 border border-slate-200 shadow-xs space-y-3">
+          <div className="bg-white rounded-none p-6 border border-slate-200 shadow-xs space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold font-mono px-2 py-0.5 rounded bg-slate-100 text-slate-700">
+              <span className="text-xs font-bold font-mono px-2 py-0.5 rounded-none bg-slate-100 text-slate-700">
                 LEVEL 0
               </span>
               <span className="text-[11px] text-slate-400 font-mono">Baseline</span>
@@ -602,9 +602,9 @@ export const LandingPage: React.FC = () => {
           </div>
 
           {/* L1 Card */}
-          <div className="bg-white rounded-[10px] p-6 border border-blue-200 shadow-xs space-y-3">
+          <div className="bg-white rounded-none p-6 border border-blue-200 shadow-xs space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold font-mono px-2 py-0.5 rounded bg-blue-50 text-blue-700">
+              <span className="text-xs font-bold font-mono px-2 py-0.5 rounded-none bg-blue-50 text-blue-700">
                 LEVEL 1
               </span>
               <span className="text-[11px] text-blue-500 font-mono">Documented</span>
@@ -619,9 +619,9 @@ export const LandingPage: React.FC = () => {
           </div>
 
           {/* L2 Card */}
-          <div className="bg-white rounded-[10px] p-6 border border-teal-200 shadow-xs space-y-3 ring-1 ring-teal-300/50">
+          <div className="bg-white rounded-none p-6 border border-teal-200 shadow-xs space-y-3 ring-1 ring-teal-300/50">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold font-mono px-2 py-0.5 rounded bg-teal-50 text-teal-800">
+              <span className="text-xs font-bold font-mono px-2 py-0.5 rounded-none bg-teal-50 text-teal-800">
                 LEVEL 2
               </span>
               <span className="text-[11px] text-teal-600 font-mono font-semibold">Recommended</span>
@@ -636,9 +636,9 @@ export const LandingPage: React.FC = () => {
           </div>
 
           {/* L3 Card */}
-          <div className="bg-white rounded-[10px] p-6 border border-emerald-200 shadow-xs space-y-3">
+          <div className="bg-white rounded-none p-6 border border-emerald-200 shadow-xs space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold font-mono px-2 py-0.5 rounded bg-emerald-50 text-emerald-800">
+              <span className="text-xs font-bold font-mono px-2 py-0.5 rounded-none bg-emerald-50 text-emerald-800">
                 LEVEL 3
               </span>
               <span className="text-[11px] text-emerald-600 font-mono">Confirmed</span>
@@ -654,7 +654,7 @@ export const LandingPage: React.FC = () => {
         </div>
 
         {/* Notice on OCR & AI Limits */}
-        <div className="mt-8 p-4 bg-amber-50/70 border border-amber-200 rounded-xl text-xs text-amber-900 flex items-start gap-3 max-w-3xl mx-auto">
+        <div className="mt-8 p-4 bg-amber-50/70 border border-amber-200 rounded-none text-xs text-amber-900 flex items-start gap-3 max-w-3xl mx-auto">
           <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
           <p>
             <strong>Statutory Guardrail Notice:</strong> OCR text extraction, cryptographic file hashes, and rule checks assist human scrutiny but do not independently prove the authenticity of a financial instrument. Elevated trust requires human officer endorsement or official bank response records.
@@ -681,8 +681,8 @@ export const LandingPage: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Capability 1 */}
-            <div className="bg-[#F5F4EF] p-6 rounded-[10px] border border-[#C9D3DB] space-y-3">
-              <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
+            <div className="bg-[#F5F4EF] p-6 rounded-none border border-[#C9D3DB] space-y-3">
+              <div className="w-10 h-10 rounded-none bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
                 <Building2 className="w-5 h-5" />
               </div>
               <h3 className="text-base font-bold text-[#0D2538]">1. Institution & Instrument Registry</h3>
@@ -692,8 +692,8 @@ export const LandingPage: React.FC = () => {
             </div>
 
             {/* Capability 2 */}
-            <div className="bg-[#F5F4EF] p-6 rounded-[10px] border border-[#C9D3DB] space-y-3">
-              <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
+            <div className="bg-[#F5F4EF] p-6 rounded-none border border-[#C9D3DB] space-y-3">
+              <div className="w-10 h-10 rounded-none bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
                 <FileText className="w-5 h-5" />
               </div>
               <h3 className="text-base font-bold text-[#0D2538]">2. Document Intake & Evidence Vault</h3>
@@ -703,8 +703,8 @@ export const LandingPage: React.FC = () => {
             </div>
 
             {/* Capability 3 */}
-            <div className="bg-[#F5F4EF] p-6 rounded-[10px] border border-[#C9D3DB] space-y-3">
-              <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
+            <div className="bg-[#F5F4EF] p-6 rounded-none border border-[#C9D3DB] space-y-3">
+              <div className="w-10 h-10 rounded-none bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
                 <FileCheck2 className="w-5 h-5" />
               </div>
               <h3 className="text-base font-bold text-[#0D2538]">3. Validation & Discrepancy Detection</h3>
@@ -714,8 +714,8 @@ export const LandingPage: React.FC = () => {
             </div>
 
             {/* Capability 4 */}
-            <div className="bg-[#F5F4EF] p-6 rounded-[10px] border border-[#C9D3DB] space-y-3">
-              <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
+            <div className="bg-[#F5F4EF] p-6 rounded-none border border-[#C9D3DB] space-y-3">
+              <div className="w-10 h-10 rounded-none bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
                 <ShieldCheck className="w-5 h-5" />
               </div>
               <h3 className="text-base font-bold text-[#0D2538]">4. Trust Ledger & Verification Desk</h3>
@@ -725,8 +725,8 @@ export const LandingPage: React.FC = () => {
             </div>
 
             {/* Capability 5 */}
-            <div className="bg-[#F5F4EF] p-6 rounded-[10px] border border-[#C9D3DB] space-y-3">
-              <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
+            <div className="bg-[#F5F4EF] p-6 rounded-none border border-[#C9D3DB] space-y-3">
+              <div className="w-10 h-10 rounded-none bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
                 <RefreshCw className="w-5 h-5" />
               </div>
               <h3 className="text-base font-bold text-[#0D2538]">5. Lifecycle Monitoring & Lineage</h3>
@@ -736,8 +736,8 @@ export const LandingPage: React.FC = () => {
             </div>
 
             {/* Capability 6 */}
-            <div className="bg-[#F5F4EF] p-6 rounded-[10px] border border-[#C9D3DB] space-y-3">
-              <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
+            <div className="bg-[#F5F4EF] p-6 rounded-none border border-[#C9D3DB] space-y-3">
+              <div className="w-10 h-10 rounded-none bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
                 <Lock className="w-5 h-5" />
               </div>
               <h3 className="text-base font-bold text-[#0D2538]">6. Release Gate & Case Management</h3>
@@ -747,8 +747,8 @@ export const LandingPage: React.FC = () => {
             </div>
 
             {/* Capability 7 */}
-            <div className="bg-[#F5F4EF] p-6 rounded-[10px] border border-[#C9D3DB] space-y-3 md:col-span-2 lg:col-span-3">
-              <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
+            <div className="bg-[#F5F4EF] p-6 rounded-none border border-[#C9D3DB] space-y-3 md:col-span-2 lg:col-span-3">
+              <div className="w-10 h-10 rounded-none bg-teal-50 border border-teal-200 text-[#0F766E] flex items-center justify-center">
                 <SlidersHorizontal className="w-5 h-5" />
               </div>
               <h3 className="text-base font-bold text-[#0D2538]">7. Command Center, Search, Reporting & Verifiable Audit</h3>
@@ -777,7 +777,7 @@ export const LandingPage: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white p-6 rounded-[10px] border border-[#C9D3DB] shadow-xs space-y-2">
+          <div className="bg-white p-6 rounded-none border border-[#C9D3DB] shadow-xs space-y-2">
             <div className="text-[#123B5D] font-bold text-sm flex items-center gap-2">
               <Lock className="w-4 h-4 text-[#0F766E]" /> Role-Based Access & Tenant Isolation
             </div>
@@ -786,7 +786,7 @@ export const LandingPage: React.FC = () => {
             </p>
           </div>
 
-          <div className="bg-white p-6 rounded-[10px] border border-[#C9D3DB] shadow-xs space-y-2">
+          <div className="bg-white p-6 rounded-none border border-[#C9D3DB] shadow-xs space-y-2">
             <div className="text-[#123B5D] font-bold text-sm flex items-center gap-2">
               <History className="w-4 h-4 text-[#0F766E]" /> Append-Only Tamper-Evident Ledger
             </div>
@@ -795,7 +795,7 @@ export const LandingPage: React.FC = () => {
             </p>
           </div>
 
-          <div className="bg-white p-6 rounded-[10px] border border-[#C9D3DB] shadow-xs space-y-2">
+          <div className="bg-white p-6 rounded-none border border-[#C9D3DB] shadow-xs space-y-2">
             <div className="text-[#123B5D] font-bold text-sm flex items-center gap-2">
               <Scale className="w-4 h-4 text-[#0F766E]" /> Maker-Checker Segregation
             </div>
@@ -804,7 +804,7 @@ export const LandingPage: React.FC = () => {
             </p>
           </div>
 
-          <div className="bg-white p-6 rounded-[10px] border border-[#C9D3DB] shadow-xs space-y-2">
+          <div className="bg-white p-6 rounded-none border border-[#C9D3DB] shadow-xs space-y-2">
             <div className="text-[#123B5D] font-bold text-sm flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-[#0F766E]" /> Release Gate Lock
             </div>
@@ -813,7 +813,7 @@ export const LandingPage: React.FC = () => {
             </p>
           </div>
 
-          <div className="bg-white p-6 rounded-[10px] border border-[#C9D3DB] shadow-xs space-y-2">
+          <div className="bg-white p-6 rounded-none border border-[#C9D3DB] shadow-xs space-y-2">
             <div className="text-[#123B5D] font-bold text-sm flex items-center gap-2">
               <Users className="w-4 h-4 text-[#0F766E]" /> Read-Only Compliance Auditor
             </div>
@@ -822,7 +822,7 @@ export const LandingPage: React.FC = () => {
             </p>
           </div>
 
-          <div className="bg-white p-6 rounded-[10px] border border-[#C9D3DB] shadow-xs space-y-2">
+          <div className="bg-white p-6 rounded-none border border-[#C9D3DB] shadow-xs space-y-2">
             <div className="text-[#123B5D] font-bold text-sm flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-[#0F766E]" /> Advisory AI Boundaries
             </div>
@@ -850,7 +850,7 @@ export const LandingPage: React.FC = () => {
             </p>
           </div>
 
-          <div className="bg-slate-900 rounded-[10px] p-4 sm:p-8 text-white space-y-6 border border-slate-800 shadow-xl">
+          <div className="bg-slate-900 rounded-none p-4 sm:p-8 text-white space-y-6 border border-slate-800 shadow-xl">
             {/* Top Bar */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
               <div>
@@ -861,41 +861,41 @@ export const LandingPage: React.FC = () => {
                   Real-time aggregation across 37 registered institutional deposits
                 </p>
               </div>
-              <span className="text-xs font-mono bg-slate-800 text-teal-400 border border-teal-500/30 px-2.5 py-1 rounded-full self-start sm:self-auto">
+              <span className="text-xs font-mono bg-slate-800 text-teal-400 border border-teal-500/30 px-2.5 py-1 rounded-none self-start sm:self-auto">
                 ILLUSTRATIVE PREVIEW — SYNTHETIC DATA
               </span>
             </div>
 
             {/* Dashboard Widgets */}
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-              <div className="bg-slate-800/80 p-3 rounded-xl border border-slate-700">
+              <div className="bg-slate-800/80 p-3 rounded-none border border-slate-700">
                 <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Active FDRs</span>
                 <span className="text-xl font-bold text-white font-mono">15</span>
               </div>
-              <div className="bg-slate-800/80 p-3 rounded-xl border border-slate-700">
+              <div className="bg-slate-800/80 p-3 rounded-none border border-slate-700">
                 <span className="text-[10px] text-amber-400 uppercase tracking-wider block">Expiring &lt;90d</span>
                 <span className="text-xl font-bold text-amber-300 font-mono">4</span>
               </div>
-              <div className="bg-slate-800/80 p-3 rounded-xl border border-slate-700">
+              <div className="bg-slate-800/80 p-3 rounded-none border border-slate-700">
                 <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Matured</span>
                 <span className="text-xl font-bold text-slate-300 font-mono">3</span>
               </div>
-              <div className="bg-slate-800/80 p-3 rounded-xl border border-slate-700">
+              <div className="bg-slate-800/80 p-3 rounded-none border border-slate-700">
                 <span className="text-[10px] text-teal-400 uppercase tracking-wider block">Renewed</span>
                 <span className="text-xl font-bold text-teal-300 font-mono">5</span>
               </div>
-              <div className="bg-slate-800/80 p-3 rounded-xl border border-slate-700">
+              <div className="bg-slate-800/80 p-3 rounded-none border border-slate-700">
                 <span className="text-[10px] text-emerald-400 uppercase tracking-wider block">Released</span>
                 <span className="text-xl font-bold text-emerald-300 font-mono">8</span>
               </div>
-              <div className="bg-slate-800/80 p-3 rounded-xl border border-slate-700">
+              <div className="bg-slate-800/80 p-3 rounded-none border border-slate-700">
                 <span className="text-[10px] text-rose-400 uppercase tracking-wider block">Blocked Releases</span>
                 <span className="text-xl font-bold text-rose-300 font-mono">2</span>
               </div>
             </div>
 
             {/* Triage Priority Queue Row Preview */}
-            <div className="bg-slate-800/60 rounded-xl p-4 border border-slate-700 space-y-2">
+            <div className="bg-slate-800/60 rounded-none p-4 border border-slate-700 space-y-2">
               <div className="flex items-center justify-between text-xs text-slate-400 border-b border-slate-700/80 pb-2">
                 <span className="font-semibold text-slate-200">Explainable Triage Priority Queue (Top Action Item)</span>
                 <span className="font-mono text-teal-400">Score: 82.5 / 100</span>
@@ -939,7 +939,7 @@ export const LandingPage: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div className="bg-white p-6 rounded-[10px] border border-[#C9D3DB] space-y-2">
+          <div className="bg-white p-6 rounded-none border border-[#C9D3DB] space-y-2">
             <h3 className="font-bold text-[#0D2538] text-sm flex items-center gap-2">
               <Building2 className="w-4 h-4 text-[#0F766E]" /> Submitting Institutions
             </h3>
@@ -948,7 +948,7 @@ export const LandingPage: React.FC = () => {
             </p>
           </div>
 
-          <div className="bg-white p-6 rounded-[10px] border border-[#C9D3DB] space-y-2">
+          <div className="bg-white p-6 rounded-none border border-[#C9D3DB] space-y-2">
             <h3 className="font-bold text-[#0D2538] text-sm flex items-center gap-2">
               <FileCheck2 className="w-4 h-4 text-[#0F766E]" /> Scrutiny Officers
             </h3>
@@ -957,7 +957,7 @@ export const LandingPage: React.FC = () => {
             </p>
           </div>
 
-          <div className="bg-white p-6 rounded-[10px] border border-[#C9D3DB] space-y-2">
+          <div className="bg-white p-6 rounded-none border border-[#C9D3DB] space-y-2">
             <h3 className="font-bold text-[#0D2538] text-sm flex items-center gap-2">
               <SlidersHorizontal className="w-4 h-4 text-[#0F766E]" /> Regional Branch Heads
             </h3>
@@ -966,7 +966,7 @@ export const LandingPage: React.FC = () => {
             </p>
           </div>
 
-          <div className="bg-white p-6 rounded-[10px] border border-[#C9D3DB] space-y-2">
+          <div className="bg-white p-6 rounded-none border border-[#C9D3DB] space-y-2">
             <h3 className="font-bold text-[#0D2538] text-sm flex items-center gap-2">
               <Scale className="w-4 h-4 text-[#0F766E]" /> Competent Authorities
             </h3>
@@ -975,7 +975,7 @@ export const LandingPage: React.FC = () => {
             </p>
           </div>
 
-          <div className="bg-white p-6 rounded-[10px] border border-[#C9D3DB] space-y-2">
+          <div className="bg-white p-6 rounded-none border border-[#C9D3DB] space-y-2">
             <h3 className="font-bold text-[#0D2538] text-sm flex items-center gap-2">
               <Database className="w-4 h-4 text-[#0F766E]" /> Finance Officials
             </h3>
@@ -984,7 +984,7 @@ export const LandingPage: React.FC = () => {
             </p>
           </div>
 
-          <div className="bg-white p-6 rounded-[10px] border border-[#C9D3DB] space-y-2">
+          <div className="bg-white p-6 rounded-none border border-[#C9D3DB] space-y-2">
             <h3 className="font-bold text-[#0D2538] text-sm flex items-center gap-2">
               <History className="w-4 h-4 text-[#0F766E]" /> Regulatory Auditors
             </h3>
@@ -1045,7 +1045,7 @@ export const LandingPage: React.FC = () => {
             ].map((item, index) => (
               <div
                 key={index}
-                className="border border-[#C9D3DB] rounded-xl overflow-hidden transition-all bg-[#F5F4EF]"
+                className="border border-[#C9D3DB] rounded-none overflow-hidden transition-all bg-[#F5F4EF]"
               >
                 <button
                   onClick={() => toggleFaq(index)}
@@ -1074,7 +1074,7 @@ export const LandingPage: React.FC = () => {
          ========================================================================= */}
       <section className="py-16 md:py-20 bg-linear-to-br from-[#123B5D] to-[#0D2538] text-white text-center relative overflow-hidden">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 space-y-5">
-          <span className="text-xs font-mono font-semibold uppercase tracking-widest text-teal-300 bg-teal-500/10 px-3 py-1 rounded-full border border-teal-400/20">
+          <span className="text-xs font-mono font-semibold uppercase tracking-widest text-teal-300 bg-teal-500/10 px-3 py-1 rounded-none border border-teal-400/20">
             INTEGRITY · ACCOUNTABILITY · COMPLIANCE
           </span>
           <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
@@ -1105,7 +1105,7 @@ export const LandingPage: React.FC = () => {
               <img
                 src="/logo.png"
                 alt="SakshyaTrail Logo"
-                className="h-11 w-auto object-contain bg-white/95 p-1 rounded-lg"
+                className="h-11 w-auto object-contain bg-white/95 p-1 rounded-none"
               />
               <div>
                 <span className="text-base font-extrabold text-white tracking-tight">

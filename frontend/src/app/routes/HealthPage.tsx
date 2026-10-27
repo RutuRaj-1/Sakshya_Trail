@@ -52,7 +52,7 @@ export const HealthPage: React.FC = () => {
             )}
           </div>
 
-          <div className="space-y-2 text-xs font-mono bg-[#F5F4EF] p-3 rounded-lg border border-[#C9D3DB]">
+          <div className="space-y-2 text-xs font-mono bg-[#F5F4EF] p-3 rounded-none border border-[#C9D3DB]">
             <div className="flex justify-between">
               <span className="text-[#5D6A75]">Service:</span>
               <span className="text-[#253746] font-semibold">{liveness?.service || 'SakshyaTrail'}</span>
@@ -90,7 +90,7 @@ export const HealthPage: React.FC = () => {
             )}
           </div>
 
-          <div className="space-y-2 text-xs font-mono bg-[#F5F4EF] p-3 rounded-lg border border-[#C9D3DB]">
+          <div className="space-y-2 text-xs font-mono bg-[#F5F4EF] p-3 rounded-none border border-[#C9D3DB]">
             <div className="flex justify-between">
               <span className="text-[#5D6A75]">Status:</span>
               <span className={isDbReady ? 'text-emerald-700 font-semibold' : 'text-amber-700 font-semibold'}>
@@ -129,13 +129,13 @@ export const HealthPage: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div>
             <div className="text-[11px] font-semibold text-[#5D6A75] mb-1">GET /api/v1/health/live</div>
-            <pre className="text-xs bg-slate-900 text-slate-200 p-3 rounded-lg overflow-x-auto font-mono">
+            <pre className="text-xs bg-slate-900 text-slate-200 p-3 rounded-none overflow-x-auto font-mono">
               {JSON.stringify(liveness, null, 2) || '// No response from liveness endpoint'}
             </pre>
           </div>
           <div>
             <div className="text-[11px] font-semibold text-[#5D6A75] mb-1">GET /api/v1/health/ready</div>
-            <pre className="text-xs bg-slate-900 text-slate-200 p-3 rounded-lg overflow-x-auto font-mono">
+            <pre className="text-xs bg-slate-900 text-slate-200 p-3 rounded-none overflow-x-auto font-mono">
               {JSON.stringify(readiness, null, 2) || '// No response from readiness endpoint'}
             </pre>
           </div>

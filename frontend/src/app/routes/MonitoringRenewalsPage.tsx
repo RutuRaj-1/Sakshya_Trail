@@ -12,11 +12,7 @@ import {
   AlertOctagon,
   SlidersHorizontal,
   Send,
-  FileSpreadsheet,
   ArrowRight,
-  ShieldAlert,
-  ChevronRight,
-  Info,
 } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { instrumentsApi, lifecycleApi } from '@/api/endpoints';
@@ -43,7 +39,6 @@ export const MonitoringRenewalsPage: React.FC = () => {
   const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const isInstitutionUser = user?.role === 'INSTITUTION_USER';
   const isOfficerOrAdmin = [
     'SYSTEM_ADMIN',
     'SCRUTINY_OFFICER',
@@ -194,10 +189,10 @@ export const MonitoringRenewalsPage: React.FC = () => {
   return (
     <div className="space-y-6 max-w-7xl mx-auto font-sans text-xs pb-12">
       {/* Top Banner */}
-      <div className="bg-[#0D2538] rounded-[10px] p-6 text-white shadow-[0_1px_3px_rgba(13,37,56,0.08)] border border-[#1e3c54] flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-[#0D2538] rounded-none p-6 text-white shadow-[0_1px_3px_rgba(13,37,56,0.08)] border border-[#1e3c54] flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="space-y-1.5 max-w-2xl">
           <div className="flex items-center gap-2">
-            <span className="bg-[#123B5D] text-[#8ACEC8] border border-[#0F766E]/40 text-[10px] font-semibold px-2.5 py-0.5 rounded-[4px] uppercase tracking-wider font-mono">
+            <span className="bg-[#123B5D] text-[#8ACEC8] border border-[#0F766E]/40 text-[10px] font-semibold px-2.5 py-0.5 rounded-none uppercase tracking-wider font-mono">
               Experience B: Lifecycle &amp; Monitoring
             </span>
             <span className="text-[#8799A9] text-xs font-mono">Portfolio Surveillance &amp; Lineage</span>
@@ -211,7 +206,7 @@ export const MonitoringRenewalsPage: React.FC = () => {
         </div>
 
         {/* Window Selector */}
-        <div className="flex items-center gap-2 bg-[#123B5D] p-1.5 rounded-[8px] border border-[#8799A9]/50 shrink-0">
+        <div className="flex items-center gap-2 bg-[#123B5D] p-1.5 rounded-none border border-[#8799A9]/50 shrink-0">
           <span className="text-[11px] text-[#C9D3DB] px-2 font-medium">Surveillance Window:</span>
           {[30, 60, 90, 180, 365].map((days) => (
             <button
@@ -223,7 +218,7 @@ export const MonitoringRenewalsPage: React.FC = () => {
                 next.set('window_days', String(days));
                 setSearchParams(next, { replace: true });
               }}
-              className={`px-2.5 py-1 rounded-[6px] text-xs font-mono font-semibold transition cursor-pointer ${
+              className={`px-2.5 py-1 rounded-none text-xs font-mono font-semibold transition cursor-pointer ${
                 windowDays === days
                   ? 'bg-[#0F766E] text-white shadow-2xs'
                   : 'text-[#C9D3DB] hover:text-white hover:bg-white/10'
@@ -237,7 +232,7 @@ export const MonitoringRenewalsPage: React.FC = () => {
 
       {/* KPI Overview Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white p-4 rounded-[10px] border border-[#C9D3DB] shadow-2xs">
+        <div className="bg-white p-4 rounded-none border border-[#C9D3DB] shadow-2xs">
           <span className="text-[#5D6A75] text-[11px] uppercase font-semibold">Active In-Term Deposits</span>
           <div className="text-2xl font-bold font-mono text-[#0D2538] mt-1">
             {isLoading ? '...' : statusCounts?.active_count ?? 0}
@@ -245,7 +240,7 @@ export const MonitoringRenewalsPage: React.FC = () => {
           <p className="text-[10px] text-[#5D6A75] mt-0.5">Valid beyond {windowDays} days</p>
         </div>
 
-        <div className="bg-white p-4 rounded-[10px] border border-amber-200 bg-amber-50/10 shadow-2xs">
+        <div className="bg-white p-4 rounded-none border border-amber-200 bg-amber-50/10 shadow-2xs">
           <span className="text-amber-800 text-[11px] uppercase font-semibold flex items-center gap-1.5">
             <Clock className="w-3.5 h-3.5 text-amber-600" />
             <span>Maturing Within {windowDays} Days</span>
@@ -256,7 +251,7 @@ export const MonitoringRenewalsPage: React.FC = () => {
           <p className="text-[10px] text-amber-700 mt-0.5">Action due for renewal or release</p>
         </div>
 
-        <div className="bg-white p-4 rounded-[10px] border border-rose-200 bg-rose-50/10 shadow-2xs">
+        <div className="bg-white p-4 rounded-none border border-rose-200 bg-rose-50/10 shadow-2xs">
           <span className="text-rose-800 text-[11px] uppercase font-semibold flex items-center gap-1.5">
             <AlertTriangle className="w-3.5 h-3.5 text-rose-600" />
             <span>Matured / Past Due</span>
@@ -267,7 +262,7 @@ export const MonitoringRenewalsPage: React.FC = () => {
           <p className="text-[10px] text-rose-700 mt-0.5">Term elapsed; awaiting action</p>
         </div>
 
-        <div className="bg-white p-4 rounded-[10px] border border-blue-200 bg-blue-50/10 shadow-2xs">
+        <div className="bg-white p-4 rounded-none border border-blue-200 bg-blue-50/10 shadow-2xs">
           <span className="text-blue-800 text-[11px] uppercase font-semibold flex items-center gap-1.5">
             <RefreshCw className="w-3.5 h-3.5 text-blue-600" />
             <span>Renewed / Rolled Over</span>
@@ -358,7 +353,7 @@ export const MonitoringRenewalsPage: React.FC = () => {
           <AlertOctagon className="w-3.5 h-3.5" />
           <span>Lifecycle Exceptions &amp; Alerts</span>
           {failedNotifications.length > 0 && (
-            <span className="bg-rose-100 text-rose-800 px-1.5 py-0.2 rounded-full font-mono text-[9px] font-bold">
+            <span className="bg-rose-100 text-rose-800 px-1.5 py-0.2 rounded-none font-mono text-[9px] font-bold">
               {failedNotifications.length}
             </span>
           )}
@@ -382,7 +377,7 @@ export const MonitoringRenewalsPage: React.FC = () => {
 
       {/* TAB CONTENT: Overview or Specific View */}
       {currentTab === 'calendar' && (
-        <div className="bg-white rounded-[10px] border border-[#C9D3DB] p-6 shadow-2xs space-y-4">
+        <div className="bg-white rounded-none border border-[#C9D3DB] p-6 shadow-2xs space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-sm font-bold text-[#0D2538] uppercase tracking-wider flex items-center gap-2">
@@ -419,7 +414,7 @@ export const MonitoringRenewalsPage: React.FC = () => {
                     <td className="py-2 px-3 text-[#5D6A75]">{formatDate(item.maturity_date)}</td>
                     <td className="py-2 px-3">
                       <span
-                        className={`px-2 py-0.5 rounded font-bold text-[10px] ${
+                        className={`px-2 py-0.5 rounded-none font-bold text-[10px] ${
                           item.days_to_maturity <= 0
                             ? 'bg-rose-100 text-rose-800'
                             : item.days_to_maturity <= 30
@@ -448,7 +443,7 @@ export const MonitoringRenewalsPage: React.FC = () => {
       )}
 
       {currentTab === 'maturities' && (
-        <div className="bg-white rounded-[10px] border border-[#C9D3DB] p-6 shadow-2xs space-y-4">
+        <div className="bg-white rounded-none border border-[#C9D3DB] p-6 shadow-2xs space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-sm font-bold text-[#0D2538] uppercase tracking-wider flex items-center gap-2">
@@ -465,7 +460,7 @@ export const MonitoringRenewalsPage: React.FC = () => {
             {maturingItems.map((item) => (
               <div
                 key={item.id}
-                className="p-3.5 rounded-[8px] border border-[#C9D3DB] bg-[#F5F4EF]/30 flex flex-col justify-between space-y-2"
+                className="p-3.5 rounded-none border border-[#C9D3DB] bg-[#F5F4EF]/30 flex flex-col justify-between space-y-2"
               >
                 <div className="flex items-start justify-between">
                   <div>
@@ -475,7 +470,7 @@ export const MonitoringRenewalsPage: React.FC = () => {
                     <p className="text-[11px] text-[#5D6A75] mt-0.5">{item.bank_name}</p>
                   </div>
                   <span
-                    className={`font-mono text-[10px] px-2 py-0.5 rounded font-bold ${
+                    className={`font-mono text-[10px] px-2 py-0.5 rounded-none font-bold ${
                       item.days_to_maturity <= 0
                         ? 'bg-rose-100 text-rose-800'
                         : 'bg-amber-100 text-amber-800'
@@ -493,13 +488,13 @@ export const MonitoringRenewalsPage: React.FC = () => {
                   <div className="flex items-center gap-2">
                     <Link
                       to={`/instruments/${item.id}`}
-                      className="px-2 py-1 rounded bg-white border border-[#C9D3DB] hover:bg-slate-50 text-[11px] font-semibold text-[#253746]"
+                      className="px-2 py-1 rounded-none bg-white border border-[#C9D3DB] hover:bg-slate-50 text-[11px] font-semibold text-[#253746]"
                     >
                       Inspect FDR
                     </Link>
                     <Link
                       to="/release"
-                      className="px-2 py-1 rounded bg-[#123B5D] hover:bg-[#0D2538] text-[11px] font-semibold text-white"
+                      className="px-2 py-1 rounded-none bg-[#123B5D] hover:bg-[#0D2538] text-[11px] font-semibold text-white"
                     >
                       Release Petition
                     </Link>
@@ -512,7 +507,7 @@ export const MonitoringRenewalsPage: React.FC = () => {
       )}
 
       {currentTab === 'exceptions' && (
-        <div className="bg-white rounded-[10px] border border-[#C9D3DB] p-6 shadow-2xs space-y-4">
+        <div className="bg-white rounded-none border border-[#C9D3DB] p-6 shadow-2xs space-y-4">
           <div>
             <h2 className="text-sm font-bold text-[#0D2538] uppercase tracking-wider flex items-center gap-2">
               <AlertOctagon className="w-4 h-4 text-rose-600" />
@@ -524,7 +519,7 @@ export const MonitoringRenewalsPage: React.FC = () => {
           </div>
 
           {failedNotifications.length === 0 ? (
-            <div className="py-8 text-center bg-emerald-50/40 rounded-[8px] border border-emerald-200 text-emerald-800">
+            <div className="py-8 text-center bg-emerald-50/40 rounded-none border border-emerald-200 text-emerald-800">
               <CheckCircle2 className="w-8 h-8 text-emerald-600 mx-auto mb-2" />
               <p className="font-bold text-xs">No Active Delivery Failures</p>
               <p className="text-[10px] text-emerald-700 mt-0.5">
@@ -536,20 +531,20 @@ export const MonitoringRenewalsPage: React.FC = () => {
               {failedNotifications.map((notif) => (
                 <div
                   key={notif.id}
-                  className="p-3 rounded-[8px] border border-rose-200 bg-rose-50/20 flex items-center justify-between"
+                  className="p-3 rounded-none border border-rose-200 bg-rose-50/20 flex items-center justify-between"
                 >
                   <div>
                     <span className="font-mono font-bold text-xs text-rose-900">
                       Notification ID: {notif.id.slice(0, 8)}
                     </span>
                     <p className="text-[11px] text-[#5D6A75] mt-0.5">
-                      Type: <strong>{notif.notification_type || notif.event_type}</strong> | Channel: {notif.channel}
+                      Type: <strong>{(notif as any).notification_type || notif.event_type}</strong> | Channel: {notif.channel}
                     </p>
                   </div>
                   <button
                     type="button"
                     onClick={() => handleRetryFailedNotification(notif.id)}
-                    className="px-3 py-1.5 rounded-[6px] bg-rose-600 text-white font-semibold hover:bg-rose-700 text-xs flex items-center gap-1 cursor-pointer"
+                    className="px-3 py-1.5 rounded-none bg-rose-600 text-white font-semibold hover:bg-rose-700 text-xs flex items-center gap-1 cursor-pointer"
                   >
                     <RefreshCw className="w-3.5 h-3.5" />
                     <span>Retry Dispatch</span>
@@ -562,7 +557,7 @@ export const MonitoringRenewalsPage: React.FC = () => {
       )}
 
       {currentTab === 'scheduler' && canAccessScheduler && (
-        <div className="bg-white rounded-[10px] border border-[#C9D3DB] p-6 shadow-2xs space-y-4">
+        <div className="bg-white rounded-none border border-[#C9D3DB] p-6 shadow-2xs space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-sm font-bold text-[#0D2538] uppercase tracking-wider flex items-center gap-2">
@@ -576,13 +571,13 @@ export const MonitoringRenewalsPage: React.FC = () => {
           </div>
 
           {schedulerActionMessage && (
-            <div className="p-3 rounded-[6px] bg-teal-50 border border-teal-200 text-[#0F766E] font-medium text-xs">
+            <div className="p-3 rounded-none bg-teal-50 border border-teal-200 text-[#0F766E] font-medium text-xs">
               {schedulerActionMessage}
             </div>
           )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-4 rounded-[8px] border border-[#C9D3DB] space-y-3 bg-[#F5F4EF]/30">
+            <div className="p-4 rounded-none border border-[#C9D3DB] space-y-3 bg-[#F5F4EF]/30">
               <h3 className="font-bold text-xs text-[#0D2538]">Statutory Reminder Dispatcher</h3>
               <p className="text-[11px] text-[#5D6A75]">
                 Scans all registered in-term instruments and dispatches 90d, 60d, and 30d maturity alerts to designated institutional officers.
@@ -591,23 +586,23 @@ export const MonitoringRenewalsPage: React.FC = () => {
                 type="button"
                 onClick={handleDispatchDue}
                 disabled={isDispatching}
-                className="inline-flex items-center gap-2 px-3.5 py-2 rounded-[6px] bg-[#0F766E] text-white font-semibold hover:bg-[#09544E] disabled:opacity-50 cursor-pointer"
+                className="inline-flex items-center gap-2 px-3.5 py-2 rounded-none bg-[#0F766E] text-white font-semibold hover:bg-[#09544E] disabled:opacity-50 cursor-pointer"
               >
                 <Send className="w-3.5 h-3.5" />
                 <span>{isDispatching ? 'Dispatching...' : 'Dispatch Due Reminders'}</span>
               </button>
             </div>
 
-            <div className="p-4 rounded-[8px] border border-[#C9D3DB] space-y-3 bg-[#F5F4EF]/30">
+            <div className="p-4 rounded-none border border-[#C9D3DB] space-y-3 bg-[#F5F4EF]/30">
               <h3 className="font-bold text-xs text-[#0D2538]">Automated Evaluation Policy</h3>
               <p className="text-[11px] text-[#5D6A75]">
                 Configured intervals: Daily evaluation at 00:00 UTC. Strict non-competing authoritative status calculated by backend Module 5.
               </p>
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-mono bg-white px-2 py-1 rounded border border-[#C9D3DB]">
+                <span className="text-[10px] font-mono bg-white px-2 py-1 rounded-none border border-[#C9D3DB]">
                   Status: <strong>ACTIVE</strong>
                 </span>
-                <span className="text-[10px] font-mono bg-white px-2 py-1 rounded border border-[#C9D3DB]">
+                <span className="text-[10px] font-mono bg-white px-2 py-1 rounded-none border border-[#C9D3DB]">
                   Mode: <strong>AUTHORITATIVE</strong>
                 </span>
               </div>
@@ -621,7 +616,7 @@ export const MonitoringRenewalsPage: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Left Column: Maturing Queue */}
           <div className="lg:col-span-5 space-y-3">
-            <div className="bg-white rounded-[10px] border border-[#C9D3DB] p-4 shadow-2xs space-y-3">
+            <div className="bg-white rounded-none border border-[#C9D3DB] p-4 shadow-2xs space-y-3">
               <div className="flex items-center justify-between">
                 <h2 className="font-bold text-[#0D2538] text-xs uppercase tracking-wider flex items-center gap-1.5">
                   <Clock className="w-4 h-4 text-[#0F766E]" />
@@ -640,7 +635,7 @@ export const MonitoringRenewalsPage: React.FC = () => {
                   placeholder="Filter queue by ref or bank..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-8 pr-3 py-1.5 text-xs rounded-[6px] border border-[#C9D3DB] focus:outline-none focus:border-[#0F766E]"
+                  className="w-full pl-8 pr-3 py-1.5 text-xs rounded-none border border-[#C9D3DB] focus:outline-none focus:border-[#0F766E]"
                 />
               </div>
 
@@ -665,7 +660,7 @@ export const MonitoringRenewalsPage: React.FC = () => {
                       <div
                         key={item.id}
                         onClick={() => handleSelectMaturityItem(item.id)}
-                        className={`p-3 rounded-[8px] border cursor-pointer transition-all select-none ${
+                        className={`p-3 rounded-none border cursor-pointer transition-all select-none ${
                           isSelected
                             ? 'bg-[#123B5D] text-white border-[#0F766E] shadow-2xs'
                             : 'bg-[#F5F4EF]/40 hover:bg-[#F5F4EF] text-[#253746] border-slate-200'
@@ -674,7 +669,7 @@ export const MonitoringRenewalsPage: React.FC = () => {
                         <div className="flex items-center justify-between font-mono">
                           <span className="font-bold text-xs">{item.reference_number}</span>
                           <span
-                            className={`text-[9px] px-2 py-0.5 rounded font-bold ${
+                            className={`text-[9px] px-2 py-0.5 rounded-none font-bold ${
                               isMatured
                                 ? 'bg-rose-100 text-rose-800'
                                 : days <= 30
@@ -704,7 +699,7 @@ export const MonitoringRenewalsPage: React.FC = () => {
             {selectedInstrument ? (
               <div className="space-y-4">
                 {/* Header Card for Selected Instrument */}
-                <div className="bg-white rounded-[10px] border border-[#C9D3DB] p-4 shadow-2xs space-y-3">
+                <div className="bg-white rounded-none border border-[#C9D3DB] p-4 shadow-2xs space-y-3">
                   <div className="flex items-start justify-between">
                     <div>
                       <div className="flex items-center gap-2">
@@ -743,7 +738,7 @@ export const MonitoringRenewalsPage: React.FC = () => {
                         type="button"
                         onClick={handleTriggerEvaluation}
                         disabled={isEvaluating}
-                        className="px-2.5 py-1 rounded-[6px] bg-[#123B5D] hover:bg-[#0D2538] text-white text-[11px] font-semibold flex items-center gap-1 cursor-pointer disabled:opacity-50"
+                        className="px-2.5 py-1 rounded-none bg-[#123B5D] hover:bg-[#0D2538] text-white text-[11px] font-semibold flex items-center gap-1 cursor-pointer disabled:opacity-50"
                       >
                         <RefreshCw className={`w-3 h-3 ${isEvaluating ? 'animate-spin' : ''}`} />
                         <span>{isEvaluating ? 'Evaluating...' : 'Re-Evaluate Lifecycle'}</span>
@@ -752,29 +747,30 @@ export const MonitoringRenewalsPage: React.FC = () => {
                   </div>
 
                   {evalMessage && (
-                    <div className="p-2 rounded bg-teal-50 border border-teal-200 text-[#0F766E] text-[11px] font-mono">
+                    <div className="p-2 rounded-none bg-teal-50 border border-teal-200 text-[#0F766E] text-[11px] font-mono">
                       {evalMessage}
                     </div>
                   )}
                 </div>
 
                 {/* Lineage Section */}
-                <div className="bg-white rounded-[10px] border border-[#C9D3DB] p-4 shadow-2xs">
+                <div className="bg-white rounded-none border border-[#C9D3DB] p-4 shadow-2xs">
                   <RenewalLineageSection
                     instrumentId={selectedInstrument.id}
-                    currentStatus={selectedInstrument.status}
-                    institutionId={selectedInstrument.institution_id}
-                    onRenewalSuccess={loadData}
+                    predecessorRecord={selectedInstrument as any}
+                    canInitiateRenewal={true}
+                    isOfficerOrAdmin={isOfficerOrAdmin}
+                    onRefreshParent={loadData}
                   />
                 </div>
 
                 {/* Notification History */}
-                <div className="bg-white rounded-[10px] border border-[#C9D3DB] p-4 shadow-2xs">
+                <div className="bg-white rounded-none border border-[#C9D3DB] p-4 shadow-2xs">
                   <LifecycleNotificationHistory instrumentId={selectedInstrument.id} />
                 </div>
               </div>
             ) : (
-              <div className="bg-white rounded-[10px] border border-[#C9D3DB] p-12 text-center text-[#5D6A75] shadow-2xs">
+              <div className="bg-white rounded-none border border-[#C9D3DB] p-12 text-center text-[#5D6A75] shadow-2xs">
                 <Layers className="w-8 h-8 text-slate-300 mx-auto mb-2" />
                 <p className="font-semibold text-xs text-[#253746]">Select an Instrument</p>
                 <p className="text-[10px] text-slate-400 mt-0.5">

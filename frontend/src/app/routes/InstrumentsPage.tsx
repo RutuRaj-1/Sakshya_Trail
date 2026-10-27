@@ -147,7 +147,7 @@ export const InstrumentsPage: React.FC = () => {
         {canRecord && (
           <button
             onClick={() => setIsModalOpen(true)}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#0F766E] hover:bg-[#09544E] text-white font-semibold shadow-xs transition-all"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-none bg-[#0F766E] hover:bg-[#09544E] text-white font-semibold shadow-xs transition-all"
           >
             <Plus className="w-4 h-4" />
             <span>Record FDR Instrument</span>
@@ -158,7 +158,7 @@ export const InstrumentsPage: React.FC = () => {
       {/* KPI Overview Strip */}
       {summary && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <div className="bg-white p-3.5 rounded-[10px] border border-[#C9D3DB] shadow-2xs">
+          <div className="bg-white p-3.5 rounded-none border border-[#C9D3DB] shadow-2xs">
             <span className="text-[#5D6A75] text-[11px]">Total Deposit Portfolio</span>
             <div className="text-base font-bold text-[#0D2538] font-mono mt-0.5">
               {formatINR(Number(summary.total_deposit_value))}
@@ -169,7 +169,7 @@ export const InstrumentsPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-white p-3.5 rounded-[10px] border border-[#C9D3DB] shadow-2xs">
+          <div className="bg-white p-3.5 rounded-none border border-[#C9D3DB] shadow-2xs">
             <span className="text-[#5D6A75] text-[11px]">Active Compliance</span>
             <div className="text-base font-bold text-emerald-700 font-mono mt-0.5">
               {summary.active_count}
@@ -180,7 +180,7 @@ export const InstrumentsPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-white p-3.5 rounded-[10px] border border-[#C9D3DB] shadow-2xs">
+          <div className="bg-white p-3.5 rounded-none border border-[#C9D3DB] shadow-2xs">
             <span className="text-[#5D6A75] text-[11px]">Expiring Within 90 Days</span>
             <div className="text-base font-bold text-amber-600 font-mono mt-0.5">
               {summary.expiring_soon_count}
@@ -191,7 +191,7 @@ export const InstrumentsPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-white p-3.5 rounded-[10px] border border-[#C9D3DB] shadow-2xs">
+          <div className="bg-white p-3.5 rounded-none border border-[#C9D3DB] shadow-2xs">
             <span className="text-[#5D6A75] text-[11px]">Under Initial Scrutiny</span>
             <div className="text-base font-bold text-blue-700 font-mono mt-0.5">
               {summary.under_scrutiny_count}
@@ -205,7 +205,7 @@ export const InstrumentsPage: React.FC = () => {
       )}
 
       {/* Filter Toolbar */}
-      <div className="bg-white p-4 rounded-[10px] border border-[#C9D3DB] shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+      <div className="bg-white p-4 rounded-none border border-[#C9D3DB] shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
         <div className="flex-1 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
           {/* Search */}
           <div className="relative flex-1 max-w-md">
@@ -218,7 +218,7 @@ export const InstrumentsPage: React.FC = () => {
                 setPage(1);
               }}
               placeholder="Search by FDR reference, bank, or institute name/code..."
-              className="w-full pl-9 pr-3 py-2 border border-[#8799A9] rounded-lg text-[#253746] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sentinel-500 bg-white"
+              className="w-full pl-9 pr-3 py-2 border border-[#8799A9] rounded-none text-[#253746] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sentinel-500 bg-white"
             />
           </div>
 
@@ -233,7 +233,7 @@ export const InstrumentsPage: React.FC = () => {
                 setPage(1);
                 updateUrlParam({ status: val });
               }}
-              className="border border-[#8799A9] rounded-lg px-2.5 py-2 bg-white text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500 font-mono text-xs"
+              className="border border-[#8799A9] rounded-none px-2.5 py-2 bg-white text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500 font-mono text-xs"
             >
               <option value="ALL">All Statuses &amp; Lifecycles</option>
               <optgroup label="Maturity Windows">
@@ -264,7 +264,7 @@ export const InstrumentsPage: React.FC = () => {
               setPage(1);
               updateUrlParam({ trust_level: val });
             }}
-            className="border border-[#8799A9] rounded-lg px-2.5 py-2 bg-white text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500 font-mono text-xs"
+            className="border border-[#8799A9] rounded-none px-2.5 py-2 bg-white text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500 font-mono text-xs"
           >
             <option value="ALL">All Trust Levels</option>
             <option value="L0_DECLARED">L0 — DECLARED</option>
@@ -282,7 +282,7 @@ export const InstrumentsPage: React.FC = () => {
               setPage(1);
               updateUrlParam({ city: val });
             }}
-            className="border border-[#8799A9] rounded-lg px-2.5 py-2 bg-white text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500 font-medium text-xs"
+            className="border border-[#8799A9] rounded-none px-2.5 py-2 bg-white text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500 font-medium text-xs"
           >
             <option value="ALL">All Demonstration Cities</option>
             <option value="Pune">Pune Jurisdiction (40 FDRs)</option>
@@ -299,7 +299,7 @@ export const InstrumentsPage: React.FC = () => {
                 setPage(1);
                 updateUrlParam({ institution_id: val });
               }}
-              className="border border-[#8799A9] rounded-lg px-2.5 py-2 bg-white text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500 max-w-[200px] truncate"
+              className="border border-[#8799A9] rounded-none px-2.5 py-2 bg-white text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500 max-w-[200px] truncate"
             >
               <option value="">All Institutions</option>
               {institutions.map((i) => (
@@ -318,7 +318,7 @@ export const InstrumentsPage: React.FC = () => {
       </div>
 
       {error && (
-        <div className="p-4 rounded-[10px] bg-rose-50 border border-rose-200 text-rose-700 flex items-center gap-2">
+        <div className="p-4 rounded-none bg-rose-50 border border-rose-200 text-rose-700 flex items-center gap-2">
           <AlertTriangle className="w-4 h-4 shrink-0" />
           <span>{error}</span>
         </div>
@@ -329,7 +329,7 @@ export const InstrumentsPage: React.FC = () => {
 
       {/* Pagination Bar */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between bg-white px-4 py-3 rounded-[10px] border border-[#C9D3DB] text-xs">
+        <div className="flex items-center justify-between bg-white px-4 py-3 rounded-none border border-[#C9D3DB] text-xs">
           <div className="text-[#5D6A75]">
             Page <span className="font-semibold text-[#253746]">{page}</span> of{' '}
             <span className="font-semibold text-[#253746]">{totalPages}</span>
@@ -338,14 +338,14 @@ export const InstrumentsPage: React.FC = () => {
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1}
-              className="p-1.5 rounded-lg border border-[#8799A9] hover:bg-[#F5F4EF] disabled:opacity-40"
+              className="p-1.5 rounded-none border border-[#8799A9] hover:bg-[#F5F4EF] disabled:opacity-40"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
             <button
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}
-              className="p-1.5 rounded-lg border border-[#8799A9] hover:bg-[#F5F4EF] disabled:opacity-40"
+              className="p-1.5 rounded-none border border-[#8799A9] hover:bg-[#F5F4EF] disabled:opacity-40"
             >
               <ChevronRight className="w-4 h-4" />
             </button>

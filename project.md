@@ -25,7 +25,7 @@ This specification reflects the complete repository audit conducted across:
 - **The Canonical Nine-Stage FDR Lifecycle Workflow** (`backend/app/core/canonical_stages.py` and `frontend/src/features/lifecycle/stageMapping.ts`).
 - **156 Unique Route Paths** and **169 Registered HTTP Operations** mounted across 10 modular FastAPI sub-routers.
 - **31 SQLAlchemy Database Tables** managed via 16 sequential Alembic migrations with cryptographic audit hash-chaining.
-- **621 Automated Automated Tests** (**527 backend pytest** + **94 frontend vitest**) passing with zero errors.
+- **633 Automated Tests** (**539 backend pytest** + **94 frontend vitest**) passing with zero errors and clean production TypeScript build.
 - **20 Synthetic Demonstration Institutions** (10 Pune, 10 Mumbai) and **80 Demonstration FDR Instruments** (4 per institution) fully seeded and verified.
 
 ---
@@ -289,7 +289,7 @@ c:\Users\bhome\OneDrive\Desktop\VIT\SIH\SIH 2026\TOP 75\FDR_Sentinel
 ## 5. Frontend Architecture
 
 ### 5.1 Route Registry & Navigation Hierarchy
-The frontend client exposes **20 distinct route paths** organized into four functional clusters within [frontend/src/components/layout/Sidebar.tsx](file:///c:/Users/bhome/OneDrive/Desktop/VIT/SIH/SIH%202026/TOP%2075/FDR_Sentinel/frontend/src/components/layout/Sidebar.tsx):
+The frontend client exposes **20 distinct route paths** organized into four functional clusters within [frontend/src/components/layout/Sidebar.tsx](frontend/src/components/layout/Sidebar.tsx):
 
 ```
 +---------------------------------------------------------------------------------+
@@ -319,21 +319,21 @@ The frontend client exposes **20 distinct route paths** organized into four func
 ```
 
 ### 5.2 The 7 Role-Specific Workspaces
-When any user navigates to `/dashboard`, [DashboardPage.tsx](file:///c:/Users/bhome/OneDrive/Desktop/VIT/SIH/SIH%202026/TOP%2075/FDR_Sentinel/frontend/src/app/routes/DashboardPage.tsx) dynamically evaluates `currentUser.role` and renders an optimized persona cockpit:
-1. **Institution User Workspace** ([InstitutionWorkspace.tsx](file:///c:/Users/bhome/OneDrive/Desktop/VIT/SIH/SIH%202026/TOP%2075/FDR_Sentinel/frontend/src/features/dashboard/workspaces/InstitutionWorkspace.tsx)): FDR submission tracker, document upload desk, open discrepancy alerts, and renewal reminders.
-2. **Scrutiny Officer Workspace** ([ScrutinyOfficerWorkspace.tsx](file:///c:/Users/bhome/OneDrive/Desktop/VIT/SIH/SIH%202026/TOP%2075/FDR_Sentinel/frontend/src/features/dashboard/workspaces/ScrutinyOfficerWorkspace.tsx)): Unverified documents queue, open rule discrepancy findings, Maker attestation desk, and release readiness reviews.
-3. **Branch Head Workspace** ([BranchHeadWorkspace.tsx](file:///c:/Users/bhome/OneDrive/Desktop/VIT/SIH/SIH%202026/TOP%2075/FDR_Sentinel/frontend/src/features/dashboard/workspaces/BranchHeadWorkspace.tsx)): Regional institution health, regional maturity escalations, and scrutiny throughput velocity.
-4. **Competent Authority Workspace** ([CompetentAuthorityWorkspace.tsx](file:///c:/Users/bhome/OneDrive/Desktop/VIT/SIH/SIH%202026/TOP%2075/FDR_Sentinel/frontend/src/features/dashboard/workspaces/CompetentAuthorityWorkspace.tsx)): Executive release approval queue with full 10-point readiness checklists and statutory sign-off modal.
-5. **Finance Officer Workspace** ([FinanceOfficerWorkspace.tsx](file:///c:/Users/bhome/OneDrive/Desktop/VIT/SIH/SIH%202026/TOP%2075/FDR_Sentinel/frontend/src/features/dashboard/workspaces/FinanceOfficerWorkspace.tsx)): Statutory release order execution desk, bank settlement confirmation, and accounting reconciliation.
-6. **Auditor Workspace** ([AuditorWorkspace.tsx](file:///c:/Users/bhome/OneDrive/Desktop/VIT/SIH/SIH%202026/TOP%2075/FDR_Sentinel/frontend/src/features/dashboard/workspaces/AuditorWorkspace.tsx)): Read-only regulatory oversight, cryptographic hash-chain verification, compliance reports, and sampling tools.
-7. **System Administrator Workspace** ([SystemAdminWorkspace.tsx](file:///c:/Users/bhome/OneDrive/Desktop/VIT/SIH/SIH%202026/TOP%2075/FDR_Sentinel/frontend/src/features/dashboard/workspaces/SystemAdminWorkspace.tsx)): User provisioning, tenant scoping diagnostics, audit ledger integrity verification, and system health telemetry.
+When any user navigates to `/dashboard`, [DashboardPage.tsx](frontend/src/app/routes/DashboardPage.tsx) dynamically evaluates `currentUser.role` and renders an optimized persona cockpit:
+1. **Institution User Workspace** ([InstitutionWorkspace.tsx](frontend/src/features/dashboard/workspaces/InstitutionWorkspace.tsx)): FDR submission tracker, document upload desk, open discrepancy alerts, and renewal reminders.
+2. **Scrutiny Officer Workspace** ([ScrutinyOfficerWorkspace.tsx](frontend/src/features/dashboard/workspaces/ScrutinyOfficerWorkspace.tsx)): Unverified documents queue, open rule discrepancy findings, Maker attestation desk, and release readiness reviews.
+3. **Branch Head Workspace** ([BranchHeadWorkspace.tsx](frontend/src/features/dashboard/workspaces/BranchHeadWorkspace.tsx)): Regional institution health, regional maturity escalations, and scrutiny throughput velocity.
+4. **Competent Authority Workspace** ([CompetentAuthorityWorkspace.tsx](frontend/src/features/dashboard/workspaces/CompetentAuthorityWorkspace.tsx)): Executive release approval queue with full 10-point readiness checklists and statutory sign-off modal.
+5. **Finance Officer Workspace** ([FinanceOfficerWorkspace.tsx](frontend/src/features/dashboard/workspaces/FinanceOfficerWorkspace.tsx)): Statutory release order execution desk, bank settlement confirmation, and accounting reconciliation.
+6. **Auditor Workspace** ([AuditorWorkspace.tsx](frontend/src/features/dashboard/workspaces/AuditorWorkspace.tsx)): Read-only regulatory oversight, cryptographic hash-chain verification, compliance reports, and sampling tools.
+7. **System Administrator Workspace** ([SystemAdminWorkspace.tsx](frontend/src/features/dashboard/workspaces/SystemAdminWorkspace.tsx)): User provisioning, tenant scoping diagnostics, audit ledger integrity verification, and system health telemetry.
 
 ---
 
 ## 6. Backend Architecture
 
 ### 6.1 Modular Router Architecture
-FastAPI initializes in [backend/app/main.py](file:///c:/Users/bhome/OneDrive/Desktop/VIT/SIH/SIH%202026/TOP%2075/FDR_Sentinel/backend/app/main.py) and mounts all domain services under the versioned `/api/v1` prefix via 10 sub-routers:
+FastAPI initializes in [backend/app/main.py](backend/app/main.py) and mounts all domain services under the versioned `/api/v1` prefix via 10 sub-routers:
 
 ```
 FastAPI Application (main.py)
@@ -505,7 +505,7 @@ erDiagram
 
 ## 9. Canonical Nine-Stage FDR Workflow
 
-The system strictly enforces the canonical nine-stage workflow defined in [backend/app/core/canonical_stages.py](file:///c:/Users/bhome/OneDrive/Desktop/VIT/SIH/SIH%202026/TOP%2075/FDR_Sentinel/backend/app/core/canonical_stages.py) and mirrored in [frontend/src/features/lifecycle/stageMapping.ts](file:///c:/Users/bhome/OneDrive/Desktop/VIT/SIH/SIH%202026/TOP%2075/FDR_Sentinel/frontend/src/features/lifecycle/stageMapping.ts):
+The system strictly enforces the canonical nine-stage workflow defined in [backend/app/core/canonical_stages.py](backend/app/core/canonical_stages.py) and mirrored in [frontend/src/features/lifecycle/stageMapping.ts](frontend/src/features/lifecycle/stageMapping.ts):
 
 ```
 +-------------------------------------------------------------------------------------------------+
@@ -569,7 +569,7 @@ Crucially, Stage 9 strictly separates four distinct statutory sub-events to prev
 
 ## 11. Lifecycle Workspace
 
-The **Lifecycle & Monitoring Workspace** ([frontend/src/app/routes/MonitoringPage.tsx](file:///c:/Users/bhome/OneDrive/Desktop/VIT/SIH/SIH%202026/TOP%2075/FDR_Sentinel/frontend/src/app/routes/MonitoringPage.tsx)) provides real-time surveillance over maturing security deposits.
+The **Lifecycle & Monitoring Workspace** ([frontend/src/app/routes/MonitoringPage.tsx](frontend/src/app/routes/MonitoringPage.tsx)) provides real-time surveillance over maturing security deposits.
 
 ### 11.1 Proactive Escalation Windows
 Deposits are categorized into statutory surveillance horizons based on the authoritative business clock:
@@ -591,7 +591,7 @@ This preserves complete financial auditability and continuous lien coverage over
 ### 12.1 Terminological Findings & Disambiguation
 During the Phase 1 repository audit, a search for the exact abbreviation **"MDR"** revealed that the acronym does not exist as an explicit string in the codebase or route tables. In regulatory deposit management, this term represents two complementary operational views:
 
-1. **Master Deposit Register (MDR)**: The central, authoritative register of all active fixed deposits pledged to AICTE. Implemented at `/instruments` via [InstrumentsPage.tsx](file:///c:/Users/bhome/OneDrive/Desktop/VIT/SIH/SIH%202026/TOP%2075/FDR_Sentinel/frontend/src/app/routes/InstrumentsPage.tsx).
+1. **Master Deposit Register (MDR)**: The central, authoritative register of all active fixed deposits pledged to AICTE. Implemented at `/instruments` via [InstrumentsPage.tsx](frontend/src/app/routes/InstrumentsPage.tsx).
 2. **Monitoring, Discharge & Renewal (MDR)**: The integrated lifecycle surveillance workspace covering maturity surveillance (`/monitoring`), renewal trees (`/monitoring?tab=renewals`), and statutory release gate checks (`/release`).
 
 ### 12.2 Integration with Canonical Workflow
@@ -605,16 +605,16 @@ Both interpretations are fully realized in the platform:
 ## 13. Document Evidence & Validation Engine
 
 ### 13.1 Secure Document Vault & Deduplication
-- **Intake**: Multi-part PDF upload streamed through [backend/app/routers/documents.py](file:///c:/Users/bhome/OneDrive/Desktop/VIT/SIH/SIH%202026/TOP%2075/FDR_Sentinel/backend/app/routers/documents.py).
+- **Intake**: Multi-part PDF upload streamed through [backend/app/routers/documents.py](backend/app/routers/documents.py).
 - **SHA-256 Hashing**: Content hashed before disk storage. Duplicate file uploads are detected immediately.
 - **Multi-Version Indexing**: Subsequent uploads create versioned records (`DocumentVersion v1, v2...`), ensuring older evidence is never overwritten.
 
 ### 13.2 Deterministic Parsing vs. Raster OCR Disclosure
 - **Deterministic Text Extraction**: Active and verified using `pdfplumber` / `pypdf`. For text-based digital PDF documents, metadata (FDR number, issuing bank, IFSC, amount, maturity date) is extracted with 100% precision.
-- **Raster OCR (Scanned Images)**: Pluggable interface present in [backend/app/services/document_processing/ocr.py](file:///c:/Users/bhome/OneDrive/Desktop/VIT/SIH/SIH%202026/TOP%2075/FDR_Sentinel/backend/app/services/document_processing/ocr.py). For demonstration purposes, scanned image files fall back to simulated confidence scores or deterministic text parsing. Production deployment requires configuring Tesseract 5 / AWS Textract.
+- **Raster OCR (Scanned Images)**: Pluggable interface present in [backend/app/services/document_processing/ocr.py](backend/app/services/document_processing/ocr.py). For demonstration purposes, scanned image files fall back to simulated confidence scores or deterministic text parsing. Production deployment requires configuring Tesseract 5 / AWS Textract.
 
 ### 13.3 25+ Deterministic Validation Rules
-The validation service ([backend/app/services/validation.py](file:///c:/Users/bhome/OneDrive/Desktop/VIT/SIH/SIH%202026/TOP%2075/FDR_Sentinel/backend/app/services/validation.py)) evaluates 25+ deterministic rules across four regulatory categories:
+The validation service ([backend/app/services/validation.py](backend/app/services/validation.py)) evaluates 25+ deterministic rules across four regulatory categories:
 1. **Lien & Beneficiary Rules**: Confirms joint pledging in favor of AICTE Chairman.
 2. **Amount & Solvency Rules**: Validates deposit amount matches mandatory APH requirements for approved intake.
 3. **Tenure & Maturity Rules**: Checks minimum tenure (minimum 5 years / 60 months) and flags past-due deposits.
@@ -625,7 +625,7 @@ The validation service ([backend/app/services/validation.py](file:///c:/Users/bh
 ## 14. Release & Refund Workflow
 
 ### 14.1 The 10-Point Server-Side Release Gate
-Before any release application can be submitted to the Competent Authority, [backend/app/services/release.py](file:///c:/Users/bhome/OneDrive/Desktop/VIT/SIH/SIH%202026/TOP%2075/FDR_Sentinel/backend/app/services/release.py) evaluates a strict 10-point automated checklist:
+Before any release application can be submitted to the Competent Authority, [backend/app/services/release.py](backend/app/services/release.py) evaluates a strict 10-point automated checklist:
 1. Deposit instrument status must be `VERIFIED` (minimum Trust Level L2).
 2. All discrepancy findings in Module 3 must be marked `RESOLVED`.
 3. Deposit maturity date must have been reached (or explicit premature waiver granted).
@@ -675,7 +675,7 @@ sequenceDiagram
 ```
 
 ### 15.2 Simulated Banking Adapters Disclosure
-In the demonstration prototype, the electronic banking integration is implemented via high-fidelity simulated adapters ([backend/app/services/external/bank_adapter.py](file:///c:/Users/bhome/OneDrive/Desktop/VIT/SIH/SIH%202026/TOP%2075/FDR_Sentinel/backend/app/services/external/bank_adapter.py)). The system simulates SFTP batch queries and Host-to-Host API confirmations. True L3 production verification requires dedicated leased lines to scheduled commercial banks.
+In the demonstration prototype, the electronic banking integration is implemented via high-fidelity simulated adapters ([backend/app/services/external/bank_adapter.py](backend/app/services/external/bank_adapter.py)). The system simulates SFTP batch queries and Host-to-Host API confirmations. True L3 production verification requires dedicated leased lines to scheduled commercial banks.
 
 ---
 
@@ -697,13 +697,13 @@ In the local development and demonstration environment, notification delivery at
 ## 17. Dashboards, Search, Reports & Audit Ledger
 
 ### 17.1 Executive Command Center
-The **Command Center Cockpit** ([frontend/src/app/routes/CommandCenterPage.tsx](file:///c:/Users/bhome/OneDrive/Desktop/VIT/SIH/SIH%202026/TOP%2075/FDR_Sentinel/frontend/src/app/routes/CommandCenterPage.tsx)) provides:
+The **Command Center Cockpit** ([frontend/src/app/routes/CommandCenterPage.tsx](frontend/src/app/routes/CommandCenterPage.tsx)) provides:
 - **Real-time KPI Tiles**: Total Registered FDRs, Aggregate Statutory Portfolio Value (INR), Pending Scrutiny Queue, Maturing in 30 Days.
 - **Priority Triage Queue**: Urgently maturing or blocked FDRs ranked by risk score.
 - **Regional Load Distribution**: Comparison of processing throughput across regional bureaus (Western, Northern, Southern, Eastern).
 
 ### 17.2 Tamper-Evident SHA-256 Audit Ledger & Replay
-The audit engine ([backend/app/core/audit.py](file:///c:/Users/bhome/OneDrive/Desktop/VIT/SIH/SIH%202026/TOP%2075/FDR_Sentinel/backend/app/core/audit.py)) implements forward-linked cryptographic chaining:
+The audit engine ([backend/app/core/audit.py](backend/app/core/audit.py)) implements forward-linked cryptographic chaining:
 $$H_n = \text{SHA256}(H_{n-1} + \text{Payload}_n)$$
 Any unauthorized modification to an earlier audit record invalidates the entire hash chain downstream. Evaluators can navigate to `/audit` and click **"Verify Hash Chain"** to execute a real-time cryptographic integrity check across the entire database.
 
@@ -712,22 +712,43 @@ Any unauthorized modification to an earlier audit record invalidates the entire 
 ## 18. Synthetic Demonstration Environment
 
 ### 18.1 Complete Portfolio Distribution
-The synthetic demonstration environment is generated via [backend/scripts/demo_seed.py](file:///c:/Users/bhome/OneDrive/Desktop/VIT/SIH/SIH%202026/TOP%2075/FDR_Sentinel/backend/scripts/demo_seed.py) and features:
-- **Exactly 20 Active Educational Institutions**:
-  - **10 in Pune**: College of Engineering Pune, MIT WPU, Vishwakarma Institute of Technology, Cummins College of Engineering, Sinhgad College of Engineering, Symbiosis Institute of Technology, Bharati Vidyapeeth Deemed University, AISSMS College of Engineering, Pimpri Chinchwad College of Engineering, DY Patil Institute of Technology.
-  - **10 in Mumbai**: Veermata Jijabai Technological Institute (VJTI), Sardar Patel Institute of Technology (SPIT), K.J. Somaiya College of Engineering, Thadomal Shahani Engineering College, Fr. Conceicao Rodrigues College of Engineering, Don Bosco Institute of Technology, Vivekanand Education Society's Institute of Technology, Vidyalankar Institute of Technology, Rajiv Gandhi Institute of Technology, Mukesh Patel School of Technology Management.
+The synthetic demonstration environment is generated via [backend/scripts/demo_seed.py](backend/scripts/demo_seed.py) and features:
+- **Exactly 20 Active Synthetic Educational Institutions**:
+  - **10 in Pune (Group A)**:
+    1. `DEMO-PUN-001`: DEMO — Deccan Valley Institute of Technology (SYNTHETIC)
+    2. `DEMO-PUN-002`: DEMO — Sahyadri Applied Sciences College (SYNTHETIC)
+    3. `DEMO-PUN-003`: DEMO — Mula-Mutha Engineering Institute (SYNTHETIC)
+    4. `DEMO-PUN-004`: DEMO — Hinjawadi School of Technical Studies (SYNTHETIC)
+    5. `DEMO-PUN-005`: DEMO — Kothrud Institute of Applied Engineering (SYNTHETIC)
+    6. `DEMO-PUN-006`: DEMO — Pashan College of Technology (SYNTHETIC)
+    7. `DEMO-PUN-007`: DEMO — Baner Institute of Digital Engineering (SYNTHETIC)
+    8. `DEMO-PUN-008`: DEMO — Hadapsar Technical Sciences College (SYNTHETIC)
+    9. `DEMO-PUN-009`: DEMO — Pimpri Centre for Engineering Studies (SYNTHETIC)
+    10. `DEMO-PUN-010`: DEMO — Warje Institute of Industrial Technology (SYNTHETIC)
+  - **10 in Mumbai (Group B)**:
+    1. `DEMO-MUM-001`: DEMO — Harbourview Institute of Technology (SYNTHETIC)
+    2. `DEMO-MUM-002`: DEMO — Western Bay College of Engineering (SYNTHETIC)
+    3. `DEMO-MUM-003`: DEMO — Sahar Institute of Applied Sciences (SYNTHETIC)
+    4. `DEMO-MUM-004`: DEMO — Powai Technical Studies College (SYNTHETIC)
+    5. `DEMO-MUM-005`: DEMO — Dadar Institute of Engineering (SYNTHETIC)
+    6. `DEMO-MUM-006`: DEMO — Chembur Applied Technology College (SYNTHETIC)
+    7. `DEMO-MUM-007`: DEMO — Borivali Centre for Technical Education (SYNTHETIC)
+    8. `DEMO-MUM-008`: DEMO — Andheri Institute of Engineering Studies (SYNTHETIC)
+    9. `DEMO-MUM-009`: DEMO — Goregaon Technical Sciences College (SYNTHETIC)
+    10. `DEMO-MUM-010`: DEMO — Vikhroli College of Industrial Technology (SYNTHETIC)
 - **Exactly 80 FDR Instruments**: Exactly 4 FDR instruments per institution spanning all lifecycle stages and trust tiers.
 - **20 Scenario Presets**: Includes healthy deposits, joint lien omissions, amount mismatches, past-due maturities, active renewals, and release cases awaiting Competent Authority approval.
 
-### 18.2 Evaluator Demonstration Credentials
-All demo accounts use standard password: `Password@123`
-- `institution.pune@sakshyatrail.gov.in` (`INSTITUTION_USER`)
-- `scrutiny.officer@sakshyatrail.gov.in` (`SCRUTINY_OFFICER`)
-- `branch.head@sakshyatrail.gov.in` (`BRANCH_HEAD`)
-- `competent.authority@sakshyatrail.gov.in` (`COMPETENT_AUTHORITY`)
-- `finance.officer@sakshyatrail.gov.in` (`FINANCE_OFFICER`)
-- `auditor@sakshyatrail.gov.in` (`AUDITOR`)
-- `admin@sakshyatrail.gov.in` (`SYSTEM_ADMIN`)
+### 18.2 Evaluator Demonstration Accounts (1-Click Autofill)
+The Sign In portal (`/login`) incorporates an evaluator convenience strip providing 1-click credential autofill across all regulatory roles for prototype evaluation:
+- **System Administrator**: `admin@aicte-india.org` (`ROLE_SYSTEM_ADMIN`)
+- **Senior Scrutiny Officer**: `scrutiny.verma@aicte-india.org` (`ROLE_SCRUTINY_OFFICER`)
+- **Regional Branch Head**: `branch.head.north@aicte-india.org` (`ROLE_BRANCH_HEAD`)
+- **Competent Authority**: `authority.member@aicte-india.org` (`ROLE_COMPETENT_AUTHORITY`)
+- **Finance Officer**: `finance.officer@aicte-india.org` (`ROLE_FINANCE_OFFICER`)
+- **Compliance Auditor**: `auditor.compliance@aicte-india.org` (`ROLE_AUDITOR`)
+- **Institution Nodal (Pune)**: `nodal.pun001@example.com` (`ROLE_INSTITUTION_USER`, Deccan Valley Institute)
+- **Institution Nodal (Mumbai)**: `nodal.mum001@example.com` (`ROLE_INSTITUTION_USER`, Harbourview Institute)
 
 ---
 
@@ -779,30 +800,35 @@ Frontend client will be accessible at: `http://localhost:5173`.
 
 ## 20. Testing & Verification Evidence
 
-### 20.1 Test Execution Results (Passing: 621 Automated Tests)
+### 20.1 Test Execution Results (Passing: 633 Automated Tests)
 
 #### Backend Automated Tests (`pytest`)
-- **Total Tests**: **527 passed** (0 failed, 0 errors, 4 warnings)
-- **Execution Time**: **21.29 seconds**
-- **Test Command**: `pytest -q`
+- **Total Tests**: **539 passed** (0 failed, 0 errors, 5 warnings)
+- **Execution Time**: **90.03 seconds**
+- **Test Command**: `pytest --tb=no`
 - **Coverage Areas**:
   - Unit tests for all 25+ validation rules.
   - Multi-tenant isolation and security invariants.
   - Server-side 10-point release gate enforcement.
   - Cryptographic SHA-256 hash-chain integrity.
   - Role-based authorization on all 156 route endpoints.
-  - Idempotent synthetic demonstration data seeder.
+  - 20-institution demonstration environment verification.
+  - System Admin permission boundaries and reconciliation.
 
 #### Frontend Automated Tests (`vitest`)
 - **Total Tests**: **94 passed** (0 failed)
-- **Execution Time**: **4.37 seconds**
+- **Execution Time**: **29.60 seconds**
 - **Test Command**: `npm run test`
 - **Coverage Areas**:
   - Role guard redirection and route protection.
   - Canonical 9-stage tracker rendering and step navigation.
-  - Dashboard workspace role switching.
+  - Dashboard workspace role switching across all 7 personas.
   - 10-point release gate checklist evaluation.
   - Form validations and error state displays.
+
+#### Frontend Type-Checking & Production Bundling
+- **Type Checking (`tsc -b`)**: **0 errors (Clean compilation)**.
+- **Production Bundle (`vite build`)**: **Built cleanly in 978ms** (dist bundle generated).
 
 ---
 

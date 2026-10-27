@@ -9,7 +9,6 @@ import {
   RefreshCw,
   DoorOpen,
   Scale,
-  Archive,
   CheckCircle2,
   ChevronRight,
   ExternalLink,
@@ -210,9 +209,9 @@ export function evaluateInstrumentLifecycleStage(
   const hasDocuments = (snapshot?.documents?.length ?? 0) > 0;
   const observations = snapshot?.observations ?? [];
   const openObservations = observations.filter((o) => o.status === 'RECORDED');
-  const openFindings = (snapshot?.findings ?? []).filter((f) => f.status === 'OPEN');
+  const openFindings = ((snapshot as any)?.findings ?? []).filter((f: any) => f.status === 'OPEN');
   const releaseInfo = (snapshot as any)?.release;
-  const hasBlockers = Boolean(releaseInfo?.has_blockers || instrument.lien_status === 'DISPUTED');
+  const hasBlockers = Boolean(releaseInfo?.has_blockers || (instrument as any).lien_status === 'DISPUTED');
 
   let currentStageNumber = 1;
   let stageStatus: 'NORMAL' | 'BLOCKED' | 'WARNING' | 'COMPLETED' = 'NORMAL';
@@ -393,21 +392,21 @@ export function evaluateInstrumentLifecycleStage(
       stageId: 'STAGE_5_BANK_VERIFICATION_TRUST',
       label: 'Bank Verification & Trust',
       state:
-        trust === 'L3_BANK_VERIFIED'
+        (String(trust) === 'L3_BANK_VERIFIED' || String(trust) === 'L3_BANK_CONFIRMED')
           ? 'COMPLETED'
-          : trust === 'L2_OFFICER_CONFIRMED'
+          : (String(trust) === 'L2_OFFICER_CONFIRMED' || String(trust) === 'L2_OFFICER_VERIFIED')
           ? 'COMPLETED'
-          : trust === 'L1_OCR_VERIFIED' || trust === 'L1_DOCUMENT_CONSISTENT'
+          : (String(trust) === 'L1_OCR_VERIFIED' || String(trust) === 'L1_DOCUMENT_CONSISTENT')
           ? 'IN_PROGRESS'
           : status === 'REGISTERED' || status === 'ACTIVE'
           ? 'AWAITING_EXTERNAL'
           : 'NOT_STARTED',
       reason:
-        trust === 'L3_BANK_VERIFIED'
+        (String(trust) === 'L3_BANK_VERIFIED' || String(trust) === 'L3_BANK_CONFIRMED')
           ? 'L3 genuine bank confirmation verified.'
-          : trust === 'L2_OFFICER_CONFIRMED'
+          : (String(trust) === 'L2_OFFICER_CONFIRMED' || String(trust) === 'L2_OFFICER_VERIFIED')
           ? 'L2 officer attestation confirmed.'
-          : trust === 'L1_DOCUMENT_CONSISTENT'
+          : String(trust) === 'L1_DOCUMENT_CONSISTENT'
           ? 'L1 document-extracted evidence only; external bank verification pending.'
           : 'Declared trust; awaiting verification dispatch or officer attestation.',
     },
@@ -498,7 +497,7 @@ const PortfolioView: React.FC<PortfolioViewProps> = (props) => {
         <div>
           <h2 id="lifecycle-matrix-heading" className="text-sm font-bold text-[#0D2538] uppercase tracking-wider flex items-center gap-2">
             <span>Nine-Stage FDR Lifecycle Triage Matrix</span>
-            <span className="text-[10px] font-mono font-semibold text-[#0F766E] bg-teal-50 border border-teal-200 px-2 py-0.5 rounded">
+            <span className="text-[10px] font-mono font-semibold text-[#0F766E] bg-teal-50 border border-teal-200 px-2 py-0.5 rounded-none">
               Authoritative PRD Pipeline
             </span>
           </h2>
@@ -506,7 +505,7 @@ const PortfolioView: React.FC<PortfolioViewProps> = (props) => {
             Real-time operational distribution across the statutory nine-stage deposit governance lifecycle. Click any stage to open its work queue.
           </p>
         </div>
-        <div className="text-[11px] text-[#5D6A75] bg-[#F5F4EF] px-2.5 py-1 rounded border border-[#C9D3DB]">
+        <div className="text-[11px] text-[#5D6A75] bg-[#F5F4EF] px-2.5 py-1 rounded-none border border-[#C9D3DB]">
           <span className="font-semibold text-[#253746]">Non-Linear:</span> Supports renewal loops (1–7), returned scrutiny, and direct releases (8–9).
         </div>
       </div>
@@ -530,7 +529,7 @@ const PortfolioView: React.FC<PortfolioViewProps> = (props) => {
               role="button"
               aria-label={`Open stage ${stage.stageNumber}: ${stage.label}. ${count} active records.`}
               className={cn(
-                'group flex flex-col justify-between p-3 rounded-[8px] bg-white border border-[#C9D3DB] hover:border-[#0F766E] hover:shadow-xs transition-all cursor-pointer relative overflow-hidden select-none',
+                'group flex flex-col justify-between p-3 rounded-none bg-white border border-[#C9D3DB] hover:border-[#0F766E] hover:shadow-xs transition-all cursor-pointer relative overflow-hidden select-none',
                 stage.stageNumber === 7 && count > 0 && 'border-amber-300 bg-amber-50/20'
               )}
             >
@@ -540,7 +539,7 @@ const PortfolioView: React.FC<PortfolioViewProps> = (props) => {
                   <span className="font-mono text-[10px] font-bold text-[#8799A9] group-hover:text-[#0F766E] transition-colors">
                     {String(stage.stageNumber).padStart(2, '0')}
                   </span>
-                  <div className="p-1 rounded bg-[#F5F4EF] group-hover:bg-teal-50 text-[#5D6A75] group-hover:text-[#0F766E] transition-colors">
+                  <div className="p-1 rounded-none bg-[#F5F4EF] group-hover:bg-teal-50 text-[#5D6A75] group-hover:text-[#0F766E] transition-colors">
                     <Icon className="w-3.5 h-3.5" />
                   </div>
                 </div>
@@ -557,7 +556,7 @@ const PortfolioView: React.FC<PortfolioViewProps> = (props) => {
               <div className="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between">
                 <div className="text-lg font-bold font-mono text-[#0D2538] leading-none">
                   {isLoading ? (
-                    <div className="h-5 w-8 bg-slate-200 animate-pulse rounded" />
+                    <div className="h-5 w-8 bg-slate-200 animate-pulse rounded-none" />
                   ) : (
                     count
                   )}
@@ -583,7 +582,7 @@ const InstrumentView: React.FC<InstrumentViewProps> = (props) => {
   const evalResult = evaluateInstrumentLifecycleStage(instrument, snapshot, currentRole);
 
   return (
-    <div className="bg-white rounded-[10px] border border-[#C9D3DB] p-5 shadow-2xs font-sans space-y-4">
+    <div className="bg-white rounded-none border border-[#C9D3DB] p-5 shadow-2xs font-sans space-y-4">
       {/* Tracker Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
         <div>
@@ -593,7 +592,7 @@ const InstrumentView: React.FC<InstrumentViewProps> = (props) => {
             </span>
             <span
               className={cn(
-                'text-[10px] font-mono font-semibold px-2 py-0.5 rounded',
+                'text-[10px] font-mono font-semibold px-2 py-0.5 rounded-none',
                 evalResult.stageStatus === 'WARNING'
                   ? 'bg-amber-100 text-amber-900 border border-amber-200'
                   : evalResult.stageStatus === 'BLOCKED'
@@ -607,14 +606,14 @@ const InstrumentView: React.FC<InstrumentViewProps> = (props) => {
             </span>
 
             {/* Separated Administrative, Trust, and Maturity Status Badges */}
-            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-100 text-slate-800 border border-slate-200">
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded-none bg-slate-100 text-slate-800 border border-slate-200">
               Admin: <strong>{instrument.status}</strong>
             </span>
-            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-blue-50 text-blue-800 border border-blue-200">
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded-none bg-blue-50 text-blue-800 border border-blue-200">
               Trust: <strong>{instrument.trust_level}</strong>
             </span>
             {instrument.maturity_indicator && (
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-50 text-amber-900 border border-amber-200">
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded-none bg-amber-50 text-amber-900 border border-amber-200">
                 Maturity: <strong>{instrument.maturity_indicator}</strong>
               </span>
             )}
@@ -626,7 +625,7 @@ const InstrumentView: React.FC<InstrumentViewProps> = (props) => {
 
         <div className="flex items-center gap-2 shrink-0">
           <span className="text-[11px] text-[#5D6A75]">Next Action:</span>
-          <span className="text-[11px] font-semibold text-[#0F766E] bg-teal-50 px-2.5 py-1 rounded border border-teal-200">
+          <span className="text-[11px] font-semibold text-[#0F766E] bg-teal-50 px-2.5 py-1 rounded-none border border-teal-200">
             {evalResult.nextAction}
           </span>
         </div>
@@ -644,7 +643,7 @@ const InstrumentView: React.FC<InstrumentViewProps> = (props) => {
             <div
               key={st.id}
               className={cn(
-                'flex flex-col items-center p-2 rounded-[6px] text-center border transition-all text-xs relative',
+                'flex flex-col items-center p-2 rounded-none text-center border transition-all text-xs relative',
                 isCurrent && 'ring-2 ring-[#0F766E] shadow-xs',
                 state === 'COMPLETED' && 'bg-emerald-50 text-emerald-900 border-emerald-200',
                 state === 'ONGOING' && 'bg-blue-50 text-blue-900 border-blue-200',
@@ -679,7 +678,7 @@ const InstrumentView: React.FC<InstrumentViewProps> = (props) => {
 
       {/* Stage 9 Operational Sub-Events Breakdown when Release or Closure is Active */}
       {(evalResult.currentStageNumber >= 8 || instrument.status === 'RELEASED') && (
-        <div className="bg-slate-50 border border-slate-200 rounded-[8px] p-3 text-xs">
+        <div className="bg-slate-50 border border-slate-200 rounded-none p-3 text-xs">
           <div className="font-bold text-[#0D2538] mb-1.5 flex items-center justify-between">
             <span>Stage 9 Operational Sub-Events Progress</span>
             <span className="text-[10px] font-normal text-[#5D6A75]">
@@ -688,7 +687,7 @@ const InstrumentView: React.FC<InstrumentViewProps> = (props) => {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 text-[11px]">
             <div className={cn(
-              'p-2 rounded border',
+              'p-2 rounded-none border',
               instrument.status === 'RELEASED' || (snapshot as any)?.release?.status === 'APPROVED' || (snapshot as any)?.release?.status === 'APPROVED_PENDING_ORDER' || (snapshot as any)?.release?.status === 'ORDER_RECORDED'
                 ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
                 : 'bg-white border-slate-200 text-slate-600'
@@ -697,7 +696,7 @@ const InstrumentView: React.FC<InstrumentViewProps> = (props) => {
               <div className="text-[10px] text-slate-500">Competent Authority</div>
             </div>
             <div className={cn(
-              'p-2 rounded border',
+              'p-2 rounded-none border',
               instrument.status === 'RELEASED' || (snapshot as any)?.release?.status === 'ORDER_RECORDED'
                 ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
                 : (snapshot as any)?.release?.status === 'APPROVED_PENDING_ORDER'
@@ -708,7 +707,7 @@ const InstrumentView: React.FC<InstrumentViewProps> = (props) => {
               <div className="text-[10px] text-slate-500">Finance Officer Only</div>
             </div>
             <div className={cn(
-              'p-2 rounded border',
+              'p-2 rounded-none border',
               instrument.status === 'RELEASED'
                 ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
                 : 'bg-white border-slate-200 text-slate-600'
@@ -717,7 +716,7 @@ const InstrumentView: React.FC<InstrumentViewProps> = (props) => {
               <div className="text-[10px] text-slate-500">Disbursement Advice Evidence</div>
             </div>
             <div className={cn(
-              'p-2 rounded border',
+              'p-2 rounded-none border',
               instrument.status === 'RELEASED'
                 ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
                 : 'bg-white border-slate-200 text-slate-600'
@@ -730,7 +729,7 @@ const InstrumentView: React.FC<InstrumentViewProps> = (props) => {
       )}
 
       {/* Statutory Guardrail Notices */}
-      <div className="bg-[#FEF7E8] border border-[#F8DEAE] rounded-[6px] p-2.5 flex items-start gap-2 text-[11px] text-[#8A5A00]">
+      <div className="bg-[#FEF7E8] border border-[#F8DEAE] rounded-none p-2.5 flex items-start gap-2 text-[11px] text-[#8A5A00]">
         <ShieldAlert className="w-4 h-4 shrink-0 mt-0.5 text-[#8A5A00]" />
         <div className="leading-relaxed">
           <strong>Statutory Guardrails:</strong> (1) Scrutiny (Stage 4) and Bank Verification (Stage 5) are separate. (2) Document upload or simulated tests do <em>not</em> constitute genuine Level 3 bank confirmation. (3) Competent Authority approval sanctions release but does <em>not</em> record release orders (Stage 9b Finance Officer only) nor prove bank disbursement.

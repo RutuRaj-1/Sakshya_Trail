@@ -66,11 +66,11 @@ export const ScrutinyOfficerWorkspace: React.FC = () => {
   return (
     <div className="space-y-6 max-w-7xl mx-auto font-sans">
       {/* Top Banner — Scrutiny Desk */}
-      <div className="bg-[#0D2538] rounded-[10px] p-6 text-white shadow-xs border border-[#1e3c54]">
+      <div className="bg-[#0D2538] rounded-none p-6 text-white shadow-xs border border-[#1e3c54]">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-1.5">
-              <span className="bg-[#123B5D] text-[#8ACEC8] border border-[#0F766E]/40 text-[10px] font-semibold px-2 py-0.5 rounded font-mono uppercase">
+              <span className="bg-[#123B5D] text-[#8ACEC8] border border-[#0F766E]/40 text-[10px] font-semibold px-2 py-0.5 rounded-none font-mono uppercase">
                 Regulatory Examination
               </span>
               <span className="text-[#8799A9] text-xs font-mono">L1/L2 Scrutiny Officer</span>
@@ -107,7 +107,7 @@ export const ScrutinyOfficerWorkspace: React.FC = () => {
       </div>
 
       {error && (
-        <div className="bg-rose-50 border border-rose-200 rounded-lg p-4 flex items-center justify-between text-xs text-rose-800">
+        <div className="bg-rose-50 border border-rose-200 rounded-none p-4 flex items-center justify-between text-xs text-rose-800">
           <div className="flex items-center gap-2">
             <AlertCircle className="w-4 h-4 text-rose-600" />
             <span>{error}</span>
@@ -122,7 +122,7 @@ export const ScrutinyOfficerWorkspace: React.FC = () => {
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="p-4 border-[#C9D3DB]">
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-lg bg-[#FDF2F1] text-[#B42318] border border-[#FECDCA]">
+            <div className="p-3 rounded-none bg-[#FDF2F1] text-[#B42318] border border-[#FECDCA]">
               <AlertTriangle className="w-5 h-5" />
             </div>
             <div>
@@ -139,7 +139,7 @@ export const ScrutinyOfficerWorkspace: React.FC = () => {
 
         <Card className="p-4 border-[#C9D3DB]">
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-lg bg-[#FEF7E8] text-[#8A5A00] border border-[#F8DEAE]">
+            <div className="p-3 rounded-none bg-[#FEF7E8] text-[#8A5A00] border border-[#F8DEAE]">
               <Clock className="w-5 h-5" />
             </div>
             <div>
@@ -154,7 +154,7 @@ export const ScrutinyOfficerWorkspace: React.FC = () => {
 
         <Card className="p-4 border-[#C9D3DB]">
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-lg bg-[#EEF6FA] text-[#123B5D] border border-[#C4DEED]">
+            <div className="p-3 rounded-none bg-[#EEF6FA] text-[#123B5D] border border-[#C4DEED]">
               <FileCheck2 className="w-5 h-5" />
             </div>
             <div>
@@ -169,7 +169,7 @@ export const ScrutinyOfficerWorkspace: React.FC = () => {
 
         <Card className="p-4 border-[#C9D3DB]">
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-lg bg-[#E6F4F2] text-[#0F766E] border border-[#99D5CE]">
+            <div className="p-3 rounded-none bg-[#E6F4F2] text-[#0F766E] border border-[#99D5CE]">
               <ShieldCheck className="w-5 h-5" />
             </div>
             <div>
@@ -200,7 +200,7 @@ export const ScrutinyOfficerWorkspace: React.FC = () => {
             </Link>
           </div>
 
-          <div className="bg-white rounded-[10px] border border-[#C9D3DB] overflow-hidden shadow-2xs">
+          <div className="bg-white rounded-none border border-[#C9D3DB] overflow-hidden shadow-2xs">
             {findings.length === 0 ? (
               <div className="p-8 text-center text-xs text-[#5D6A75]">
                 <FileCheck2 className="w-8 h-8 text-emerald-500 mx-auto mb-2" />
@@ -223,7 +223,7 @@ export const ScrutinyOfficerWorkspace: React.FC = () => {
                       <tr key={finding.id} className="hover:bg-slate-50 transition-colors">
                         <td className="py-3 px-4">
                           <span
-                            className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded ${
+                            className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-none ${
                               finding.severity === 'CRITICAL'
                                 ? 'bg-rose-100 text-rose-800 border border-rose-200'
                                 : finding.severity === 'HIGH'
@@ -271,7 +271,7 @@ export const ScrutinyOfficerWorkspace: React.FC = () => {
             </Link>
           </div>
 
-          <div className="bg-white rounded-[10px] border border-[#C9D3DB] p-4 space-y-3 shadow-2xs">
+          <div className="bg-white rounded-none border border-[#C9D3DB] p-4 space-y-3 shadow-2xs">
             {releaseCases.length === 0 ? (
               <p className="text-xs text-[#5D6A75] text-center py-6">No release requests awaiting scrutiny review.</p>
             ) : (
@@ -279,7 +279,7 @@ export const ScrutinyOfficerWorkspace: React.FC = () => {
                 <Link
                   key={rc.id}
                   to={`/release/${rc.id}`}
-                  className="block p-3 rounded-lg border border-slate-200 hover:border-[#0F766E] transition-all bg-[#F5F4EF]/40"
+                  className="block p-3 rounded-none border border-slate-200 hover:border-[#0F766E] transition-all bg-[#F5F4EF]/40"
                 >
                   <div className="flex items-center justify-between">
                     <span className="font-mono font-bold text-xs text-[#0D2538]">{rc.case_number}</span>

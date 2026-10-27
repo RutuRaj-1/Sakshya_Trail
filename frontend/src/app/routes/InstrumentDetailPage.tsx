@@ -177,13 +177,13 @@ export const InstrumentDetailPage: React.FC = () => {
 
   if (error || !instrument) {
     return (
-      <div className="max-w-2xl mx-auto my-12 p-8 bg-white rounded-[10px] border border-[#C9D3DB] text-center shadow-xs">
+      <div className="max-w-2xl mx-auto my-12 p-8 bg-white rounded-none border border-[#C9D3DB] text-center shadow-xs">
         <AlertTriangle className="w-12 h-12 text-rose-500 mx-auto mb-3" />
         <h2 className="text-base font-semibold text-[#253746]">Instrument Unavailable</h2>
         <p className="text-xs text-[#5D6A75] mt-1 max-w-md mx-auto">{error || 'Record was not found.'}</p>
         <button
           onClick={() => navigate('/instruments')}
-          className="mt-6 inline-flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-[#253746] text-xs font-semibold rounded-lg transition-colors"
+          className="mt-6 inline-flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-[#253746] text-xs font-semibold rounded-none transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Return to Registry</span>
@@ -213,7 +213,7 @@ export const InstrumentDetailPage: React.FC = () => {
           {canEdit && (
             <button
               onClick={() => setIsEditModalOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#8799A9] bg-white hover:bg-[#F5F4EF] text-[#253746] font-semibold shadow-2xs transition-colors"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-none border border-[#8799A9] bg-white hover:bg-[#F5F4EF] text-[#253746] font-semibold shadow-2xs transition-colors"
             >
               <Edit2 className="w-3.5 h-3.5" />
               <span>Edit Registry Information</span>
@@ -231,15 +231,15 @@ export const InstrumentDetailPage: React.FC = () => {
       />
 
       {/* Main FDR Certificate Header Card */}
-      <div className="bg-white rounded-[10px] border border-[#C9D3DB] shadow-xs p-6 sm:p-8 space-y-6">
+      <div className="bg-white rounded-none border border-[#C9D3DB] shadow-xs p-6 sm:p-8 space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-6 border-b border-slate-100">
           <div className="flex items-start gap-4">
-            <div className="w-14 h-14 rounded-[10px] bg-[#EEF6FA] border border-sentinel-100 text-[#123B5D] flex items-center justify-center shrink-0">
+            <div className="w-14 h-14 rounded-none bg-[#EEF6FA] border border-sentinel-100 text-[#123B5D] flex items-center justify-center shrink-0">
               <FileSpreadsheet className="w-7 h-7" />
             </div>
             <div>
               <div className="flex flex-wrap items-center gap-2">
-                <span className="font-mono text-sm px-2.5 py-0.5 rounded bg-slate-900 text-white font-bold tracking-wider">
+                <span className="font-mono text-sm px-2.5 py-0.5 rounded-none bg-slate-900 text-white font-bold tracking-wider">
                   {instrument.reference_number}
                 </span>
                 {/* Administrative Status */}
@@ -247,7 +247,7 @@ export const InstrumentDetailPage: React.FC = () => {
                   {instrument.status}
                 </Badge>
                 {/* Trust Level */}
-                <span className="inline-flex items-center gap-1 font-mono text-[10px] font-bold px-2 py-0.5 rounded bg-purple-100 text-purple-800 border border-purple-200">
+                <span className="inline-flex items-center gap-1 font-mono text-[10px] font-bold px-2 py-0.5 rounded-none bg-purple-100 text-purple-800 border border-purple-200">
                   <Shield className="w-3 h-3 text-purple-700" />
                   <span>{instrument.trust_level.replace('_', ' — ')}</span>
                 </span>
@@ -272,25 +272,25 @@ export const InstrumentDetailPage: React.FC = () => {
             <div className="text-2xl font-black text-[#0D2538] font-mono">
               {formatINR(Number(instrument.amount))}
             </div>
-            <span className="text-[10px] text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded font-medium inline-block">
+            <span className="text-[10px] text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-none font-medium inline-block">
               100% Precise Decimal Storage
             </span>
           </div>
         </div>
 
         {/* Multi-Dimensional Status Clarity Notice */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 p-3 rounded-[10px] bg-[#F5F4EF] border border-[#C9D3DB]">
-          <div className="p-2.5 bg-white rounded-lg border border-[#C9D3DB]/80">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 p-3 rounded-none bg-[#F5F4EF] border border-[#C9D3DB]">
+          <div className="p-2.5 bg-white rounded-none border border-[#C9D3DB]/80">
             <span className="text-[10px] uppercase font-bold text-slate-400 block">1. Administrative State</span>
             <span className="text-xs font-bold text-[#253746]">{instrument.status}</span>
             <p className="text-[10px] text-[#5D6A75] mt-0.5">Procedural stage in the regulatory deposit registry.</p>
           </div>
-          <div className="p-2.5 bg-white rounded-lg border border-[#C9D3DB]/80">
+          <div className="p-2.5 bg-white rounded-none border border-[#C9D3DB]/80">
             <span className="text-[10px] uppercase font-bold text-purple-600 block">2. Evidentiary Trust Level</span>
             <span className="text-xs font-bold text-purple-800">{instrument.trust_level}</span>
             <p className="text-[10px] text-[#5D6A75] mt-0.5">Degree of multi-tier verification (L0 declared to L3 bank confirmed).</p>
           </div>
-          <div className="p-2.5 bg-white rounded-lg border border-[#C9D3DB]/80">
+          <div className="p-2.5 bg-white rounded-none border border-[#C9D3DB]/80">
             <span className="text-[10px] uppercase font-bold text-amber-600 block">3. Maturity / Term Window</span>
             <span className="text-xs font-bold text-amber-800">{instrument.maturity_indicator || 'ACTIVE'}</span>
             <p className="text-[10px] text-[#5D6A75] mt-0.5">Statutory validity and calendar expiry timeline.</p>
@@ -302,7 +302,7 @@ export const InstrumentDetailPage: React.FC = () => {
       <div className="flex items-center gap-2 border-b border-[#C9D3DB] overflow-x-auto pb-1">
         <button
           onClick={() => setActiveTab('snapshot')}
-          className={`flex items-center gap-1.5 px-3 py-2 rounded-lg font-semibold whitespace-nowrap transition-colors ${
+          className={`flex items-center gap-1.5 px-3 py-2 rounded-none font-semibold whitespace-nowrap transition-colors ${
             activeTab === 'snapshot'
               ? 'bg-[#0F766E] text-white shadow-xs'
               : 'text-[#5D6A75] hover:bg-slate-100'
@@ -314,7 +314,7 @@ export const InstrumentDetailPage: React.FC = () => {
 
         <button
           onClick={() => setActiveTab('documents')}
-          className={`flex items-center gap-1.5 px-3 py-2 rounded-lg font-semibold whitespace-nowrap transition-colors ${
+          className={`flex items-center gap-1.5 px-3 py-2 rounded-none font-semibold whitespace-nowrap transition-colors ${
             activeTab === 'documents'
               ? 'bg-[#0F766E] text-white shadow-xs'
               : 'text-[#5D6A75] hover:bg-slate-100'
@@ -326,7 +326,7 @@ export const InstrumentDetailPage: React.FC = () => {
 
         <button
           onClick={() => setActiveTab('field_history')}
-          className={`flex items-center gap-1.5 px-3 py-2 rounded-lg font-semibold whitespace-nowrap transition-colors ${
+          className={`flex items-center gap-1.5 px-3 py-2 rounded-none font-semibold whitespace-nowrap transition-colors ${
             activeTab === 'field_history'
               ? 'bg-[#0F766E] text-white shadow-xs'
               : 'text-[#5D6A75] hover:bg-slate-100'
@@ -338,7 +338,7 @@ export const InstrumentDetailPage: React.FC = () => {
 
         <button
           onClick={() => setActiveTab('lineage')}
-          className={`flex items-center gap-1.5 px-3 py-2 rounded-lg font-semibold whitespace-nowrap transition-colors ${
+          className={`flex items-center gap-1.5 px-3 py-2 rounded-none font-semibold whitespace-nowrap transition-colors ${
             activeTab === 'lineage'
               ? 'bg-[#0F766E] text-white shadow-xs'
               : 'text-[#5D6A75] hover:bg-slate-100'
@@ -350,7 +350,7 @@ export const InstrumentDetailPage: React.FC = () => {
 
         <button
           onClick={() => setActiveTab('observations')}
-          className={`flex items-center gap-1.5 px-3 py-2 rounded-lg font-semibold whitespace-nowrap transition-colors ${
+          className={`flex items-center gap-1.5 px-3 py-2 rounded-none font-semibold whitespace-nowrap transition-colors ${
             activeTab === 'observations'
               ? 'bg-[#0F766E] text-white shadow-xs'
               : 'text-[#5D6A75] hover:bg-slate-100'
@@ -362,7 +362,7 @@ export const InstrumentDetailPage: React.FC = () => {
 
         <button
           onClick={() => setActiveTab('audit')}
-          className={`flex items-center gap-1.5 px-3 py-2 rounded-lg font-semibold whitespace-nowrap transition-colors ${
+          className={`flex items-center gap-1.5 px-3 py-2 rounded-none font-semibold whitespace-nowrap transition-colors ${
             activeTab === 'audit'
               ? 'bg-[#0F766E] text-white shadow-xs'
               : 'text-[#5D6A75] hover:bg-slate-100'
@@ -380,7 +380,7 @@ export const InstrumentDetailPage: React.FC = () => {
         <div className="space-y-6">
           {/* Active Discrepancies Alert if present */}
           {snapshot?.instrument?.active_findings && snapshot.instrument.active_findings.length > 0 && (
-            <div className="bg-rose-50 border border-rose-200 rounded-[10px] p-5 space-y-3">
+            <div className="bg-rose-50 border border-rose-200 rounded-none p-5 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <AlertTriangle className="w-4 h-4 text-rose-600" />
@@ -400,7 +400,7 @@ export const InstrumentDetailPage: React.FC = () => {
                   <div key={f.id} className="py-2 flex items-start justify-between gap-4">
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="font-mono font-bold text-[10px] px-1.5 py-0.5 rounded bg-rose-200 text-rose-800">
+                        <span className="font-mono font-bold text-[10px] px-1.5 py-0.5 rounded-none bg-rose-200 text-rose-800">
                           {f.rule_code}
                         </span>
                         <span className="font-semibold text-rose-900">{f.message}</span>
@@ -419,7 +419,7 @@ export const InstrumentDetailPage: React.FC = () => {
           )}
 
           {/* Detailed Attribute Columns */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-white rounded-[10px] border border-[#C9D3DB] shadow-xs p-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-white rounded-none border border-[#C9D3DB] shadow-xs p-6">
             {/* Term Dates & Derived Maturity */}
             <div className="space-y-3">
               <h3 className="font-bold text-[#0D2538] uppercase tracking-wider text-[11px] flex items-center gap-1.5">
@@ -427,7 +427,7 @@ export const InstrumentDetailPage: React.FC = () => {
                 <span>Deposit Term &amp; Dates</span>
               </h3>
 
-              <div className="bg-[#F5F4EF]/70 rounded-[10px] p-4 border border-[#C9D3DB]/80 space-y-2.5 font-mono">
+              <div className="bg-[#F5F4EF]/70 rounded-none p-4 border border-[#C9D3DB]/80 space-y-2.5 font-mono">
                 <div className="flex justify-between">
                   <span className="text-[#5D6A75] font-sans">Issue Date</span>
                   <span className="font-medium text-[#253746]">{formatDate(instrument.issue_date)}</span>
@@ -439,7 +439,7 @@ export const InstrumentDetailPage: React.FC = () => {
                 <div className="flex justify-between items-center pt-1 border-t border-[#C9D3DB]">
                   <span className="text-[#5D6A75] font-sans">Derived Window</span>
                   <span
-                    className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                    className={`px-2 py-0.5 rounded-none text-[10px] font-bold ${
                       instrument.maturity_indicator === 'ACTIVE'
                         ? 'bg-emerald-100 text-emerald-800'
                         : instrument.maturity_indicator === 'EXPIRING_SOON'
@@ -460,7 +460,7 @@ export const InstrumentDetailPage: React.FC = () => {
                 <span>Statutory Lien Marking</span>
               </h3>
 
-              <div className="bg-[#F5F4EF]/70 rounded-[10px] p-4 border border-[#C9D3DB]/80 space-y-2.5">
+              <div className="bg-[#F5F4EF]/70 rounded-none p-4 border border-[#C9D3DB]/80 space-y-2.5">
                 <div className="flex justify-between">
                   <span className="text-[#5D6A75]">Lien Holder</span>
                   <span className="font-semibold text-[#253746]">{instrument.lien_holder}</span>
@@ -487,7 +487,7 @@ export const InstrumentDetailPage: React.FC = () => {
                 <span>Parent Institution Entity</span>
               </h3>
 
-              <div className="bg-[#F5F4EF]/70 rounded-[10px] p-4 border border-[#C9D3DB]/80 space-y-2.5">
+              <div className="bg-[#F5F4EF]/70 rounded-none p-4 border border-[#C9D3DB]/80 space-y-2.5">
                 <div className="flex justify-between">
                   <span className="text-[#5D6A75]">Permanent Code</span>
                   <span className="font-mono text-[#123B5D] font-bold">
@@ -506,21 +506,21 @@ export const InstrumentDetailPage: React.FC = () => {
           </div>
 
           {/* Module 4 Bank Confirmation & Trust Desk Link */}
-          <div className="bg-white rounded-[10px] border border-purple-200 p-5 space-y-3 shadow-2xs">
+          <div className="bg-white rounded-none border border-purple-200 p-5 space-y-3 shadow-2xs">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <ShieldCheck className="w-4 h-4 text-purple-600" />
                 <h4 className="font-bold text-[#253746] text-xs">Trust &amp; Bank Verification Desk</h4>
               </div>
-              <span className="font-mono text-[9px] uppercase bg-purple-100 text-purple-800 px-1.5 py-0.5 rounded font-semibold border border-purple-200">
+              <span className="font-mono text-[9px] uppercase bg-purple-100 text-purple-800 px-1.5 py-0.5 rounded-none font-semibold border border-purple-200">
                 Module 4 Active
               </span>
             </div>
 
-            <div className="p-4 border border-purple-100 rounded-[10px] bg-purple-50/30 space-y-2.5">
+            <div className="p-4 border border-purple-100 rounded-none bg-purple-50/30 space-y-2.5">
               <div className="flex items-center justify-between">
                 <span className="text-xs text-[#5D6A75] font-medium">Assessed Trust Level:</span>
-                <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-white text-purple-800 border border-purple-200 shadow-2xs">
+                <span className="font-mono text-xs font-bold px-2 py-0.5 rounded-none bg-white text-purple-800 border border-purple-200 shadow-2xs">
                   {instrument.trust_level}
                 </span>
               </div>
@@ -536,7 +536,7 @@ export const InstrumentDetailPage: React.FC = () => {
               <div className="pt-2">
                 <Link
                   to={`/verification/${instrument.id}`}
-                  className="w-full inline-flex items-center justify-center gap-1.5 py-2 px-3 text-xs font-semibold rounded-lg bg-purple-700 text-white hover:bg-purple-800 transition-colors shadow-2xs"
+                  className="w-full inline-flex items-center justify-center gap-1.5 py-2 px-3 text-xs font-semibold rounded-none bg-purple-700 text-white hover:bg-purple-800 transition-colors shadow-2xs"
                 >
                   <ShieldCheck className="w-3.5 h-3.5" />
                   <span>Open Trust &amp; Verification Desk</span>
@@ -578,7 +578,7 @@ export const InstrumentDetailPage: React.FC = () => {
           TAB 2: Document History & SHA-256 Hashes
           ===================================================================== */}
       {activeTab === 'documents' && (
-        <div className="bg-white rounded-[10px] border border-[#C9D3DB] shadow-xs overflow-hidden">
+        <div className="bg-white rounded-none border border-[#C9D3DB] shadow-xs overflow-hidden">
           <div className="p-6 border-b border-slate-100 flex items-center justify-between">
             <div>
               <h3 className="font-bold text-[#0D2538] text-sm">Versioned Document Certificates &amp; Scans</h3>
@@ -587,7 +587,7 @@ export const InstrumentDetailPage: React.FC = () => {
               </p>
             </div>
             <div className="flex items-center gap-2">
-              <span className="font-mono text-[10px] bg-slate-100 text-[#5D6A75] px-2.5 py-1 rounded-lg font-semibold">
+              <span className="font-mono text-[10px] bg-slate-100 text-[#5D6A75] px-2.5 py-1 rounded-none font-semibold">
                 Protected Object Storage
               </span>
             </div>
@@ -619,7 +619,7 @@ export const InstrumentDetailPage: React.FC = () => {
                   {snapshot.documents.map((doc) => (
                     <tr key={doc.id} className="hover:bg-[#F5F4EF]/70 transition-colors">
                       <td className="px-6 py-3.5">
-                        <span className="font-bold text-[#123B5D] bg-[#EEF6FA] border border-[#C4DEED] px-2 py-0.5 rounded text-xs">
+                        <span className="font-bold text-[#123B5D] bg-[#EEF6FA] border border-[#C4DEED] px-2 py-0.5 rounded-none text-xs">
                           v{doc.version_number}
                         </span>
                       </td>
@@ -642,7 +642,7 @@ export const InstrumentDetailPage: React.FC = () => {
                       </td>
                       <td className="px-6 py-3.5">
                         <div className="flex items-center gap-1.5">
-                          <code className="text-[10px] bg-slate-100 text-[#253746] px-1.5 py-0.5 rounded font-mono border border-[#C9D3DB]">
+                          <code className="text-[10px] bg-slate-100 text-[#253746] px-1.5 py-0.5 rounded-none font-mono border border-[#C9D3DB]">
                             {doc.sha256_hash.slice(0, 16)}...
                           </code>
                           <button
@@ -663,7 +663,7 @@ export const InstrumentDetailPage: React.FC = () => {
                           href={doc.download_url}
                           target="_blank"
                           rel="noreferrer"
-                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-[#253746] font-semibold text-xs transition-colors"
+                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-none bg-slate-100 hover:bg-slate-200 text-[#253746] font-semibold text-xs transition-colors"
                         >
                           <Download className="w-3 h-3" />
                           <span>Download</span>
@@ -682,7 +682,7 @@ export const InstrumentDetailPage: React.FC = () => {
           TAB 3: Field Provenance History
           ===================================================================== */}
       {activeTab === 'field_history' && (
-        <div className="bg-white rounded-[10px] border border-[#C9D3DB] shadow-xs overflow-hidden">
+        <div className="bg-white rounded-none border border-[#C9D3DB] shadow-xs overflow-hidden">
           <div className="p-6 border-b border-slate-100">
             <h3 className="font-bold text-[#0D2538] text-sm">Audited Field Modification History</h3>
             <p className="text-[#5D6A75] text-xs mt-0.5">
@@ -718,13 +718,13 @@ export const InstrumentDetailPage: React.FC = () => {
                         {fh.field_name}
                       </td>
                       <td className="px-6 py-3.5 text-[#253746]">
-                        <span className="bg-emerald-50 text-emerald-800 px-2 py-0.5 rounded border border-emerald-200">
+                        <span className="bg-emerald-50 text-emerald-800 px-2 py-0.5 rounded-none border border-emerald-200">
                           {fh.recorded_value}
                         </span>
                       </td>
                       <td className="px-6 py-3.5 text-[#5D6A75]">
                         {fh.previous_value ? (
-                          <span className="line-through bg-slate-100 text-[#5D6A75] px-2 py-0.5 rounded">
+                          <span className="line-through bg-slate-100 text-[#5D6A75] px-2 py-0.5 rounded-none">
                             {fh.previous_value}
                           </span>
                         ) : (
@@ -754,7 +754,7 @@ export const InstrumentDetailPage: React.FC = () => {
           TAB 4: Lifecycle & Lineage History (with SIMULATED highlighting)
           ===================================================================== */}
       {activeTab === 'lineage' && (
-        <div className="bg-white rounded-[10px] border border-[#C9D3DB] shadow-xs p-6 space-y-4">
+        <div className="bg-white rounded-none border border-[#C9D3DB] shadow-xs p-6 space-y-4">
           <div className="border-b border-slate-100 pb-4">
             <h3 className="font-bold text-[#0D2538] text-sm">Lifecycle Lineage &amp; Verification Chain</h3>
             <p className="text-[#5D6A75] text-xs mt-0.5">
@@ -778,14 +778,14 @@ export const InstrumentDetailPage: React.FC = () => {
                         : 'border-sentinel-600'
                     }`}
                   />
-                  <div className="bg-[#F5F4EF]/70 border border-[#C9D3DB] rounded-[10px] p-4 space-y-2">
+                  <div className="bg-[#F5F4EF]/70 border border-[#C9D3DB] rounded-none p-4 space-y-2">
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <div className="flex items-center gap-2">
-                        <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded bg-slate-200 text-[#253746]">
+                        <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded-none bg-slate-200 text-[#253746]">
                           {ev.event_type}
                         </span>
                         {ev.is_simulated && (
-                          <span className="font-mono text-[10px] font-black px-2 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-300 uppercase">
+                          <span className="font-mono text-[10px] font-black px-2 py-0.5 rounded-none bg-amber-100 text-amber-900 border border-amber-300 uppercase">
                             SIMULATED ADAPTER
                           </span>
                         )}
@@ -797,7 +797,7 @@ export const InstrumentDetailPage: React.FC = () => {
                     <p className="font-medium text-[#253746] text-xs">{ev.summary}</p>
 
                     {ev.details && Object.keys(ev.details).length > 0 && (
-                      <div className="pt-2 text-[11px] font-mono text-[#5D6A75] bg-white p-2.5 rounded-lg border border-[#C9D3DB]/80">
+                      <div className="pt-2 text-[11px] font-mono text-[#5D6A75] bg-white p-2.5 rounded-none border border-[#C9D3DB]/80">
                         {Object.entries(ev.details).map(([k, v]) => (
                           <div key={k} className="flex justify-between py-0.5">
                             <span className="text-slate-400">{k}:</span>
@@ -818,7 +818,7 @@ export const InstrumentDetailPage: React.FC = () => {
           TAB 5: Append-Only Scrutiny Observations
           ===================================================================== */}
       {activeTab === 'observations' && (
-        <div className="bg-white rounded-[10px] border border-[#C9D3DB] shadow-xs p-6 space-y-6">
+        <div className="bg-white rounded-none border border-[#C9D3DB] shadow-xs p-6 space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
             <div>
               <h3 className="font-bold text-[#0D2538] text-sm">Append-Only Regulatory Scrutiny Observations</h3>
@@ -830,7 +830,7 @@ export const InstrumentDetailPage: React.FC = () => {
             {canManageObservations && (
               <button
                 onClick={() => setIsCreateObsModalOpen(true)}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-[10px] bg-[#0F766E] hover:bg-[#09544E] text-white font-semibold text-xs transition-colors shadow-2xs"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-none bg-[#0F766E] hover:bg-[#09544E] text-white font-semibold text-xs transition-colors shadow-2xs"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Record Scrutiny Note</span>
@@ -851,7 +851,7 @@ export const InstrumentDetailPage: React.FC = () => {
               {snapshot.observations.map((obs) => (
                 <div
                   key={obs.id}
-                  className={`rounded-[10px] border p-5 space-y-3 transition-colors ${
+                  className={`rounded-none border p-5 space-y-3 transition-colors ${
                     obs.status === 'SUPERSEDED'
                       ? 'bg-[#F5F4EF]/60 border-[#C9D3DB] opacity-75'
                       : obs.status === 'RESOLVED'
@@ -861,7 +861,7 @@ export const InstrumentDetailPage: React.FC = () => {
                 >
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div className="flex items-center gap-2">
-                      <span className="font-mono text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-slate-900 text-white">
+                      <span className="font-mono text-[10px] uppercase font-bold px-2 py-0.5 rounded-none bg-slate-900 text-white">
                         {obs.observation_category}
                       </span>
                       <Badge
@@ -878,7 +878,7 @@ export const InstrumentDetailPage: React.FC = () => {
                         {obs.status}
                       </Badge>
                       {obs.is_internal_only && (
-                        <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded bg-rose-100 text-rose-800 border border-rose-200">
+                        <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded-none bg-rose-100 text-rose-800 border border-rose-200">
                           INTERNAL ONLY
                         </span>
                       )}
@@ -890,7 +890,7 @@ export const InstrumentDetailPage: React.FC = () => {
                   </div>
 
                   {/* Note Body */}
-                  <div className="text-xs text-[#253746] leading-relaxed font-sans bg-[#F5F4EF]/50 p-3 rounded-[10px] border border-slate-100">
+                  <div className="text-xs text-[#253746] leading-relaxed font-sans bg-[#F5F4EF]/50 p-3 rounded-none border border-slate-100">
                     {obs.observation_text}
                   </div>
 
@@ -930,7 +930,7 @@ export const InstrumentDetailPage: React.FC = () => {
                           setAmendText(obs.observation_text);
                           setAmendReason('');
                         }}
-                        className="px-3 py-1.5 rounded-lg border border-[#8799A9] hover:bg-[#F5F4EF] text-[#253746] font-semibold text-[11px] transition-colors"
+                        className="px-3 py-1.5 rounded-none border border-[#8799A9] hover:bg-[#F5F4EF] text-[#253746] font-semibold text-[11px] transition-colors"
                       >
                         Amend / Supersede Note
                       </button>
@@ -939,7 +939,7 @@ export const InstrumentDetailPage: React.FC = () => {
                           setResolvingObs(obs);
                           setResolveReason('');
                         }}
-                        className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-[11px] transition-colors"
+                        className="px-3 py-1.5 rounded-none bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-[11px] transition-colors"
                       >
                         Resolve Note
                       </button>
@@ -956,7 +956,7 @@ export const InstrumentDetailPage: React.FC = () => {
           TAB 6: Chronological Audit Timeline
           ===================================================================== */}
       {activeTab === 'audit' && (
-        <div className="bg-white rounded-[10px] border border-[#C9D3DB] shadow-xs p-6 space-y-4">
+        <div className="bg-white rounded-none border border-[#C9D3DB] shadow-xs p-6 space-y-4">
           <div className="border-b border-slate-100 pb-4">
             <h3 className="font-bold text-[#0D2538] text-sm">Material Regulatory Audit Trail</h3>
             <p className="text-[#5D6A75] text-xs mt-0.5">
@@ -998,7 +998,7 @@ export const InstrumentDetailPage: React.FC = () => {
       {/* Create Observation Modal */}
       {isCreateObsModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4">
-          <div className="bg-white rounded-[10px] border border-[#C9D3DB] max-w-lg w-full p-6 space-y-4 shadow-xl">
+          <div className="bg-white rounded-none border border-[#C9D3DB] max-w-lg w-full p-6 space-y-4 shadow-xl">
             <h3 className="text-sm font-bold text-[#0D2538]">Record Scrutiny Observation</h3>
             <form onSubmit={handleCreateObservation} className="space-y-4">
               <div>
@@ -1008,7 +1008,7 @@ export const InstrumentDetailPage: React.FC = () => {
                 <select
                   value={obsCategory}
                   onChange={(e) => setObsCategory(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-[#8799A9] bg-white text-xs text-[#253746]"
+                  className="w-full px-3 py-2 rounded-none border border-[#8799A9] bg-white text-xs text-[#253746]"
                 >
                   <option value="GENERAL">GENERAL — General Observation</option>
                   <option value="DISCREPANCY">DISCREPANCY — Discrepancy Note</option>
@@ -1028,7 +1028,7 @@ export const InstrumentDetailPage: React.FC = () => {
                   value={obsText}
                   onChange={(e) => setObsText(e.target.value)}
                   placeholder="Enter detailed scrutiny observation findings..."
-                  className="w-full px-3 py-2 rounded-lg border border-[#8799A9] text-xs text-[#253746] focus:ring-1 focus:ring-sentinel-500"
+                  className="w-full px-3 py-2 rounded-none border border-[#8799A9] text-xs text-[#253746] focus:ring-1 focus:ring-sentinel-500"
                 />
               </div>
 
@@ -1037,7 +1037,7 @@ export const InstrumentDetailPage: React.FC = () => {
                   type="checkbox"
                   checked={obsInternalOnly}
                   onChange={(e) => setObsInternalOnly(e.target.checked)}
-                  className="rounded border-[#8799A9] text-[#123B5D] w-4 h-4"
+                  className="rounded-none border-[#8799A9] text-[#123B5D] w-4 h-4"
                 />
                 <span className="text-[#253746] font-medium text-[11px]">
                   Internal Bureau Use Only (Hidden from Institution)
@@ -1048,13 +1048,13 @@ export const InstrumentDetailPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsCreateObsModalOpen(false)}
-                  className="px-3.5 py-2 rounded-lg border border-[#8799A9] hover:bg-[#F5F4EF] text-[#253746] font-semibold text-xs"
+                  className="px-3.5 py-2 rounded-none border border-[#8799A9] hover:bg-[#F5F4EF] text-[#253746] font-semibold text-xs"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-lg bg-[#0F766E] hover:bg-[#09544E] text-white font-semibold text-xs"
+                  className="px-4 py-2 rounded-none bg-[#0F766E] hover:bg-[#09544E] text-white font-semibold text-xs"
                 >
                   Record Observation
                 </button>
@@ -1067,13 +1067,13 @@ export const InstrumentDetailPage: React.FC = () => {
       {/* Amend Observation Modal */}
       {amendingObs && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4">
-          <div className="bg-white rounded-[10px] border border-[#C9D3DB] max-w-lg w-full p-6 space-y-4 shadow-xl">
+          <div className="bg-white rounded-none border border-[#C9D3DB] max-w-lg w-full p-6 space-y-4 shadow-xl">
             <h3 className="text-sm font-bold text-[#0D2538]">Amend Scrutiny Note (Append-Only)</h3>
             <p className="text-[11px] text-[#5D6A75]">
               The existing note will be preserved and linked as superseded. A new revision note will be authored under your credentials.
             </p>
 
-            <div className="p-3 bg-[#F5F4EF] rounded-[10px] border border-[#C9D3DB] text-[#5D6A75] text-[11px]">
+            <div className="p-3 bg-[#F5F4EF] rounded-none border border-[#C9D3DB] text-[#5D6A75] text-[11px]">
               <span className="font-semibold block text-[#253746]">Original Note:</span>
               {amendingObs.observation_text}
             </div>
@@ -1088,7 +1088,7 @@ export const InstrumentDetailPage: React.FC = () => {
                   rows={4}
                   value={amendText}
                   onChange={(e) => setAmendText(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg border border-[#8799A9] text-xs text-[#253746]"
+                  className="w-full px-3 py-2 rounded-none border border-[#8799A9] text-xs text-[#253746]"
                 />
               </div>
 
@@ -1102,7 +1102,7 @@ export const InstrumentDetailPage: React.FC = () => {
                   value={amendReason}
                   onChange={(e) => setAmendReason(e.target.value)}
                   placeholder="e.g. Corrected deposit branch IFSC code following bank attestation"
-                  className="w-full px-3 py-2 rounded-lg border border-[#8799A9] text-xs text-[#253746]"
+                  className="w-full px-3 py-2 rounded-none border border-[#8799A9] text-xs text-[#253746]"
                 />
               </div>
 
@@ -1110,13 +1110,13 @@ export const InstrumentDetailPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setAmendingObs(null)}
-                  className="px-3.5 py-2 rounded-lg border border-[#8799A9] hover:bg-[#F5F4EF] text-[#253746] font-semibold text-xs"
+                  className="px-3.5 py-2 rounded-none border border-[#8799A9] hover:bg-[#F5F4EF] text-[#253746] font-semibold text-xs"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-lg bg-[#0F766E] hover:bg-[#09544E] text-white font-semibold text-xs"
+                  className="px-4 py-2 rounded-none bg-[#0F766E] hover:bg-[#09544E] text-white font-semibold text-xs"
                 >
                   Commit Amendment
                 </button>
@@ -1129,7 +1129,7 @@ export const InstrumentDetailPage: React.FC = () => {
       {/* Resolve Observation Modal */}
       {resolvingObs && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4">
-          <div className="bg-white rounded-[10px] border border-[#C9D3DB] max-w-md w-full p-6 space-y-4 shadow-xl">
+          <div className="bg-white rounded-none border border-[#C9D3DB] max-w-md w-full p-6 space-y-4 shadow-xl">
             <h3 className="text-sm font-bold text-[#0D2538]">Resolve Scrutiny Note</h3>
             <p className="text-[11px] text-[#5D6A75]">
               Provide an authoritative justification for marking this regulatory observation as resolved.
@@ -1146,7 +1146,7 @@ export const InstrumentDetailPage: React.FC = () => {
                   value={resolveReason}
                   onChange={(e) => setResolveReason(e.target.value)}
                   placeholder="e.g. Verified original FDR deposit slip matching AICTE statutory amount."
-                  className="w-full px-3 py-2 rounded-lg border border-[#8799A9] text-xs text-[#253746]"
+                  className="w-full px-3 py-2 rounded-none border border-[#8799A9] text-xs text-[#253746]"
                 />
               </div>
 
@@ -1154,13 +1154,13 @@ export const InstrumentDetailPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setResolvingObs(null)}
-                  className="px-3.5 py-2 rounded-lg border border-[#8799A9] hover:bg-[#F5F4EF] text-[#253746] font-semibold text-xs"
+                  className="px-3.5 py-2 rounded-none border border-[#8799A9] hover:bg-[#F5F4EF] text-[#253746] font-semibold text-xs"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs"
+                  className="px-4 py-2 rounded-none bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs"
                 >
                   Mark Resolved
                 </button>

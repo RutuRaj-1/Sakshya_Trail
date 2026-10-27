@@ -171,7 +171,7 @@ export const AuditPage: React.FC = () => {
       {verificationResult && (
         <div
           data-testid="verification-status-banner"
-          className={`p-4 rounded-[10px] border transition-all ${
+          className={`p-4 rounded-none border transition-all ${
             verificationResult.is_chain_intact
               ? 'bg-emerald-50/70 border-emerald-200 text-emerald-900'
               : 'bg-rose-50/90 border-rose-300 text-rose-900 shadow-sm'
@@ -228,7 +228,7 @@ export const AuditPage: React.FC = () => {
 
                 {/* If Inconsistency detected, show forensic diagnosis */}
                 {verificationResult.first_inconsistency && (
-                  <div className="mt-4 p-3 bg-white/80 rounded-lg border border-rose-300 font-mono text-xs text-rose-950 space-y-1">
+                  <div className="mt-4 p-3 bg-white/80 rounded-none border border-rose-300 font-mono text-xs text-rose-950 space-y-1">
                     <div className="font-bold text-rose-700 flex items-center gap-1.5">
                       <AlertTriangle className="w-4 h-4" /> Earliest Detected Inconsistency at Sequence #{verificationResult.first_inconsistency.sequence_number}:
                     </div>
@@ -236,7 +236,7 @@ export const AuditPage: React.FC = () => {
                     <div><strong>Event UUID:</strong> {verificationResult.first_inconsistency.event_id}</div>
                     <div><strong>Expected Digest:</strong> {verificationResult.first_inconsistency.expected_hash || 'None'}</div>
                     <div><strong>Stored Digest:</strong> {verificationResult.first_inconsistency.actual_hash || 'None'}</div>
-                    <p className="font-sans text-rose-900 mt-2 text-[11px] bg-rose-100/60 p-2 rounded">
+                    <p className="font-sans text-rose-900 mt-2 text-[11px] bg-rose-100/60 p-2 rounded-none">
                       <strong>Security Advisory:</strong> {verificationResult.first_inconsistency.safe_explanation}. This ledger inconsistency has been formally logged to the compliance registry. Database tampering or unauthorized sequence manipulation must be escalated to the Competent Authority.
                     </p>
                   </div>
@@ -255,7 +255,7 @@ export const AuditPage: React.FC = () => {
       )}
 
       {verificationError && (
-        <div className="p-4 rounded-[10px] border border-rose-200 bg-rose-50 text-rose-800 text-xs flex items-center justify-between">
+        <div className="p-4 rounded-none border border-rose-200 bg-rose-50 text-rose-800 text-xs flex items-center justify-between">
           <div className="flex items-center gap-2">
             <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
             <span>Verification Request Failed: {verificationError}</span>
@@ -267,7 +267,7 @@ export const AuditPage: React.FC = () => {
       )}
 
       {/* Filter and Query Desk */}
-      <Card className="p-4 bg-white border border-[#C9D3DB] rounded-[10px] shadow-2xs space-y-3">
+      <Card className="p-4 bg-white border border-[#C9D3DB] rounded-none shadow-2xs space-y-3">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
           {/* Keyword Search */}
           <div className="lg:col-span-2 relative">
@@ -282,7 +282,7 @@ export const AuditPage: React.FC = () => {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && setPage(0)}
-                className="w-full text-xs bg-[#F5F4EF] border border-[#C9D3DB] rounded-lg pl-8 pr-3 py-2 text-[#0D2538] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sentinel-500 focus:bg-white transition-all font-mono"
+                className="w-full text-xs bg-[#F5F4EF] border border-[#C9D3DB] rounded-none pl-8 pr-3 py-2 text-[#0D2538] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sentinel-500 focus:bg-white transition-all font-mono"
               />
             </div>
           </div>
@@ -298,7 +298,7 @@ export const AuditPage: React.FC = () => {
                 setActionFilter(e.target.value);
                 setPage(0);
               }}
-              className="w-full text-xs bg-[#F5F4EF] border border-[#C9D3DB] rounded-lg px-2.5 py-2 text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500 font-mono"
+              className="w-full text-xs bg-[#F5F4EF] border border-[#C9D3DB] rounded-none px-2.5 py-2 text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500 font-mono"
             >
               <option value="">All Action Types</option>
               <option value="AUTH_LOGIN_SUCCESS">AUTH_LOGIN_SUCCESS</option>
@@ -329,7 +329,7 @@ export const AuditPage: React.FC = () => {
                 setOutcomeFilter(e.target.value);
                 setPage(0);
               }}
-              className="w-full text-xs bg-[#F5F4EF] border border-[#C9D3DB] rounded-lg px-2.5 py-2 text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500 font-mono"
+              className="w-full text-xs bg-[#F5F4EF] border border-[#C9D3DB] rounded-none px-2.5 py-2 text-[#253746] focus:outline-none focus:ring-2 focus:ring-sentinel-500 font-mono"
             >
               <option value="">All Outcomes</option>
               <option value="SUCCESS">SUCCESS</option>
@@ -351,7 +351,7 @@ export const AuditPage: React.FC = () => {
                   setDateFrom(e.target.value);
                   setPage(0);
                 }}
-                className="w-full text-[11px] bg-[#F5F4EF] border border-[#C9D3DB] rounded-lg px-2 py-1.5 text-[#253746] focus:outline-none focus:ring-1 focus:ring-sentinel-500"
+                className="w-full text-[11px] bg-[#F5F4EF] border border-[#C9D3DB] rounded-none px-2 py-1.5 text-[#253746] focus:outline-none focus:ring-1 focus:ring-sentinel-500"
                 title="Date From"
               />
               <Button
@@ -369,7 +369,7 @@ export const AuditPage: React.FC = () => {
       </Card>
 
       {/* Events Table Container */}
-      <div className="bg-white rounded-[10px] border border-[#C9D3DB] shadow-xs overflow-hidden">
+      <div className="bg-white rounded-none border border-[#C9D3DB] shadow-xs overflow-hidden">
         {isLoading ? (
           <div className="p-12 text-center text-[#5D6A75]">
             <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-[#C9D3DB] border-t-sentinel-600 mb-3" />
@@ -418,7 +418,7 @@ export const AuditPage: React.FC = () => {
                     {/* Sequence */}
                     <td className="py-3 px-4">
                       {e.sequence_number !== null && e.sequence_number !== undefined ? (
-                        <span className="font-bold text-[#0D2538] bg-[#EEF6FA] border border-[#C4DEED] px-1.5 py-0.5 rounded text-[11px]">
+                        <span className="font-bold text-[#0D2538] bg-[#EEF6FA] border border-[#C4DEED] px-1.5 py-0.5 rounded-none text-[11px]">
                           #{e.sequence_number}
                         </span>
                       ) : (
@@ -551,7 +551,7 @@ export const AuditPage: React.FC = () => {
       {/* Forensic Event Detail Modal */}
       {selectedEvent && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-in fade-in duration-150">
-          <div className="bg-white rounded-[10px] border border-[#C9D3DB] shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden">
+          <div className="bg-white rounded-none border border-[#C9D3DB] shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden">
             {/* Modal Header */}
             <div className="px-6 py-4 border-b border-[#C9D3DB] flex items-center justify-between bg-[#F5F4EF]">
               <div className="flex items-center gap-2">
@@ -567,7 +567,7 @@ export const AuditPage: React.FC = () => {
               </div>
               <button
                 onClick={() => setSelectedEvent(null)}
-                className="text-slate-400 hover:text-[#5D6A75] p-1 rounded-lg"
+                className="text-slate-400 hover:text-[#5D6A75] p-1 rounded-none"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -576,7 +576,7 @@ export const AuditPage: React.FC = () => {
             {/* Modal Body */}
             <div className="p-6 overflow-y-auto space-y-4 font-mono text-xs">
               {/* Cryptographic Linkage Card */}
-              <div className="bg-slate-900 text-slate-100 p-4 rounded-[10px] space-y-2 border border-slate-800">
+              <div className="bg-slate-900 text-slate-100 p-4 rounded-none space-y-2 border border-slate-800">
                 <div className="flex items-center justify-between text-slate-400 text-[11px] uppercase tracking-wider font-sans font-semibold">
                   <span>Cryptographic Proof & SHA-256 Linkage</span>
                   <Lock className="w-3.5 h-3.5 text-emerald-400" />
@@ -618,7 +618,7 @@ export const AuditPage: React.FC = () => {
               </div>
 
               {/* Event Attributes Grid */}
-              <div className="grid grid-cols-2 gap-3 bg-[#F5F4EF] p-3 rounded-lg border border-[#C9D3DB]">
+              <div className="grid grid-cols-2 gap-3 bg-[#F5F4EF] p-3 rounded-none border border-[#C9D3DB]">
                 <div>
                   <span className="text-[#5D6A75] text-[10px] block font-sans">Action Code:</span>
                   <span className="font-bold text-[#0D2538]">{selectedEvent.action}</span>
@@ -671,7 +671,7 @@ export const AuditPage: React.FC = () => {
                     </button>
                   )}
                 </div>
-                <pre className="bg-slate-900 text-slate-100 p-3 rounded-lg overflow-x-auto text-[11px] leading-relaxed max-h-56">
+                <pre className="bg-slate-900 text-slate-100 p-3 rounded-none overflow-x-auto text-[11px] leading-relaxed max-h-56">
                   {selectedEvent.metadata && Object.keys(selectedEvent.metadata).length > 0
                     ? JSON.stringify(selectedEvent.metadata, null, 2)
                     : '// No additional payload metadata recorded for this entry.'}

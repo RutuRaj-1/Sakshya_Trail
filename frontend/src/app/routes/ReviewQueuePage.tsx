@@ -267,15 +267,15 @@ export const ReviewQueuePage: React.FC = () => {
   const renderStatusBadge = (status: string) => {
     switch (status) {
       case 'OPEN':
-        return <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-200"><AlertOctagon className="w-3 h-3" /> OPEN</span>;
+        return <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-none border border-rose-200"><AlertOctagon className="w-3 h-3" /> OPEN</span>;
       case 'IN_REVIEW':
-        return <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200"><Clock className="w-3 h-3" /> IN REVIEW</span>;
+        return <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-none border border-amber-200"><Clock className="w-3 h-3" /> IN REVIEW</span>;
       case 'RESOLVED':
-        return <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200"><CheckCircle2 className="w-3 h-3" /> RESOLVED</span>;
+        return <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-none border border-emerald-200"><CheckCircle2 className="w-3 h-3" /> RESOLVED</span>;
       case 'DISMISSED':
-        return <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#5D6A75] bg-slate-100 px-2 py-0.5 rounded-full border border-[#C9D3DB]"><XCircle className="w-3 h-3" /> DISMISSED</span>;
+        return <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#5D6A75] bg-slate-100 px-2 py-0.5 rounded-none border border-[#C9D3DB]"><XCircle className="w-3 h-3" /> DISMISSED</span>;
       case 'SUPERSEDED':
-        return <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-200"><RefreshCw className="w-3 h-3" /> SUPERSEDED</span>;
+        return <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-none border border-indigo-200"><RefreshCw className="w-3 h-3" /> SUPERSEDED</span>;
       default:
         return <Badge variant="default">{status}</Badge>;
     }
@@ -298,7 +298,7 @@ export const ReviewQueuePage: React.FC = () => {
           setActiveScoreDetails(details);
         }}
         className={cn(
-          'inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs border transition-all hover:scale-105 cursor-pointer shadow-sm',
+          'inline-flex items-center gap-1 px-2.5 py-1 rounded-none text-xs border transition-all hover:scale-105 cursor-pointer shadow-sm',
           colorClass
         )}
         title="Click to view explainable factor score breakdown"
@@ -321,7 +321,7 @@ export const ReviewQueuePage: React.FC = () => {
             <h1 className="text-xl font-bold text-[#0D2538] tracking-tight">
               Discrepancy Review Queue
             </h1>
-            <span className="text-[10px] bg-[#EEF6FA] text-[#0D2538] font-semibold px-2 py-0.5 rounded-full border border-[#C4DEED]">
+            <span className="text-[10px] bg-[#EEF6FA] text-[#0D2538] font-semibold px-2 py-0.5 rounded-none border border-[#C4DEED]">
               Module 3 — Audit & Governance
             </span>
           </div>
@@ -336,7 +336,7 @@ export const ReviewQueuePage: React.FC = () => {
           <button
             onClick={() => loadQueue()}
             disabled={isLoading}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#8799A9] bg-white hover:bg-[#F5F4EF] text-[#253746] font-medium text-xs transition-colors shadow-sm disabled:opacity-50"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-none border border-[#8799A9] bg-white hover:bg-[#F5F4EF] text-[#253746] font-medium text-xs transition-colors shadow-sm disabled:opacity-50"
           >
             <RefreshCw className={cn('w-3.5 h-3.5', isLoading && 'animate-spin')} />
             Refresh
@@ -346,7 +346,7 @@ export const ReviewQueuePage: React.FC = () => {
 
       {/* Notifications */}
       {successMsg && (
-        <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-3 rounded-lg flex items-center justify-between">
+        <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-3 rounded-none flex items-center justify-between">
           <div className="flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-emerald-600" />
             <span>{successMsg}</span>
@@ -358,7 +358,7 @@ export const ReviewQueuePage: React.FC = () => {
       )}
 
       {error && (
-        <div className="bg-rose-50 border border-rose-200 text-rose-800 px-4 py-3 rounded-lg flex items-center justify-between">
+        <div className="bg-rose-50 border border-rose-200 text-rose-800 px-4 py-3 rounded-none flex items-center justify-between">
           <div className="flex items-center gap-2">
             <AlertTriangle className="w-4 h-4 text-rose-600" />
             <span>{error}</span>
@@ -370,7 +370,7 @@ export const ReviewQueuePage: React.FC = () => {
       )}
 
       {/* Filter Toolbar */}
-      <div className="bg-white border border-[#C9D3DB] rounded-[10px] p-4 shadow-sm space-y-3">
+      <div className="bg-white border border-[#C9D3DB] rounded-none p-4 shadow-sm space-y-3">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
           {/* Search */}
           <div className="relative">
@@ -380,7 +380,7 @@ export const ReviewQueuePage: React.FC = () => {
               placeholder="Search reference, bank, rule code, title..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-3 py-1.5 bg-[#F5F4EF] border border-[#C9D3DB] rounded-lg text-xs focus:ring-1 focus:ring-sentinel-500 focus:bg-white outline-none transition-all"
+              className="w-full pl-9 pr-3 py-1.5 bg-[#F5F4EF] border border-[#C9D3DB] rounded-none text-xs focus:ring-1 focus:ring-sentinel-500 focus:bg-white outline-none transition-all"
             />
           </div>
 
@@ -393,7 +393,7 @@ export const ReviewQueuePage: React.FC = () => {
                 setStatusFilter(e.target.value);
                 setPage(1);
               }}
-              className="w-full bg-[#F5F4EF] border border-[#C9D3DB] rounded-lg py-1.5 px-2.5 text-xs focus:ring-1 focus:ring-sentinel-500 outline-none"
+              className="w-full bg-[#F5F4EF] border border-[#C9D3DB] rounded-none py-1.5 px-2.5 text-xs focus:ring-1 focus:ring-sentinel-500 outline-none"
             >
               <option value="ACTIVE">Active (Open & In Review)</option>
               <option value="OPEN">Open Only</option>
@@ -413,7 +413,7 @@ export const ReviewQueuePage: React.FC = () => {
                 setSeverityFilter(e.target.value);
                 setPage(1);
               }}
-              className="w-full bg-[#F5F4EF] border border-[#C9D3DB] rounded-lg py-1.5 px-2.5 text-xs focus:ring-1 focus:ring-sentinel-500 outline-none"
+              className="w-full bg-[#F5F4EF] border border-[#C9D3DB] rounded-none py-1.5 px-2.5 text-xs focus:ring-1 focus:ring-sentinel-500 outline-none"
             >
               <option value="">All Severities</option>
               <option value="CRITICAL">Critical</option>
@@ -433,7 +433,7 @@ export const ReviewQueuePage: React.FC = () => {
                 setCategoryFilter(e.target.value);
                 setPage(1);
               }}
-              className="w-full bg-[#F5F4EF] border border-[#C9D3DB] rounded-lg py-1.5 px-2.5 text-xs focus:ring-1 focus:ring-sentinel-500 outline-none"
+              className="w-full bg-[#F5F4EF] border border-[#C9D3DB] rounded-none py-1.5 px-2.5 text-xs focus:ring-1 focus:ring-sentinel-500 outline-none"
             >
               <option value="">All Categories</option>
               <option value="REQUIRED_FIELD">Required Fields</option>
@@ -458,7 +458,7 @@ export const ReviewQueuePage: React.FC = () => {
                   setSelectedInstFilter(e.target.value);
                   setPage(1);
                 }}
-                className="w-full bg-[#F5F4EF] border border-[#C9D3DB] rounded-lg py-1.5 px-2.5 text-xs focus:ring-1 focus:ring-sentinel-500 outline-none"
+                className="w-full bg-[#F5F4EF] border border-[#C9D3DB] rounded-none py-1.5 px-2.5 text-xs focus:ring-1 focus:ring-sentinel-500 outline-none"
               >
                 <option value="">All Institutions</option>
                 {institutions.map((i) => (
@@ -475,7 +475,7 @@ export const ReviewQueuePage: React.FC = () => {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="w-full bg-[#F5F4EF] border border-[#C9D3DB] rounded-lg py-1.5 px-2.5 text-xs focus:ring-1 focus:ring-sentinel-500 outline-none"
+              className="w-full bg-[#F5F4EF] border border-[#C9D3DB] rounded-none py-1.5 px-2.5 text-xs focus:ring-1 focus:ring-sentinel-500 outline-none"
             >
               <option value="priority">Priority Score (0–100)</option>
               <option value="detected_at">First Detected Date</option>
@@ -489,7 +489,7 @@ export const ReviewQueuePage: React.FC = () => {
             <select
               value={sortOrder}
               onChange={(e) => setSortOrder(e.target.value)}
-              className="w-full bg-[#F5F4EF] border border-[#C9D3DB] rounded-lg py-1.5 px-2.5 text-xs focus:ring-1 focus:ring-sentinel-500 outline-none"
+              className="w-full bg-[#F5F4EF] border border-[#C9D3DB] rounded-none py-1.5 px-2.5 text-xs focus:ring-1 focus:ring-sentinel-500 outline-none"
             >
               <option value="desc">Descending</option>
               <option value="asc">Ascending</option>
@@ -499,11 +499,11 @@ export const ReviewQueuePage: React.FC = () => {
       </div>
 
       {/* Review Queue Findings Table */}
-      <div className="bg-white border border-[#C9D3DB] rounded-[10px] overflow-hidden shadow-sm">
+      <div className="bg-white border border-[#C9D3DB] rounded-none overflow-hidden shadow-sm">
         <div className="px-4 py-3 border-b border-[#C9D3DB] flex items-center justify-between bg-[#F5F4EF]">
           <div className="flex items-center gap-2">
             <span className="font-semibold text-[#253746]">Review Queue Discrepancies</span>
-            <span className="bg-slate-200 text-[#253746] text-[10px] font-bold px-2 py-0.5 rounded-full">
+            <span className="bg-slate-200 text-[#253746] text-[10px] font-bold px-2 py-0.5 rounded-none">
               {total} items
             </span>
           </div>
@@ -613,7 +613,7 @@ export const ReviewQueuePage: React.FC = () => {
                           setActiveFinding(item);
                           setIsDetailOpen(true);
                         }}
-                        className="inline-flex items-center gap-1 px-2 py-1 rounded bg-slate-100 group-hover:bg-[#EEF6FA] text-[#5D6A75] group-hover:text-[#123B5D] font-medium text-[11px] transition-colors"
+                        className="inline-flex items-center gap-1 px-2 py-1 rounded-none bg-slate-100 group-hover:bg-[#EEF6FA] text-[#5D6A75] group-hover:text-[#123B5D] font-medium text-[11px] transition-colors"
                       >
                         <Eye className="w-3.5 h-3.5" />
                         Review
@@ -635,7 +635,7 @@ export const ReviewQueuePage: React.FC = () => {
             <button
               onClick={() => setPage((p) => Math.max(p - 1, 1))}
               disabled={page <= 1}
-              className="p-1 rounded border border-[#8799A9] bg-white hover:bg-[#F5F4EF] disabled:opacity-40 disabled:cursor-not-allowed text-[#5D6A75]"
+              className="p-1 rounded-none border border-[#8799A9] bg-white hover:bg-[#F5F4EF] disabled:opacity-40 disabled:cursor-not-allowed text-[#5D6A75]"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
@@ -643,7 +643,7 @@ export const ReviewQueuePage: React.FC = () => {
             <button
               onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
               disabled={page >= totalPages}
-              className="p-1 rounded border border-[#8799A9] bg-white hover:bg-[#F5F4EF] disabled:opacity-40 disabled:cursor-not-allowed text-[#5D6A75]"
+              className="p-1 rounded-none border border-[#8799A9] bg-white hover:bg-[#F5F4EF] disabled:opacity-40 disabled:cursor-not-allowed text-[#5D6A75]"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
@@ -663,7 +663,7 @@ export const ReviewQueuePage: React.FC = () => {
                 <div className="flex items-center gap-2">
                   {renderSeverityBadge(activeFinding.severity)}
                   {renderStatusBadge(activeFinding.status)}
-                  <span className="text-[10px] font-mono text-[#5D6A75] bg-slate-200 px-2 py-0.5 rounded">
+                  <span className="text-[10px] font-mono text-[#5D6A75] bg-slate-200 px-2 py-0.5 rounded-none">
                     v{activeFinding.concurrency_version}
                   </span>
                 </div>
@@ -681,7 +681,7 @@ export const ReviewQueuePage: React.FC = () => {
                   setActionType(null);
                   setActionError(null);
                 }}
-                className="text-slate-400 hover:text-[#5D6A75] p-1 rounded-lg hover:bg-slate-100"
+                className="text-slate-400 hover:text-[#5D6A75] p-1 rounded-none hover:bg-slate-100"
               >
                 &times;
               </button>
@@ -690,7 +690,7 @@ export const ReviewQueuePage: React.FC = () => {
             {/* Modal Content Scrollable Area */}
             <div className="flex-1 overflow-y-auto p-5 space-y-5">
               {/* Plain-Language Explanation */}
-              <div className="bg-[#F5F4EF] border border-[#C9D3DB] rounded-lg p-3.5 space-y-2">
+              <div className="bg-[#F5F4EF] border border-[#C9D3DB] rounded-none p-3.5 space-y-2">
                 <div className="flex items-center gap-2 text-[#253746] font-semibold text-xs">
                   <Info className="w-4 h-4 text-[#123B5D]" />
                   <span>Explainable Finding Details</span>
@@ -702,13 +702,13 @@ export const ReviewQueuePage: React.FC = () => {
                 {/* Values comparison */}
                 {(activeFinding.observed_value || activeFinding.expected_value) && (
                   <div className="grid grid-cols-2 gap-2 pt-2 border-t border-[#C9D3DB] text-xs">
-                    <div className="bg-rose-50 border border-rose-100 rounded p-2">
+                    <div className="bg-rose-50 border border-rose-100 rounded-none p-2">
                       <span className="text-[10px] font-semibold text-rose-800 block">Observed Value</span>
                       <span className="font-mono text-[#253746] break-words">
                         {activeFinding.observed_value || 'None'}
                       </span>
                     </div>
-                    <div className="bg-emerald-50 border border-emerald-100 rounded p-2">
+                    <div className="bg-emerald-50 border border-emerald-100 rounded-none p-2">
                       <span className="text-[10px] font-semibold text-emerald-800 block">Expected / Baseline</span>
                       <span className="font-mono text-[#253746] break-words">
                         {activeFinding.expected_value || 'None'}
@@ -718,14 +718,14 @@ export const ReviewQueuePage: React.FC = () => {
                 )}
 
                 {activeFinding.suggested_action && (
-                  <div className="text-[11px] text-[#0D2538] bg-[#EEF6FA] border border-sentinel-100 rounded p-2">
+                  <div className="text-[11px] text-[#0D2538] bg-[#EEF6FA] border border-sentinel-100 rounded-none p-2">
                     <strong>Recommended Next Action:</strong> {activeFinding.suggested_action}
                   </div>
                 )}
               </div>
 
               {/* Priority Score Breakdown Card */}
-              <div className="border border-[#C9D3DB] rounded-lg p-3.5 space-y-2 bg-white">
+              <div className="border border-[#C9D3DB] rounded-none p-3.5 space-y-2 bg-white">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 text-[#253746] font-semibold text-xs">
                     <ShieldAlert className="w-4 h-4 text-amber-500" />
@@ -745,7 +745,7 @@ export const ReviewQueuePage: React.FC = () => {
 
               {/* Classification & Evidence References */}
               <div className="grid grid-cols-2 gap-3 text-xs">
-                <div className="border border-[#C9D3DB] rounded-lg p-3 space-y-1">
+                <div className="border border-[#C9D3DB] rounded-none p-3 space-y-1">
                   <span className="text-[10px] text-slate-400 font-semibold uppercase">Rule Classification</span>
                   <div className="font-medium text-[#253746]">
                     {activeFinding.rule_type === 'HEURISTIC' ? 'Heuristic Advisory Indicator' : 'Deterministic Rule'}
@@ -757,7 +757,7 @@ export const ReviewQueuePage: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="border border-[#C9D3DB] rounded-lg p-3 space-y-1">
+                <div className="border border-[#C9D3DB] rounded-none p-3 space-y-1">
                   <span className="text-[10px] text-slate-400 font-semibold uppercase">Policy Version Ref</span>
                   <div className="font-mono text-[#253746] text-[11px]">
                     {activeFinding.policy_version_ref || 'global-default'}
@@ -778,7 +778,7 @@ export const ReviewQueuePage: React.FC = () => {
                   <span>Review Observations & Action History</span>
                 </div>
 
-                <div className="border border-[#C9D3DB] rounded-lg divide-y divide-slate-100 bg-white max-h-48 overflow-y-auto">
+                <div className="border border-[#C9D3DB] rounded-none divide-y divide-slate-100 bg-white max-h-48 overflow-y-auto">
                   {activeFinding.review_notes && activeFinding.review_notes.length > 0 ? (
                     activeFinding.review_notes.map((note, idx) => (
                       <div key={note.id || idx} className="p-3 text-xs space-y-1">
@@ -792,12 +792,12 @@ export const ReviewQueuePage: React.FC = () => {
                           {note.action}
                         </div>
                         {note.reason && (
-                          <div className="text-[#5D6A75] bg-[#F5F4EF] border border-slate-100 rounded p-1.5 text-[11px]">
+                          <div className="text-[#5D6A75] bg-[#F5F4EF] border border-slate-100 rounded-none p-1.5 text-[11px]">
                             <strong>Reason:</strong> {note.reason}
                           </div>
                         )}
                         {note.note && (
-                          <div className="text-[#5D6A75] bg-[#F5F4EF] border border-slate-100 rounded p-1.5 text-[11px]">
+                          <div className="text-[#5D6A75] bg-[#F5F4EF] border border-slate-100 rounded-none p-1.5 text-[11px]">
                             {note.note}
                           </div>
                         )}
@@ -822,7 +822,7 @@ export const ReviewQueuePage: React.FC = () => {
                   <h3 className="font-semibold text-[#253746] text-xs">Officer Workflow Actions</h3>
 
                   {actionError && (
-                    <div className="bg-rose-50 border border-rose-200 text-rose-800 p-2.5 rounded text-xs">
+                    <div className="bg-rose-50 border border-rose-200 text-rose-800 p-2.5 rounded-none text-xs">
                       {actionError}
                     </div>
                   )}
@@ -834,7 +834,7 @@ export const ReviewQueuePage: React.FC = () => {
                         <button
                           onClick={() => handleStatusTransition('IN_REVIEW')}
                           disabled={isSubmittingAction}
-                          className="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded text-xs font-medium transition-colors shadow-sm"
+                          className="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-none text-xs font-medium transition-colors shadow-sm"
                         >
                           Mark In Review
                         </button>
@@ -847,7 +847,7 @@ export const ReviewQueuePage: React.FC = () => {
                               setActionType('RESOLVE');
                               setActionReason('');
                             }}
-                            className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-xs font-medium transition-colors shadow-sm"
+                            className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-none text-xs font-medium transition-colors shadow-sm"
                           >
                             Resolve Discrepancy...
                           </button>
@@ -857,7 +857,7 @@ export const ReviewQueuePage: React.FC = () => {
                               setActionType('DISMISS');
                               setActionReason('');
                             }}
-                            className="px-3 py-1.5 bg-slate-600 hover:bg-slate-700 text-white rounded text-xs font-medium transition-colors shadow-sm"
+                            className="px-3 py-1.5 bg-slate-600 hover:bg-slate-700 text-white rounded-none text-xs font-medium transition-colors shadow-sm"
                           >
                             Dismiss with Reason...
                           </button>
@@ -869,7 +869,7 @@ export const ReviewQueuePage: React.FC = () => {
                           setActionType('OBSERVE');
                           setActionReason('');
                         }}
-                        className="px-3 py-1.5 border border-[#8799A9] hover:bg-[#F5F4EF] text-[#253746] rounded text-xs font-medium transition-colors shadow-sm"
+                        className="px-3 py-1.5 border border-[#8799A9] hover:bg-[#F5F4EF] text-[#253746] rounded-none text-xs font-medium transition-colors shadow-sm"
                       >
                         Add Observation
                       </button>
@@ -878,7 +878,7 @@ export const ReviewQueuePage: React.FC = () => {
                         onClick={() => {
                           setActionType('ASSIGN');
                         }}
-                        className="px-3 py-1.5 border border-[#8799A9] hover:bg-[#F5F4EF] text-[#253746] rounded text-xs font-medium transition-colors shadow-sm"
+                        className="px-3 py-1.5 border border-[#8799A9] hover:bg-[#F5F4EF] text-[#253746] rounded-none text-xs font-medium transition-colors shadow-sm"
                       >
                         Assign Officer...
                       </button>
@@ -888,7 +888,7 @@ export const ReviewQueuePage: React.FC = () => {
                           setActionType('RETURN_CORRECTION');
                           setActionReason('');
                         }}
-                        className="px-3 py-1.5 bg-rose-50 border border-rose-200 hover:bg-rose-100 text-rose-700 rounded text-xs font-medium transition-colors shadow-sm"
+                        className="px-3 py-1.5 bg-rose-50 border border-rose-200 hover:bg-rose-100 text-rose-700 rounded-none text-xs font-medium transition-colors shadow-sm"
                       >
                         Return for Correction...
                       </button>
@@ -896,7 +896,7 @@ export const ReviewQueuePage: React.FC = () => {
                       <button
                         onClick={handleReevaluate}
                         disabled={isLoading}
-                        className="px-3 py-1.5 border border-[#8799A9] hover:bg-[#F5F4EF] text-[#253746] rounded text-xs font-medium transition-colors shadow-sm inline-flex items-center gap-1"
+                        className="px-3 py-1.5 border border-[#8799A9] hover:bg-[#F5F4EF] text-[#253746] rounded-none text-xs font-medium transition-colors shadow-sm inline-flex items-center gap-1"
                       >
                         <RefreshCw className={cn('w-3 h-3', isLoading && 'animate-spin')} />
                         Re-evaluate Finding
@@ -904,7 +904,7 @@ export const ReviewQueuePage: React.FC = () => {
                     </div>
                   ) : (
                     /* Inline Action Confirmation Form */
-                    <div className="bg-[#F5F4EF] border border-[#C9D3DB] rounded-lg p-3 space-y-3">
+                    <div className="bg-[#F5F4EF] border border-[#C9D3DB] rounded-none p-3 space-y-3">
                       <div className="flex items-center justify-between font-semibold text-[#253746] text-xs">
                         <span>
                           {actionType === 'RESOLVE' && 'Resolve Finding (Mandatory Reason Required)'}
@@ -930,7 +930,7 @@ export const ReviewQueuePage: React.FC = () => {
                           <select
                             value={selectedOfficerId}
                             onChange={(e) => setSelectedOfficerId(e.target.value)}
-                            className="w-full bg-white border border-[#C9D3DB] rounded p-2 text-xs outline-none"
+                            className="w-full bg-white border border-[#C9D3DB] rounded-none p-2 text-xs outline-none"
                           >
                             <option value="">-- Choose Officer --</option>
                             {officers.map((o) => (
@@ -942,7 +942,7 @@ export const ReviewQueuePage: React.FC = () => {
                           <button
                             onClick={handleAssign}
                             disabled={!selectedOfficerId || isSubmittingAction}
-                            className="px-3 py-1.5 bg-[#123B5D] hover:bg-[#0D2538] text-white rounded text-xs font-semibold disabled:opacity-50"
+                            className="px-3 py-1.5 bg-[#123B5D] hover:bg-[#0D2538] text-white rounded-none text-xs font-semibold disabled:opacity-50"
                           >
                             Confirm Assignment
                           </button>
@@ -958,7 +958,7 @@ export const ReviewQueuePage: React.FC = () => {
                             value={actionReason}
                             onChange={(e) => setActionReason(e.target.value)}
                             rows={3}
-                            className="w-full bg-white border border-[#C9D3DB] rounded p-2 text-xs outline-none focus:ring-1 focus:ring-sentinel-500"
+                            className="w-full bg-white border border-[#C9D3DB] rounded-none p-2 text-xs outline-none focus:ring-1 focus:ring-sentinel-500"
                           />
                           <div className="flex items-center justify-between">
                             <span className="text-[10px] text-slate-400">
@@ -975,7 +975,7 @@ export const ReviewQueuePage: React.FC = () => {
                                 actionReason.trim().length < (actionType === 'OBSERVE' ? 3 : 10) ||
                                 isSubmittingAction
                               }
-                              className="px-3 py-1.5 bg-[#123B5D] hover:bg-[#0D2538] text-white rounded text-xs font-semibold disabled:opacity-50"
+                              className="px-3 py-1.5 bg-[#123B5D] hover:bg-[#0D2538] text-white rounded-none text-xs font-semibold disabled:opacity-50"
                             >
                               {isSubmittingAction ? 'Submitting...' : 'Confirm Action'}
                             </button>
@@ -1002,7 +1002,7 @@ export const ReviewQueuePage: React.FC = () => {
       {/* ========================================================================= */}
       {activeScoreDetails && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-[10px] shadow-2xl max-w-xl w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+          <div className="bg-white rounded-none shadow-2xl max-w-xl w-full overflow-hidden animate-in fade-in zoom-in-95 duration-150">
             {/* Header */}
             <div className="p-4 border-b border-[#C9D3DB] flex items-center justify-between bg-[#F5F4EF]">
               <div className="flex items-center gap-2">
@@ -1022,14 +1022,14 @@ export const ReviewQueuePage: React.FC = () => {
             {/* Content */}
             <div className="p-5 space-y-4 max-h-[80vh] overflow-y-auto">
               {/* Disclaimer Banner */}
-              <div className="bg-amber-50 border border-amber-200 text-amber-900 rounded-lg p-3 text-xs leading-relaxed">
+              <div className="bg-amber-50 border border-amber-200 text-amber-900 rounded-none p-3 text-xs leading-relaxed">
                 <strong>Transparent Review-Ordering Metric:</strong> {activeScoreDetails.disclaimer}
               </div>
 
               {/* Factor Contribution Table */}
               <div className="space-y-2">
                 <span className="font-semibold text-[#253746] text-xs">Deterministic Factor Breakdown</span>
-                <div className="border border-[#C9D3DB] rounded-lg divide-y divide-slate-100 overflow-hidden">
+                <div className="border border-[#C9D3DB] rounded-none divide-y divide-slate-100 overflow-hidden">
                   {activeScoreDetails.factor_breakdown.map((f, i) => (
                     <div key={i} className="p-3 text-xs space-y-1 bg-white">
                       <div className="flex items-center justify-between font-medium">
@@ -1038,7 +1038,7 @@ export const ReviewQueuePage: React.FC = () => {
                         </span>
                         <div className="flex items-center gap-1.5">
                           {f.is_missing ? (
-                            <span className="text-[10px] bg-slate-100 text-[#5D6A75] px-1.5 py-0.5 rounded border border-[#C9D3DB]">
+                            <span className="text-[10px] bg-slate-100 text-[#5D6A75] px-1.5 py-0.5 rounded-none border border-[#C9D3DB]">
                               Unknown/Missing
                             </span>
                           ) : (
@@ -1056,7 +1056,7 @@ export const ReviewQueuePage: React.FC = () => {
 
               {/* Missing Fields Note */}
               {activeScoreDetails.missing_fields && activeScoreDetails.missing_fields.length > 0 && (
-                <div className="text-[11px] text-[#5D6A75] bg-[#F5F4EF] border border-[#C9D3DB] rounded p-2.5">
+                <div className="text-[11px] text-[#5D6A75] bg-[#F5F4EF] border border-[#C9D3DB] rounded-none p-2.5">
                   <strong>Missing / Non-penalized Inputs:</strong>{' '}
                   {activeScoreDetails.missing_fields.join(', ')}
                   <p className="text-[10px] text-slate-400 mt-0.5">
@@ -1070,7 +1070,7 @@ export const ReviewQueuePage: React.FC = () => {
             <div className="p-3 border-t border-[#C9D3DB] bg-[#F5F4EF] flex justify-end">
               <button
                 onClick={() => setActiveScoreDetails(null)}
-                className="px-4 py-1.5 bg-slate-700 hover:bg-slate-800 text-white rounded text-xs font-semibold"
+                className="px-4 py-1.5 bg-slate-700 hover:bg-slate-800 text-white rounded-none text-xs font-semibold"
               >
                 Close
               </button>

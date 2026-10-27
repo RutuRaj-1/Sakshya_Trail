@@ -63,11 +63,11 @@ export const AuditorWorkspace: React.FC = () => {
   return (
     <div className="space-y-6 max-w-7xl mx-auto font-sans">
       {/* Top Banner — Auditor Cockpit */}
-      <div className="bg-[#0D2538] rounded-[10px] p-6 text-white shadow-xs border border-[#1e3c54]">
+      <div className="bg-[#0D2538] rounded-none p-6 text-white shadow-xs border border-[#1e3c54]">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-1.5">
-              <span className="bg-[#123B5D] text-[#8ACEC8] border border-[#0F766E]/40 text-[10px] font-semibold px-2 py-0.5 rounded font-mono uppercase">
+              <span className="bg-[#123B5D] text-[#8ACEC8] border border-[#0F766E]/40 text-[10px] font-semibold px-2 py-0.5 rounded-none font-mono uppercase">
                 Compliance & Integrity
               </span>
               <span className="text-[#8799A9] text-xs font-mono">Independent Auditor Cockpit</span>
@@ -108,7 +108,7 @@ export const AuditorWorkspace: React.FC = () => {
       </div>
 
       {/* Auditor Read-Only Guardrail Notice */}
-      <div className="bg-[#EEF6FA] border border-[#C4DEED] rounded-lg p-3.5 flex items-start gap-2.5 text-xs text-[#245B7A]">
+      <div className="bg-[#EEF6FA] border border-[#C4DEED] rounded-none p-3.5 flex items-start gap-2.5 text-xs text-[#245B7A]">
         <Lock className="w-4 h-4 shrink-0 mt-0.5" />
         <p className="leading-relaxed">
           <strong>Auditor Read-Only Invariant (PRD-FR-095):</strong> You have read-only inspection access across all platform modules. All business state mutation controls (creation, editing, approvals, trust transitions) are strictly disabled. The &ldquo;Verify Audit Chain&rdquo; action is an idempotent, read-only cryptographic validation operation.
@@ -116,7 +116,7 @@ export const AuditorWorkspace: React.FC = () => {
       </div>
 
       {error && (
-        <div className="bg-rose-50 border border-rose-200 rounded-lg p-4 flex items-center justify-between text-xs text-rose-800">
+        <div className="bg-rose-50 border border-rose-200 rounded-none p-4 flex items-center justify-between text-xs text-rose-800">
           <div className="flex items-center gap-2">
             <AlertCircle className="w-4 h-4 text-rose-600" />
             <span>{error}</span>
@@ -129,7 +129,7 @@ export const AuditorWorkspace: React.FC = () => {
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="p-4 border-[#C9D3DB]">
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-lg bg-[#E7F3EC] text-[#18794E] border border-[#B4DFC9]">
+            <div className="p-3 rounded-none bg-[#E7F3EC] text-[#18794E] border border-[#B4DFC9]">
               <ShieldCheck className="w-5 h-5" />
             </div>
             <div>
@@ -146,7 +146,7 @@ export const AuditorWorkspace: React.FC = () => {
 
         <Card className="p-4 border-[#C9D3DB]">
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-lg bg-[#EEF6FA] text-[#123B5D] border border-[#C4DEED]">
+            <div className="p-3 rounded-none bg-[#EEF6FA] text-[#123B5D] border border-[#C4DEED]">
               <History className="w-5 h-5" />
             </div>
             <div>
@@ -161,7 +161,7 @@ export const AuditorWorkspace: React.FC = () => {
 
         <Card className="p-4 border-[#C9D3DB]">
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-lg bg-[#E6F4F2] text-[#0F766E] border border-[#99D5CE]">
+            <div className="p-3 rounded-none bg-[#E6F4F2] text-[#0F766E] border border-[#99D5CE]">
               <FileCheck2 className="w-5 h-5" />
             </div>
             <div>
@@ -176,7 +176,7 @@ export const AuditorWorkspace: React.FC = () => {
 
         <Card className="p-4 border-[#C9D3DB]">
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-lg bg-[#F5F4EF] text-[#5D6A75] border border-[#C9D3DB]">
+            <div className="p-3 rounded-none bg-[#F5F4EF] text-[#5D6A75] border border-[#C9D3DB]">
               <Lock className="w-5 h-5" />
             </div>
             <div>
@@ -192,7 +192,7 @@ export const AuditorWorkspace: React.FC = () => {
 
       {/* Cryptographic Proof Card */}
       {chainStatus && (
-        <div className="bg-white rounded-[10px] border border-[#C9D3DB] p-4 shadow-2xs space-y-2">
+        <div className="bg-white rounded-none border border-[#C9D3DB] p-4 shadow-2xs space-y-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-emerald-600" />
@@ -204,7 +204,7 @@ export const AuditorWorkspace: React.FC = () => {
               Verified at: {new Date(chainStatus.verification_timestamp).toLocaleTimeString()}
             </span>
           </div>
-          <div className="p-3 rounded-lg bg-emerald-50/50 border border-emerald-200 text-xs font-mono text-emerald-900 leading-relaxed">
+          <div className="p-3 rounded-none bg-emerald-50/50 border border-emerald-200 text-xs font-mono text-emerald-900 leading-relaxed">
             Status: <span className="font-bold">{chainStatus.status}</span> &bull; Scope:{' '}
             {chainStatus.verification_scope_description} &bull; Verified count: {chainStatus.verified_count} events &bull; Latest Sequence:{' '}
             {chainStatus.latest_sequence_number ?? 'N/A'}
@@ -227,7 +227,7 @@ export const AuditorWorkspace: React.FC = () => {
           </Link>
         </div>
 
-        <div className="bg-white rounded-[10px] border border-[#C9D3DB] overflow-hidden shadow-2xs">
+        <div className="bg-white rounded-none border border-[#C9D3DB] overflow-hidden shadow-2xs">
           {events.length === 0 ? (
             <p className="text-xs text-[#5D6A75] text-center py-8">No audit events recorded.</p>
           ) : (
@@ -263,7 +263,7 @@ export const AuditorWorkspace: React.FC = () => {
                       </td>
                       <td className="py-2.5 px-4">
                         <span
-                          className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded ${
+                          className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-none ${
                             ev.outcome === 'SUCCESS'
                               ? 'bg-emerald-100 text-emerald-800'
                               : 'bg-rose-100 text-rose-800'

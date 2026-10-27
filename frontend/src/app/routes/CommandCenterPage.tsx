@@ -149,10 +149,10 @@ export const CommandCenterPage: React.FC = () => {
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-12">
       {/* Top Cockpit Header - Structured Brutalism Container */}
-      <div className="bg-[#0D2538] rounded-[10px] p-6 text-white shadow-[0_1px_3px_rgba(13,37,56,0.08)] border border-[#1e3c54] flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-[#0D2538] rounded-none p-6 text-white shadow-[0_1px_3px_rgba(13,37,56,0.08)] border border-[#1e3c54] flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="space-y-1.5 max-w-2xl">
           <div className="flex items-center gap-2">
-            <span className="bg-[#123B5D] text-[#8ACEC8] border border-[#0F766E]/40 text-[11px] font-semibold px-2.5 py-0.5 rounded-[4px] uppercase tracking-wider font-mono">
+            <span className="bg-[#123B5D] text-[#8ACEC8] border border-[#0F766E]/40 text-[11px] font-semibold px-2.5 py-0.5 rounded-none uppercase tracking-wider font-mono">
               {isInstitutionUser ? 'Institution Command Center' : 'Bureau Executive Cockpit'}
             </span>
             <span className="text-[#8799A9] text-xs font-mono">SIH 26265</span>
@@ -173,7 +173,7 @@ export const CommandCenterPage: React.FC = () => {
               setInspectedMetricId(null);
               setDictionaryOpen(true);
             }}
-            className="inline-flex items-center gap-1.5 px-3 py-2 bg-[#123B5D] hover:bg-[#0D2538] text-white text-xs font-medium rounded-[8px] border border-[#8799A9] shadow-2xs transition cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3 py-2 bg-[#123B5D] hover:bg-[#0D2538] text-white text-xs font-medium rounded-none border border-[#8799A9] shadow-2xs transition cursor-pointer"
           >
             <BookOpen className="w-4 h-4 text-[#8ACEC8]" />
             <span>Metric Dictionary (PRD-FR-077)</span>
@@ -183,7 +183,7 @@ export const CommandCenterPage: React.FC = () => {
             type="button"
             onClick={loadCommandCenterData}
             disabled={isLoading}
-            className="inline-flex items-center gap-1.5 px-3 py-2 bg-[#0F766E] hover:bg-[#09544E] text-white text-xs font-semibold rounded-[8px] shadow-2xs transition disabled:opacity-50 cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3 py-2 bg-[#0F766E] hover:bg-[#09544E] text-white text-xs font-semibold rounded-none shadow-2xs transition disabled:opacity-50 cursor-pointer"
           >
             <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
             <span>{isLoading ? 'Refreshing...' : 'Refresh Live Data'}</span>
@@ -194,7 +194,7 @@ export const CommandCenterPage: React.FC = () => {
 
       {/* Error Banner with Retry */}
       {error && (
-        <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-900 flex items-start justify-between gap-3 text-xs">
+        <div className="p-4 rounded-none bg-rose-50 border border-rose-200 text-rose-900 flex items-start justify-between gap-3 text-xs">
           <div className="flex items-start gap-2">
             <AlertCircle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
             <div>
@@ -207,7 +207,7 @@ export const CommandCenterPage: React.FC = () => {
           <button
             type="button"
             onClick={loadCommandCenterData}
-            className="px-3 py-1 bg-white border border-rose-300 rounded font-semibold text-rose-800 hover:bg-rose-100 shrink-0"
+            className="px-3 py-1 bg-white border border-rose-300 rounded-none font-semibold text-rose-800 hover:bg-rose-100 shrink-0"
           >
             Retry Aggregation
           </button>
@@ -217,7 +217,7 @@ export const CommandCenterPage: React.FC = () => {
       {/* Dual Governance Strip: Relocated Trust Hierarchy Guide & Live Cryptographic Audit Integrity */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
         {/* Relocated Trust Hierarchy Guide (L0–L3) */}
-        <div className="lg:col-span-8 bg-white rounded-[10px] border border-[#C9D3DB] p-4 shadow-2xs">
+        <div className="lg:col-span-8 bg-white rounded-none border border-[#C9D3DB] p-4 shadow-2xs">
           <div className="flex items-center justify-between mb-2 pb-2 border-b border-slate-100">
             <div className="flex items-center gap-2">
               <FileCheck2 className="w-4 h-4 text-[#0F766E]" />
@@ -229,25 +229,25 @@ export const CommandCenterPage: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-            <div className="p-2.5 rounded-[6px] bg-[#F5F4EF] border border-[#C9D3DB]">
+            <div className="p-2.5 rounded-none bg-[#F5F4EF] border border-[#C9D3DB]">
               <div className="font-mono font-bold text-[#5D6A75] text-[11px]">L0 — DECLARED</div>
               <p className="text-[10px] text-[#253746] mt-0.5 font-medium leading-tight">
                 Self-declared by institution. Unverified intake.
               </p>
             </div>
-            <div className="p-2.5 rounded-[6px] bg-blue-50/50 border border-blue-200">
+            <div className="p-2.5 rounded-none bg-blue-50/50 border border-blue-200">
               <div className="font-mono font-bold text-blue-800 text-[11px]">L1 — DOC-CONSISTENT</div>
               <p className="text-[10px] text-blue-950 mt-0.5 font-medium leading-tight">
                 Matches uploaded certificate scan. Not authenticated.
               </p>
             </div>
-            <div className="p-2.5 rounded-[6px] bg-teal-50/50 border border-teal-200">
+            <div className="p-2.5 rounded-none bg-teal-50/50 border border-teal-200">
               <div className="font-mono font-bold text-[#0F766E] text-[11px]">L2 — OFFICER-VERIFIED</div>
               <p className="text-[10px] text-teal-950 mt-0.5 font-medium leading-tight">
                 Scrutiny officer reviewed with attested rationale.
               </p>
             </div>
-            <div className="p-2.5 rounded-[6px] bg-emerald-50/50 border border-emerald-200">
+            <div className="p-2.5 rounded-none bg-emerald-50/50 border border-emerald-200">
               <div className="font-mono font-bold text-emerald-800 text-[11px]">L3 — BANK-CONFIRMED</div>
               <p className="text-[10px] text-emerald-950 mt-0.5 font-medium leading-tight">
                 Direct host-to-host or authenticated source reply.
@@ -257,7 +257,7 @@ export const CommandCenterPage: React.FC = () => {
         </div>
 
         {/* Cryptographic Audit Chain Status Card */}
-        <div className="lg:col-span-4 bg-white rounded-[10px] border border-[#C9D3DB] p-4 shadow-2xs flex flex-col justify-between">
+        <div className="lg:col-span-4 bg-white rounded-none border border-[#C9D3DB] p-4 shadow-2xs flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-2 pb-2 border-b border-slate-100">
               <div className="flex items-center gap-2">
@@ -271,12 +271,12 @@ export const CommandCenterPage: React.FC = () => {
 
             <div className="flex items-center gap-2 mt-1">
               {auditChainStatus?.is_chain_intact ? (
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-emerald-100 text-emerald-900 border border-emerald-200 font-mono text-xs font-bold">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-none bg-emerald-100 text-emerald-900 border border-emerald-200 font-mono text-xs font-bold">
                   <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700" />
                   <span>CHAIN VERIFIED (PASS)</span>
                 </div>
               ) : (
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-teal-50 text-[#0F766E] border border-teal-200 font-mono text-xs font-semibold">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-none bg-teal-50 text-[#0F766E] border border-teal-200 font-mono text-xs font-semibold">
                   <CheckCircle2 className="w-3.5 h-3.5 text-[#0F766E]" />
                   <span>CHAIN INTACT (ACTIVE)</span>
                 </div>
