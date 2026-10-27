@@ -48,56 +48,59 @@ export const LandingPage: React.FC = () => {
       {/* =========================================================================
           SECTION A: TOP NAVIGATION BAR
          ========================================================================= */}
-      <header className="sticky top-0 z-50 st-glass-panel border-b border-[#C9D3DB] shadow-xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-          {/* Logo & Brand Wordmark */}
-          <Link to="/" className="flex items-center gap-3 group focus:outline-none focus:ring-2 focus:ring-[#0F766E] rounded-xl p-1">
+      <header className="sticky top-0 z-50 st-glass-panel border-b border-[#C9D3DB] shadow-xs bg-white/95 backdrop-blur-md">
+        <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-12 h-20 flex items-center justify-between gap-4">
+          {/* Logo & Brand Wordmark - Aligned in Left Corner */}
+          <Link
+            to="/"
+            className="flex items-center gap-3 shrink-0 group focus:outline-none focus:ring-2 focus:ring-[#0F766E] rounded-xl p-1"
+          >
             <img
               src="/logo.png"
               alt="SakshyaTrail Logo"
-              className="h-12 w-auto object-contain transition-transform group-hover:scale-105 drop-shadow-xs"
+              className="h-11 sm:h-12 w-auto object-contain transition-transform group-hover:scale-105 drop-shadow-xs shrink-0"
             />
-            <div className="hidden sm:block">
+            <div className="hidden sm:block shrink-0">
               <div className="flex items-center gap-1.5">
-                <span className="text-xl font-extrabold tracking-tight text-[#0D2538]">
+                <span className="text-xl font-extrabold tracking-tight text-[#0D2538] whitespace-nowrap">
                   Sakshya<span className="text-[#0F766E]">Trail</span>
                 </span>
-                <span className="text-[10px] font-mono font-semibold uppercase bg-teal-50 text-[#0F766E] border border-teal-200 px-1.5 py-0.5 rounded">
+                <span className="text-[10px] font-mono font-semibold uppercase bg-teal-50 text-[#0F766E] border border-teal-200 px-1.5 py-0.5 rounded whitespace-nowrap">
                   SIH 26265
                 </span>
               </div>
-              <p className="text-[11px] font-medium text-[#5D6A75] leading-tight">
+              <p className="text-[11px] font-medium text-[#5D6A75] leading-tight whitespace-nowrap">
                 Security Deposit & FDR Lifecycle Integrity Platform
               </p>
             </div>
           </Link>
 
-          {/* Center Navigation Links (Desktop) */}
-          <nav className="hidden lg:flex items-center gap-1 text-sm font-medium text-[#5D6A75]">
+          {/* Center Navigation Links (Desktop) - Alligned in One Line */}
+          <nav className="hidden lg:flex items-center justify-center gap-1 xl:gap-2 text-xs xl:text-sm font-medium text-[#5D6A75] whitespace-nowrap flex-nowrap">
             {navLinks.map((link) => (
               <a
                 key={link.name}
                 href={link.href}
-                className="px-3 py-1.5 rounded-lg hover:text-[#0D2538] hover:bg-slate-100/80 transition-colors"
+                className="px-2.5 xl:px-3 py-1.5 rounded-lg hover:text-[#0D2538] hover:bg-slate-100/80 transition-colors whitespace-nowrap shrink-0"
               >
                 {link.name}
               </a>
             ))}
           </nav>
 
-          {/* Right Action: Sign In or Access Dashboard */}
-          <div className="hidden sm:flex items-center gap-3">
+          {/* Right Action: Sign In or Access Dashboard - Aligned in Right Corner */}
+          <div className="hidden sm:flex items-center gap-2.5 shrink-0 justify-end">
             {isAuthenticated ? (
               <div className="flex items-center gap-3">
-                <span className="text-xs text-[#5D6A75] hidden md:inline">
+                <span className="text-xs text-[#5D6A75] hidden xl:inline whitespace-nowrap">
                   Signed in as <strong className="text-[#0D2538] font-mono">{user?.role}</strong>
                 </span>
                 <Link to="/dashboard">
                   <Button
                     size="sm"
-                    className="bg-[#123B5D] hover:bg-[#0D2538] text-white font-semibold shadow-sm"
+                    className="bg-[#123B5D] hover:bg-[#0D2538] text-white font-semibold shadow-sm whitespace-nowrap cursor-pointer"
                   >
-                    <SlidersHorizontal className="w-3.5 h-3.5 mr-1.5" /> Access Dashboard
+                    <SlidersHorizontal className="w-3.5 h-3.5 mr-1.5 shrink-0" /> Access Dashboard
                   </Button>
                 </Link>
               </div>
@@ -107,7 +110,7 @@ export const LandingPage: React.FC = () => {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="border-[#C9D3DB] text-[#123B5D] hover:bg-slate-100 font-medium"
+                    className="border-[#C9D3DB] text-[#123B5D] hover:bg-slate-100 font-medium whitespace-nowrap cursor-pointer"
                   >
                     Sign In
                   </Button>
@@ -115,9 +118,10 @@ export const LandingPage: React.FC = () => {
                 <Link to="/login">
                   <Button
                     size="sm"
-                    className="bg-[#0F766E] hover:bg-teal-700 text-white font-semibold shadow-xs"
+                    className="bg-[#0F766E] hover:bg-teal-700 text-white font-semibold shadow-xs whitespace-nowrap cursor-pointer inline-flex items-center"
                   >
-                    Access Portal <ArrowRight className="w-3.5 h-3.5 ml-1" />
+                    <span>Access Portal</span>
+                    <ArrowRight className="w-3.5 h-3.5 ml-1 shrink-0" />
                   </Button>
                 </Link>
               </div>
@@ -125,15 +129,15 @@ export const LandingPage: React.FC = () => {
           </div>
 
           {/* Mobile Menu Hamburger Toggle */}
-          <div className="flex lg:hidden items-center gap-2">
+          <div className="flex lg:hidden items-center gap-2 shrink-0">
             <Link to="/login" className="sm:hidden">
-              <Button size="sm" className="bg-[#123B5D] text-white text-xs px-2.5 py-1">
+              <Button size="sm" className="bg-[#123B5D] text-white text-xs px-2.5 py-1 whitespace-nowrap">
                 Sign In
               </Button>
             </Link>
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500"
+              className="p-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500 cursor-pointer"
               aria-label="Toggle mobile menu"
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
