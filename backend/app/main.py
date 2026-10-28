@@ -36,6 +36,10 @@ async def lifespan(app: FastAPI):
     # Startup: Ensure tables exist for local development / testing
     try:
         Base.metadata.create_all(bind=engine)
+        from app.db.session import SessionLocal
+        from app.modules.documents.service import DocumentService
+        with SessionLocal() as db:
+            DocumentService.initialize_default_categories(db)
     except Exception as exc:
         print(f"[Startup Warning] Could not automatically create tables: {exc}")
     yield

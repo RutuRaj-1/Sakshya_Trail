@@ -144,7 +144,14 @@ def get_scanner_provider() -> ScannerProvider:
     """
     global _scanner_provider
     if _scanner_provider is None:
-        _scanner_provider = DisabledScannerProvider()
+        try:
+            from app.core.config import settings
+            if getattr(settings, "SAKSHYATRAIL_DEMO_MODE", False) or getattr(settings, "ENVIRONMENT", "") == "development":
+                _scanner_provider = DemoScannerProvider()
+            else:
+                _scanner_provider = DisabledScannerProvider()
+        except Exception:
+            _scanner_provider = DisabledScannerProvider()
     return _scanner_provider
 
 

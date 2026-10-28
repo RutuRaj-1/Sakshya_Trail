@@ -90,12 +90,12 @@ export const ScrutinyOfficerWorkspace: React.FC = () => {
               </Button>
             </Link>
             <Link to="/verification">
-              <Button size="sm" variant="outline" className="border-[#8799A9] text-white hover:bg-[#123B5D]">
+              <Button size="sm" variant="outline" className="border-[#8799A9] text-white hover:bg-[#123B5D] hover:text-white hover:border-[#C9D3DB] bg-transparent">
                 <ShieldCheck className="w-4 h-4 mr-1.5" /> Verification Desk
               </Button>
             </Link>
             <Link to="/search">
-              <Button size="sm" variant="outline" className="border-[#8799A9] text-white hover:bg-[#123B5D]">
+              <Button size="sm" variant="outline" className="border-[#8799A9] text-white hover:bg-[#123B5D] hover:text-white hover:border-[#C9D3DB] bg-transparent">
                 <Search className="w-4 h-4 mr-1.5" /> Unified Search
               </Button>
             </Link>

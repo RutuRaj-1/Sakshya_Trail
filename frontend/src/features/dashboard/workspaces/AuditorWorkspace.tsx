@@ -91,12 +91,12 @@ export const AuditorWorkspace: React.FC = () => {
               {isVerifying ? 'Verifying Chain...' : 'Verify Audit Chain'}
             </Button>
             <Link to="/audit">
-              <Button size="sm" variant="outline" className="border-[#8799A9] text-white hover:bg-[#123B5D]">
+              <Button size="sm" variant="outline" className="border-[#8799A9] text-white hover:bg-[#123B5D] hover:text-white hover:border-[#C9D3DB] bg-transparent">
                 <History className="w-4 h-4 mr-1.5" /> Full Audit Explorer
               </Button>
             </Link>
             <Link to="/reports">
-              <Button size="sm" variant="outline" className="border-[#8799A9] text-white hover:bg-[#123B5D]">
+              <Button size="sm" variant="outline" className="border-[#8799A9] text-white hover:bg-[#123B5D] hover:text-white hover:border-[#C9D3DB] bg-transparent">
                 <FileSpreadsheet className="w-4 h-4 mr-1.5" /> Evidence Exports
               </Button>
             </Link>

@@ -208,6 +208,10 @@ def _evaluate_document_completeness(
         normalized_docs = dict(docs_by_category)
         if "FDR_COPY" in normalized_docs and "FDR_RECEIPT" not in normalized_docs:
             normalized_docs["FDR_RECEIPT"] = normalized_docs["FDR_COPY"]
+        if "FDR_CERTIFICATE" in normalized_docs and "FDR_RECEIPT" not in normalized_docs:
+            normalized_docs["FDR_RECEIPT"] = normalized_docs["FDR_CERTIFICATE"]
+        if "DISCHARGE_SANCTION" in normalized_docs and "SANCTION_ORDER" not in normalized_docs:
+            normalized_docs["SANCTION_ORDER"] = normalized_docs["DISCHARGE_SANCTION"]
 
         required_categories = ["FDR_RECEIPT", "SANCTION_ORDER"]
         

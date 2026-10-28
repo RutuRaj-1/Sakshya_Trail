@@ -84,7 +84,7 @@ export const CompetentAuthorityWorkspace: React.FC = () => {
               </Button>
             </Link>
             <Link to="/audit">
-              <Button size="sm" variant="outline" className="border-[#8799A9] text-white hover:bg-[#123B5D]">
+              <Button size="sm" variant="outline" className="border-[#8799A9] text-white hover:bg-[#123B5D] hover:text-white hover:border-[#C9D3DB] bg-transparent">
                 <History className="w-4 h-4 mr-1.5" /> Decision Audit Trail
               </Button>
             </Link>

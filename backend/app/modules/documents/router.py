@@ -515,6 +515,26 @@ async def trigger_version_extraction_endpoint(
         raise NotFoundException("Version not found for this document")
 
     if version.processing_status != "CLEAN":
+        from app.modules.documents.storage import get_storage_provider
+        scanner = get_scanner_provider()
+        storage = get_storage_provider()
+        try:
+            fc = storage.read_file(version.storage_key)
+            scan_res = scanner.scan_bytes(fc, version.original_filename)
+            if scan_res.status == "CLEAN":
+                DocumentService.update_version_processing_status(
+                    db=db,
+                    version_id=version.id,
+                    processing_status=scan_res.status,
+                    scan_provider=scan_res.provider,
+                    scan_result_json=scan_res.to_json(),
+                    error_details=scan_res.error_message,
+                )
+                db.refresh(version)
+        except Exception:
+            pass
+
+    if version.processing_status != "CLEAN":
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Extraction cannot run on file with processing status '{version.processing_status}'. Only CLEAN files can be extracted.",

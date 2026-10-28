@@ -93,12 +93,12 @@ export const InstitutionWorkspace: React.FC = () => {
               </Button>
             </Link>
             <Link to="/documents">
-              <Button size="sm" variant="outline" className="border-[#8799A9] text-white hover:bg-[#123B5D]">
+              <Button size="sm" variant="outline" className="border-[#8799A9] text-white hover:bg-[#123B5D] hover:text-white hover:border-[#C9D3DB] bg-transparent">
                 <UploadCloud className="w-4 h-4 mr-1.5" /> Upload Evidence
               </Button>
             </Link>
             <Link to="/release">
-              <Button size="sm" variant="outline" className="border-[#8799A9] text-white hover:bg-[#123B5D]">
+              <Button size="sm" variant="outline" className="border-[#8799A9] text-white hover:bg-[#123B5D] hover:text-white hover:border-[#C9D3DB] bg-transparent">
                 <FileText className="w-4 h-4 mr-1.5" /> Release Petition
               </Button>
             </Link>

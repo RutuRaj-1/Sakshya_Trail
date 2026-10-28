@@ -585,6 +585,9 @@ export const DocumentsEvidencePage: React.FC = () => {
                   <option value="BANK_CONFIRMATION_LETTER">Bank Confirmation Letter</option>
                   <option value="RENEWAL_ADVICE">Renewal / Lineage Rollover Notice</option>
                   <option value="DISCHARGE_SANCTION">Discharge / Release Sanction Order</option>
+                  <option value="LIEN_OR_PLEDGE_LETTER">Lien / Pledge Endorsement Letter</option>
+                  <option value="AFFIDAVIT">Sworn Affidavit from Institution</option>
+                  <option value="REQUEST_LETTER">Formal Release / Verification Request Letter</option>
                   <option value="OTHER_SUPPORTING">Other Supporting Evidence</option>
                 </select>
               </div>

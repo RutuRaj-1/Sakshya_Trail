@@ -21,12 +21,17 @@ PROCESSING_STATES = {
 DEFAULT_CATEGORIES = {
     "FDR_COPY": "Scanned copy of the Fixed Deposit Receipt",
     "FDR_RECEIPT": "Official FDR Receipt / Deposit Certificate",
+    "FDR_CERTIFICATE": "Fixed Deposit Certificate / Advice Scan",
     "SANCTION_ORDER": "Regulatory or Institution Sanction Order",
+    "DISCHARGE_SANCTION": "Discharge / Release Sanction Order",
     "BANK_CONFIRMATION": "Official bank confirmation letter",
+    "BANK_CONFIRMATION_LETTER": "Bank Confirmation Letter",
     "LIEN_OR_PLEDGE_LETTER": "Lien or pledge endorsement letter",
     "AFFIDAVIT": "Sworn affidavit from institution",
     "REQUEST_LETTER": "Letter requesting release/renewal/verification",
+    "RENEWAL_ADVICE": "Renewal / Lineage Rollover Notice",
     "SUPPORTING_DOCUMENT": "Additional supporting evidence",
+    "OTHER_SUPPORTING": "Other Supporting Evidence",
     "OTHER": "Other document types",
 }
 
