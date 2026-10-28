@@ -404,6 +404,8 @@ class DemoSeeder:
             ("Statutory Compliance Auditor", "auditor.compliance@aicte-india.org", "AuditorPassword@2026", ROLE_AUDITOR),
         ]
 
+        from app.core.security import verify_password, hash_password
+
         for name, email, pwd, role in internal_roles:
             user = db.query(User).filter(User.email == email).first()
             if not user:
@@ -421,6 +423,12 @@ class DemoSeeder:
                     )
                 self.stats["users_created"] += 1
                 print(f"  + Provisioned Internal User: {email} ({role})")
+            else:
+                if not self.dry_run and not verify_password(pwd, user.password_hash):
+                    user.password_hash = hash_password(pwd)
+                    user.full_name = f"{name} [DEMO]"
+                    user.is_active = True
+                    print(f"  * Reconciled credentials for: {email}")
 
         # 2. Exactly 20 Institution Users (1 per institution)
         for inst in institutions:
@@ -442,6 +450,12 @@ class DemoSeeder:
                         actor_role="SYSTEM_ADMIN",
                     )
                 self.stats["users_created"] += 1
+            else:
+                if not self.dry_run and not verify_password("NodalPassword@2026", user.password_hash):
+                    user.password_hash = hash_password("NodalPassword@2026")
+                    user.institution_id = inst.id
+                    user.is_active = True
+                    print(f"  * Reconciled credentials for: {email}")
 
     def _ensure_release_profile(self, db: Session) -> ReleaseChecklistProfile:
         profile = db.query(ReleaseChecklistProfile).filter(ReleaseChecklistProfile.profile_code == "DEMO-FDR-STANDARD").first()

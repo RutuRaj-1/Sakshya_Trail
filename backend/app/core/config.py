@@ -65,7 +65,7 @@ class Settings(BaseSettings):
     # Database
     DATABASE_URL: str = "sqlite:///./fdr_sentinel.db"
     SAKSHYATRAIL_DEMO_DATABASE_URL: str = "sqlite:///./fdr_sentinel_demo.db"
-    SAKSHYATRAIL_DEMO_MODE: bool = False
+    SAKSHYATRAIL_DEMO_MODE: bool = True
     DB_POOL_SIZE: int = 5
     DB_MAX_OVERFLOW: int = 10
     DB_TIMEOUT: int = 30

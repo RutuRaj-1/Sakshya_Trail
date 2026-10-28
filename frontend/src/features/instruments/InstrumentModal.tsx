@@ -346,7 +346,7 @@ export const InstrumentModal: React.FC<Props> = ({
                 <option value="">Select registered institution...</option>
                 {institutions.map((inst) => (
                   <option key={inst.id} value={inst.id}>
-                    {inst.code} — {inst.legal_name || inst.name} ({inst.city}, {inst.state})
+                    {inst.code} — {inst.display_name || inst.legal_name || inst.name} ({inst.city}, {inst.state})
                   </option>
                 ))}
               </select>

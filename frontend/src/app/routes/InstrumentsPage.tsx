@@ -304,7 +304,7 @@ export const InstrumentsPage: React.FC = () => {
               <option value="">All Institutions</option>
               {institutions.map((i) => (
                 <option key={i.id} value={i.id}>
-                  {i.code} — {i.legal_name || i.name}
+                  {i.code} — {i.display_name || i.legal_name || i.name} ({i.city})
                 </option>
               ))}
             </select>

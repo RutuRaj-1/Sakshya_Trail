@@ -96,7 +96,7 @@ def list_institutions(
         count_stmt = count_stmt.where(search_filter)
 
     total = db.scalar(count_stmt) or 0
-    items = db.scalars(stmt.order_by(Institution.created_at.desc()).offset(skip).limit(limit)).all()
+    items = db.scalars(stmt.order_by(Institution.code.asc()).offset(skip).limit(limit)).all()
     return items, total
 
 

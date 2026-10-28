@@ -22,10 +22,37 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
   const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
   const url = `${API_BASE_URL}${cleanEndpoint}`;
 
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-    ...(options.headers as Record<string, string> || {}),
-  };
+  const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData;
+
+  let headers: Record<string, string> = {};
+
+  if (!isFormData) {
+    headers['Content-Type'] = 'application/json';
+  }
+
+  if (options.headers) {
+    if (typeof Headers !== 'undefined' && options.headers instanceof Headers) {
+      options.headers.forEach((value, key) => {
+        headers[key] = value;
+      });
+    } else if (Array.isArray(options.headers)) {
+      for (const [key, value] of options.headers) {
+        headers[key] = value;
+      }
+    } else {
+      headers = { ...headers, ...(options.headers as Record<string, string>) };
+    }
+  }
+
+  if (isFormData) {
+    // If body is FormData, delete any manually passed Content-Type header so that
+    // fetch/browser generates the proper multipart boundary automatically.
+    for (const key of Object.keys(headers)) {
+      if (key.toLowerCase() === 'content-type') {
+        delete headers[key];
+      }
+    }
+  }
 
   try {
     const res = await fetch(url, {
@@ -66,26 +93,32 @@ export const apiClient = {
   get: <T>(endpoint: string, options?: RequestInit) =>
     request<T>(endpoint, { method: 'GET', ...options }),
 
-  post: <T>(endpoint: string, body?: any, options?: RequestInit) =>
-    request<T>(endpoint, {
+  post: <T>(endpoint: string, body?: any, options?: RequestInit) => {
+    const isFormData = typeof FormData !== 'undefined' && body instanceof FormData;
+    return request<T>(endpoint, {
       method: 'POST',
-      body: body ? JSON.stringify(body) : undefined,
+      body: isFormData ? body : (body !== undefined ? JSON.stringify(body) : undefined),
       ...options,
-    }),
+    });
+  },
 
-  put: <T>(endpoint: string, body?: any, options?: RequestInit) =>
-    request<T>(endpoint, {
+  put: <T>(endpoint: string, body?: any, options?: RequestInit) => {
+    const isFormData = typeof FormData !== 'undefined' && body instanceof FormData;
+    return request<T>(endpoint, {
       method: 'PUT',
-      body: body ? JSON.stringify(body) : undefined,
+      body: isFormData ? body : (body !== undefined ? JSON.stringify(body) : undefined),
       ...options,
-    }),
+    });
+  },
 
-  patch: <T>(endpoint: string, body?: any, options?: RequestInit) =>
-    request<T>(endpoint, {
+  patch: <T>(endpoint: string, body?: any, options?: RequestInit) => {
+    const isFormData = typeof FormData !== 'undefined' && body instanceof FormData;
+    return request<T>(endpoint, {
       method: 'PATCH',
-      body: body ? JSON.stringify(body) : undefined,
+      body: isFormData ? body : (body !== undefined ? JSON.stringify(body) : undefined),
       ...options,
-    }),
+    });
+  },
 
   delete: <T>(endpoint: string, options?: RequestInit) =>
     request<T>(endpoint, { method: 'DELETE', ...options }),

@@ -585,9 +585,7 @@ export const documentsApi = {
       extraction_status?: string | null;
       extracted_fields_id?: string | null;
       uploaded_at: string;
-    }>(`/instruments/${instrumentId}/documents`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    }),
+    }>(`/instruments/${instrumentId}/documents`, formData),
   uploadVersion: (documentId: string, formData: FormData) =>
     apiClient.post<{
       success: boolean;
@@ -603,9 +601,7 @@ export const documentsApi = {
       extraction_status?: string | null;
       extracted_fields_id?: string | null;
       uploaded_at: string;
-    }>(`/documents/${documentId}/versions`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    }),
+    }>(`/documents/${documentId}/versions`, formData),
   triggerExtraction: (documentId: string, versionId: string) =>
     apiClient.post<ExtractedFieldsDetail>(`/documents/${documentId}/versions/${versionId}/extract`),
   getDownloadUrl: (documentId: string, versionId: string) =>
