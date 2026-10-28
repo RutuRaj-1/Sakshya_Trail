@@ -175,7 +175,7 @@ def create_verification_request(
         status=VerificationRequestStatus.PENDING.value,
         snapshot_data_json=json.dumps(snapshot),
         requested_fields_json=json.dumps(fields_to_track),
-        correlation_id=correlation_id,
+        correlation_id=correlation_id or f"CORR-{uuid.uuid4().hex[:12].upper()}",
         attempt_count=1,
         last_attempt_at=datetime.now(timezone.utc),
         requested_by_user_id=current_user.id,
@@ -336,6 +336,44 @@ def dispatch_verification_request(
         req.status = VerificationRequestStatus.MATCH.value
     elif final_result == VerificationResult.MISMATCH.value:
         req.status = VerificationRequestStatus.MISMATCH.value
+        # Step 12: Generate persistent discrepancy findings in Module 3 validation engine
+        try:
+            from app.modules.validation.registry import RuleResult
+            from app.modules.validation.finding_service import upsert_finding
+            from app.modules.validation.enums import (
+                RuleOutcome,
+                RuleType,
+                RuleSeverity,
+                FindingCategory,
+            )
+
+            for mismatched_field, comp in field_comparisons.items():
+                if isinstance(comp, dict) and comp.get("is_match") is False:
+                    finding_result = RuleResult(
+                        rule_id="RULE_BANK_RECONCILIATION_MISMATCH",
+                        rule_version="1.0.0",
+                        rule_type=RuleType.DETERMINISTIC,
+                        outcome=RuleOutcome.FAIL,
+                        category=FindingCategory.CROSS_SOURCE_RECONCILIATION,
+                        severity=RuleSeverity.CRITICAL,
+                        title=f"Bank Verification Discrepancy: {mismatched_field.replace('_', ' ').title()}",
+                        explanation=(
+                            f"Bank confirmation returned '{comp.get('bank_value')}' for {mismatched_field}, "
+                            f"which conflicts with declared value '{comp.get('instrument_value')}'."
+                        ),
+                        observed_value=str(comp.get("bank_value")),
+                        expected_value=str(comp.get("instrument_value")),
+                        fingerprint_key=f"reconciliation_mismatch_{mismatched_field}",
+                    )
+                    upsert_finding(
+                        db=db,
+                        instrument_id=instrument.id,
+                        institution_id=instrument.institution_id,
+                        rule_result=finding_result,
+                        triggered_by_user_id=current_user.id,
+                    )
+        except Exception as exc:
+            pass
     elif final_result == VerificationResult.TIMEOUT.value:
         req.status = VerificationRequestStatus.TIMEOUT.value
         req.error_details = adapter_res.error_details

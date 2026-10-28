@@ -233,11 +233,47 @@ _storage_provider: Optional[StorageProvider] = None
 def get_storage_provider() -> StorageProvider:
     """
     Get or initialize the global storage provider instance.
-    Defaults to LocalFileStorageProvider if not explicitly set.
+
+    Selection priority:
+    1. If an explicit provider was set via set_storage_provider() (e.g. in tests), use it.
+    2. If DOCUMENT_STORAGE_BACKEND=firebase AND FIREBASE_STORAGE_ENABLED=true, attempt
+       to initialise FirebaseStorageProvider. On any initialisation failure, log a WARNING
+       and fall back to local storage rather than crashing startup.
+    3. Default: LocalFileStorageProvider (local filesystem).
     """
     global _storage_provider
     if _storage_provider is None:
-        _storage_provider = LocalFileStorageProvider()
+        try:
+            from app.core.config import settings
+            backend = getattr(settings, "DOCUMENT_STORAGE_BACKEND", "local").lower()
+            firebase_enabled = getattr(settings, "FIREBASE_STORAGE_ENABLED", False)
+
+            if backend == "firebase" and firebase_enabled:
+                try:
+                    from app.modules.documents.firebase_storage import FirebaseStorageProvider
+                    creds_path = getattr(settings, "GOOGLE_APPLICATION_CREDENTIALS", None)
+                    bucket = settings.FIREBASE_STORAGE_BUCKET
+                    if not bucket:
+                        raise ValueError("FIREBASE_STORAGE_BUCKET is not configured.")
+                    _storage_provider = FirebaseStorageProvider(
+                        bucket_name=bucket,
+                        credentials_path=creds_path,
+                    )
+                    print(
+                        f"[Storage] Backend: Firebase Cloud Storage "
+                        f"(bucket={bucket})"
+                    )
+                except Exception as exc:
+                    print(
+                        f"[Storage WARNING] Firebase storage unavailable: {exc}. "
+                        f"Falling back to local storage."
+                    )
+                    _storage_provider = LocalFileStorageProvider()
+            else:
+                _storage_provider = LocalFileStorageProvider()
+                print("[Storage] Backend: local filesystem")
+        except Exception:
+            _storage_provider = LocalFileStorageProvider()
     return _storage_provider
 
 

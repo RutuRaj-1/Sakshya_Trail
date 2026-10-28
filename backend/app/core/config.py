@@ -2,7 +2,7 @@
 Application Configuration Module
 Reads from environment variables and provides validated settings using Pydantic Settings.
 """
-from typing import List, Union
+from typing import List, Optional, Union
 from pydantic import AnyHttpUrl, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -85,10 +85,35 @@ class Settings(BaseSettings):
     FIREBASE_MESSAGING_SENDER_ID: str = "2017740195"
     FIREBASE_APP_ID: str = "1:2017740195:web:ed1355f7fd21cd3ad80616"
     FIREBASE_MEASUREMENT_ID: str = "G-YYNCY2BVT9"
+
+    # Firebase Storage Backend Control
+    # Set DOCUMENT_STORAGE_BACKEND=firebase and FIREBASE_STORAGE_ENABLED=true to activate.
+    # GOOGLE_APPLICATION_CREDENTIALS must point to your service account JSON (never commit it).
+    # If Firebase credentials are missing or invalid, startup will warn and fallback to local.
+    FIREBASE_STORAGE_ENABLED: bool = False
+    DOCUMENT_STORAGE_BACKEND: str = "local"  # "local" | "firebase"
+    GOOGLE_APPLICATION_CREDENTIALS: Optional[str] = None  # Absolute or relative path to service account JSON
+
     # Module 4: Verification Desk & Adapter Settings
     ENABLE_SIMULATED_VERIFICATION: bool = True  # Disabled in production
     LIVE_BANK_ADAPTER_ENABLED: bool = False     # Unconfigured until live bank partnership is authorized
     MAX_VERIFICATION_RETRY_ATTEMPTS: int = 3
+
+    # External Integration Architecture & Gateway Control (Prompt 2)
+    # INTEGRATION_MODE: "mock" (default demo/testing) | "sandbox" (authorized testbed) | "production"
+    INTEGRATION_MODE: str = "mock"
+    AICTE_INTEGRATION_ENABLED: bool = False
+    BANK_VERIFICATION_ENABLED: bool = False
+    AICTE_API_BASE_URL: Optional[str] = None
+    AICTE_API_KEY: Optional[str] = None
+    AICTE_CLIENT_ID: Optional[str] = None
+    AICTE_CLIENT_SECRET: Optional[str] = None
+    BANK_GATEWAY_BASE_URL: Optional[str] = None
+    BANK_GATEWAY_API_KEY: Optional[str] = None
+    BANK_GATEWAY_CLIENT_CERT_PATH: Optional[str] = None
+    INTEGRATION_TIMEOUT_SECONDS: int = 15
+    INTEGRATION_MAX_RETRIES: int = 3
+    INTEGRATION_RATE_LIMIT_PER_MINUTE: int = 60
 
     # Module 5: Lifecycle & Renewal Settings
     ENABLE_LIFECYCLE_DATE_ADVANCE: bool = True  # Demo-only date advance; disabled in production

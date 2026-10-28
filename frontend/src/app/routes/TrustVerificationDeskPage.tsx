@@ -67,6 +67,7 @@ export const TrustVerificationDeskPage: React.FC = () => {
   const [trustAssessments, setTrustAssessments] = useState<TrustAssessmentItem[]>([]);
   const [provenanceList, setProvenanceList] = useState<FieldProvenanceItem[]>([]);
   const [verificationRequests, setVerificationRequests] = useState<VerificationRequestItem[]>([]);
+  const [integrationStatus, setIntegrationStatus] = useState<any>(null);
 
   // Directory state (when searching or no instrument selected)
   const [instrumentsDirectory, setInstrumentsDirectory] = useState<Instrument[]>([]);
@@ -130,6 +131,10 @@ export const TrustVerificationDeskPage: React.FC = () => {
     try {
       const res = await instrumentsApi.list({ limit: 50 });
       setInstrumentsDirectory(res.items || []);
+      try {
+        const statusRes = await verificationApi.getIntegrationStatus();
+        setIntegrationStatus(statusRes);
+      } catch (e) {}
     } catch (err: any) {
       console.error('Failed to load instruments directory', err);
     } finally {
@@ -462,6 +467,36 @@ export const TrustVerificationDeskPage: React.FC = () => {
               <RefreshCw className={cn('w-4 h-4', isSearchingDirectory && 'animate-spin')} />
               Refresh
             </Button>
+          </div>
+        </div>
+
+        {/* Gateway & Environment Diagnostic Banner (Prompt 2) */}
+        <div className="p-4 rounded-none bg-slate-900 text-white border border-slate-700 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <div className="p-2 rounded-none bg-slate-800 border border-slate-600 text-emerald-400">
+              <ShieldCheck className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-300">External Gateway Architecture:</span>
+                <span className="px-2 py-0.5 text-xs font-bold bg-amber-400/20 text-amber-300 border border-amber-400/40">
+                  {integrationStatus?.integration_mode?.toUpperCase() || 'MOCK'} ENVIRONMENT
+                </span>
+                <span className="text-xs text-slate-300">
+                  AICTE Registry: <strong>{integrationStatus?.gateways?.aicte_registry?.status || 'OPERATIONAL_MOCK'}</strong>
+                </span>
+                <span className="text-slate-500">|</span>
+                <span className="text-xs text-slate-300">
+                  Core Bank Gateway: <strong>{integrationStatus?.gateways?.bank_gateway?.status || 'OPERATIONAL_SIMULATION'}</strong>
+                </span>
+              </div>
+              <p className="text-xs text-slate-300 mt-1">
+                Evidentiary Governance Invariant: Simulated and Sandbox responses are quarantined to testbed evaluation and CANNOT satisfy statutory Level 3 Bank Confirmation.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 text-xs text-slate-300 bg-slate-800/80 px-3 py-1.5 border border-slate-700 shrink-0">
+            <span>Correlation Engine: <strong>Active</strong></span>
           </div>
         </div>
 

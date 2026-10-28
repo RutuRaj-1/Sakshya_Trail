@@ -82,3 +82,13 @@ def client(db_session: Session) -> Generator[TestClient, None, None]:
     with TestClient(app) as test_client:
         yield test_client
     app.dependency_overrides.clear()
+
+
+@pytest.fixture(autouse=True)
+def configure_test_storage():
+    """Ensure automated tests always use LocalFileStorageProvider to avoid cloud network calls."""
+    import tempfile
+    from app.modules.documents.storage import set_storage_provider, LocalFileStorageProvider
+    with tempfile.TemporaryDirectory() as tmpdir:
+        set_storage_provider(LocalFileStorageProvider(base_directory=tmpdir))
+        yield

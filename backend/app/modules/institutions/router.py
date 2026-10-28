@@ -168,3 +168,77 @@ def update_institution_status(
         request_ip=client_ip,
         request_id=request_id,
     )
+
+
+@router.post("/{institution_id}/verify-external")
+def verify_institution_externally(
+    institution_id: str,
+    request: Request,
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db),
+):
+    """
+    Verify an institution against the external AICTE / AISHE regulatory registry provider.
+    - Uses configured provider (Mock, Sandbox, or Live).
+    - Preserves correlation ID, verified vs mismatched attributes, and audit evidence.
+    - Does not overwrite authoritative institution identity directly without statutory review.
+    """
+    verify_csrf_origin(request)
+    client_ip = request.client.host if request.client else None
+
+    # Fetch institution
+    inst = get_institution_by_id(db=db, current_user=current_user, institution_id=institution_id)
+
+    # Call integration provider
+    from app.modules.institutions.integrations.factory import get_institution_verification_provider
+    from app.modules.audit.service import log_audit_event
+
+    provider = get_institution_verification_provider()
+    correlation_id = request.headers.get("x-correlation-id") or request.headers.get("x-request-id")
+    result = provider.verify_institution(
+        institution_code=inst.code,
+        legal_name=inst.legal_name,
+        expected_state=inst.state,
+        correlation_id=correlation_id,
+    )
+
+    # Log immutable audit event
+    log_audit_event(
+        db=db,
+        action="INSTITUTION_REGISTRY_VERIFIED",
+        entity_type="institution",
+        entity_id=inst.id,
+        actor_user_id=current_user.id,
+        actor_email=current_user.email,
+        actor_role=current_user.role,
+        outcome="SUCCESS" if result.is_verified else "MISMATCH",
+        ip_address=client_ip,
+        metadata={
+            "institution_code": inst.code,
+            "provider_name": result.provider_name,
+            "environment": result.environment,
+            "correlation_id": result.correlation_id,
+            "status": result.status,
+            "official_approval_status": result.official_approval_status,
+            "verified_fields": list(result.verified_fields.keys()),
+            "mismatched_fields": list(result.mismatched_fields.keys()),
+        },
+    )
+
+    return {
+        "institution_id": inst.id,
+        "institution_code": inst.code,
+        "is_verified": result.is_verified,
+        "status": result.status,
+        "provider_name": result.provider_name,
+        "environment": result.environment,
+        "correlation_id": result.correlation_id,
+        "timestamp": result.timestamp.isoformat(),
+        "official_approval_status": result.official_approval_status,
+        "handbook_year": result.handbook_year,
+        "verified_fields": result.verified_fields,
+        "mismatched_fields": result.mismatched_fields,
+        "unsupported_fields": result.unsupported_fields,
+        "notes": result.notes,
+    }
+

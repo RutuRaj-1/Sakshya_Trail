@@ -77,6 +77,8 @@ export const institutionsApi = {
     apiClient.patch<Institution>(`/institutions/${id}`, data),
   setStatus: (id: string, is_active: boolean, reason?: string) =>
     apiClient.post<Institution>(`/institutions/${id}/status`, { is_active, reason }),
+  verifyExternal: (id: string) =>
+    apiClient.post<any>(`/institutions/${id}/verify-external`),
 };
 
 export const usersApi = {
@@ -302,6 +304,10 @@ export const verificationApi = {
   // Responses
   getResponse: (responseId: string) =>
     apiClient.get<VerificationResponseItem>(`/verification/responses/${responseId}`),
+
+  // Operational Gateway Status (Prompt 2)
+  getIntegrationStatus: () =>
+    apiClient.get<any>('/verification/integration-status'),
 };
 
 export const lifecycleApi = {

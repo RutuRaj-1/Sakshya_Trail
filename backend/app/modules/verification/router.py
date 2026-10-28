@@ -572,3 +572,104 @@ def get_response_details(
     return get_verification_response_by_id(
         db=db, response_id=response_id, current_user=current_user
     )
+
+
+# ---------------------------------------------------------------------------
+# External Integration Gateway Status & Health (Prompt 2)
+# ---------------------------------------------------------------------------
+
+@router.get(
+    "/integration-status",
+    summary="Get operational status of AICTE and Bank external integration gateways",
+)
+def get_external_integration_status(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+):
+    """
+    Returns operational diagnostics for external institutional (AICTE) and
+    banking verification gateways. Surfaces active mode, provider, environment,
+    and verification metrics without exposing credentials.
+    """
+    from app.core.config import settings
+    from app.modules.verification.models import VerificationRequest, VerificationResponse
+    from app.modules.verification.enums import VerificationRequestStatus, VerificationResult
+    from sqlalchemy import func
+
+    # Compute live metrics from database
+    total_reqs = db.scalar(select(func.count(VerificationRequest.id))) or 0
+    pending_reqs = db.scalar(
+        select(func.count(VerificationRequest.id)).where(
+            VerificationRequest.status.in_([
+                VerificationRequestStatus.PENDING.value,
+                VerificationRequestStatus.SENT.value,
+                VerificationRequestStatus.REQUESTED.value,
+            ])
+        )
+    ) or 0
+    match_count = db.scalar(
+        select(func.count(VerificationResponse.id)).where(
+            VerificationResponse.result == VerificationResult.MATCH.value
+        )
+    ) or 0
+    mismatch_count = db.scalar(
+        select(func.count(VerificationResponse.id)).where(
+            VerificationResponse.result == VerificationResult.MISMATCH.value
+        )
+    ) or 0
+    timeout_count = db.scalar(
+        select(func.count(VerificationResponse.id)).where(
+            VerificationResponse.result == VerificationResult.TIMEOUT.value
+        )
+    ) or 0
+    unavailable_count = db.scalar(
+        select(func.count(VerificationResponse.id)).where(
+            VerificationResponse.result == VerificationResult.SOURCE_UNAVAILABLE.value
+        )
+    ) or 0
+
+    latest_response = db.scalar(
+        select(VerificationResponse.created_at)
+        .order_by(VerificationResponse.created_at.desc())
+        .limit(1)
+    )
+
+    mode = getattr(settings, "INTEGRATION_MODE", "mock").lower()
+
+    return {
+        "integration_mode": mode,
+        "is_production_gated": mode != "production",
+        "gateways": {
+            "aicte_registry": {
+                "enabled": settings.AICTE_INTEGRATION_ENABLED,
+                "provider": "AICTE Central Institutional Registry",
+                "mode": mode,
+                "endpoint_configured": bool(settings.AICTE_API_BASE_URL and not "placeholder" in settings.AICTE_API_BASE_URL),
+                "status": "OPERATIONAL_MOCK" if mode == "mock" else ("SANDBOX_ACTIVE" if mode == "sandbox" else ("LIVE_CONNECTED" if settings.AICTE_INTEGRATION_ENABLED else "UNCONFIGURED_AWAITING_AUTHORIZATION")),
+                "disclaimer": "Simulated mock records" if mode == "mock" else ("Authorized testbed" if mode == "sandbox" else "Statutory live feed"),
+            },
+            "bank_gateway": {
+                "enabled": settings.BANK_VERIFICATION_ENABLED or settings.LIVE_BANK_ADAPTER_ENABLED,
+                "provider": "Core Banking Network Gateway",
+                "mode": mode,
+                "endpoint_configured": bool(settings.BANK_GATEWAY_BASE_URL and not "placeholder" in settings.BANK_GATEWAY_BASE_URL),
+                "status": "OPERATIONAL_SIMULATION" if mode == "mock" else ("SANDBOX_ACTIVE" if mode == "sandbox" else ("LIVE_CONNECTED" if settings.BANK_VERIFICATION_ENABLED else "UNCONFIGURED_AWAITING_AUTHORIZATION")),
+                "l3_trust_eligible": mode == "production" and (settings.BANK_VERIFICATION_ENABLED or settings.LIVE_BANK_ADAPTER_ENABLED),
+                "disclaimer": "Simulated prototype cannot grant production L3 trust" if mode != "production" else "Authoritative banking evidence",
+            },
+        },
+        "metrics": {
+            "total_requests": total_reqs,
+            "pending_requests": pending_reqs,
+            "match_responses": match_count,
+            "mismatch_discrepancies": mismatch_count,
+            "timeout_responses": timeout_count,
+            "source_unavailable_responses": unavailable_count,
+            "last_activity_at": latest_response.isoformat() if latest_response else None,
+        },
+        "policies": {
+            "max_retries": settings.INTEGRATION_MAX_RETRIES,
+            "timeout_seconds": settings.INTEGRATION_TIMEOUT_SECONDS,
+            "rate_limit_per_minute": settings.INTEGRATION_RATE_LIMIT_PER_MINUTE,
+        },
+    }

@@ -26,6 +26,7 @@ dependencies = [
     "python-multipart>=0.0.12",
     "reportlab>=5.0.0",
     "pypdf>=5.0.0",
+    "firebase-admin>=6.5.0",
 ]
 
 [project.optional-dependencies]
@@ -40,6 +41,9 @@ addopts = "-ra -q --import-mode=importlib"
 testpaths = ["tests"]
 asyncio_mode = "auto"
 pythonpath = ["."]
+markers = [
+    "integration: mark test as requiring real external service credentials (deselect with '-m not integration')",
+]
 
 [tool.ruff]
 line-length = 100

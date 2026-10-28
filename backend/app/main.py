@@ -42,6 +42,22 @@ async def lifespan(app: FastAPI):
             DocumentService.initialize_default_categories(db)
     except Exception as exc:
         print(f"[Startup Warning] Could not automatically create tables: {exc}")
+
+    # Startup: Validate and initialise document storage backend
+    try:
+        from app.modules.documents.storage import get_storage_provider
+        get_storage_provider()  # logs its backend choice
+        if settings.FIREBASE_STORAGE_ENABLED and settings.DOCUMENT_STORAGE_BACKEND == "firebase":
+            if not settings.FIREBASE_STORAGE_BUCKET:
+                print("[Startup ERROR] FIREBASE_STORAGE_ENABLED=true but FIREBASE_STORAGE_BUCKET is not set.")
+            if not getattr(settings, "GOOGLE_APPLICATION_CREDENTIALS", None):
+                print(
+                    "[Startup INFO] GOOGLE_APPLICATION_CREDENTIALS not set; "
+                    "using Application Default Credentials (ADC)."
+                )
+    except Exception as exc:
+        print(f"[Startup Warning] Storage backend initialisation issue: {exc}")
+
     yield
     # Shutdown logic if any
     pass

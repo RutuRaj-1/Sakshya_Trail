@@ -79,3 +79,15 @@ pnpm-debug.log*
 lerna-debug.log*
 tmp/
 temp/
+
+# Firebase / Google Cloud credentials (NEVER commit service account keys)
+*serviceAccount*.json
+*service_account*.json
+*serviceaccount*.json
+backend/serviceAccountKey.json
+serviceAccountKey.json
+google-credentials.json
+gcp-credentials.json
+
+*firebase-adminsdk*.json
+sih-*.json
