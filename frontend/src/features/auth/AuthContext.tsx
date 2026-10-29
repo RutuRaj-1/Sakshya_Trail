@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { authApi } from '@/api/endpoints';
+import { apiClient } from '@/api/client';
 import type { User } from '@/types';
 
 interface AuthContextType {
@@ -35,6 +36,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (email: string, password: string): Promise<User> => {
     const res = await authApi.login({ email, password });
+    if (res.access_token) {
+      apiClient.setToken(res.access_token);
+    }
     setUser(res.user);
     return res.user;
   };
@@ -43,6 +47,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       await authApi.logout();
     } finally {
+      apiClient.clearToken();
       setUser(null);
       sessionStorage.removeItem('dismiss_password_rotation');
     }

@@ -40,8 +40,17 @@ async def lifespan(app: FastAPI):
         from app.modules.documents.service import DocumentService
         with SessionLocal() as db:
             DocumentService.initialize_default_categories(db)
+            from app.modules.auth.models import User
+            if db.query(User).count() == 0:
+                print("[Startup INFO] Empty database detected. Auto-seeding initial users & demo dataset...")
+                try:
+                    from scripts.init_db import seed_database
+                    seed_database(db)
+                    print("[Startup INFO] Initial dataset seeded successfully.")
+                except Exception as seed_err:
+                    print(f"[Startup Warning] Auto-seeding encountered: {seed_err}")
     except Exception as exc:
-        print(f"[Startup Warning] Could not automatically create tables: {exc}")
+        print(f"[Startup Warning] Could not automatically initialize database: {exc}")
 
     # Startup: Validate and initialise document storage backend
     try:
@@ -77,10 +86,13 @@ app = FastAPI(
 )
 
 # CORS Middleware
+# Allow requests from localhost and all Vercel deployment domains (*.vercel.app)
+cors_regex = r"^https?:\/\/(.*\.vercel\.app|localhost|127\.0\.0\.1)(:[0-9]+)?$"
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,
-    allow_origin_regex=r"^http:\/\/(localhost|127\.0\.0\.1)(:[0-9]+)?$" if settings.DEBUG else None,
+    allow_origin_regex=cors_regex,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

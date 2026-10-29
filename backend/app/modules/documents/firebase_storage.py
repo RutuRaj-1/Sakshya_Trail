@@ -65,12 +65,34 @@ class FirebaseStorageProvider(StorageProvider):
 
         try:
             if not firebase_admin._apps:
-                if credentials_path:
+                # Resolution priority for cloud / container environments:
+                raw_json = os.environ.get("FIREBASE_SERVICE_ACCOUNT_JSON")
+                raw_b64 = os.environ.get("FIREBASE_SERVICE_ACCOUNT_BASE64")
+
+                if raw_json:
+                    import json
+                    cred = fb_credentials.Certificate(json.loads(raw_json))
+                    logger.info("[Firebase] Initialised with FIREBASE_SERVICE_ACCOUNT_JSON env var.")
+                elif raw_b64:
+                    import json, base64
+                    decoded = base64.b64decode(raw_b64).decode("utf-8")
+                    cred = fb_credentials.Certificate(json.loads(decoded))
+                    logger.info("[Firebase] Initialised with FIREBASE_SERVICE_ACCOUNT_BASE64 env var.")
+                elif credentials_path and os.path.exists(credentials_path):
                     cred = fb_credentials.Certificate(credentials_path)
-                    logger.info("[Firebase] Initialised with service-account credentials.")
+                    logger.info("[Firebase] Initialised with service-account credentials file: %s", credentials_path)
+                elif os.path.exists("/etc/secrets/serviceAccountKey.json"):
+                    cred = fb_credentials.Certificate("/etc/secrets/serviceAccountKey.json")
+                    logger.info("[Firebase] Initialised with Render secret file (/etc/secrets/serviceAccountKey.json).")
                 else:
-                    cred = fb_credentials.ApplicationDefault()
-                    logger.info("[Firebase] Initialised with Application Default Credentials.")
+                    try:
+                        cred = fb_credentials.ApplicationDefault()
+                        logger.info("[Firebase] Initialised with Application Default Credentials.")
+                    except Exception as adc_err:
+                        raise StorageException(
+                            "No valid Firebase credentials found. Provide FIREBASE_SERVICE_ACCOUNT_JSON env, "
+                            "a secret file at /etc/secrets/serviceAccountKey.json, or configure local storage."
+                        ) from adc_err
 
                 firebase_admin.initialize_app(cred, {"storageBucket": bucket_name})
             else:

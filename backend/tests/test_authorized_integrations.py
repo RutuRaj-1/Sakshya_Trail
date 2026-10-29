@@ -21,7 +21,8 @@ from unittest.mock import patch, MagicMock
 
 from app.core.config import settings
 from app.common.exceptions import AppException
-from app.db.session import SessionLocal
+from app.db.session import SessionLocal, engine
+from app.db.base import Base
 from app.modules.auth.models import User
 from app.modules.institutions.models import Institution
 from app.modules.instruments.models import Instrument
@@ -61,6 +62,7 @@ from app.modules.validation.models import ValidationFinding
 
 @pytest.fixture
 def db():
+    Base.metadata.create_all(bind=engine)
     session = SessionLocal()
     try:
         yield session
@@ -289,7 +291,7 @@ class TestVerificationPipeline:
         finding = db.query(ValidationFinding).filter(
             ValidationFinding.instrument_id == test_instrument.id,
             ValidationFinding.category == "CROSS_SOURCE_RECONCILIATION",
-        ).first()
+        ).order_by(ValidationFinding.created_at.desc()).first()
         assert finding is not None
         assert finding.rule_id == "RULE_BANK_RECONCILIATION_MISMATCH"
         assert finding.status in {"OPEN", "IN_REVIEW"}

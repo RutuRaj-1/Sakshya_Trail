@@ -1,11 +1,86 @@
-# Environment Variables
-.env
-.env.local
-.env.*.local
-*.env
+# ===================================================================
+# SAKSHYATRAIL / FDR SENTINEL - COMPREHENSIVE GITIGNORE
+# Hardened to prevent sensitive files, credentials, local databases,
+# scratch scripts, test dumps, and build caches from being pushed.
+# ===================================================================
 
-# Python / Virtual Environment
+# --- 1. ENVIRONMENT VARIABLES & SECRETS (CRITICAL) ---
+.env
+.env.*
+*.env
+*.local
+# Whitelist environment example templates for deployment reference:
+!.env.example
+!.env.*.example
+!frontend/.env.example
+!frontend/.env.*.example
+
+# --- 2. FIREBASE, GOOGLE CLOUD & PRIVATE CREDENTIALS ---
+# Prevents any Firebase Service Account or IAM credential leakage
+*serviceAccount*.json
+*service_account*.json
+*serviceaccount*.json
+*firebase-adminsdk*.json
+sih-*.json
+credentials*.json
+client_secret*.json
+token*.json
+serviceAccountKey.json
+backend/serviceAccountKey.json
+google-credentials*.json
+gcp-credentials*.json
+
+# Certificates & Private Keys
+*.pem
+*.key
+*.cert
+*.crt
+*.pfx
+*.p12
+*.jks
+id_rsa*
+id_ed25519*
+
+# --- 3. DATABASES & LOCAL STORAGE VOLUMES ---
+# SQLite files, write-ahead logs, and snapshots
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+fdr_sentinel.db
+fdr_sentinel_demo.db
+backend/fdr_sentinel*.db
+
+# Document storage directories & uploaded artifacts
+storage/
+backend/storage/
+data/
+uploads/
+downloads/
+
+# --- 4. SCRATCH SCRIPTS & TEST OUTPUT DUMPS ---
+# Local helper scripts and temporary workspace
+scratch/
+*/scratch/
+tmp/
+temp/
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+*~
+
+# Test execution logs & private terminal output dumps
+*test_results*.txt
+prompt*_test_results.txt
+test_results.txt
+backend/*test_results*.txt
+
+# --- 5. PYTHON / VIRTUAL ENVIRONMENTS & CACHES ---
 __pycache__/
+*/__pycache__/
 *.py[cod]
 *$py.class
 *.so
@@ -18,7 +93,6 @@ ENV/
 build/
 develop-eggs/
 dist/
-downloads/
 eggs/
 .eggs/
 lib/
@@ -32,7 +106,7 @@ wheels/
 .installed.cfg
 *.egg
 
-# Testing & Coverage
+# Testing & Coverage tooling
 .pytest_cache/
 .coverage
 htmlcov/
@@ -42,52 +116,45 @@ coverage.xml
 *.cover
 *.py,cover
 .hypothesis/
+.ruff_cache/
+.mypy_cache/
 
-# Database / Local Storage
-*.db
-*.sqlite
-*.sqlite3
-fdr_sentinel.db
-backend/fdr_sentinel.db
-backend/storage/
-storage/
-
-# Node / Frontend
+# --- 6. FRONTEND / NODE / VITE / VERCEL ---
+node_modules/
+*/node_modules/
 frontend/node_modules/
 frontend/dist/
 frontend/dist-ssr/
 frontend/.cache/
 frontend/coverage/
-*.local
+dist/
+dist-ssr/
+.turbo/
+.output/
+*.tsbuildinfo
+vite.config.ts.timestamp-*
 
-# IDEs & OS files
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-.DS_Store
-Thumbs.db
-desktop.ini
+# Cloud deployment CLI metadata
+.vercel/
+.render/
 
-# Logs & temp
+# Package manager logs
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
-tmp/
-temp/
 
-# Firebase / Google Cloud credentials (NEVER commit service account keys)
-*serviceAccount*.json
-*service_account*.json
-*serviceaccount*.json
-backend/serviceAccountKey.json
-serviceAccountKey.json
-google-credentials.json
-gcp-credentials.json
-
-*firebase-adminsdk*.json
-sih-*.json
+# --- 7. IDE & OPERATING SYSTEM ARTIFACTS ---
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.code-workspace
+.DS_Store
+Thumbs.db
+ehthumbs.db
+desktop.ini

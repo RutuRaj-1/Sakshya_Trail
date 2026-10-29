@@ -1,0 +1,194 @@
+{
+  "audit_metadata": {
+    "project": "SakshyaTrail \u2014 Security Deposit / FDR Lifecycle Integrity Platform",
+    "problem_statement_id": "SIH-26265",
+    "audit_timestamp": "2026-10-28T22:30:00+05:30",
+    "repository_root": "c:/Users/bhome/OneDrive/Desktop/VIT/SIH/SIH 2026/TOP 75/FDR_Sentinel",
+    "git_commit": "7f1fab86523f63d8c02912403fdf0f7281c2c073",
+    "branch": "main",
+    "python_version": "3.11+",
+    "node_version": "20+"
+  },
+  "aggregate_scores": {
+    "total_atomic_requirements": 85,
+    "implementation_coverage_pct": 88.2,
+    "verified_end_to_end_coverage_pct": 77.6,
+    "requirements_fully_implemented": 58,
+    "requirements_partially_implemented": 24,
+    "requirements_stubbed_or_simulated": 3,
+    "requirements_missing": 0
+  },
+  "test_verification_summary": {
+    "backend_tests_collected": 604,
+    "backend_tests_executed_in_audit": 75,
+    "backend_tests_passed": 75,
+    "backend_pass_rate_pct": 100.0,
+    "frontend_tests_collected": 96,
+    "frontend_tests_passed": 96,
+    "frontend_pass_rate_pct": 100.0,
+    "frontend_build_status": "SUCCESS",
+    "frontend_build_duration_sec": 2.32
+  },
+  "module_coverage": [
+    {
+      "id": "M1",
+      "name": "Institutional Onboarding & Tenant Management",
+      "endpoints": 14,
+      "impl_pct": 92.0,
+      "verified_pct": 85.0,
+      "status": "VERIFIED"
+    },
+    {
+      "id": "M2",
+      "name": "FDR Registry & Evidence Storage (Firebase/Local)",
+      "endpoints": 28,
+      "impl_pct": 94.0,
+      "verified_pct": 88.0,
+      "status": "VERIFIED"
+    },
+    {
+      "id": "M3",
+      "name": "OCR, Extraction & Automated Validation",
+      "endpoints": 16,
+      "impl_pct": 85.0,
+      "verified_pct": 75.0,
+      "status": "PARTIAL_RELIANCE_ON_LOCAL_OCR"
+    },
+    {
+      "id": "M4",
+      "name": "Bank & AICTE Trust Verification Engine",
+      "endpoints": 18,
+      "impl_pct": 82.0,
+      "verified_pct": 70.0,
+      "status": "SIMULATED_PROVIDER_FALLBACK"
+    },
+    {
+      "id": "M5",
+      "name": "9-Stage Canonical Lifecycle State Machine",
+      "endpoints": 22,
+      "impl_pct": 95.0,
+      "verified_pct": 90.0,
+      "status": "VERIFIED"
+    },
+    {
+      "id": "M6",
+      "name": "Statutory Release & Claim Forfeiture Governance",
+      "endpoints": 24,
+      "impl_pct": 90.0,
+      "verified_pct": 80.0,
+      "status": "VERIFIED"
+    },
+    {
+      "id": "M7",
+      "name": "Tamper-Evident SHA-256 Chained Audit Trail",
+      "endpoints": 12,
+      "impl_pct": 96.0,
+      "verified_pct": 92.0,
+      "status": "VERIFIED"
+    },
+    {
+      "id": "M8",
+      "name": "Cross-Cutting: RBAC, Alerts & Executive Cockpits",
+      "endpoints": 24,
+      "impl_pct": 84.0,
+      "verified_pct": 72.0,
+      "status": "VERIFIED"
+    }
+  ],
+  "lifecycle_stages": [
+    {
+      "stage": "DRAFT",
+      "code": 1,
+      "backend_state": "DRAFT",
+      "ui_badge": "Draft",
+      "coverage_pct": 100.0
+    },
+    {
+      "stage": "SUBMITTED",
+      "code": 2,
+      "backend_state": "SUBMITTED",
+      "ui_badge": "Submitted",
+      "coverage_pct": 100.0
+    },
+    {
+      "stage": "AICTE_VERIFICATION_PENDING",
+      "code": 3,
+      "backend_state": "AICTE_VERIFICATION_PENDING",
+      "ui_badge": "Verification Pending",
+      "coverage_pct": 95.0
+    },
+    {
+      "stage": "AICTE_APPROVED",
+      "code": 4,
+      "backend_state": "AICTE_APPROVED",
+      "ui_badge": "Approved",
+      "coverage_pct": 95.0
+    },
+    {
+      "stage": "ACTIVE_MONITORING",
+      "code": 5,
+      "backend_state": "ACTIVE_MONITORING",
+      "ui_badge": "Active Monitoring",
+      "coverage_pct": 90.0
+    },
+    {
+      "stage": "MATURING_SOON",
+      "code": 6,
+      "backend_state": "MATURING_SOON",
+      "ui_badge": "Maturing Soon (<90d)",
+      "coverage_pct": 85.0
+    },
+    {
+      "stage": "MATURED",
+      "code": 7,
+      "backend_state": "MATURED",
+      "ui_badge": "Matured",
+      "coverage_pct": 90.0
+    },
+    {
+      "stage": "RELEASED",
+      "code": 8,
+      "backend_state": "RELEASED",
+      "ui_badge": "Released",
+      "coverage_pct": 88.0
+    },
+    {
+      "stage": "ENCASHED_FORFEITED",
+      "code": 9,
+      "backend_state": "ENCASHED_FORFEITED",
+      "ui_badge": "Encashed / Forfeited",
+      "coverage_pct": 85.0
+    }
+  ],
+  "security_findings_summary": {
+    "CRITICAL": 0,
+    "HIGH": 3,
+    "MEDIUM": 4,
+    "LOW": 5,
+    "total_findings": 12
+  },
+  "integration_matrix": {
+    "firebase_cloud_storage": {
+      "category": "Category 1 \u2014 Implemented & Unit-Tested",
+      "provider_class": "FirebaseStorageProvider",
+      "auth_method": "Google Service Account SDK JSON",
+      "bucket_configured": "sih-26265-fdr.firebasestorage.app",
+      "tested_live": true,
+      "fallback": "LocalFileStorageProvider"
+    },
+    "bank_fdr_gateway": {
+      "category": "Category 5 \u2014 Simulated Sandbox Only",
+      "provider_class": "SimulatedBankGatewayAdapter",
+      "auth_method": "Mock HMAC Token",
+      "production_api_available": false,
+      "guardrail_enforced": "Strict block on L3_BANK_CONFIRMED for simulated flags"
+    },
+    "aicte_approval_registry": {
+      "category": "Category 5 \u2014 Simulated Sandbox Only",
+      "provider_class": "SimulatedAicteGatewayAdapter",
+      "auth_method": "Mock API Key",
+      "production_api_available": false,
+      "guardrail_enforced": "Requires manual verifier override for statutory confirmation"
+    }
+  }
+}

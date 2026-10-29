@@ -36,15 +36,21 @@ def verify_csrf_origin(request: Request) -> None:
     """
     Validates Origin/Referer against allowed origins for state-changing operations
     to protect against CSRF attacks when using cookie authentication.
+    Requests using Authorization: Bearer headers are inherently immune to CSRF.
     """
+    # Authorization header is not automatically attached by browsers in CSRF attacks
+    auth_header = request.headers.get("Authorization")
+    if auth_header and auth_header.startswith("Bearer "):
+        return
+
     if request.method in ("POST", "PUT", "PATCH", "DELETE"):
         origin = request.headers.get("origin")
         referer = request.headers.get("referer")
         is_dev = settings.ENVIRONMENT == "development" or settings.DEBUG
 
-        # Allow requests if origin matches CORS whitelist or is local dev host
+        # Allow requests if origin matches CORS whitelist, local dev host, or *.vercel.app
         if origin:
-            if origin in settings.CORS_ORIGINS:
+            if origin in settings.CORS_ORIGINS or origin.endswith(".vercel.app") or ".vercel.app:" in origin:
                 return
             if is_dev and (origin.startswith("http://localhost:") or origin.startswith("http://127.0.0.1:")):
                 return
@@ -54,7 +60,7 @@ def verify_csrf_origin(request: Request) -> None:
         elif referer:
             if is_dev and (referer.startswith("http://localhost:") or referer.startswith("http://127.0.0.1:")):
                 return
-            if any(referer.startswith(o) for o in settings.CORS_ORIGINS):
+            if any(referer.startswith(o) for o in settings.CORS_ORIGINS) or ".vercel.app" in referer:
                 return
             raise ForbiddenException("Referer header origin mismatch")
 

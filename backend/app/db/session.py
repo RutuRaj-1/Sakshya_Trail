@@ -10,6 +10,11 @@ from sqlalchemy.orm import sessionmaker, Session
 from app.core.config import settings
 
 active_db_url = settings.active_database_url
+
+# Render & cloud providers use postgres:// which SQLAlchemy 2.x requires as postgresql://
+if active_db_url.startswith("postgres://"):
+    active_db_url = active_db_url.replace("postgres://", "postgresql://", 1)
+
 is_sqlite = active_db_url.startswith("sqlite")
 
 engine_kwargs: Dict[str, Any] = {

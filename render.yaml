@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: sakshyatrail-backend
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /healthz
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: ENVIRONMENT
+        value: production
+      - key: DEBUG
+        value: false
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DOCUMENT_STORAGE_BACKEND
+        value: firebase
+      - key: FIREBASE_STORAGE_ENABLED
+        value: true
+      - key: FIREBASE_STORAGE_BUCKET
+        value: sih-26265-fdr.firebasestorage.app
+      - key: SAKSHYATRAIL_DEMO_MODE
+        value: true
+      - key: CORS_ORIGINS
+        value: "https://*.vercel.app,http://localhost:5173"
+
