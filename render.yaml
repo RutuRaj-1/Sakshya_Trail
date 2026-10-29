@@ -1,4 +1,7 @@
 services:
+  # =================================================================
+  # 1. SAKSHYATRAIL BACKEND (FastAPI / Python Web Service)
+  # =================================================================
   - type: web
     name: sakshyatrail-backend
     runtime: python
@@ -25,5 +28,23 @@ services:
       - key: SAKSHYATRAIL_DEMO_MODE
         value: true
       - key: CORS_ORIGINS
-        value: "https://*.vercel.app,http://localhost:5173"
+        value: "https://*.onrender.com,https://*.vercel.app,http://localhost:5173"
 
+  # =================================================================
+  # 2. SAKSHYATRAIL FRONTEND (React / Vite Web Service)
+  # =================================================================
+  - type: web
+    name: sakshyatrail-frontend
+    runtime: node
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    startCommand: npx serve -s dist -l $PORT
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: 20.18.0
+      - key: VITE_API_BASE_URL
+        fromService:
+          type: web
+          name: sakshyatrail-backend
+          property: host

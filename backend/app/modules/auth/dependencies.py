@@ -48,9 +48,9 @@ def verify_csrf_origin(request: Request) -> None:
         referer = request.headers.get("referer")
         is_dev = settings.ENVIRONMENT == "development" or settings.DEBUG
 
-        # Allow requests if origin matches CORS whitelist, local dev host, or *.vercel.app
+        # Allow requests if origin matches CORS whitelist, local dev host, or *.vercel.app|.*.onrender.com
         if origin:
-            if origin in settings.CORS_ORIGINS or origin.endswith(".vercel.app") or ".vercel.app:" in origin:
+            if origin in settings.CORS_ORIGINS or origin.endswith(".vercel.app|.*.onrender.com") or ".vercel.app|.*.onrender.com:" in origin:
                 return
             if is_dev and (origin.startswith("http://localhost:") or origin.startswith("http://127.0.0.1:")):
                 return
@@ -60,7 +60,7 @@ def verify_csrf_origin(request: Request) -> None:
         elif referer:
             if is_dev and (referer.startswith("http://localhost:") or referer.startswith("http://127.0.0.1:")):
                 return
-            if any(referer.startswith(o) for o in settings.CORS_ORIGINS) or ".vercel.app" in referer:
+            if any(referer.startswith(o) for o in settings.CORS_ORIGINS) or ".vercel.app|.*.onrender.com" in referer:
                 return
             raise ForbiddenException("Referer header origin mismatch")
 
