@@ -36,7 +36,8 @@ class Settings(BaseSettings):
         "http://localhost:5175",
         "http://127.0.0.1:5175",
         "http://localhost:3000",
-        "http://127.0.0.1:3000"
+        "http://127.0.0.1:3000",
+        "https://sakshya-trail-frontend.vercel.app"
     ]
 
     @field_validator("CORS_ORIGINS", mode="before")

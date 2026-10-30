@@ -86,8 +86,8 @@ app = FastAPI(
 )
 
 # CORS Middleware
-# Allow requests from localhost and all Vercel deployment domains (*.vercel.app|.*.onrender.com)
-cors_regex = r"^https?:\/\/(.*\.vercel\.app|localhost|127\.0\.0\.1)(:[0-9]+)?$"
+# Allow requests from localhost, all Vercel deployment domains (*.vercel.app), and Render (*.onrender.com)
+cors_regex = r"^https?:\/\/([a-zA-Z0-9\-_.]+\.vercel\.app|[a-zA-Z0-9\-_.]+\.onrender\.com|localhost|127\.0\.0\.1)(:[0-9]+)?$"
 
 app.add_middleware(
     CORSMiddleware,

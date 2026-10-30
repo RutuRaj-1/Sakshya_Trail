@@ -32,6 +32,42 @@ def extract_token_from_request(request: Request) -> Optional[str]:
     return None
 
 
+def is_valid_cross_origin(url_str: Optional[str]) -> bool:
+    """
+    Determines if the Origin or Referer header belongs to an approved domain.
+    Supports localhost, all Vercel (*.vercel.app), Render (*.onrender.com),
+    and any domains defined in settings.CORS_ORIGINS.
+    """
+    if not url_str:
+        return True
+
+    import re
+    # 1. Check explicit CORS_ORIGINS list (exact or prefix match)
+    for allowed in settings.CORS_ORIGINS:
+        allowed_clean = allowed.strip().rstrip("/")
+        if url_str == allowed_clean or url_str.startswith(allowed_clean + "/"):
+            return True
+        if "*" in allowed_clean:
+            wildcard_pattern = "^" + re.escape(allowed_clean).replace(r"\*", r"[a-zA-Z0-9\-_.]+") + r"(:[0-9]+)?(\/.*)?$"
+            if re.match(wildcard_pattern, url_str, re.IGNORECASE):
+                return True
+
+    # 2. Localhost development origins
+    if (
+        url_str.startswith("http://localhost:")
+        or url_str.startswith("http://127.0.0.1:")
+        or url_str in ("http://localhost", "http://127.0.0.1")
+    ):
+        return True
+
+    # 3. Dynamic cloud domains: all Vercel (*.vercel.app) and Render (*.onrender.com) deployments
+    cloud_pattern = r"^https?:\/\/([a-zA-Z0-9\-_.]+\.vercel\.app|[a-zA-Z0-9\-_.]+\.onrender\.com)(:[0-9]+)?(\/.*)?$"
+    if re.match(cloud_pattern, url_str, re.IGNORECASE):
+        return True
+
+    return False
+
+
 def verify_csrf_origin(request: Request) -> None:
     """
     Validates Origin/Referer against allowed origins for state-changing operations
@@ -46,21 +82,13 @@ def verify_csrf_origin(request: Request) -> None:
     if request.method in ("POST", "PUT", "PATCH", "DELETE"):
         origin = request.headers.get("origin")
         referer = request.headers.get("referer")
-        is_dev = settings.ENVIRONMENT == "development" or settings.DEBUG
 
-        # Allow requests if origin matches CORS whitelist, local dev host, or *.vercel.app|.*.onrender.com
         if origin:
-            if origin in settings.CORS_ORIGINS or origin.endswith(".vercel.app|.*.onrender.com") or ".vercel.app|.*.onrender.com:" in origin:
-                return
-            if is_dev and (origin.startswith("http://localhost:") or origin.startswith("http://127.0.0.1:")):
-                return
-            if any(origin.startswith(o) for o in settings.CORS_ORIGINS):
+            if is_valid_cross_origin(origin):
                 return
             raise ForbiddenException("Cross-Origin request blocked by security policy")
         elif referer:
-            if is_dev and (referer.startswith("http://localhost:") or referer.startswith("http://127.0.0.1:")):
-                return
-            if any(referer.startswith(o) for o in settings.CORS_ORIGINS) or ".vercel.app|.*.onrender.com" in referer:
+            if is_valid_cross_origin(referer):
                 return
             raise ForbiddenException("Referer header origin mismatch")
 
