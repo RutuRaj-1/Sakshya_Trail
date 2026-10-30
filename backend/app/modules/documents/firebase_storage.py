@@ -18,6 +18,7 @@ Security design:
 Do NOT call this module from the frontend or expose its methods via a public
 API without first performing authorization in the FastAPI route layer.
 """
+import os
 import datetime
 import hashlib
 import io
@@ -81,6 +82,16 @@ class FirebaseStorageProvider(StorageProvider):
                 elif credentials_path and os.path.exists(credentials_path):
                     cred = fb_credentials.Certificate(credentials_path)
                     logger.info("[Firebase] Initialised with service-account credentials file: %s", credentials_path)
+                elif credentials_path and os.path.exists(os.path.join("backend", credentials_path)):
+                    resolved = os.path.join("backend", credentials_path)
+                    cred = fb_credentials.Certificate(resolved)
+                    logger.info("[Firebase] Initialised with resolved credentials file: %s", resolved)
+                elif os.path.exists("backend/serviceAccountKey.json"):
+                    cred = fb_credentials.Certificate("backend/serviceAccountKey.json")
+                    logger.info("[Firebase] Initialised with backend/serviceAccountKey.json")
+                elif os.path.exists("serviceAccountKey.json"):
+                    cred = fb_credentials.Certificate("serviceAccountKey.json")
+                    logger.info("[Firebase] Initialised with serviceAccountKey.json")
                 elif os.path.exists("/etc/secrets/serviceAccountKey.json"):
                     cred = fb_credentials.Certificate("/etc/secrets/serviceAccountKey.json")
                     logger.info("[Firebase] Initialised with Render secret file (/etc/secrets/serviceAccountKey.json).")

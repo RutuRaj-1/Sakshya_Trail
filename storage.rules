@@ -1,0 +1,51 @@
+rules_version = '2';
+
+/**
+ * SakshyaTrail — Firebase Cloud Storage Security Rules
+ * SIH Problem Statement ID: 26265
+ * Bucket: sih-26265-fdr.firebasestorage.app
+ * 
+ * Security Invariants:
+ * - All document bytes must be uploaded through the FastAPI Backend API proxy
+ *   (/api/v1/documents/upload) to guarantee MIME verification, SHA-256 byte hashing,
+ *   antivirus scanning, and append-only audit logging.
+ * - Direct client write access is completely blocked to prevent unvetted file injection.
+ * - Privileged access is handled server-side using the Firebase Admin SDK.
+ */
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isRegulatoryOfficer() {
+      return isAuthenticated() && (
+        request.auth.token.role == 'ADMIN' ||
+        request.auth.token.role == 'SYSTEM_ADMIN' ||
+        request.auth.token.role == 'AICTE_ADMIN' ||
+        request.auth.token.role == 'AICTE_OFFICER' ||
+        request.auth.token.role == 'SCRUTINY_OFFICER' ||
+        request.auth.token.role == 'COMPETENT_AUTHORITY' ||
+        request.auth.token.role == 'AUDITOR'
+      );
+    }
+
+    // SakshyaTrail document storage isolation prefix
+    match /sakshyatrail/{allPaths=**} {
+      // Direct client upload is denied: uploads must flow via the backend API proxy.
+      allow write: if false;
+
+      // Allow authenticated regulatory officers to download certified documents directly if token provided
+      allow read: if isRegulatoryOfficer();
+    }
+
+    // Deny all other unmapped paths
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
+

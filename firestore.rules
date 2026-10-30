@@ -1,0 +1,159 @@
+rules_version = '2';
+
+/**
+ * SakshyaTrail — Cloud Firestore Security Rules
+ * SIH Problem Statement ID: 26265
+ * Project: sih-26265-fdr
+ * 
+ * Enforces Zero-Trust Architecture:
+ * - Direct client mutations to financial balances, lifecycle stages, and audit records are blocked.
+ * - Audit logs are strictly immutable (append-only via backend Admin SDK).
+ * - Multi-tenant isolation is enforced via institution token claims.
+ */
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // -------------------------------------------------------------------------
+    // Reusable Security Functions
+    // -------------------------------------------------------------------------
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function getUserRole() {
+      return request.auth.token.role;
+    }
+
+    function getUserInstitutionId() {
+      return request.auth.token.institution_id;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && (
+        getUserRole() == 'ADMIN' ||
+        getUserRole() == 'SYSTEM_ADMIN'
+      );
+    }
+
+    function isRegulatoryOfficer() {
+      return isAuthenticated() && (
+        isAdmin() ||
+        getUserRole() == 'AICTE_ADMIN' ||
+        getUserRole() == 'AICTE_OFFICER' ||
+        getUserRole() == 'SCRUTINY_OFFICER' ||
+        getUserRole() == 'COMPETENT_AUTHORITY' ||
+        getUserRole() == 'BRANCH_HEAD'
+      );
+    }
+
+    function isComplianceAuditor() {
+      return isAuthenticated() && (
+        getUserRole() == 'AUDITOR' ||
+        isAdmin()
+      );
+    }
+
+    function isTenantUser(institutionId) {
+      return isAuthenticated() && (
+        getUserInstitutionId() == institutionId ||
+        isRegulatoryOfficer() ||
+        isComplianceAuditor()
+      );
+    }
+
+    // -------------------------------------------------------------------------
+    // 1. Institutions Registry (/institutions)
+    // -------------------------------------------------------------------------
+    match /institutions/{institutionId} {
+      // Any authenticated officer or the affiliated college representative can read
+      allow read: if isTenantUser(institutionId);
+      
+      // Only System Administrators can provision or modify institutional tenants
+      allow write: if isAdmin();
+    }
+
+    // -------------------------------------------------------------------------
+    // 2. FDR Instruments (/instruments)
+    // -------------------------------------------------------------------------
+    match /instruments/{instrumentId} {
+      // Tenant college user can read their own FDRs; regulatory officers can read all
+      allow read: if isAuthenticated() && (
+        isRegulatoryOfficer() ||
+        isComplianceAuditor() ||
+        resource.data.institution_id == getUserInstitutionId()
+      );
+
+      // Writes must occur through the FastAPI backend to ensure SHA-256 audit chaining.
+      // Direct client updates are blocked to prevent tampering with deposit values/stages.
+      allow write: if false;
+    }
+
+    // -------------------------------------------------------------------------
+    // 3. Document Metadata & Evidence Catalog (/documents)
+    // -------------------------------------------------------------------------
+    match /documents/{documentId} {
+      allow read: if isAuthenticated() && (
+        isRegulatoryOfficer() ||
+        isComplianceAuditor() ||
+        resource.data.institution_id == getUserInstitutionId()
+      );
+
+      // Uploads and versioning must be handled via FastAPI server to compute SHA-256 byte hashes
+      allow write: if false;
+    }
+
+    // -------------------------------------------------------------------------
+    // 4. Cryptographic Hash-Chained Audit Trail (/audit_events)
+    // -------------------------------------------------------------------------
+    match /audit_events/{eventId} {
+      // Compliance Auditors, Regulatory Executives, and Admins can inspect logs
+      allow read: if isComplianceAuditor() || isRegulatoryOfficer();
+
+      // Zero-Trust: Audit logs can NEVER be updated or deleted by any client.
+      // Written exclusively via backend Service Account SDK.
+      allow write: if false;
+    }
+
+    // -------------------------------------------------------------------------
+    // 5. In-App Notifications (/notifications)
+    // -------------------------------------------------------------------------
+    match /notifications/{notificationId} {
+      // Users can only view their own notifications
+      allow read: if isAuthenticated() && (
+        resource.data.recipient_id == request.auth.uid ||
+        resource.data.user_id == request.auth.uid
+      );
+
+      // Users can only update the 'is_read' flag on their notifications
+      allow update: if isAuthenticated() && (
+        resource.data.recipient_id == request.auth.uid &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['is_read', 'read_at'])
+      );
+
+      allow create, delete: if false;
+    }
+
+    // -------------------------------------------------------------------------
+    // 6. User Profiles (/users)
+    // -------------------------------------------------------------------------
+    match /users/{userId} {
+      allow read: if isAuthenticated() && (
+        request.auth.uid == userId ||
+        isRegulatoryOfficer()
+      );
+
+      // Only administrators can mutate user account permissions
+      allow write: if isAdmin();
+    }
+
+    // -------------------------------------------------------------------------
+    // Default Fallback: Zero-Trust Deny All
+    // -------------------------------------------------------------------------
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+

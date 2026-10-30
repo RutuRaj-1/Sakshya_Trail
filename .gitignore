@@ -1,7 +1,9 @@
 # ===================================================================
-# SAKSHYATRAIL / FDR SENTINEL - COMPREHENSIVE GITIGNORE
-# Hardened to prevent sensitive files, credentials, local databases,
-# scratch scripts, test dumps, and build caches from being pushed.
+# SAKSHYATRAIL / FDR SENTINEL - PRODUCTION MASTER GITIGNORE
+# Hardened for Final GitHub Release:
+# - Blocks all private keys, secrets, credentials, databases, test dumps
+# - Protects local scratch scripts and IDE clutter
+# - Whitelists deployment configuration and Firebase rule definitions
 # ===================================================================
 
 # --- 1. ENVIRONMENT VARIABLES & SECRETS (CRITICAL) ---
@@ -9,14 +11,19 @@
 .env.*
 *.env
 *.local
-# Whitelist environment example templates for deployment reference:
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Whitelist safe environment example templates for deployment reference:
 !.env.example
 !.env.*.example
 !frontend/.env.example
 !frontend/.env.*.example
+!backend/.env.example
 
-# --- 2. FIREBASE, GOOGLE CLOUD & PRIVATE CREDENTIALS ---
-# Prevents any Firebase Service Account or IAM credential leakage
+# --- 2. FIREBASE & GOOGLE CLOUD SERVICE ACCOUNT KEYS (NEVER COMMIT) ---
 *serviceAccount*.json
 *service_account*.json
 *serviceaccount*.json
@@ -30,6 +37,12 @@ backend/serviceAccountKey.json
 google-credentials*.json
 gcp-credentials*.json
 
+# Whitelist Firebase deployment manifests & security rules:
+!firebase.json
+!firestore.rules
+!firestore.indexes.json
+!storage.rules
+
 # Certificates & Private Keys
 *.pem
 *.key
@@ -42,7 +55,7 @@ id_rsa*
 id_ed25519*
 
 # --- 3. DATABASES & LOCAL STORAGE VOLUMES ---
-# SQLite files, write-ahead logs, and snapshots
+# SQLite databases, write-ahead logs, and demo databases
 *.db
 *.db-shm
 *.db-wal
@@ -51,13 +64,11 @@ id_ed25519*
 fdr_sentinel.db
 fdr_sentinel_demo.db
 backend/fdr_sentinel*.db
-
-# Document storage directories & uploaded artifacts
-storage/
-backend/storage/
 data/
 uploads/
 downloads/
+storage/
+backend/storage/
 
 # --- 4. SCRATCH SCRIPTS & TEST OUTPUT DUMPS ---
 # Local helper scripts and temporary workspace
@@ -134,11 +145,16 @@ dist-ssr/
 *.tsbuildinfo
 vite.config.ts.timestamp-*
 
-# Cloud deployment CLI metadata
+# Cloud deployment CLI metadata & caches
 .vercel/
 .render/
+.firebase/
 
-# Package manager logs
+# Firebase & package manager debug logs
+firebase-debug.log*
+firestore-debug.log*
+ui-debug.log*
+hub-debug.log*
 *.log
 npm-debug.log*
 yarn-debug.log*
